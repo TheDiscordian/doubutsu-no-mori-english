@@ -2581,8 +2581,9 @@ donor lists, canonical metadata, unchanged native Gulliver handover outside its
 two selection patches, actor descriptor/relocation, and complete winter trade
 owner, hooks, code, relocation, and allocation. Neither route enables unrelated
 event providers. Sparse selections use the same actual profile flags as ordinary
-imports. Prepared summer-camping rewards remain unavailable: their enterable
-tent and scene are new features, not supplied by the existing winter igloo.
+imports. Retained summer-camping rewards remain unavailable while their complete
+acquisition is unfinished; already-built tent/scene resources stay in V3, and
+their version label alone does not exclude a working route.
 Admission changes selection data only; installed artwork, native runtime, and
 saved layouts are retained. Keep older native evidence attached to its tested
 build and warn that narrower saved profiles can reject added reward identities.

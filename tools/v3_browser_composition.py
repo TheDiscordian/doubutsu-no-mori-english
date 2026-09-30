@@ -217,7 +217,8 @@ def rules(image, report, *, scope='development'):
             if row['id'] in UNAVAILABLE_BEHAVIOURS:
                 row['pipeline_unavailable'] = True
         for group in result.get('runtime_groups', []):
-            group['forced_disabled'] = True
+            from v3_holiday_selection import pipeline_allowed
+            group['forced_disabled'] = not pipeline_allowed(group,report)
         full = composition.resolve(catalog, requested_options(catalog, report),
             behaviour_options=behaviours or None, scope=scope, report=report)
         selected, _, _ = composition.compose(image, report, catalog, full)

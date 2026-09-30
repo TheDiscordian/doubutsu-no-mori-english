@@ -54,8 +54,14 @@ def groups(image, report):
     return result
 
 
-def active(group, enabled, behaviours, *, scope='development'):
-    if scope == 'v3-pipeline':
+def pipeline_allowed(group, report):
+    """Retain the built gift/diary provider without admitting unfinished systems."""
+    from v3_holiday_acquisition import providers_installed
+    return group['id']=='diary-holidays' and providers_installed(report)
+
+
+def active(group, enabled, behaviours, *, scope='development', report=None):
+    if scope == 'v3-pipeline' and not pipeline_allowed(group, report or {}):
         return False
     return bool(set(group['any_imports']) & set(enabled)) or any(
         behaviours.get(r['id']) == r['value'] for r in group['any_behaviours'])
@@ -126,7 +132,7 @@ def update_report(image, blob, report, selection):
         return
     enabled = set(selection['enabled'])
     states = {g['id']: active(g, enabled, selection.get('behaviours', {}),
-                             scope=selection.get('scope', 'development')) for g in contract['groups']}
+                             scope=selection.get('scope', 'development'),report=report) for g in contract['groups']}
     contract['resolved_groups'] = states
     on = states['diary-holidays']
     n['record']['selected'] = n['lifecycle']['active'] = on

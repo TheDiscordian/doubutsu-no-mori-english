@@ -204,7 +204,8 @@ export function validatePlan(plan) {
     require(typeof group.id === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(group.id) && !groupIds.has(group.id),
       'Invalid or repeated runtime group.');
     groupIds.add(group.id);
-    require(pipeline ? group.forced_disabled === true : group.forced_disabled === undefined,
+    require(pipeline ? typeof group.forced_disabled === 'boolean' &&
+      (group.forced_disabled || group.id === 'diary-holidays') : group.forced_disabled === undefined,
       'Invalid feature activation scope.');
     array(group.any_imports, 0, 2048); array(group.any_behaviours, 0, 32); array(group.fields, 1, 64);
     require(group.any_imports.length + group.any_behaviours.length > 0 &&

@@ -245,6 +245,8 @@ def catalogue(image, report):
         raise ValueError('Incomplete or duplicated installed development catalogue')
     from v3_furniture_rewards import verify_existing_system_items
     verify_existing_system_items(image, report)
+    from v3_holiday_acquisition import verify_installed_items
+    verify_installed_items(image, report)
     return dict(sorted(result.items()))
 
 
@@ -499,7 +501,7 @@ def compose(image, report, catalog, selection):
     enabled = set(selection['enabled'])
     from v3_holiday_selection import groups as event_groups, active as event_active, checksum_fields as event_checksums
     for group in event_groups(image, report):
-        on = event_active(group, enabled, values, scope=scope)
+        on = event_active(group, enabled, values, scope=scope, report=report)
         for field in group['fields']:
             change(field['offset'], struct.pack('>I', field['enabled'] if on else field['disabled']), group['id'])
     from v3_carried_selection import masks as carried_masks, checksum_fields as carried_checksums

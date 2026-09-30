@@ -14,6 +14,74 @@ SOURCES=('tools/v3_holiday_acquisition.py','tools/v3_holiday_rewards.py',
     'tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py','tools/v3_catalogue.py')
 
 
+def providers_installed(report):
+    """Readiness of the retained complete gift/diary provider, not a V4 label."""
+    n=report.get('equipment_resources',{}).get('npc_extra',{})
+    events=n.get('events',{})
+    return bool(n.get('installed') and n.get('world',{}).get('installed') and
+        n.get('actor_callbacks_bound') and n.get('lifecycle',{}).get('callbacks_installed') and
+        n.get('dialogue',{}).get('installed') and n.get('optional_dialogue',{}).get('installed') and
+        events.get('selection',{}).get('installed') and
+        events.get('calendar',{}).get('actor_admission_bound') and
+        events.get('dispatch',{}).get('complete_dependency_preflight') and
+        events.get('festivals',{}).get('native_services_bound') and
+        events.get('participants',{}).get('unbound_services')==[])
+
+
+def installed_items(report):
+    """Admit the connected Mayor gifts; the separate exercise prize is reviewed separately."""
+    if not providers_installed(report):return set()
+    group=next((g for g in report['equipment_resources']['npc_extra']['events']['selection']['groups']
+                if g['id']=='diary-holidays'),None)
+    if not group:return set()
+    return {r['item_id'] for r in report['furniture']['imports']
+        if r.get('holiday_acquisition',{}).get('route')=='holiday' and
+        r['holiday_acquisition'].get('native_delivery_installed') and
+        r['holiday_acquisition'].get('destination_item')==r['item_id'] and
+        r['holiday_acquisition'].get('events') and not r['holiday_acquisition'].get('dependencies') and
+        r['id'] in group['any_imports'] and r.get('runtime_installed') and
+        not set(r.get('remaining',[]))-{'representative native execution','ordinary gameplay and save/restart'}}
+
+
+def verify_installed_items(image,report):
+    """Authenticate all admitted gift identities, providers, English text, and ordering."""
+    items=installed_items(report)
+    if not items:return items
+    from v3_furniture_pipeline import Source
+    from v3_furniture_install import catalogue_record,order_mask
+    from v3_import_storage import ITEMS
+    from v3_registry import furniture_source
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    binding=checked(source,image,report)
+    if binding is None:raise ValueError('Missing installed holiday acquisition')
+    from v3_holiday_selection import groups
+    from v3_npc_registry import TABLE
+    n=report['equipment_resources']['npc_extra'];events=n['events']
+    group=next(g for g in groups(image,report) if g['id']=='diary-holidays')
+    expected={(n['packet']['ram']+TABLE+16+44*i+4,3,1) for i in range(5)}
+    expected.add((events['festivals']['code']['symbols']['af_hp_available'],1,0))
+    expected.add((events['dispatch']['bindings']['af_holiday_decoration_ready'],31,7))
+    if (len(group['fields'])!=7 or
+        {(f['ram'],f['enabled'],f['disabled']) for f in group['fields']}!=expected):
+        raise ValueError('Incomplete installed holiday provider activation fields')
+    from v3_asset_loader import BLOB
+    blob=by_vrom(image)[BLOB].extract(image)
+    for row in report['furniture']['imports']:
+        if row['item_id'] not in items:continue
+        donor,_=furniture_source(row);destination=binding['destinations'].get(donor)
+        record=catalogue_record(row);slot=row['runtime_index']-1024
+        metadata=blob[ITEMS+slot*32:ITEMS+(slot+1)*32]
+        if (not destination or destination['item']!=int(row['item_id'],16) or
+            destination['index']!=row['runtime_index'] or not catalogue_source(source,donor,slot,record) or
+            row['donor_list_sha256']!=sha256(source.raw(row['donor_list'])) or
+            row['ordinary_stock'] or row['stock_group']!=255 or row['reward_route']!=0 or
+            struct.unpack_from('>2H',metadata)!=(row['runtime_index'],destination['item']) or
+            metadata[7]!=1 or metadata[24]!=order_mask(record) or metadata[27]!=0):
+            raise ValueError('Changed installed holiday gift identity, source membership, or metadata')
+    return items
+
+
 def contract(source):
     from v3_holiday_rewards import discover
     if not hasattr(source,'holiday_reward_contract'):

@@ -18,14 +18,16 @@ Regular items should be obtainable through the regular item pool.
 Rewards that fit existing systems are in scope for V3. Assess acquisition by the
 actual systems it requires, not by whether an item is special or awarded as a
 reward. Mail, holiday, gift, and golden-tool rewards are not automatically V4.
-Items requiring an entirely new acquisition feature or building should not be
-importable through browser or offline selections until that feature exists in V4.
+Items requiring an unavailable new acquisition feature or building should not be
+importable through browser or offline selections until their acquisition works.
 V3 may prepare their conversion/resources, but should not put them in substitute
 regular stock. Prepared integration and selectable imports are separate states.
 
-New buildings and entirely new features, including savings accounts, Able Sisters/
-custom designs, the Museum building, and island facilities, belong to V4.
-Preserve existing experiments and evaluate reward consumers individually; no V3
+Building new systems, including savings accounts, Able Sisters/custom designs,
+the Museum building, and island facilities, is V4 work. Already-built features
+can stay in V3; do not remove, disable, or isolate them solely because they are
+V4-type features. This does not require completing unfinished feature ports or
+make unverified acquisition complete. Preserve existing experiments and evaluate reward consumers individually; no V3
 task requires completing a new V4 system or choosing its replacement route.
 Design-dependent sign boards and saved-pattern representations remain deferred.
 Ordinary fish, insects, fossils, and other items retain their actual item
@@ -371,8 +373,11 @@ pair. Neither alternative requires a new feature or building. See the
 Gulliver souvenirs and winter-igloo rewards extend existing native handovers and
 are admitted when their complete installed shared providers and item behaviours
 are ready. Their independent selections enable no unrelated event features.
-Summer-camping rewards require the new enterable tent and scene and remain
-unavailable. See [shared optional rewards](V3_FURNITURE_PIPELINE.md#shared-optional-npc-rewards).
+Summer-camping rewards retain the built enterable tent and scene but remain
+unavailable while their complete acquisition is unfinished. Fifty installed
+Mayor gifts are independently admitted through the retained gift/diary provider,
+with the existing calendar choice, no diary dependency, and source catalogue
+ordering where appropriate. See [shared optional rewards](V3_FURNITURE_PIPELINE.md#shared-optional-npc-rewards).
 
 The [shared room-alias discovery](V3_FURNITURE_PIPELINE.md#room-display-aliases)
 connects 48 donor display models to their actual parent items, including four

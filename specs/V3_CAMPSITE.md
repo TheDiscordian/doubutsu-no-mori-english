@@ -1,11 +1,14 @@
-# Preserved summer campsite (V4)
+# Preserved summer campsite
 
 ## Purpose and boundary
 
 The ten summer-camping furniture rewards belong to the donor's conversations in
-an enterable tent, requiring a new building and scene. Those features are V4
-work; V3 keeps the rewards unavailable and preserves the experimental resources
-without resuming the feature port. Do not substitute ordinary shop stock or an
+an enterable tent, requiring a new building and scene. Already-built parts can
+stay in V3; do not remove or disable them merely because building new systems is
+V4 work. The current rewards remain unavailable while their complete acquisition
+path is unfinished; the version label alone is not grounds for excluding a working
+route. Retain the experimental resources without requiring completion of the
+unfinished feature port. Do not substitute ordinary shop stock or an
 unrelated gift source. The decorative tent model `336C` and
 collectible lantern `339C` do not supply the enterable building or scene light.
 

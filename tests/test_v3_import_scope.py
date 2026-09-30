@@ -15,7 +15,7 @@ from aflib import sha256
 import v3_optional_composition as composer
 import v3_browser_composition as browser
 from v3_creature_choices import options as behaviour_options
-from v3_holiday_selection import groups
+from v3_holiday_selection import groups,active
 from v3_import_scope import PIPELINE, UNAVAILABLE_BEHAVIOURS, availability, requested_options
 
 LOCK = ROOT/os.environ.get('V3_IMPORT_SCOPE_LOCK', 'build/v3-seasonal-stock-installed-03/build-lock.json')
@@ -49,11 +49,14 @@ class ImportScopeTests(unittest.TestCase):
             pool.update(r['item_id'] for r in seasonal['source']['imports'])
         from v3_furniture_rewards import existing_system_items
         pool.update(existing_system_items(self.report))
+        from v3_holiday_acquisition import installed_items
+        pool.update(installed_items(self.report))
         self.assertEqual({r['item_id'] for k,r in self.catalog.items()
                           if r['kind'] == 'furniture' and k in offered},
                          pool & {r['item_id'] for r in self.catalog.values() if r['kind'] == 'furniture'})
         self.assertEqual([r['id'] for r in self.plan['options'] if not r.get('dependency_only')], offered)
-        self.assertTrue(all(g['forced_disabled'] for g in self.plan['runtime_groups']))
+        self.assertEqual({g['id']:g['forced_disabled'] for g in self.plan['runtime_groups']},
+                         {'diary-holidays':False,'carried-quest':True})
         self.assertEqual({r['id'] for r in self.plan['behaviours'] if r.get('pipeline_unavailable')}, UNAVAILABLE_BEHAVIOURS)
         self.assertTrue(all('v4_only' not in r for r in self.plan['behaviours']))
         self.assertTrue(all(not r['selectable'] and r['reason'] for r in self.plan['pending_options']))
@@ -66,7 +69,8 @@ class ImportScopeTests(unittest.TestCase):
         self.assertTrue(all(self.states[key]['selectable'] for key in lottery))
         selection=self.select(lottery)
         self.assertEqual(set(selection['requested']),set(lottery))
-        self.assertTrue(all(group['forced_disabled'] for group in self.plan['runtime_groups']))
+        self.assertFalse(any(active(g,selection['enabled'],selection['behaviours'],scope=PIPELINE,
+                                   report=self.report) for g in groups(self.image,self.report)))
         self.assertTrue(all('deferred to V4' not in self.states[key]['reason'] for key in lottery))
 
     def test_installed_golden_routes_are_independent_and_require_their_providers(self):
@@ -106,7 +110,8 @@ class ImportScopeTests(unittest.TestCase):
         redd = [composer.furniture_key(r) for r in self.report['shops']['imports'] if r['group']==3]
         self.assertEqual(len(redd),12)
         self.assertTrue(all(self.states[k]['selectable'] for k in redd))
-        self.assertTrue(all(g['forced_disabled'] for g in self.plan['runtime_groups']))
+        self.assertFalse(any(active(g,redd,{},scope=PIPELINE,report=self.report)
+                             for g in groups(self.image,self.report)))
 
     def test_existing_gulliver_and_igloo_rewards_require_their_actual_providers(self):
         from v3_furniture_rewards import existing_system_items
@@ -117,7 +122,7 @@ class ImportScopeTests(unittest.TestCase):
         self.assertEqual({route:len(keys) for route,keys in categories.items()}, {12:20,19:8,23:10})
         self.assertTrue(all(self.states[key]['selectable'] for route in (12,19) for key in categories[route]))
         self.assertTrue(all(not self.states[key]['selectable'] for key in categories[23]))
-        self.assertTrue(all('new summer-camping building and scene' in self.states[key]['reason']
+        self.assertTrue(all('summer-camping acquisition path is unfinished' in self.states[key]['reason']
                             for key in categories[23]))
         for route in (12,19):
             for key in (categories[route][0], categories[route][-1]):
@@ -191,6 +196,60 @@ class ImportScopeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'descriptor'):
             composer.furniture_stock_tables(self.image,bad,self.catalog)
 
+    def test_built_mayor_gifts_are_independent_and_activate_only_their_provider(self):
+        from v3_holiday_acquisition import installed_items
+        gifts=[r for r in self.report['furniture']['imports'] if r['item_id'] in installed_items(self.report)]
+        self.assertEqual(len(gifts),50)
+        self.assertEqual(sum(r['catalogue_orderable'] for r in gifts),12)
+        self.assertTrue(all(self.states[r['id']]['selectable'] for r in gifts))
+        self.assertFalse(self.states['GAFE01-r0/item/1FCC']['selectable'])
+        for key in ('GAFE01-r0/item/1FC0','GAFE01-r0/item/30A8','GAFE01-r0/item/3378'):
+            for mode in ('N64','GameCube'):
+                selection=self.select([key],{'holiday-calendar':mode})
+                self.assertEqual(selection['enabled'],[key]);self.assertEqual(selection['required'],[])
+                result,_,_=composer.compose(self.image,self.report,self.catalog,selection)
+                for group in groups(self.image,self.report):
+                    on=group['id']=='diary-holidays'
+                    for field in group['fields']:
+                        self.assertEqual(struct.unpack_from('>I',result,field['offset'])[0],
+                                         field['enabled'] if on else field['disabled'])
+        for family,field in (('world','installed'),('optional_dialogue','installed'),
+                             ('lifecycle','callbacks_installed')):
+            bad=copy.deepcopy(self.report);bad['equipment_resources']['npc_extra'][family][field]=False
+            self.assertEqual(installed_items(bad),set())
+        bad=copy.deepcopy(self.report)
+        bad['equipment_resources']['npc_extra']['events']['participants']['unbound_services']=['missing actor']
+        self.assertEqual(installed_items(bad),set())
+        bad=copy.deepcopy(self.report)
+        row=next(r for r in bad['furniture']['imports'] if r['id']==gifts[0]['id'])
+        row['remaining']=['native interaction']
+        self.assertFalse(availability(self.catalog,bad)[row['id']]['selectable'])
+
+    def test_mayor_admission_authenticates_providers_source_text_and_metadata(self):
+        from v3_holiday_acquisition import verify_installed_items
+        from v3_import_storage import ITEMS
+        from aflib import by_vrom
+        from v3_asset_loader import BLOB
+        self.assertEqual(len(verify_installed_items(self.image,self.report)),50)
+        n=self.report['equipment_resources']['npc_extra']
+        for part in (n['packet'],n['events']['sky']['packet'],n['events']['festivals']['packet']):
+            broken=bytearray(self.image);broken[part['physical']+123]^=1
+            with self.assertRaisesRegex(ValueError,'complete holiday acquisition packet'):
+                verify_installed_items(broken,self.report)
+        key='GAFE01-r0/item/1FC0';row=self.catalog[key]
+        broken=bytearray(self.image)
+        broken[by_vrom(self.image)[BLOB].pstart+ITEMS+(row['runtime_index']-1024)*32+24]=8
+        with self.assertRaisesRegex(ValueError,'gift identity'):
+            verify_installed_items(broken,self.report)
+        bad=copy.deepcopy(self.report)
+        next(r for r in bad['furniture']['imports'] if r['id']==key)['donor_list_sha256']='0'*64
+        with self.assertRaisesRegex(ValueError,'gift identity'):
+            verify_installed_items(self.image,bad)
+        bad=copy.deepcopy(self.report)
+        bad['equipment_resources']['npc_extra']['events']['selection']['groups'][0]['fields'].pop()
+        with self.assertRaisesRegex(ValueError,'provider activation fields'):
+            verify_installed_items(self.image,bad)
+
     def test_unavailable_acquisition_and_behaviour_settings_reject_before_composition(self):
         rejected = [k for k,s in self.states.items() if not s['selectable']]
         self.assertIn('GAFE01-r0/item/3294', rejected)  # Savings mailbox, not regular stock.
@@ -213,7 +272,7 @@ class ImportScopeTests(unittest.TestCase):
         self.assertTrue(resources.isdisjoint(selected['requested']))
         self.assertTrue(all(self.catalog[k]['kind'] == 'clothing' for k in resources))
 
-    def test_scope_disables_new_feature_groups_even_for_diaries_and_preserves_source(self):
+    def test_scope_retains_built_providers_and_preserves_unfinished_resources(self):
         requested = requested_options(self.catalog, self.report)
         result, writes, blob = composer.compose(self.image, self.report, self.catalog, self.select(requested))
         self.assertIsNotNone(blob)
@@ -227,8 +286,10 @@ class ImportScopeTests(unittest.TestCase):
                 # read these actual four-byte furniture flags.
                 self.assertEqual(struct.unpack_from('>I',result,base+row['enable_offset'])[0],0)
         for group in groups(self.image, self.report):
+            on=active(group,requested,self.select(requested)['behaviours'],scope=PIPELINE,report=self.report)
             for field in group['fields']:
-                self.assertEqual(struct.unpack_from('>I', result, field['offset'])[0], field['disabled'])
+                self.assertEqual(struct.unpack_from('>I', result, field['offset'])[0],
+                                 field['enabled'] if on else field['disabled'])
         restored = composer.apply_writes(result, [{**r,'before':r['after'],'after':r['before']} for r in writes])
         self.assertEqual(restored, self.image)
         self.assertEqual(sha256(result), self.plan['all_selected_sha256'])
@@ -257,6 +318,9 @@ class ImportScopeTests(unittest.TestCase):
         for route in (12,19):
             keys = [by_item[r['item_id']] for r in rewards if r['route']==route]
             profiles.extend([(f'reward-route-{route}',keys),(f'sparse-reward-{route}',keys[-1:])])
+        for key in ('GAFE01-r0/item/1FC0','GAFE01-r0/item/30A8','GAFE01-r0/item/3378'):
+            profiles.append(('mayor-'+key.rsplit('/',1)[-1],[key]))
+        profiles.append(('mayor-calendar-gc',['GAFE01-r0/item/1FC0'],{'holiday-calendar':'GameCube'}))
         cases = []
         seasonal = self.report['equipment_resources'].get('seasonal_stock')
         if seasonal:
@@ -276,7 +340,7 @@ class ImportScopeTests(unittest.TestCase):
                 stable=str(composer.stable_reference(self.report)[0]))))
             process = subprocess.run(['node', '--experimental-global-webcrypto',
                 str(ROOT/'tests/v3_browser_equivalence.mjs'), str(path)],
-                capture_output=True, text=True, timeout=90)
+                capture_output=True, text=True, timeout=180)
         self.assertEqual(process.returncode, 0, process.stderr)
         self.assertEqual(len(json.loads(process.stdout)['passed']), len(cases))
 

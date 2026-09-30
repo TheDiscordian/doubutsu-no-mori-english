@@ -7,7 +7,7 @@ policy limits user-facing selections without treating all rewards as V4.
 DEVELOPMENT = 'development'
 PIPELINE = 'v3-pipeline'
 SCOPES = (PIPELINE, DEVELOPMENT)
-UNAVAILABLE_BEHAVIOURS = frozenset(('holiday-calendar', 'tournament-measurements',
+UNAVAILABLE_BEHAVIOURS = frozenset(('tournament-measurements',
                                   'birthday-presentation'))
 
 
@@ -29,6 +29,8 @@ def availability(catalog, report):
         shops.update(r['item_id'] for r in seasonal['source']['imports'])
     from v3_furniture_rewards import existing_system_items
     shops.update(existing_system_items(report))
+    from v3_holiday_acquisition import installed_items
+    shops.update(installed_items(report))
     summer_rewards = {r['item_id'] for r in report.get('furniture_rewards', {}).get('imports', [])
                       if r['route'] == 23}
     shirts = {item for group in report['clothing']['stock']['groups']
@@ -78,7 +80,7 @@ def availability(catalog, report):
         result[key] = dict(selectable=ready, dependency_only=dependency_only,
             reason=('Included only as an authentic villager starting-outfit resource; not a standalone item choice.'
                     if dependency_only else '' if ready else
-                    'Requires the new summer-camping building and scene, deferred to V4.'
+                    'The retained summer-camping acquisition path is unfinished; its new building and scene alone do not establish working rewards.'
                     if kind == 'furniture' and row['item_id'] in summer_rewards else
                     'Acquisition is not admitted by the current V3 selection policy; existing-system reward routes require individual review.'))
     for key, row in catalog.items():

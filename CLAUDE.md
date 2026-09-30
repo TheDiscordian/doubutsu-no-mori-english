@@ -16,14 +16,17 @@ browser/offline selections. Regular items are importable and obtainable through
 the regular item pool. Read `specs/V3_OPTIONAL_IMPORTS.md` and the active V3 queue.
 Rewards that fit existing systems are in scope for V3 item acquisition. A reward
 or special-item label does not itself make an item V4 work. Defer acquisition
-only when it requires an entirely new feature or building, rather than extending
-an existing system. Items depending on those deferred features should not be
+only when it requires an unavailable entirely new feature or building, rather than
+extending an existing or already-built system. Items depending on those deferred features should not be
 importable before they are obtainable. Their conversion/resources can be prepared
 in V3; prepared or installed resources do not make them importable. Do not invent
 substitute regular stock or unrelated gifts for special items.
-New buildings and entirely new features, including Able Sisters/custom designs,
-the Museum building, island facilities, and savings accounts, belong to V4.
-Preserve existing experimental code/resources; assess each acquisition path by
+Building new systems, including Able Sisters/custom designs, the Museum building,
+island facilities, and savings accounts, is V4 work. Already-built features can
+stay in V3; do not remove, disable, or isolate them merely to enforce the version
+boundary. This does not require completing unfinished feature ports or establish
+that their item acquisition works. Preserve existing experimental code/resources;
+assess each acquisition path by
 its actual dependencies instead of excluding all mail, holiday, or golden-tool
 rewards. Do not demand policies for new V4 systems as V3 prerequisites.
 Design-dependent sign boards remain deferred. Ordinary item behaviours, including
@@ -155,8 +158,8 @@ the experimental V3 publication hold does not apply to V2 fixes.
   postponing item-specific work until all shared categories are finished.
   Regular items enter the regular item pool. Rewards that fit existing systems
   remain V3 acquisition work; do not blanket-defer gifts, mail, holiday rewards,
-  or golden-tool rewards by name. Acquisition requiring an entirely new feature
-  or building belongs to V4. Prepare supported artwork and shared records without
+  or golden-tool rewards by name. Building an unavailable new acquisition feature
+  or building belongs to V4; already-built features can stay in V3. Prepare supported artwork and shared records without
   implementing those deferred features. Items with incomplete behaviour or
   unavailable acquisition should not be selectable. Report prepared pipeline
   coverage separately from importability; preparation does not enable an item. Extend a
@@ -170,7 +173,8 @@ the experimental V3 publication hold does not apply to V2 fixes.
 - V3 completes the import pipeline for items and villagers. Once that pipeline
   is complete, verify and hand it over.
   Do not continue into new buildings or entirely new V4 features. Existing-system
-  rewards are not automatically excluded from V3. Preserve installed item
+  rewards are not automatically excluded from V3. Retain already-built features
+  rather than removing them to enforce that boundary. Preserve installed item
   behaviours and existing evidence without expanding unrelated feature checks.
 - Use existing focused checks once per meaningful change. Reuse passing native
   evidence for unchanged code/resources; do not add exhaustive per-record or

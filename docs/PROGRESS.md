@@ -28,18 +28,20 @@ V3 is only the import pipeline for items and villagers. Regular items should be
 importable and obtainable through the regular item pool. Rewards that fit existing
 systems are in scope for V3. Special items are not automatically deferred: assess
 their actual acquisition dependencies. Items requiring new buildings or entirely
-new features should not be importable until those features exist in V4; prepared
-resources do not make them importable. Savings accounts, new facilities, and
-comparable entirely new features are outside V3. Preserve experiments and evaluate
+new features should not be importable until their acquisition works; prepared
+resources do not make them importable. Building new systems remains V4 work, but
+already-built features can stay in V3. Do not remove, disable, or isolate those
+features solely to enforce the version boundary, or treat their unfinished ports
+as new V3 requirements. Preserve experiments and evaluate
 existing-system reward routes individually. See the
 [active pipeline queue](WORK_QUEUE.md#execution-order).
 
 ### Current import selections and verification
 
 Browser and offline builds default to the V3 pipeline scope. Both offer all
-twenty villagers and 181 independent item choices. Two exclusive
+twenty villagers and 231 independent item choices. Two exclusive
 starting-outfit resources follow their villagers as dependencies, not standalone
-item choices. Select all requests 201 choices and includes those two resources.
+item choices. Select all requests 251 choices and includes those two resources.
 Actual checked stock tables determine regular furniture, clothing, and surfaces;
 the remaining item categories use their installed native acquisition paths.
 Seven furniture choices use the existing native lottery, with checked donor
@@ -66,8 +68,17 @@ shared helper, donor lists, canonical metadata, native Gulliver handover/descrip
 and winter trade code, relocation, hooks, and allocation. Missing providers or
 unfinished item behaviour keep the affected imports unavailable. Selecting these
 rewards enables no unrelated event provider and adds no runtime or artwork.
-The ten summer-camping rewards remain unavailable because they require the new
-enterable tent and scene; the existing winter igloo does not supply that feature.
+Fifty Mayor holiday gifts use the retained complete selector, English dialogue,
+native inventory handover, and saved reward records. Independent choices activate
+the already-built gift/diary provider without requiring diary imports or enabling
+the separate Wisp provider or savings account. Twelve gifts retain source catalogue
+ordering after collection; none enters ordinary shop stock. The installed N64/
+GameCube calendar choice remains available. No actor code, artwork, allocation,
+or saved field is added by this admission. Complete provider packets, activation
+fields, donor selectors/membership, destination identities, retained English text,
+and canonical metadata authenticate before composition.
+The ten summer-camping rewards remain unavailable while their complete acquisition
+path is unfinished, not merely because the retained tent and scene are V4-type work.
 The current filter leaves items outside its admitted acquisition categories
 unavailable; this is implemented selection behaviour, not proof that every
 excluded reward requires V4. Review those exclusions against existing-system
@@ -80,18 +91,19 @@ not enable the optional holiday, Wisp, birthday, or savings-account providers.
 Unavailable behaviour controls are hidden without a blanket V4 classification.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-09/build.json`, pinned to the ABI-390
-cartridge. Eleven current-cartridge scope/browser-equivalence checks pass across
-targeted runs, covering complete Redd stock routing, selected-only furniture
+`build/v3-import-pipeline-browser-10/build.json`, pinned to the ABI-390
+cartridge. Thirteen current-cartridge scope/browser-equivalence checks pass,
+covering complete Redd stock routing, selected-only furniture
 lists, four independent
 golden tools, reward-provider/resource rejection, and the existing Gulliver/igloo
-routes. Nineteen actual browser/offline profiles match. The current headless
+routes, and independent Mayor gifts/provider activation. Twenty-three actual
+browser/offline profiles match. The current headless
 Chromium worker check at
-`build/v3-import-pipeline-worker-07/results.json` reads actual game files and
-matches the offline Gulliver/igloo two-item selection. Retained unchanged worker
+`build/v3-import-pipeline-worker-08/results.json` reads actual game files and
+matches the offline fixed, station-model, and flower-model gift selection. Retained unchanged worker
 checks cover cancellation and invalid-input rejection.
 The current interface check passes at
-`build/v3-import-pipeline-interface-09/results.json`, including independent
+`build/v3-import-pipeline-interface-10/results.json`, including independent
 selection/dependencies, keyboard controls, unavailable-review data, and download
 lifecycle checks, the actual GameCube stock setting, its downloaded hash and
 receipt, and invalidation when settings change. Five focused seasonal checks
@@ -106,8 +118,12 @@ camper trade C with native APIs doubled. The retained native reward/trade result
 at `build/v3-furniture-camping-native-01/results.json` keep their original build
 identity. Shared reward code, complete trade owner, and relocation hashes remain
 identical; this is retained unchanged evidence, not fresh current-profile gameplay.
-Ordinary Gulliver and igloo conversations/purchases remain unverified.
-Thirteen focused JavaScript checks pass with Node's
+Ordinary Gulliver, igloo, and Mayor conversations remain unverified. The actual
+shared world/reward C passes its connected sanitizer check on current installed
+data, including 128 handovers, four-player receipts, visitors, full/stale inventory,
+and resource gates, with native inventory I/O doubled. No exhausted holiday native
+fixture is replayed or relabelled as passing gameplay.
+Fourteen focused JavaScript checks pass with Node's
 `--experimental-global-webcrypto` flag.
 <!-- Verification work record: the initial Node invocation lacks the required
 Web Crypto flag and fails before crypto-dependent assertions; the corrected
@@ -116,11 +132,11 @@ Empty selection returns exact V2-14. No game files are uploaded; the temporary
 check servers are stopped. The export is unserved.
 
 The all-available offline profile is
-`build/v3-import-pipeline-profile-10/profile.json`; UPS reconstruction passes.
+`build/v3-import-pipeline-profile-11/profile.json`; UPS reconstruction passes.
 ROM SHA-256:
-`2ab4decb5a20c2a7013353e32543265cc4251d9ebc6141bcd3ab3f8d9a34bbd2`.
+`87fd2dd3fbd6b8dd9bbb2a0501b618c7c0b6bd4b959cd03913513a919d3e5777`.
 UPS SHA-256:
-`1075ffe054e4ba59277c99a366d8e928fd872b0798a55fb6cb88ef20789b02d8`.
+`cc7fdf171a81ed2d5b568a143d71bcb89b2074c89fa40f2b7180321900438b82`.
 It uses ABI 390 and retains format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and
 format-20-or-earlier V3 readers cannot read these saves; preserve separate saves
 and backups. Supported older saves migrate forward. Browser composition does
@@ -141,16 +157,16 @@ CRC, decompression, all three saved-record CRCs, canonical selected profiles,
 zero unused padding, and the preserved imported fan. Five focused scene/save
 tests pass, including that actual written-chip check. This verifies this town's
 ordinary save/restart, not every item behaviour, synchronous writing,
-diary-preflight execution, or hardware. The current 201-choice profile extends
+diary-preflight execution, or hardware. The current 251-choice profile extends
 that selection with four golden tools, twelve native Redd items, and the seasonal
-candle/flag, plus the Gulliver and winter-igloo rewards. Its stock adapter occupies
+candle/flag, the Gulliver and winter-igloo rewards, and fifty Mayor gifts. Its stock adapter occupies
 an existing preloaded gap, preserving complete artwork and save format;
 selected-only stock data stays connected.
 It has not repeated ordinary save/reload. Compatibility with ABI 389 is expected
 in both directions when import profiles and other behaviour settings match;
 cross-version save/restart is not verified.
 The added reward identities require a build selecting those same imports; a
-profile-10 save may be rejected by profile-09's narrower selection despite the
+profile-11 save may be rejected by profile-10's narrower selection despite the
 unchanged ABI and saved layout. Preserve separate builds, saves, and backups.
 The native format-20 golden reward/state and shovel-rule evidence remains at
 `build/v3-golden-rewards-native-01/results.json` and

@@ -1,5 +1,70 @@
 # Automatic furniture pipeline checkpoint
 
+## Retained Mayor gift provider and independent V3 selection
+
+V3 admits fifty installed Mayor holiday gifts from the complete donor selector
+family. The shared acquisition verifier authenticates actual source functions,
+reward table, additive destination mappings, whole provider packets, all seven
+activation fields, retained official English messages/choices, and canonical
+profile metadata. Complete item behaviour and provider readiness remain required.
+The separate exercise-card prize is not admitted by this gift category.
+
+The built gift/diary provider activates for its selected imports and existing
+calendar choice in both browser and offline composition. No diary is a dependency
+of a gift. Unrelated regular imports, golden tools, Gulliver, and winter-igloo
+selections do not activate it. The separately gated Wisp provider stays off.
+No actor code, artwork, allocation, acquisition shortcut, or saved field is added.
+Twelve gift items retain actual source catalogue ordering after collection; none
+is inserted into ordinary shop stock. Already-built features can stay in V3;
+version labels alone do not require removal or exclusion of working acquisition.
+Retained summer resources stay present, with unfinished acquisition still explicit.
+
+Thirteen focused current-cartridge import-scope tests pass, including twenty-three
+actual browser/offline profiles, independent fixed/random-station/random-flower
+gift selections, both calendar modes, provider removal, missing activation fields,
+full-packet mutations, donor membership, metadata/orderability, and unchanged
+stock/save/selection consumers. Fourteen JavaScript tests pass, including explicit
+activation-scope rejection for the separately gated provider.
+The connected world/reward C sanitizer check uses the current installed tables,
+profile/metadata records, and saved-reward compilation flags. All 65 selector
+candidates, 128 handovers, four-player receipts, visitors, full/stale inventory,
+and resource gates pass with inventory I/O doubled. This is not ordinary native
+conversation evidence. No exhausted holiday fixture or harness budget is replayed.
+
+Current all-available profile:
+`build/v3-import-pipeline-profile-11/profile.json`, twenty villagers and 231
+independent items, plus two required starting outfits. ABI 390, format 21/wire 7,
+eight-MiB RAM, FlashRAM, runtime code, and artwork are unchanged. ROM SHA-256:
+`87fd2dd3fbd6b8dd9bbb2a0501b618c7c0b6bd4b959cd03913513a919d3e5777`.
+UPS SHA-256:
+`cc7fdf171a81ed2d5b568a143d71bcb89b2074c89fa40f2b7180321900438b82`.
+UPS reconstruction passes. Profile-11 saves may be rejected by narrower profile-10 builds;
+V2 and format-20-or-earlier readers cannot load format 21. Keep separate builds,
+matching profiles, and backed-up test saves. Current-profile ordinary save/reload,
+Mayor conversations, broad gameplay, and original hardware remain unverified.
+
+The private unserved export is `build/v3-import-pipeline-browser-10/build.json`.
+The actual Chromium worker reads real game inputs and matches offline composition
+for bottled ship, a station model, and a flower model at
+`build/v3-import-pipeline-worker-08/results.json`, result SHA-256:
+`566ee148c3a6e2e311dd818df9146c366397b14178d7f36e3c5474c44aacecef`.
+Selected ROM SHA-256:
+`0758cb85d7dc869c99b4575783fb646227f3a320f7c66135ebdc5e06ecda9598`.
+The real interface check at `build/v3-import-pipeline-interface-10/results.json`
+passes independent selection/dependencies, category controls, actual downloads,
+invalid-input/cancellation checks, seasonal behaviour invalidation, and exact
+V2-14 empty output. Result SHA-256:
+`5c3b44373916e4d0732f7d2abaf49da8da16a40a9894ceef3b2af5270c3d11cd`.
+Both servers stop, with local body-free GETs, no uploads, and no browser errors.
+The deployed patcher and local preview remain unchanged.
+
+The next acquisition consumers are the actual exercise-card/radio, Harvest,
+Wisp, and other retained reward routes. The current Harvest checker rejects the
+older manager receipt after subsequent growth; validate the actual retained
+manager/cleanup bindings rather than weakening checks or assuming a game defect.
+Continue the distinct save consumers, retained creature-failure classification,
+and private handoff. Do not build new features to expand the V3 goal.
+
 ## Existing Gulliver and winter-igloo reward admission
 
 The checked ABI-390 cartridge at
@@ -13,8 +78,9 @@ descriptor and relocation, unchanged handover outside its two selection patches,
 and winter trade code, hooks, full owner/relocation, and allocation.
 Missing providers or incomplete item behaviour remove the affected choices.
 
-Summer route 23 remains unavailable. Its enterable tent and scene are new
-features, unlike the existing winter igloo. All ten actual furniture enable
+Summer route 23 remains unavailable while its complete acquisition is unfinished.
+The retained enterable tent and scene do not alone establish working rewards.
+All ten actual furniture enable
 words are zero in the all-available composition; the preserved summer calendar
 and event-manager predicates read those words. Selecting Gulliver/igloo rewards
 does not activate that building or any unrelated event provider. The selector

@@ -13,13 +13,16 @@ fish/insect/fossil imports remain V3 work; the Museum building is not required.
 V3 completes the shared import pipeline for items and villagers, not GameCube feature ports.
 Regular items should be importable and obtainable through the regular item pool.
 Rewards that fit existing systems are in scope for V3. A special item or reward
-is not automatically V4 work. Items whose acquisition requires an entirely new
-feature or building should not be importable until that feature exists in V4.
+is not automatically V4 work. Items depending on an unavailable acquisition
+feature or building should not be importable until their acquisition works.
 Preparing their converted resources is allowed; inventing substitute ordinary
 stock or unrelated gifts is not. New buildings and entirely new features, such
 as savings accounts, Able Sisters/custom designs, and island facilities, are not
 V3 tasks or prerequisites. Assess mail, holiday, gift, and golden-tool acquisition
 by their actual dependencies rather than excluding entire reward categories.
+Already-built features can stay in V3. Do not remove, disable, or isolate them
+solely to enforce the version boundary; retaining them does not require completing
+unfinished feature ports or make their acquisition verified.
 This boundary governs every continuation and subsystem note in this queue.
 
 ### Execution order
@@ -33,7 +36,8 @@ This boundary governs every continuation and subsystem note in this queue.
    them until all shared categories are finished.
 2. Complete browser/offline import selection and regular item-pool integration.
    Include working rewards that fit existing systems. Keep items requiring
-   deferred new features unavailable; do not port their V4 systems.
+   unavailable acquisition out of the selector; do not build new V4 systems or remove
+   already-built features merely because they are V4-type work.
 3. Run focused import-pipeline/runtime/save checks and deliver the private pipeline
    playtest build. Broad human testing follows the build, not the reverse.
 
@@ -55,8 +59,8 @@ Current implementation task: finish existing-system acquisition selection,
 remaining focused save consumers, and the private import-pipeline handoff.
 The checked current build is
 `build/v3-seasonal-stock-installed-03/build-lock.json`, ABI 390. The all-available
-profile is `build/v3-import-pipeline-profile-10/profile.json`: twenty villagers
-and 181 independent item choices, plus two required starting-outfit resources.
+profile is `build/v3-import-pipeline-profile-11/profile.json`: twenty villagers
+and 231 independent item choices, plus two required starting-outfit resources.
 Seven included furniture rewards use the existing native lottery; no new event
 provider is enabled for those rewards. Ordinary regular-pool integration remains
 installed. Keep unsupported acquisition unavailable without calling every
@@ -77,27 +81,39 @@ the complete installed selection-aware helper and existing native handovers.
 Complete source lists, metadata, helper/guards, native owner/descriptor, winter
 trade code/relocation, hooks, and allocations authenticate before composition.
 Missing providers or unfinished item behaviour keep the affected items unavailable.
-The ten summer rewards require the new tent/scene and remain unavailable; no new
-summer building or unrelated event provider is enabled by these selections.
+The ten summer rewards retain their built tent/scene resources but remain
+unavailable while their complete acquisition is unfinished. The V4-type label
+alone does not exclude an already-built working feature.
 Reward and trade code hashes match retained passing native evidence; no unchanged
 fixture is replayed. Ordinary conversations and current-profile saving are unclaimed.
 All four installed golden tools follow the shared readiness checks; missing
 acquisition dependencies or reward providers keep the affected choice unavailable.
 Their tree, Shrine, and collection-completion presentation routes do not require
 holiday, Wisp, birthday, or savings-account activation.
+Fifty Mayor gifts use the complete installed shared holiday provider, independently
+of diary selection. Source selectors, destination mappings, full provider packets,
+all seven activation fields, official English records, and metadata/orderability
+authenticate before composition. Twelve gifts remain orderable after collection;
+none enters shop stock. The existing calendar choice works in both modes. This
+admission adds no runtime code, artwork, allocation, or save field. Unrelated
+selections leave this provider off; Wisp and the savings account remain independent.
 
 Current real-file browser worker and interface checks pass:
-`build/v3-import-pipeline-browser-09/build.json`,
-`build/v3-import-pipeline-worker-07/results.json`, and
-`build/v3-import-pipeline-interface-09/results.json`. Browser hashes match offline
+`build/v3-import-pipeline-browser-10/build.json`,
+`build/v3-import-pipeline-worker-08/results.json`, and
+`build/v3-import-pipeline-interface-10/results.json`. Browser hashes match offline
 builds; empty selection returns V2-14. The private export is unserved.
-Eleven focused current-cartridge scope/browser-equivalence checks pass across
-targeted runs, including nineteen actual profile hashes, both seasonal modes
+Thirteen focused current-cartridge scope/browser-equivalence checks pass,
+including twenty-three actual profile hashes, both seasonal modes
 with each item selected alone,
 complete native Redd routing, stock selection, four standalone golden tools,
-and complete/sparse Gulliver and igloo rewards. Two shared C sanitizer checks pass.
+complete/sparse Gulliver and igloo rewards, and independent Mayor gifts.
+Two shared reward/trade C sanitizer checks retain passing results; the actual
+connected world/reward C also passes on current installed data with inventory
+I/O doubled. Ordinary Mayor conversations remain unverified; no exhausted holiday
+native fixture is replayed.
 The current interface check also verifies actual GameCube-mode downloads and
-setting-change invalidation. Thirteen focused JavaScript checks
+setting-change invalidation. Fourteen focused JavaScript checks
 pass. Unavailable behaviour controls no longer
 carry the misleading blanket V4 label.
 
@@ -112,7 +128,7 @@ and clothing survive. Full-chip validation checks both bank checksums, CRCs,
 complete decompression, all saved records, selected profiles, and zero padding.
 Five focused scene/save tests pass. Hardware and broad gameplay are unclaimed.
 The current selection adds four golden tools, twelve Redd items, the festive
-pair, twenty Gulliver souvenirs, and eight winter-igloo rewards. The seasonal
+pair, twenty Gulliver souvenirs, eight winter-igloo rewards, and fifty Mayor gifts. The seasonal
 adapter fits an existing preloaded gap without changing
 artwork, scene allocations, or saved format. Ordinary save/reload of that larger profile is not
 claimed. Retained native golden-rule/state checks pass on their recorded
@@ -131,8 +147,14 @@ Remaining connected work:
 
 1. Review remaining existing-system reward exclusions individually. Golden-tool,
    Redd, fixed-ID seasonal stock, Gulliver, and winter-igloo admission are connected.
-   Review the actual holiday/Mayor gift dependencies next, distinguishing existing
-   native handovers from entirely new events or buildings. Reuse installed
+   The fifty installed Mayor gifts and their existing calendar choice are admitted.
+   Review the remaining exercise-card/radio, Harvest, Wisp, password, postal,
+   and retained summer-camping acquisition routes against their actual
+   acquisition dependencies, retaining already-built features. The current
+   Harvest resource check rejects its historical manager receipt after later
+   manager growth; establish the actual retained bindings before admission, rather
+   than treating this rejection as proof of a game defect or a V4 requirement.
+   Reuse installed
    resources and passing category evidence. Do not blanket-admit
    optional event providers or require completing entirely new V4 features.
    Pool names alone do not prove a new-feature requirement or a complete route.
@@ -155,8 +177,9 @@ new V4 features do not make every reward a V4 item.
 ### Preserved acquisition experiments
 
 The linked preparation and installed experimental code below remain preserved.
-New buildings and entirely new features belong to V4; existing-system reward
-paths are evaluated for V3 individually. These subsystem notes do not authorise
+Building new systems belongs to V4; already-built features can stay in V3.
+Existing-system and already-built reward paths are evaluated for V3 individually.
+These subsystem notes do not authorise
 resuming all experimental features or blanket-excluding all rewards.
 
 The category's checked preparation is

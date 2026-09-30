@@ -12,7 +12,7 @@ const clone = structuredClone;
 
 test('deferred equipment and carried reviews match the checked plan exactly', async () => {
   const pending = ['equipment', 'carried'].map((kind, i) => ({ id: id('item', `253${i}`),
-    name: `Deferred ${kind}`, kind, selectable: false, reason: 'Special acquisition is deferred to V4.' }));
+    name: `Deferred ${kind}`, kind, selectable: false, reason: 'Acquisition is not installed.' }));
   const plan = { base_sha256: '0'.repeat(64), scope: 'v3-pipeline', options: [], pending_options: pending };
   const originalFetch = globalThis.fetch;
   async function review(rows) {
@@ -79,6 +79,31 @@ test('dependencies, reasons, duplicates, removal, and order independence', async
   assert.deepEqual(resolveSelection(plan, [A]).required, []);
   assert.throws(() => resolveSelection(plan, ['unknown']), /Unknown/);
   assert.throws(() => resolveSelection(plan, 'all'), /list/);
+});
+
+test('V3 retains the built gift provider while other runtime groups stay guarded', async () => {
+  const { plan, source } = await fixture();
+  const view = new DataView(source.buffer);
+  view.setUint32(0x103200, 1);
+  source.set(n64Checksum(source), 0x10);
+  plan.header.before = hex(source.subarray(0x10, 0x18));
+  plan.base_sha256 = await sha256(source);
+  plan.all_selected_sha256 = plan.base_sha256;
+  plan.scope = 'v3-pipeline';
+  plan.runtime_groups = [{ id: 'diary-holidays', forced_disabled: false,
+    any_imports: [A], any_behaviours: [],
+    fields: [{ offset: 0x103200, before: '00000001', enabled: 1, disabled: 0 }] }];
+  for (const [requested, expected] of [[[A], 1], [[B], 0]]) {
+    const { output } = await composeSelection(source, plan, requested);
+    assert.equal(new DataView(output.buffer).getUint32(0x103200), expected);
+  }
+  const invalid = clone(plan);
+  invalid.runtime_groups[0].id = 'carried-quest';
+  assert.throws(() => validatePlan(invalid), /feature activation scope/);
+  invalid.runtime_groups[0].forced_disabled = true;
+  validatePlan(invalid);
+  delete invalid.runtime_groups[0].forced_disabled;
+  assert.throws(() => validatePlan(invalid), /feature activation scope/);
 });
 
 test('selected rows pack, disabled fields clear, checksums update, and inputs stay untouched', async () => {
