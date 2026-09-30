@@ -43,6 +43,45 @@ of the complete furniture and floor/wall family. Reuse installed artwork and
 behaviours; do not substitute shop stock or create per-item installers. Map the
 remaining connected consumers once before implementation.
 
+Harvest's complete actor/state/dialogue preparation is
+`build/v3-harvest-connected-prepared-09/`; its finally linked resources are
+`build/v3-harvest-connected-linked-05/connected.json`. These are source durability
+checkpoints, not installed acquisition. The full 39-function source owner,
+twelve mapped rewards, 36 official messages, and complete 125-frame motion share
+the 28-owner registry while retaining all 27 existing source callbacks and four
+resident imported motions. Franklin uses additive name `D0D1`, profile `F5`, and
+banks 460/461. His complete model is 12,480 bytes, textures are 4,128 bytes, actor
+is 2,420 bytes, and guarded pool is 2,704 bytes. Linked code/state uses 21,008
+bytes in the checked `807F0000..807FC000` reservation; the pool fits the separate
+`807FC000..80800000` tail. Nothing reserves or loads that new packet in the
+current cartridge yet.
+
+The nine-row native allocation/name readers compile with one C/assembly capacity
+definition. All six native identity callers are checked and rebound in the
+prepared owners; existing eight name records retain their order and contents.
+The focused complete-source fixture covers selected-only nonrepeating rewards,
+full saved identity initialization before the shared constructor, retained
+reward history, additive message comparisons, refused/accepted cutlery, and
+single reward insertion with native forty-byte area guards. Native services are
+recording doubles. The affected existing Wisp handover check passes. No physical
+save I/O, ordinary conversation, hiding, arrival, or hardware result is claimed.
+
+Next connected consumer: extend the shared placement category with the complete
+source hiding masks/foreground classifiers and nearest-centre flat-unit search,
+seeded acre exclusions (including the actual ball), player and marine fallbacks,
+and after-conversation relocation. Bind source `make_actor_in_free_block_hide`,
+`show_actor_at_wade`, `walk_actor_at_wade_hide`, and the four Harvest manager
+callbacks together. Retain the source placement ID `51`; do not substitute an
+ordinary wandering placement or checkfgcol-only appearance. Then append source
+event 108/native 116 to the real manager references/daily calendar, install the
+prepared banks/pool/dialogue/public redirects, and admit all twelve independent
+family choices with their actual cutlery dependency. Current gameplay/save
+verification remains pending. The Harvest new-harness allowance and setup retry
+are exhausted; do not reset them or replay unchanged component checks.
+<!-- Harvest work record: new-harness window 2026-09-30 03:10:10..03:40:10 UTC.
+The corrected initial setup passes; no native gameplay harness is completed.
+Focused verification of actual game-defect repairs is not a new setup cycle. -->
+
 Nook's four front-counter code/result/handover bindings and complete shared
 keyboard/font/dialogue/audio resources are installed. ABI 378 additionally admits
 all sixteen source password-only furniture records and both HomePage surfaces.

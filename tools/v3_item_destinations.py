@@ -34,6 +34,22 @@ def destinations(image, report, source_items, *, lock):
         if row['id'] in installed and installed[row['id']]['item_id'] != row['item_id']:
             raise ValueError('Conflicting installed item destinations')
         installed[row['id']] = row
+    if report.get('room_surfaces'):
+        from v3_surface_selection import options
+        from aflib import by_vrom
+        from v3_asset_loader import BLOB
+        # Complete installed surface records retain canonical destinations even
+        # while acquisition is pending. This is identity, not an enable gate.
+        options(by_vrom(image)[BLOB].extract(image),report)
+        surface=report['room_surfaces']
+        for row in surface['rows']:
+            item=next(r for r in surface['items']['rows'] if r['id']==row['id'])
+            if item['item_id']!=row['destination_item_id']:
+                raise ValueError('Conflicting complete surface destination')
+            record=dict(row,item_id=row['destination_item_id'])
+            if row['id'] in installed and installed[row['id']]['item_id']!=record['item_id']:
+                raise ValueError('Conflicting installed surface destination')
+            installed[row['id']]=record
     carried = {int(r['donor_item_id'], 16): r for r in
                report['equipment_resources']['carried_items']['rows']}
     result = []

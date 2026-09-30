@@ -14,7 +14,7 @@ VILLAGERS = {
 # Special actors are not ordinary residents or individually selectable villagers.
 # Native profiles C9/CA/CB are the no-demo sentinel, summer tent, and balloon.
 # The existing camper mask uses D08F. These reservations do not enable spawning.
-SPECIAL_NPC_REGISTRY_VERSION = 6
+SPECIAL_NPC_REGISTRY_VERSION = 7
 SPECIAL_NPCS = {
     'GAFE01-r0/npc/ev-soncho2': dict(donor_name=0xD074, donor_profile=0xCC,
         name=0xD090, profile=0xCC, model_bank=448, texture_bank=449),
@@ -35,6 +35,8 @@ SPECIAL_NPCS = {
     'GAFE01-r0/npc/present-tortimer': dict(donor_name=0xD073, donor_profile=0xC7,
         name=0xD0D0, profile=0xF4, model_bank=448, texture_bank=449, draw_index=354,
         identity_source=0xD06E),
+    'GAFE01-r0/npc/ev-turkey': dict(donor_name=0xD08D, donor_profile=0xEF,
+        name=0xD0D1, profile=0xF5, model_bank=460, texture_bank=461, draw_index=379),
 }
 
 # The gift resident shares the complete gift callbacks, not Tortimer's artwork.

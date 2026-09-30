@@ -137,10 +137,17 @@ int af_hp_name_profile(u16 name) {
     int index=name_index(name);return index>=0?af_hp_records[index].profile:-1;
 }
 static int ready(const AFHPRecord *r) {
+#ifdef AF_HP_HARVEST_REGISTRY
+    /* The complete converted Franklin owner is 2420 bytes. Special actors
+     * still allocate their own checked full-size slots, not the native pool. */
+    const u32 maximum=2420;
+#else
+    const u32 maximum=2400;
+#endif
     if(!r->source || !r->source->ctor || !r->source->dtor ||
        !r->source->move || !r->source->draw || (r->kind&~7u) ||
        ((r->kind&AF_HP_REWARD)?(r->event || r->save || (r->kind&AF_HP_NO_SAVE)):!r->event) ||
-       r->source->actor_bytes<sizeof(ACTOR) || r->source->actor_bytes>2400)return 0;
+       r->source->actor_bytes<sizeof(ACTOR) || r->source->actor_bytes>maximum)return 0;
     return r->count?(r->part==3 && r->source->actor_bytes>=sizeof(NPC_ACTOR)):
         r->part==7 || (r->part==4 && r->source->actor_bytes==sizeof(ACTOR));
 }

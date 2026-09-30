@@ -39,6 +39,26 @@ hardware remain unverified. Continue the other source acquisition categories,
 beginning with the complete Harvest reward path. See
 [the Nook checkpoint](checkpoints/V3_NOOK_PASSWORDS.md).
 
+Harvest's full source owner and shared native adapters compile and finally link
+at `build/v3-harvest-connected-linked-05/connected.json`, using preparation
+`build/v3-harvest-connected-prepared-09/`. All 39 actor functions, twelve reward
+identities, 36 official messages, and the complete 125-frame motion are retained.
+The 28-owner registry keeps existing source callbacks/motions; Franklin's full
+model, textures, voice identity, and guarded 2,420-byte actor have prepared native
+records. Nine-row allocation/name/spawn readers compile, with six checked native
+identity caller rebindings and unchanged existing name records. The linked owner
+uses 21,008 code/state bytes and a 2,704-byte pool in checked upper memory.
+Complete-source host checks pass for reward filtering/cycling, safe first-record
+initialization and history retention, dialogue continuation, refused/accepted
+cutlery, single insertion, native-area guards, and queued player rotation.
+Native inventory/event/player services remain recording doubles. The affected
+existing Wisp handover check passes. Hiding/relocation, manager/calendar
+installation, family admission, and ordinary gameplay/save verification remain
+unfinished. These resources are not installed in ABI 378 and add no selectable
+choices. Both deployed patchers remain stable V2-14. The Harvest harness allowance
+and corrected setup retry are spent; continue the same connected category without
+a new setup cycle. See [the exact next consumers](WORK_QUEUE.md#execution-order).
+
 The current native password helper passes 45 assertions and twelve selected-item
 cases, including complete DMA/CRC/cache loading, native RNG, saved-state
 preservation, guards, and cleanup. Checkpoint restoration and the following CPU

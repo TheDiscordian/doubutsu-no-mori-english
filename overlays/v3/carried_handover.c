@@ -1,5 +1,5 @@
 /* Use the native discard animation and native inventory transaction. A refused
- * request must not consume the spirits or advance the source conversation. */
+ * request must not consume spirits/cutlery or advance the source conversation. */
 #include "carried_event.h"
 typedef struct {
     u32 birth,change_master,change_mode;
@@ -28,11 +28,15 @@ void *af_cw_handover_master(void) {
 }
 int mPlib_request_main_give_type1(GAME *game,u16 item,int mode,int present,int surface) {
     NativeHandover *h=clip();const u8 *player=(const u8 *)af_cw_player_actor(game);
-    if(!h || !player || h->master || item!=0x2D28 || af_carried_quantity(item)!=1 ||
+    u16 owner;
+    if(item==0x2D28 && af_carried_quantity(item)==1)owner=0xD0CD;
+    else if(item==0x2530 && af_carried_type(item)==47)owner=0xD0D1;
+    else return 0;
+    if(!h || !player || h->master ||
        mode!=7 || present || surface || af_cw_player()<0 || af_cw_player()>=4 ||
        !af_cw_private() || *(const int *)(player+0xCF0)!=0x40)return 0;
     ACTOR *npc=*(ACTOR *const *)(player+0xD10);
-    if(!npc || npc->npc_id!=0xD0CD || !af_hp_admit(npc,game))return 0;
+    if(!npc || npc->npc_id!=owner || !af_hp_admit(npc,game))return 0;
     return af_cw_native_request_give(game,item,mode,present,surface)==1;
 }
 int mPr_SetFreePossessionItem(void *player,u16 item,int condition) {

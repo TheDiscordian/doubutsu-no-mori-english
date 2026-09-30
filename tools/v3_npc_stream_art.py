@@ -18,6 +18,7 @@ from v3_villager_art import DRAW_BASE,DRAW_STRIDE,native_palette,normalise_verte
 from v3_villager_mesh import faces
 
 MODEL_LIMIT=0x2800
+MODEL_SLOT_BYTES=0x4000
 TEXTURE_LIMIT=0x1620
 
 
@@ -145,7 +146,7 @@ def prepare(source,index):
             =={p-at:t for p,t in links.items()}])
 
 
-def pack_lists(vertices,records,compiled,joint_bytes):
+def pack_lists(vertices,records,compiled,joint_bytes,*,model_limit=MODEL_LIMIT):
     """Intern repeated state commands only when the complete model needs it.
 
     Each replacement is an ordinary returning F3DEX2 display-list call. No
@@ -155,7 +156,9 @@ def pack_lists(vertices,records,compiled,joint_bytes):
     streams={r['symbol']:[(raw[i:i+8],i) for i in range(0,len(raw),8)]
         for r in records for raw in (compiled[r['symbol']],)}
     required=len(vertices)+sum(len(compiled[r['symbol']]) for r in records)+joint_bytes+8
-    while (required+15)&~15>MODEL_LIMIT:
+    if type(model_limit)!=int or not MODEL_LIMIT<=model_limit<=MODEL_SLOT_BYTES or model_limit&15:
+        raise ValueError('NPC model allowance leaves its complete virtual bank slot')
+    while (required+15)&~15>model_limit:
         groups={}
         for name,commands in streams.items():
             for begin in range(len(commands)):
@@ -202,9 +205,11 @@ def pack_lists(vertices,records,compiled,joint_bytes):
     return data,offsets,shared
 
 
-def build(source,index,output):
+def build(source,index,output,*,model_limit=MODEL_LIMIT):
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):raise ValueError('Use a fresh ignored NPC output')
+    if type(model_limit)!=int or not MODEL_LIMIT<=model_limit<=MODEL_SLOT_BYTES or model_limit&15:
+        raise ValueError('NPC model allowance leaves its complete virtual bank slot')
     prepared=prepare(source,index);output.mkdir(parents=True)
     write_new(output/'commands.c',prepared['source'].encode())
     compiled=compile_commands(output/'gbi',output/'commands.c',prepared['sections'])
@@ -227,14 +232,15 @@ def build(source,index,output):
                     ((nw-1)*4,(nh-1)*4)!=extent or
                     (mode>>8&3,mode>>18&3)!=(wrap[pair>>10&3],wrap[pair>>8&3])):
                 raise ValueError('Converted NPC changes a face, joint matrix, or texture binding')
-    model,offsets,shared=pack_lists(prepared['vertices'],prepared['records'],compiled,len(prepared['joints']))
+    model,offsets,shared=pack_lists(prepared['vertices'],prepared['records'],compiled,len(prepared['joints']),
+        model_limit=model_limit)
     joint_offset=len(model);joints=bytearray(prepared['joints'])
     for p,target in prepared['joint_links'].items():
         struct.pack_into('>I',joints,p-prepared['joints_at'],0x06000000+offsets[target])
     model.extend(joints);skeleton_offset=len(model)
     model.extend(prepared['skeleton'][:4]+struct.pack('>I',0x06000000+joint_offset))
     model.extend(bytes(-len(model)%16))
-    if len(model)>MODEL_LIMIT:raise ValueError('Complete streamed NPC mesh exceeds its reserved model bank')
+    if len(model)>model_limit:raise ValueError('Complete streamed NPC mesh exceeds its reserved model bank')
     write_new(output/'model.bin',model);write_new(output/'texture.bin',prepared['texture'])
     report=dict(format='AFV3-NPC-STREAM-ART-1',draw_index=index,source_aliases=prepared['aliases'],
         donor_draw_sha256=prepared['draw_sha256'],model_bytes=len(model),model_sha256=sha256(model),
@@ -242,7 +248,7 @@ def build(source,index,output):
         skeleton=0x06000000+skeleton_offset,joint_offset=joint_offset,
         joints=prepared['skeleton'][0],visible_joints=prepared['skeleton'][1],
         vertices=prepared['vertex_bytes']//16,triangles=sum(r['triangles'] for r in prepared['records']),
-        model_limit=MODEL_LIMIT,texture_limit=TEXTURE_LIMIT,body_offset=prepared['body_offset'],
+        model_limit=model_limit,texture_limit=TEXTURE_LIMIT,body_offset=prepared['body_offset'],
         body_bytes=prepared['body_bytes'],eye_offsets=prepared['eye_offsets'],mouth_offsets=prepared['mouth_offsets'],
         resources=prepared['resources'],models=prepared['records'],runtime_installed=False,
         shared_command_blocks=shared,
@@ -257,8 +263,9 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--draw-index',type=int,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--model-limit',type=lambda value:int(value,0),default=MODEL_LIMIT)
     args=parser.parse_args()
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
-    r=build(source,args.draw_index,args.output)
+    r=build(source,args.draw_index,args.output,model_limit=args.model_limit)
     print(json.dumps({k:r[k] for k in ('model_bytes','texture_bytes','joints','visible_joints','triangles','runtime_installed')}))

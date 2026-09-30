@@ -921,7 +921,9 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
         # Golden gifts use native town-name insertion (0x2F). Farley's whole
         # speech brackets its cursor pacing with the installed English runtime's
         # 0x72/0x73 commands; preserve both and every pause inside that span.
-        allowed.update((47,114,115))
+        # Franklin also retains the native 0x52 character-size presentation.
+        # font_control.c dispatches it to the complete native 80091900 owner.
+        allowed.update((47,82,114,115))
     # Adapt the actual N64 location, not the idiom "Well, ...". Exact source
     # substrings keep deliberate breaks and every command in place.
     shrine={

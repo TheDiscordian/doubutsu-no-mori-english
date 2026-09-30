@@ -2,6 +2,9 @@
  * schedule, and event identities do not index the original native tables. */
 #include "carried_event.h"
 #include "room_rigs.h"
+#ifdef AF_HP_HARVEST_REGISTRY
+#include "harvest_state.h"
+#endif
 extern const u32 *volatile af_hp_native_npc_clip;
 extern int af_holiday_observers_clip(void);
 extern const u32 af_cw_available;
@@ -10,6 +13,9 @@ extern void af_hp_native_dying(int,ACTOR *);
 
 int af_hp_owner_enabled(const AFHPRecord *record) {
     if(!record)return 0;
+#ifdef AF_HP_HARVEST_REGISTRY
+    if(record->event==AF_HR_SOURCE)return af_hr_enabled_mask()!=0;
+#endif
 #ifdef AF_HP_REWARD_REGISTRY
     if(record->kind&AF_HP_REWARD)return af_rw_owner_enabled(record);
 #endif

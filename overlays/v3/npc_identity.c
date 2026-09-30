@@ -3,7 +3,7 @@ typedef unsigned char u8;
 typedef unsigned int u32;
 static const AFNpcIdentity *identity(u32 name) {
     const AFNpcIdentities *t=&af_npc_identities;
-    if(t->magic!=0x41464E49 || t->version!=1 || t->count>8 || t->stride!=16)return 0;
+    if(t->magic!=0x41464E49 || t->version!=1 || t->count>AF_NPC_EXTRA_MAX || t->stride!=16)return 0;
     for(u32 i=0;i<t->count;i++)if(t->rows[i].name==name)return t->rows+i;
     return 0;
 }

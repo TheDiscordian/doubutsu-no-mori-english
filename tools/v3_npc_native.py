@@ -44,10 +44,11 @@ PROVIDERS={
 SOURCES=('tools/v3_npc_native.py','tools/v3_npc_registry.py','tools/v3_registry.py',
     'tools/v3_room_goods.py','tools/v3_furniture_install.py','tools/npc_mail_show.py',
     'overlays/v3/npc_identity.c','overlays/v3/npc_identity.h','overlays/v3/npc_identity_spawn.S',
+    'overlays/v3/npc_registry_limits.h',
     'translations/provenance.json')
 
 
-def identities(base,members):
+def identities(base,members,*,order=None):
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     raw=source.raw('l_sp_actor_name')
@@ -61,7 +62,11 @@ def identities(base,members):
     catalogue=json.loads((ROOT/'translations/provenance.json').read_bytes());validate(catalogue)
     credits={r['id']:r for r in catalogue['entries']}
     data=bytearray(struct.pack('>4I',0x41464E49,1,len(members),16));rows=[]
-    for identity,r in sorted(members.items()):
+    if order is None:order=sorted(members)
+    if len(order)!=len(members) or set(order)!=set(members):
+        raise ValueError('Incomplete or duplicate native identity ordering')
+    for identity in order:
+        r=members[identity]
         source_name=r.get('identity_source',r['donor_name'])
         found=[(sex,index,sound) for name,sex,index,sound in struct.iter_unpack('>HHII',raw) if name==source_name]
         if len(found)!=1:raise ValueError('Missing or ambiguous donor character identity')
@@ -78,7 +83,8 @@ def identities(base,members):
         rows.append(dict(identity=identity,name=r['name'],donor_name=r['donor_name'],sex=sex,
             identity_source=source_name,sound_spec=sound,string_id=index,text=text,
             source_sha256=sha256(original),encoded_sha256=sha256(encoded)))
-    if len(data)>144:raise ValueError('Special-character identity directory exceeds its reservation')
+    if len(data)>BRIDGES-IDENTITIES:
+        raise ValueError('Special-character identity directory exceeds its reservation')
     return bytes(data),rows
 
 

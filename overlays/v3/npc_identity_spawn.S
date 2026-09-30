@@ -1,6 +1,7 @@
 /* Shared registry lookup for both NPC controllers. Their ABI permits only
  * at/t1 to change, takes the special name in v1, and returns at original sp+56.
  * Preserve the original row pointer in t1 on every unmatched path. */
+#include "npc_registry_limits.h"
 .set noreorder
 .set noat
 .set nomacro
@@ -26,7 +27,7 @@ af_npc_identity_spawn:
     bne $at,$t2,3f
      nop
     lw $t2,8($t0)
-    sltiu $at,$t2,9
+    sltiu $at,$t2,AF_NPC_EXTRA_CAPACITY+1
     beq $at,$zero,3f
      addiu $t0,$t0,16
 1:  beq $t2,$zero,3f

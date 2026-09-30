@@ -31,6 +31,7 @@ DMA=0xA300
 CANE=0xB000
 SOURCES=('tools/v3_npc_registry.py','tools/v3_registry.py','tools/v3_npc_stream_runtime.py',
     'tools/v3_asset_loader.py','overlays/v3/npc_registry.c','overlays/v3/npc_registry.h',
+    'overlays/v3/npc_registry_limits.h',
     'overlays/v3/npc_registry.ld','overlays/v3/npc_stream_draw.h','overlays/v3/npc_stream_draw.c',
     'tools/v3_furniture_install.py','tools/v3_room_goods.py','overlays/v3/surface_bootstrap.c',
     'overlays/v3/npc_dma.c','overlays/v3/npc_dma.h','tools/v3_keyframes.py')
@@ -169,7 +170,7 @@ def append_banks(base,prior,blob,entries,*,excluded_spans=()):
     """
     capacity=prior['object_capacity'];end=capacity+len(entries)*2
     wanted=sorted(e[k] for e in entries for k in ('model_bank','texture_bank'))
-    if (not entries or not 448<=capacity<end<=460 or wanted!=list(range(capacity,end)) or
+    if (not entries or not 448<=capacity<end<=462 or wanted!=list(range(capacity,end)) or
             struct.unpack_from('>I',blob,12)[0]!=capacity):
         raise ValueError('Changed additional NPC object-table capacity')
     start=prior['asset']['symbols']['af_v3_object_status']-BLOB_RAM
@@ -187,7 +188,10 @@ def append_banks(base,prior,blob,entries,*,excluded_spans=()):
     records=[];resources=[]
     for entry in entries:
         directory=entry['directory'];art=json.loads((directory/'art.json').read_bytes())
-        for kind,limit in (('model',0x2800),('texture',0x1620)):
+        model_limit=art.get('model_limit',0x2800)
+        if type(model_limit)!=int or not 0x2800<=model_limit<=0x4000 or model_limit&15:
+            raise ValueError('NPC model allowance leaves its complete virtual bank slot')
+        for kind,limit in (('model',model_limit),('texture',0x1620)):
             resources.append((kind,entry[kind+'_bank'],limit,directory,art,entry['identity']))
     staging=bytearray(base);physical_rows=copy.deepcopy(prior.get('physical_resources',[]));writes=[]
     old_banks=prior.get('equipment_resources',{}).get('npc_extra',{}).get('banks',[])
@@ -407,7 +411,7 @@ def u32_local(data,at):
     return struct.unpack_from('>I',data,at)[0]
 
 
-def refresh_renderer(npc,data,output,base,changes,*,extra_sources=(),link_symbols=None):
+def refresh_renderer(npc,data,output,base,changes,*,extra_sources=(),link_symbols=None,rebind_identities=False):
     """Refresh the common character renderer in its existing code reservation.
 
     Registry/actor callers retain their public entries. The two native drawing
@@ -420,11 +424,15 @@ def refresh_renderer(npc,data,output,base,changes,*,extra_sources=(),link_symbol
         raise ValueError('Changed shared NPC code reservation')
     code,compiled=compile_part('npc_registry',output,link_symbols=link_symbols or old['link_symbols'],
         extra_sources=('overlays/v3/npc_stream_draw.c','overlays/v3/npc_dma.c',*extra_sources))
+    moved={};identity_exports={'af_npc_identity_name','af_npc_identity_actor_name',
+        'af_npc_identity_sex','af_npc_identity_sound','af_npc_identity_spawn'}
     for name,address in old['symbols'].items():
         if name.startswith('af_') and RAM<=address<RAM+0x2000 and name not in (
                 'af_v3_npc_dma_request','af_v3_npc_dma_init','af_v3_npc_stream_draw'):
             if compiled['symbols'].get(name)!=address:
-                raise ValueError('Moved shared NPC reader without rebinding: '+name)
+                if not rebind_identities or name not in identity_exports:
+                    raise ValueError('Moved shared NPC reader without rebinding: '+name)
+                moved[name]=(address,compiled['symbols'][name])
     files=by_vrom(base)
     before=struct.pack('>I',jump(old['symbols']['af_v3_npc_stream_draw'],link=True))
     after=struct.pack('>I',jump(compiled['symbols']['af_v3_npc_stream_draw'],link=True))
@@ -435,6 +443,35 @@ def refresh_renderer(npc,data,output,base,changes,*,extra_sources=(),link_symbol
             raise ValueError('Changed installed complete NPC drawing call')
         owner[at:at+4]=after;changes[vrom]=bytes(owner)
         hook.update(previous_call=before.hex(),installed_call=after.hex())
+    if moved:
+        # These are the complete installed entry/call bindings from the native
+        # identity installer. Never overwrite a moved entry inside new code.
+        from v3_asset_loader import MODULE,MODULE_RAM
+        bindings=[(MODULE,MODULE_RAM,0x80196044,'af_npc_identity_name',False),
+            (MODULE,MODULE_RAM,0x80195D20,'af_npc_identity_actor_name',False),
+            (CODE_VROM,CODE_RAM,0x800AD0B8,'af_npc_identity_sex',False),
+            (CODE_VROM,CODE_RAM,0x800AD1E0,'af_npc_identity_sound',False)]
+        spawn=[h for batch in npc.get('native_batches',[]) for h in batch['hooks']
+            if h['helper']=='af_npc_identity_spawn']
+        if len(spawn)!=2:raise ValueError('Both installed NPC identity spawn callers are required')
+        bindings.extend((h['vrom'],h['ram'],h['address'],'af_npc_identity_spawn',True) for h in spawn)
+        redirects=[]
+        for vrom,ram,address,name,call in bindings:
+            if name not in moved:continue
+            previous,target=moved[name];owner=bytearray(changes.get(vrom,files[vrom].extract(base)))
+            at=address-ram;before=struct.pack('>I',jump(previous,link=call))+(b'' if call else bytes(4))
+            after=struct.pack('>I',jump(target,link=call))+(b'' if call else bytes(4))
+            if owner[at:at+len(before)]!=before:
+                raise ValueError('Changed installed native identity consumer: '+name)
+            owner[at:at+len(after)]=after;changes[vrom]=bytes(owner)
+            redirects.append(dict(vrom=vrom,ram=ram,address=address,helper=name,
+                before=before.hex(),after=after.hex(),delay_slot_preserved=call))
+        if {r['helper'] for r in redirects}!=set(moved):
+            raise ValueError('Incomplete moved native identity binding set')
+        for h in spawn:
+            if 'af_npc_identity_spawn' in moved:
+                h['before']=h['after'];h['after']=struct.pack('>I',jump(compiled['symbols']['af_npc_identity_spawn'],link=True)).hex()
+        npc['identity_rebindings']=redirects
     data[:0x2000]=code+bytes(0x2000-len(code))
     npc['code']=compiled;npc['packet'].update(sha256=sha256(data),crc32=zlib.crc32(data))
     npc['renderer_capabilities']=dict(absent_expressions=True,clamped_non_power_of_two_tiles=True,

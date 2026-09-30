@@ -1,11 +1,12 @@
 #ifndef AF_V3_NPC_REGISTRY_H
 #define AF_V3_NPC_REGISTRY_H
 #include "npc_stream_draw.h"
+#include "npc_registry_limits.h"
 enum {
     AF_NPC_EXTRA_MAGIC=0x41464E58, AF_NPC_SLOT_MAGIC=0x41464E53,
     AF_NPC_SLOT_GUARD=0x4E504347,
     AF_NPC_EXTRA_IMPLEMENTED=1, AF_NPC_EXTRA_SELECTED=2,
-    AF_NPC_EXTRA_MAX=8
+    AF_NPC_EXTRA_MAX=AF_NPC_EXTRA_CAPACITY
 };
 typedef struct {
     unsigned short name,profile;
@@ -22,6 +23,7 @@ typedef struct {
 } AFNpcExtras;
 #ifdef __mips__
 _Static_assert(sizeof(AFNpcExtra)==44,"Native additional NPC record");
+_Static_assert(sizeof(AFNpcExtras)<=0x200,"Complete registry stays before the first descriptor");
 #endif
 extern const AFNpcExtras af_v3_npc_extras;
 void *af_v3_npc_extra_descriptor(int);
