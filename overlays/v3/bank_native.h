@@ -20,6 +20,7 @@ int af_bank_native_request(void *);
 int af_bank_native_construct(void *);
 int af_bank_native_set_proc(void *);
 int af_bank_native_destruct(void *);
+int af_bank_native_cancel(void *);
 #ifndef __mips__
 extern void *af_bank_test_pointer(const void *,unsigned int);
 extern void af_bank_test_store_pointer(void *,unsigned int,void *);

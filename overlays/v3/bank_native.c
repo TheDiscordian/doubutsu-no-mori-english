@@ -76,7 +76,7 @@ static void store_pointer(void *p,u32 at,void *v) {*(void **)((u8 *)p+at)=v;}
 #define pointer af_bank_test_pointer
 #define store_pointer af_bank_test_store_pointer
 #endif
-static struct {void *submenu,*overlay,*private,*game;u32 player;int requested,active;} context;
+static struct {void *submenu,*overlay,*private,*game;u32 player;int requested,active,cancelled;} context;
 #define MENU 0x10280u
 static int owned(void *s) {
     return s && s==context.submenu && context.overlay==pointer(s,0x2C) &&
@@ -146,10 +146,11 @@ int af_bank_native_request(void *s) {
         af_bank_native_selected()!=1 || af_bank_native_eligible()!=1 ||
         !af_bank_valid(af_bank_native_account(),48) || !af_bank_native_wallet(af_bank_now_private,&wallet))return 0;
     context.submenu=s;context.private=af_bank_now_private;context.player=af_bank_player;
-    context.requested=1;return 1;
+    context.requested=1;context.cancelled=0;return 1;
 }
 int af_bank_native_construct(void *s) {
     if(!context.requested || context.submenu!=s || word((u8 *)s+4)!=7)return 0;
+    if(context.cancelled) {context.requested=0;context.submenu=0;return -1;}
     context.overlay=pointer(s,0x2C);context.requested=0;
     if(!context.overlay || !af_bank_frontend_open(&ops,&context)) {context.submenu=0;return -1;}
     context.active=1;return 1;
@@ -160,7 +161,12 @@ int af_bank_native_destruct(void *s) {
     af_bank_frontend_destruct();
     if(af_bank_frontend_active())return -1;
     context.submenu=context.overlay=context.private=context.game=0;
-    context.requested=context.active=0;return 1;
+    context.requested=context.active=context.cancelled=0;return 1;
+}
+int af_bank_native_cancel(void *s) {
+    if(!s || s!=context.submenu)return 0;
+    if(context.requested) {context.cancelled=1;return 1;}
+    return context.active?af_bank_frontend_cancel():0;
 }
 float af_bank_native_width(const unsigned char *s,int n,int half) {
     return (float)af_bank_native_string_width(s,n,half);

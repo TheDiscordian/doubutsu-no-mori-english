@@ -11,9 +11,10 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import by_vrom,CODE_RAM,CODE_VROM,sha256
 from v3_furniture_pipeline import Source
-from v3_bank_frontend import generate,artwork,native_contract,reuse_artwork,ROOTS
+from v3_bank_frontend import generate,artwork,native_contract,admission_contract,reuse_artwork,ROOTS
+from v3_post_office import pelly
 
-PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-05')
+PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-09')
 
 
 class BankFrontendTests(unittest.TestCase):
@@ -24,6 +25,10 @@ class BankFrontendTests(unittest.TestCase):
 
     def test_whole_frontend_and_shared_resource_contract(self):
         generated,report=generate(self.source);prepared=json.loads((PREPARED/'prepared.json').read_bytes())
+        pg,pg_report=pelly(self.source);generated.update(pg)
+        self.assertEqual(json.loads(json.dumps(pg_report)),prepared['pelly'])
+        self.assertEqual(len(pg_report['functions']),15)
+        self.assertIn('u8 str[11];',pg['pelly_source.c']);self.assertNotIn('u8 str[8];',pg['pelly_source.c'])
         self.assertEqual(len(report['bank_functions']),16)
         self.assertTrue(prepared['compiled_frontend']);self.assertFalse(prepared['native_frontend_installed'])
         self.assertFalse(prepared['saved_record_installed']);self.assertEqual(prepared['base_abi'],386)
@@ -62,6 +67,12 @@ class BankFrontendTests(unittest.TestCase):
         report=native_contract(owner,rel,core)
         self.assertEqual(report,json.loads((PREPARED/'prepared.json').read_bytes())['native_adapter'])
         self.assertEqual(report['menu_slot'],7);self.assertFalse(report['saved_provider_bound'])
+        admission=admission_contract(files[0x8A6C10].extract(base),files[0x8A8A10].extract(base),core)
+        self.assertEqual(admission,json.loads((PREPARED/'prepared.json').read_bytes())['admission'])
+        self.assertEqual(admission['added_bank_actions'],list(range(33,38)))
+        changed=bytearray(core);changed[0x80094A90-CODE_RAM+20]^=1
+        with self.assertRaisesRegex(ValueError,'admission field owner'):
+            admission_contract(files[0x8A6C10].extract(base),files[0x8A8A10].extract(base),changed)
         changed=bytearray(core);changed[0x800B8B08-CODE_RAM+20]^=1
         with self.assertRaisesRegex(ValueError,'complete native bank service'):native_contract(owner,rel,changed)
         changed=bytearray(owner);changed[0x80897B3C-0x808979C0]^=1
@@ -82,7 +93,9 @@ class BankFrontendTests(unittest.TestCase):
                 str(ROOT/'tests/v3_bank_frontend_test.c'),str(ROOT/'overlays/v3/bank_account.c'),
                 str(PREPARED/'bank_source.c'),'-o',str(output)]
             if native:command+=['-DAF_BANK_TEST_NATIVE=1',str(ROOT/'overlays/v3/bank_native.c'),
-                str(ROOT/'tests/v3_bank_native_test.c')]
+                str(ROOT/'tests/v3_bank_native_test.c'),str(PREPARED/'pelly_source.c'),
+                str(ROOT/'overlays/v3/bank_admission.c'),str(ROOT/'overlays/v3/bank_pelly_native.c'),
+                str(ROOT/'tests/v3_bank_pelly_test.c')]
             build=subprocess.run(command,capture_output=True,text=True,timeout=60)
             self.assertEqual(build.returncode,0,build.stdout+build.stderr)
             run=subprocess.run([str(output)],capture_output=True,text=True,timeout=30)

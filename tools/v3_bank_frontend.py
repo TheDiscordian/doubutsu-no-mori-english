@@ -18,7 +18,7 @@ from v3_asset_loader import ROOT
 from v3_furniture_pipeline import Source,assemble_models,compile_models
 from v3_holiday_participants import clean,constants,read
 from v3_password_policy import function
-from v3_post_office import discover,generate as numerical,HEADER_REFERENCES
+from v3_post_office import discover,generate as numerical,pelly,HEADER_REFERENCES
 from v3_ui_art import Packet
 
 FONT_SOURCE='89f63d09c6c6b5c71b9ec2b51ffe3cba9ef89ea89714cec9ad8bef015c2316de'
@@ -28,7 +28,9 @@ SOURCES=('tools/v3_bank_frontend.py','tools/v3_post_office.py','tools/v3_ui_art.
     'overlays/v3/bank_source_adapter.c','overlays/v3/bank_source_adapter.h',
     'overlays/v3/bank_frontend.h','overlays/v3/bank_frontend_source.h',
     'overlays/v3/bank_frontend_source.c','overlays/v3/bank_native.c','overlays/v3/bank_native.h',
-    'translations/provenance.json')
+    'translations/provenance.json','tools/v3_password_policy.py',
+    'overlays/v3/bank_pelly.h','overlays/v3/bank_pelly_source.h',
+    'overlays/v3/bank_pelly_source.c','overlays/v3/bank_pelly_native.c','overlays/v3/bank_admission.c')
 ROOTS=('tyo_win_mode','tyo_win_model','tyo_win_moji2T_model','tyo_win_moji3T_model')
 NATIVE_SERVICES={
     'af_bank_native_translate':(0x800E0314,264,'767212be165dde7a9be2467ffb03b98a80af114e9ad9d352e21998c6f9981ca2'),
@@ -69,6 +71,34 @@ def native_contract(owner,relocation,core):
         field_instructions={f'{a:08X}':f'{w:08X}' for a,w in instructions.items()},
         private_fields=dict(pockets=0x14,conditions=0x34,wallet=0x38,loan=0x3C),
         installed=False,saved_provider_bound=False,pelly_admission_bound=False)
+
+
+def admission_contract(owner,relocation,core):
+    from v3_furniture_roofs import BLOCKS
+    if (len(owner)!=7680 or sha256(owner)!='6c1df6be28bed6cc469f37a59ae317c6ba2ab86ba97c124f9d287da47be007ac' or
+        sha256(relocation)!='ac371d4f4c5d0c87f2ffb3d56bbddfdd7f1384ecca4cca5d3e769e4306241d2f'):
+        raise ValueError('Changed complete Pelly native owner')
+    houses=[]
+    for name,address,size,digest in BLOCKS:
+        if name not in ('home_arrangement','home_upgrade_colour','current_player_home'):continue
+        if sha256(core[address-CODE_RAM:address-CODE_RAM+size])!=digest:
+            raise ValueError('Changed complete native banking admission field owner: '+name)
+        houses.append(dict(name=name,address=address,bytes=size,sha256=digest))
+    # Whole current owner guards include existing translated mail repairs. These
+    # actual native reads/writes establish the distinct N64 actor/menu fields.
+    fields={0x809C34A8:0xA2020724,0x809C34B0:0xAE180944,0x809C375C:0xA3100948,
+        0x809C3C44:0x91040948,0x809C40D0:0x91CF1D98,
+        0x809C4E84:0xAC860938,0x809C4E94:0xAC8F0940,0x809C4BB0:0x24841CBC}
+    for address,word in fields.items():
+        if u32(owner,address-0x809C3420)!=word:raise ValueError('Changed actual Pelly actor/menu field contract')
+    return dict(owner_sha256=sha256(owner),relocation_sha256=sha256(relocation),
+        houses=houses,fields={f'{a:08X}':f'{w:08X}' for a,w in fields.items()},
+        native_actions=33,added_bank_actions=list(range(33,38)),
+        source_bank_actions=list(range(24,29)),native_home_bytes=0xB48,
+        size_offset=0x22,size_shift=6,renew_mask=8,native_completed_size=2,
+        donor_minimum_size=3,homes=0x8012A428,arrangement=0x80135DFA,
+        home_identity_bytes=16,loan=0x3C,submenu=0x1CBC,submenu_open=0x1D98,
+        bank_flag_in_native_actor=False,compiled=True,installed=False)
 
 
 def artwork(source):
@@ -183,7 +213,10 @@ def prepare(output,lock,*,reuse_art=None):
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     files=by_vrom(base)
     native=native_contract(files[0x79B120].extract(base),files[0x79BF10].extract(base),files[CODE_VROM].extract(base))
-    generated,report=generate(source);prepared=artwork(source);output.mkdir(parents=True)
+    admission=admission_contract(files[0x8A6C10].extract(base),files[0x8A8A10].extract(base),files[CODE_VROM].extract(base))
+    generated,report=generate(source);pg,pg_report=pelly(source);generated.update(pg)
+    report['pelly']=pg_report;report['admission']=admission
+    prepared=artwork(source);output.mkdir(parents=True)
     for name,data in generated.items():write_new(output/name,data.encode())
     write_new(output/'post-office-rewards.bin',source.raw('l_mml_postoffice_info'))
     if reuse_art:
@@ -205,13 +238,25 @@ def prepare(output,lock,*,reuse_art=None):
     run('gcc',*flags,'bank_source.c','-o','bank-source.o')
     run('gcc',*flags,'/source/overlays/v3/bank_account.c','-o','bank-account.o')
     run('gcc',*flags,'/source/overlays/v3/bank_native.c','-o','bank-native.o')
-    run('ld','-EB','-r','bank-source.o','bank-account.o','bank-native.o','-o','post-office.o')
+    run('gcc',*flags,'pelly_source.c','-o','pelly-source.o')
+    run('gcc',*flags,'/source/overlays/v3/bank_pelly_native.c','-o','pelly-native.o')
+    run('gcc',*flags,'/source/overlays/v3/bank_admission.c','-o','bank-admission.o')
+    run('ld','-EB','-r','bank-source.o','bank-account.o','bank-native.o',
+        'pelly-source.o','pelly-native.o','bank-admission.o','-o','post-office.o')
     unbound=run('nm','--undefined-only','post-office.o').strip().splitlines()
     if {line.split()[-1] for line in unbound}-{'memcpy','memset',*ROOTS,
             'af_bank_native_translate','af_bank_native_scale','af_bank_native_matrix',
             'af_bank_native_string_width','af_bank_native_line','af_bank_native_account',
-            'af_bank_native_eligible','af_bank_native_selected','af_bank_now_private',
-            'af_bank_player','af_bank_native_set_pocket','af_bank_native_sound'}:
+            'af_bank_now_private','af_bank_player','af_bank_native_set_pocket','af_bank_native_sound',
+            'af_bank_account_mode','af_bank_home_arrangement','af_bank_native_homes',
+            'af_bank_pelly_window','af_bank_pelly_continue','af_bank_pelly_disappeared','af_bank_pelly_appeared',
+            'af_bank_pelly_unlock','af_bank_pelly_force','af_bank_pelly_free_string',
+            'af_bank_pelly_appear','af_bank_pelly_disappear','af_bank_pelly_order','af_bank_pelly_set_order',
+            'af_bank_pelly_choice_window','af_bank_pelly_choice','af_bank_pelly_mail_count',
+            'af_bank_pelly_first_job','af_bank_pelly_foreigner','af_bank_pelly_loan_balance',
+            'af_bank_pelly_native_open_menu','af_bank_pelly_message_map','af_bank_pelly_message_unmap',
+            'af_bank_pelly_native_number','af_bank_pelly_native_continue','af_bank_pelly_native_change',
+            'af_bank_pelly_april_clip','af_bank_pelly_native_message'}:
         raise ValueError('Unexpected frontend dependencies: '+str(unbound))
     report.update(base_sha256=sha256(base),base_abi=prior['runtime_abi'],native_adapter=native,
         artwork_reused_from=str(Path(reuse_art).resolve().relative_to(ROOT)) if reuse_art else None,

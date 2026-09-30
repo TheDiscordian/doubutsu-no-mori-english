@@ -102,7 +102,7 @@ physical persistence, or hardware result is claimed.
 
 `tools/v3_bank_frontend.py` prepares all sixteen complete bank functions and the
 three complete source integer-formatting functions at
-`build/v3-post-office-bank-frontend-prepared-05/prepared.json`. It retains the
+`build/v3-post-office-bank-frontend-prepared-09/prepared.json`. It retains the
 genuine title, OK label, complete frame, cash/Bell/balance labels, and complete
 128-by-32 deposit/withdrawal textures. The shared UI converter preserves both
 source CI palette slots and checked tile-one replacement without overwriting
@@ -130,19 +130,48 @@ The adapter uses verified native menu/callback offsets and passes the actual
 game argument to the original pre-draw callback. An owned construction failure
 must reject the bank path, not fall through into repayment.
 
+`overlays/v3/bank_admission.c` checks the actual resident, paid loan, matched
+sixteen-byte personal/home identity, house-arrangement byte, largest native
+house size, and renovation bit. Complete native house-arrangement, home-pointer,
+and renovation-owner guards establish these distinct fields. The donor requires
+size three (its upper-floor house); the native house upgrade owner provides floor
+sizes zero through two and treats next-size three separately. The GameCube bank
+mode therefore admits the completed largest native house (size two), with no
+loan or renovation. This platform adaptation must be stated in the eventual
+N64/GameCube bank choice; N64 mode keeps banking disabled. No upper-floor building
+or guessed house field is introduced.
+
+`tools/v3_post_office.py` also compiles fifteen complete Pelly conversation
+functions, including greeting, business selection, status, deposit, menu waiting,
+closing balance display, and recovery/continuation. The source declaration's
+eight-byte balance buffer is corrected to the formatter's actual eleven-byte
+output. `overlays/v3/bank_pelly_native.c` uses the actual N64 actor fields and
+submenu/open flag, not the GameCube layout. Source bank actions 24–28 map to
+additive native actions 33–37; existing native letter/card actions at 24–28 remain
+intact. Non-bank choices return to the original native setup callback. Banking
+status stays in the borrowed view, avoiding the original native four-row status
+tables. A resident change or actor release requests ordinary bank closing without
+publishing a preview. Menu ownership lasts until the real native destructor;
+cancelled pending construction returns an owned failure, never original repayment.
+
 Whole current repayment-owner/relocation guards and seven whole native service
 guards pass. Four focused frontend checks pass: complete donor/generated/art
 comparison with reuse/provenance, current native contract and mutation rejection,
 sanitized source lifecycle/transaction/drawing, and sanitized native-menu/pocket
-adapters. Native callbacks and pocket services are doubles in these host tests;
-this is not native execution. The two original numerical checks and two affected
-diary resource/state checks retain passing unchanged evidence.
+adapters, now including the complete Pelly route, greeting variants, largest
+balance, house/identity/renovation admission, stale residents, action restoration,
+and pending/active cancellation ownership. Complete Pelly-owner/relocation and
+house-service guards also pass. Native callbacks, menu opening, and pocket services
+are doubles in these host tests; this is not native execution. The two original
+numerical checks pass against unchanged generated numerical functions. The two
+affected diary resource/state checks retain passing unchanged evidence.
 
-The combined relocatable MIPS object has 13,278 code bytes, 30 data bytes, and
-1,020 BSS bytes, SHA-256
-`adc257c07b2ac6b9824b9f02e94aee761578b65a0ee6859c70e30e986023db44`.
-It is not linked or installed. Native selected-mode/admission/account providers,
-fixed services, drawing roots, and menu/save ownership remain unbound. No native
+The combined relocatable MIPS object has 18,269 code bytes, 30 data bytes, and
+1,056 BSS bytes, SHA-256
+`7340e585f1fc74cfbeb2efd31d33cf9b523b660de6c002f4218f55de13937617`.
+It is not linked or installed. Selection/home/current-player/account bindings,
+official dialogue remapping, fixed message/menu services, April Fools control,
+drawing roots, lifecycle hooks, and menu/save ownership remain unbound. No native
 bank harness starts and no existing harness budget resets. The current ABI-386
 ROM, format 20/wire 7, selections, and both patcher deployments are unchanged.
 
@@ -160,13 +189,13 @@ Keep selected-profile gating, successful-delivery-only acknowledgement, full
 queue retry, and one-time persistence. The existing catalogue-order/ticket
 wrapper in `POST_OFFICE_LETTERS.md` is not this savings-reward mechanism.
 
-Install the prepared complete bank frontend and connect Pelly's genuine business/deposit/closing
-actions, preserving repayment and the donor constructor's native-resident,
-paid-loan, house-size, and no-renewal admission. The exact next owner is Pelly's
-ordinary account admission and menu request, with real selected-mode/eligibility
-providers. Bind the checked wallet/pocket adapter and native services only through
-reviewed owners. Reserve and link complete code/state/art without assuming the
-old packet's remaining space fits the larger frontend. Attach
+Install the prepared complete bank/Pelly route, preserving repayment and the
+reviewed resident/loan/house/renovation admission. The exact next connections are
+the official bank greeting/deposit/closing message and choice remapping, the real
+saved-town account provider, and native menu/lifecycle installation. Bind the
+compiled selection/admission adapters and checked wallet/pocket services only
+through reviewed owners. Reserve and link complete code/state/art without assuming
+the old packet's remaining space fits the larger frontend. Attach
 `AFBA` to the whole saved-town transaction with a new supported envelope/wire,
 forward migration preserving all existing card/golden/console/town data, player
 deletion, town reset, preflight, and older-reader rejection. Account-required

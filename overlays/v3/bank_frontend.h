@@ -28,4 +28,7 @@ void af_bank_frontend_move(void);
 int af_bank_frontend_draw(void *game);
 void af_bank_frontend_destruct(void);
 int af_bank_frontend_active(void);
+/* Request ordinary closing without publishing a preview or destroying the
+ * native menu owner early. Busy callbacks must retry rather than fall through. */
+int af_bank_frontend_cancel(void);
 #endif

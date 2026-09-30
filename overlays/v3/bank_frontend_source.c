@@ -107,3 +107,10 @@ void af_bank_frontend_destruct(void) {
     af_bn_ui.transaction.open=0;af_bn_ui.active=0;af_bn_ui.ops=0;af_bn_ui.context=0;
 }
 int af_bank_frontend_active(void) {return af_bn_ui.active;}
+int af_bank_frontend_cancel(void) {
+    if(af_bn_ui.busy)return -1;
+    if(!af_bn_ui.active)return 0;
+    af_bn_ui.busy=1;af_bn_ui.transaction.open=0;
+    af_bn_close(&af_bn_ui.overlay.menu_info[mSM_OVL_BANK],mSM_MOVE_OUT_TOP);
+    af_bn_ui.busy=0;return 1;
+}

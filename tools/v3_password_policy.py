@@ -41,6 +41,8 @@ def reference_texts():
 
 def function(text,name):
     match=re.search(r'(?:extern|static)\s+[^;{}]*?\b'+re.escape(name)+r'\s*\([^;{}]*\)\s*\{',text)
+    if not match:
+        match=re.search(r'^(?:void|int)\s+'+re.escape(name)+r'\s*\([^;{}]*\)\s*\{',text,re.M)
     if not match:raise ValueError('Missing complete reference function: '+name)
     depth=1;end=match.end()
     while depth and end<len(text):

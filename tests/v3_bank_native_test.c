@@ -1,4 +1,5 @@
 #include "bank_native.h"
+#include "bank_pelly.h"
 #include <assert.h>
 #include <string.h>
 typedef unsigned int u32;
@@ -6,21 +7,20 @@ static union {u32 aligned;unsigned char bytes[0x40];} private;
 static unsigned char record[48],submenu[0xF0],overlay[0x10730];
 void *af_bank_now_private;
 unsigned char af_bank_player;
-static int eligible=1,selected=1,set_calls,pre_calls,draw_calls,move_calls,end_calls,close_calls;
-static void *pointers[10];static unsigned int offsets[10],pointer_count;
-static void *pointer_owners[10];
+unsigned char af_bank_account_mode=1,af_bank_home_arrangement,af_bank_native_homes[4*0xB48];
+static int set_calls,pre_calls,draw_calls,move_calls,end_calls,close_calls;
+static void *pointers[16];static unsigned int offsets[16],pointer_count;
+static void *pointer_owners[16];
 static u32 word(const unsigned char *p) {return (u32)p[0]<<24|(u32)p[1]<<16|(u32)p[2]<<8|p[3];}
 static void put(unsigned char *p,u32 n) {p[0]=n>>24;p[1]=n>>16;p[2]=n>>8;p[3]=n;}
 unsigned char *af_bank_native_account(void) {return record;}
-int af_bank_native_eligible(void) {return eligible;}
-int af_bank_native_selected(void) {return selected;}
 void *af_bank_test_pointer(const void *p,unsigned int at) {
     for(u32 i=0;i<pointer_count;i++)if(p==pointer_owners[i] && at==offsets[i])return pointers[i];
     return 0;
 }
 void af_bank_test_store_pointer(void *p,unsigned int at,void *value) {
     for(u32 i=0;i<pointer_count;i++)if(p==pointer_owners[i] && at==offsets[i]) {pointers[i]=value;return;}
-    assert(pointer_count<10);pointer_owners[pointer_count]=p;offsets[pointer_count]=at;
+    assert(pointer_count<16);pointer_owners[pointer_count]=p;offsets[pointer_count]=at;
     pointers[pointer_count++]=value;
 }
 void af_bank_native_set_pocket(void *p,int slot,unsigned short item,unsigned int condition) {
@@ -39,6 +39,8 @@ extern void af_bank_test_native_draw(void *,void (*)(void *,void *));
 void af_bank_native_test(void) {
     memset(private.bytes,0xA5,sizeof(private.bytes));memset(submenu,0,sizeof(submenu));memset(overlay,0,sizeof(overlay));
     af_bank_now_private=private.bytes;af_bank_player=0;assert(af_bank_reset(record,48));
+    put(private.bytes+0x3C,0);memcpy(af_bank_native_homes,private.bytes,16);
+    af_bank_native_homes[0x22]=0x80;
     put(private.bytes+0x38,99999);put(private.bytes+0x34,0xC0000008u);
     for(u32 i=0;i<15;i++)private.bytes[0x14+2*i]=private.bytes[0x15+2*i]=0;
     private.bytes[0x14]=0x21;private.bytes[0x15]=2;
@@ -77,7 +79,17 @@ void af_bank_native_test(void) {
     assert(!af_bank_native_commit(record,before,after,private.bytes,&wallet,&next) && set_calls==count);
     memcpy(after,before,48);put(after+16,100001);next.items[1]=0;
     assert(!af_bank_native_commit(record,before,after,private.bytes,&wallet,&next) && set_calls==count);
-    selected=0;put(submenu+4,0);assert(!af_bank_native_request(submenu));selected=1;
-    eligible=0;assert(!af_bank_native_request(submenu));eligible=1;
+    af_bank_account_mode=0;put(submenu+4,0);assert(!af_bank_native_request(submenu));af_bank_account_mode=1;
+    put(private.bytes+0x3C,1);assert(!af_bank_native_request(submenu));put(private.bytes+0x3C,0);
     af_bank_player=4;assert(!af_bank_native_request(submenu));af_bank_player=0;
+    /* Forced closing retains bank ownership until the ordinary native dtor. */
+    assert(af_bank_native_request(submenu)==1);put(submenu+4,7);
+    assert(af_bank_native_construct(submenu)==1);
+    count=close_calls;assert(af_bank_native_cancel(submenu)==1 && close_calls==count+1);
+    assert(af_bank_frontend_active() && af_bank_native_destruct(submenu)==1);
+    /* Cancelling an admitted request before construction is an owned failure,
+     * never an invitation to open the old loan repayment menu. */
+    put(submenu+4,0);assert(af_bank_native_request(submenu)==1);
+    assert(af_bank_native_cancel(submenu)==1);put(submenu+4,7);
+    assert(af_bank_native_construct(submenu)==-1 && !af_bank_frontend_active());
 }

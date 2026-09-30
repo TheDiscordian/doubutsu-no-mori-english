@@ -113,9 +113,16 @@ int main(void) {
     reset(999999999);assert(af_bank_frontend_open(&ops,&c));c.move();c.refuse=2;
     graph.head=commands;graph.tail=commands+2048;old_lines=lines;
     assert(c.draw(&game)==0 && graph.head==commands && lines==old_lines);
+    reset(0);assert(af_bank_frontend_open(&ops,&c));c.move();press(8);
+    assert(af_bank_frontend_cancel()==1 && af_bank_frontend_active());
+    assert(!c.commits && c.wallet.wallet==99999 && c.transitions[AF_BANK_UI_CLOSE]==1);
+    c.move();assert(c.transitions[AF_BANK_UI_END]==1);
+    af_bank_frontend_destruct();assert(!af_bank_frontend_active());
     reset(0);c.eligible=0;assert(!af_bank_frontend_open(&ops,&c));assert(!af_bank_frontend_active());
 #ifdef AF_BANK_TEST_NATIVE
     af_bank_native_test();
+    extern void af_bank_pelly_test(void);
+    af_bank_pelly_test();
 #endif
     puts("Complete donor banking lifecycle, rendering, transfers, and guarded callbacks pass; native I/O is doubled.");
     return 0;
