@@ -47,14 +47,16 @@ runtime alternatives; other substantial differences still need real bindings.
 
 Current implementation task: finish focused stability/save verification and the
 private import-pipeline handoff. Regular-pool browser/offline integration passes:
-`build/v3-import-pipeline-browser-03/build.json`,
+`build/v3-import-pipeline-browser-04/build.json`,
 `build/v3-import-pipeline-interface-03/results.json`, and
-`build/v3-import-pipeline-worker-01/results.json`. The all-available profile is
-`build/v3-import-pipeline-profile-01/profile.json` (148 independent choices,
+`build/v3-import-pipeline-worker-02/results.json`. The unchanged interface evidence
+is reused; the current repaired cartridge's worker hashes match offline builds.
+The all-available profile is
+`build/v3-import-pipeline-profile-04/profile.json` (148 independent choices,
 including all twenty villagers, plus two required outfit resources). Preserve
 these results and disabled special-item selections. Complete the exact current
 cartridge's bounded save check. Its boot/RAM/startup/guard/fault check passes at
-`build/v3-import-pipeline-boot-01/results.json`; the blank FlashRAM output does
+`build/v3-import-pipeline-boot-04/results.json`; the blank FlashRAM output does
 not establish save/reload or ordinary progression. The format-21 native save
 attempt at `build/v3-import-pipeline-save-write-01/results.json` stops before
 writes: its 16,640-byte transfer allocation cannot fit the captured native
@@ -63,15 +65,25 @@ scene arena's 14,576 free bytes. The spring foreground owner now reserves
 `80AA01B0`, without checking its result. The separate save menu calls the
 synchronous writer after gameplay cleanup clears the scene arena; unlike the
 original writer, the installed writer requires an allocation from that arena.
-The shared guarded 65,536-byte private-bank implementation is prepared at
-`build/v3-private-save-bank-prepared-02/prepared.json` (356 MIPS code bytes),
-with four passing focused host checks. It is not installed. Next authenticate
-the retired scratch reservation's current users, install initialization through
-the shared startup, and bind both synchronous writers, diary preflight, and the
-native allocated loader/release to the shared private bank. Preserve complete
-data, native I/O, asynchronous framebuffer ownership, and save format 21.
-Verify the changed callers; ordinary scene headroom remains separate from this
-save workspace. Do not reduce the diagnostic buffer and call save coverage
+The guarded complete-bank workspace is installed through the existing checked
+startup at `build/v3-private-save-bank-installed-06/build-lock.json`, ABI 388.
+All 23 former scratch exports are authenticated as redirects to the active
+diary owner. Both synchronous writers, diary preflight, and native allocated
+loader/release use the complete 65,536-byte bank without the scene heap. The
+retained 64-byte save record resides at `806A9080`, outside the native title
+replay buffer; ten authenticated high-address bindings retain all entry addresses,
+other instructions, and saved data. Native buffer reservation scans include
+full RAM/end and pixel extents, not a neighbouring function's short byte count.
+Six focused host checks, five installed-cartridge checks, and five current-build
+browser/offline scope checks pass. The native Start/load path reads a complete
+bank and releases it with zero save error, intact guards, and intact relocated
+state at `build/v3-import-pipeline-boot-04/results.json`. The matching checkpoint
+contains the complete blank-chip read in the private bank and title replay data
+at the old conflicting address. This verifies loading, not a completed game save.
+Next verify the actual synchronous writing/diary consumers and ordinary
+save/restart, and finish the private handoff. Preserve complete data, native I/O,
+asynchronous framebuffer ownership, and save format 21. Ordinary scene headroom
+remains separate from this save workspace. Do not reduce the diagnostic buffer and call save coverage
 complete, skip the synchronous writer, replay exhausted fixtures, or reset this
 save-check harness's spent debugging budget. Retain its unverified adapter and
 exact failed output. Classify retained creature constructor/scheduler failures

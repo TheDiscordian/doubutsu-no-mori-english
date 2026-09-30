@@ -1,5 +1,6 @@
 """Actual V3 FlashRAM hook composition and sanitized save/load control flow."""
 import json
+import os
 from pathlib import Path
 import struct
 import subprocess
@@ -20,6 +21,33 @@ OUTPUT = ROOT / 'build/v3-save-runtime-02'
 
 
 class SaveRuntimeHostTests(unittest.TestCase):
+    def test_native_data_extents_do_not_use_code_function_byte_counts(self):
+        from v3_console_disk_install import reservations
+        title = dict(ram=0x807E9000, end=0x807ED830, bytes=112, resource_bytes=0x4830)
+        self.assertIn((title['ram'], title['end']), list(reservations(title)))
+        pixels = dict(pixels_ram=0x807D9000, pixels_end=0x807E8120)
+        self.assertIn((pixels['pixels_ram'], pixels['pixels_end']), list(reservations(pixels)))
+
+    def test_binding_authenticates_complete_function_and_preserves_delay_slots(self):
+        from v3_private_save_bank import bind_function, refresh_code
+        raw = bytearray(struct.pack('>8I', 1, 0x0040F809, 3, 4, 5, 0x0040F809, 7, 8))
+        before = bytes(raw)
+        contract = ('fixture', 0x80001000, 0x80001020, sha256(raw),
+                    ((0x80001004, 'acquire'), (0x80001014, 'release')))
+        receipt = bind_function(raw, 0x80001000, contract,
+                                dict(acquire=0x804F31CC, release=0x804F3218))
+        for patch in receipt['patches']:
+            at = patch['address']-0x80001000
+            self.assertEqual(raw[at+4:at+8], before[at+4:at+8])
+            self.assertEqual(struct.unpack_from('>I', raw, at)[0], patch['after'])
+        bad = bytearray(before); bad[-1] ^= 1
+        with self.assertRaisesRegex(ValueError, 'complete allocating save consumer'):
+            bind_function(bad, 0x80001000, contract, {})
+        metadata = [dict(ram=None, bytes=32), dict(ram='80001000', bytes=32),
+                    dict(ram=0x80001000, bytes=32, sha256=sha256(before))]
+        refresh_code(metadata, before, raw, 0x80001000)
+        self.assertEqual(metadata[-1]['sha256'], sha256(raw))
+
     def test_sanitized_private_complete_bank_ownership(self):
         with tempfile.TemporaryDirectory(prefix='af-v3-private-bank-tests-') as directory:
             binary = Path(directory) / 'test'
@@ -139,6 +167,127 @@ class SaveRuntimeCartridgeTests(unittest.TestCase):
         self.assertEqual(compose(self.native, self.base, changes, added), self.rom)
         self.assertEqual(compose(self.native, self.base, {}, {}), self.base)
         self.assertEqual(apply_ups(self.native, (OUTPUT / 'asset-loader.ups').read_bytes()), self.rom)
+
+
+PRIVATE_OUTPUT = ROOT/os.environ.get('V3_PRIVATE_SAVE_BANK_BUILD', 'build/v3-private-save-bank-installed-06')
+
+
+@unittest.skipUnless((PRIVATE_OUTPUT/'build-lock.json').is_file(), 'Installed private save bank required')
+class PrivateSaveBankCartridgeTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from v3_furniture_install import inputs
+        cls.rom, cls.report = inputs(PRIVATE_OUTPUT/'build-lock.json')
+        cls.base, cls.prior = inputs(PRIVATE_OUTPUT/'base-lock.json')
+        cls.bank = cls.report['equipment_resources']['private_save_bank']
+        cls.files, cls.old_files = by_vrom(cls.rom), by_vrom(cls.base)
+
+    def test_complete_startup_packet_owns_guards_without_growing_descriptor_table(self):
+        from v3_private_save_bank import CONSOLE_RAM, RAM, END, CODE, MAGIC, GUARD
+        from v3_physical_resources import verify
+        p = self.bank['packet']; raw = self.rom[p['physical']:p['physical']+p['bytes']]
+        self.assertEqual(sha256(raw), p['sha256'])
+        self.assertEqual(zlib.crc32(raw), p['crc32'])
+        old = self.prior['equipment_resources']['console_storage']['packet']
+        old_blob = self.old_files[BLOB].extract(self.base)
+        self.assertEqual(raw[:old['bytes']], old_blob[old['blob_offset']:old['blob_offset']+old['bytes']])
+        self.assertEqual(raw[RAM-CONSOLE_RAM:RAM-CONSOLE_RAM+16], struct.pack('>4I', MAGIC, 0, GUARD, GUARD))
+        self.assertEqual(raw[RAM-CONSOLE_RAM+16:RAM-CONSOLE_RAM+16+65536], bytes(65536))
+        self.assertEqual(raw[RAM-CONSOLE_RAM+65552:RAM-CONSOLE_RAM+65568], struct.pack('>4I', *([GUARD]*4)))
+        n = self.bank['code']['bytes']
+        self.assertEqual(sha256(raw[CODE-CONSOLE_RAM:CODE-CONSOLE_RAM+n]), self.bank['code']['sha256'])
+        self.assertEqual(p['bytes'], END-CONSOLE_RAM)
+        e = self.report['equipment_resources']; boot = e['surface_bootstrap']['code']
+        self.assertEqual((boot['packet_count'], boot['packet_stride'], boot['bytes']), (23, 16, 676))
+        blob = self.files[BLOB].extract(self.rom)
+        at = e['blob_offset']+boot['symbols']['packets']-e['ram']
+        rows = [struct.unpack_from('>4I', blob, at+i*16) for i in range(23)]
+        matching = [r for r in rows if r[0] == CONSOLE_RAM]
+        self.assertEqual(len(matching), 1)
+        self.assertEqual(matching[0][:3], (CONSOLE_RAM, p['physical']|0x80000000, p['bytes']))
+        crc_at = e['blob_offset']+matching[0][3]-e['ram']
+        self.assertEqual(struct.unpack_from('>I', blob, crc_at)[0], p['crc32'])
+        verify(self.rom, self.report['physical_resources'])
+
+    def test_every_changed_save_consumer_preserves_complete_other_instructions(self):
+        e = self.report['equipment_resources']; old = self.prior['equipment_resources']
+        owners = ((e['diaries']['packets']['storage'], old['diaries']['packets']['storage']),
+                  (e['carried_items']['quest']['packet'], old['carried_items']['quest']['packet']))
+        for receipt in self.bank['consumers']:
+            p, previous = next(pair for pair in owners if pair[0]['ram'] <= receipt['first'] < pair[0]['ram']+pair[0]['bytes'])
+            a, b = receipt['first']-p['ram'], receipt['last']-p['ram']
+            before = self.base[previous['physical']+a:previous['physical']+b]
+            after = self.rom[p['physical']+a:p['physical']+b]
+            self.assertEqual(sha256(before), receipt['before_sha256'])
+            self.assertEqual(sha256(after), receipt['after_sha256'])
+            restored = bytearray(after)
+            for patch in receipt['patches']:
+                at = patch['address']-receipt['first']
+                self.assertEqual(struct.unpack_from('>2I', after, at), (patch['after'], patch['delay_slot']))
+                struct.pack_into('>I', restored, at, patch['before'])
+            self.assertEqual(restored, before)
+        before = self.old_files[CODE_VROM].extract(self.base)
+        after = self.files[CODE_VROM].extract(self.rom); restored = bytearray(after)
+        for patch in self.bank['native_patches']:
+            at = patch['address']-CODE_RAM
+            self.assertEqual(struct.unpack_from('>2I', after, at), (patch['after'], patch['delay_slot']))
+            struct.pack_into('>I', restored, at, patch['before'])
+        self.assertEqual(restored, before)  # Includes untouched asynchronous framebuffer owner.
+
+    def test_scratch_retirement_rejects_live_or_changed_original_owner(self):
+        from v3_private_save_bank import authenticate_retirement
+        blob = bytearray(self.old_files[BLOB].extract(self.base))
+        authenticate_retirement(self.prior, blob)
+        old = self.prior['equipment_resources']['console_storage']['packet']
+        blob[old['blob_offset']] ^= 1
+        with self.assertRaisesRegex(ValueError, 'predecessor'):
+            authenticate_retirement(self.prior, blob)
+        import copy
+        prior = copy.deepcopy(self.prior)
+        prior['live_fixture'] = dict(ram=0x804E3000, bytes=16)
+        with self.assertRaisesRegex(ValueError, 'exclusively retired'):
+            authenticate_retirement(prior, self.old_files[BLOB].extract(self.base))
+
+    def test_retained_save_record_moves_out_of_title_replay_without_other_code_changes(self):
+        from v3_private_save_bank import RETAINED_STATE_RAM
+        from v3_console_disk_install import reservations
+        moved = self.bank['retained_state']; old = self.prior['equipment_resources']['bank']
+        self.assertEqual(moved['ram'], RETAINED_STATE_RAM)
+        self.assertTrue(moved['title_buffer']['ram'] <= moved['previous_ram'] < moved['title_buffer']['end'])
+        self.assertFalse(any(a < RETAINED_STATE_RAM+64 and RETAINED_STATE_RAM < b
+                             for a,b in reservations(self.prior)))
+        p = self.report['equipment_resources']['bank']['packet']
+        at = old['ram']-p['ram']; size = old['code']['bytes']
+        before = self.base[old['packet']['physical']+at:old['packet']['physical']+at+size]
+        after = self.rom[p['physical']+at:p['physical']+at+size]
+        self.assertEqual(sha256(after), moved['after_sha256'])
+        restored = bytearray(after)
+        self.assertEqual(len(moved['patches']), 10)
+        for patch in moved['patches']:
+            offset = patch['address']-old['ram']
+            self.assertEqual(struct.unpack_from('>I', after, offset)[0], patch['after'])
+            self.assertEqual(patch['before']>>16, patch['after']>>16)
+            for lower in patch['lower_addresses']:
+                pos = lower-old['ram']
+                self.assertEqual(after[pos:pos+4], before[pos:pos+4])
+            struct.pack_into('>I', restored, offset, patch['before'])
+        self.assertEqual(restored, before)
+        self.assertEqual(self.report['equipment_resources']['bank']['code']['symbols'], old['code']['symbols'])
+        self.assertIn(f'-DAF_BANK_STATE_RAM=0x{RETAINED_STATE_RAM:X}u',
+                      self.report['save_codec']['active_storage_code']['flags'])
+
+    def test_save_identity_choices_and_artwork_are_retained(self):
+        self.assertEqual(self.report['save_codec']['format_version'], 21)
+        self.assertEqual(self.report['save_runtime']['profile_hex'], self.prior['save_runtime']['profile_hex'])
+        self.assertEqual(self.report['save_runtime']['state_bytes'], self.prior['save_runtime']['state_bytes'])
+        self.assertEqual(self.report['shops'], self.prior['shops'])
+        self.assertEqual(self.report['npc_draw']['imports'], self.prior['npc_draw']['imports'])
+        self.assertEqual(self.report['furniture']['imports'], self.prior['furniture']['imports'])
+        self.assertFalse(self.report['shared_runtime_refresh']['saved_format_changed'])
+        self.assertFalse(self.report['shared_runtime_refresh']['artwork_changed'])
+        self.assertEqual(self.bank['scene_heap_bytes'], 0)
+        native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(native, (PRIVATE_OUTPUT/'asset-loader.ups').read_bytes()), self.rom)
 
 
 if __name__ == '__main__':

@@ -126,7 +126,10 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
     check('runtime end guard', state_guard, bytes.fromhex('AF53C0DE') * 4)
     if console:
         packet=console['packet']; all_blob=files[BLOB].extract(rom)
-        check('complete console startup packet',packet['ram'],all_blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
+        raw = (rom[packet['physical']:packet['physical']+packet['bytes']]
+               if packet.get('storage') == 'physical-ROM' else
+               all_blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
+        check('complete console startup packet',packet['ram'],raw)
         check('console state initialized',console['state']['ram'],struct.pack('>4I',0x41464335,0,0,0))
         for workspace in ('scratch','hash'):
             check('console '+workspace+' guard',scratch_guard if workspace == 'scratch' else console[workspace]['guard'],bytes.fromhex('AF4355DE')*4)

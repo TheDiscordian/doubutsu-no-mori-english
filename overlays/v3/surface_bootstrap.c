@@ -7,7 +7,7 @@ extern int af_surface_dma(void *,u32,u32);
 extern u32 af_surface_crc(const void *,u32);
 extern void af_surface_writeback(void *,u32),af_surface_invalidate(void *,u32);
 extern int af_surface_prior_init(void);
-#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL) || defined(AF_TREE_EFFECTS_PHYSICAL) || defined(AF_CARRIED_QUEST_PHYSICAL) || defined(AF_HARVEST_PHYSICAL)
+#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL) || defined(AF_TREE_EFFECTS_PHYSICAL) || defined(AF_CARRIED_QUEST_PHYSICAL) || defined(AF_HARVEST_PHYSICAL) || defined(AF_CONSOLE_STORAGE_PHYSICAL)
 extern int af_surface_pi(u32,void *,u32);
 #endif
 
@@ -23,7 +23,7 @@ static const u32 carry_crc=AF_ROOM_CARRY_CRC;
 #ifdef AF_PLAYER_EXERCISE_VROM
 static const u32 exercise_crc=AF_PLAYER_EXERCISE_CRC;
 #endif
-#ifdef AF_CONSOLE_STORAGE_VROM
+#if defined(AF_CONSOLE_STORAGE_VROM) || defined(AF_CONSOLE_STORAGE_PHYSICAL)
 static const u32 storage_crc=AF_CONSOLE_STORAGE_CRC;
 #endif
 #ifdef AF_CONSOLE_IMAGES_VROM
@@ -128,7 +128,9 @@ static const struct StartupPacket packets[]={
 #ifdef AF_PLAYER_EXERCISE_VROM
     {DEST(exercise_code,0x804CE000u),AF_PLAYER_EXERCISE_VROM,AF_PLAYER_EXERCISE_BYTES,&exercise_crc},
 #endif
-#ifdef AF_CONSOLE_STORAGE_VROM
+#ifdef AF_CONSOLE_STORAGE_PHYSICAL
+    {DEST(console_code,0x804DE200u),AF_CONSOLE_STORAGE_PHYSICAL|0x80000000u,AF_CONSOLE_STORAGE_BYTES,&storage_crc},
+#elif defined(AF_CONSOLE_STORAGE_VROM)
     {DEST(console_code,0x804DE200u),AF_CONSOLE_STORAGE_VROM,AF_CONSOLE_STORAGE_BYTES,&storage_crc},
 #endif
 #ifdef AF_CONSOLE_IMAGES_VROM
@@ -185,7 +187,7 @@ static const struct StartupPacket packets[]={
 
 int af_v3_surface_init(void) {
     for (const struct StartupPacket *p=packets;p<packets+sizeof(packets)/sizeof(*packets);p++) {
-#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL) || defined(AF_TREE_EFFECTS_PHYSICAL) || defined(AF_CARRIED_QUEST_PHYSICAL) || defined(AF_HARVEST_PHYSICAL)
+#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL) || defined(AF_TREE_EFFECTS_PHYSICAL) || defined(AF_CARRIED_QUEST_PHYSICAL) || defined(AF_HARVEST_PHYSICAL) || defined(AF_CONSOLE_STORAGE_PHYSICAL)
         int status=(p->source&0x80000000u)?
             af_surface_pi(physical_address(p->source),p->destination,p->bytes):
             af_surface_dma(p->destination,p->source,p->bytes);

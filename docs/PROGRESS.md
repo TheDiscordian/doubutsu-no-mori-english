@@ -46,25 +46,30 @@ preserved; selection changes do not reconvert artwork or remove physical data.
 New event/reward providers stay disabled, and their V4 controls are hidden.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-03/build.json`. Five current-cartridge scope
-tests and twelve JavaScript checks pass. Headless Chromium interface and worker
-checks pass at `build/v3-import-pipeline-interface-03/results.json` and
-`build/v3-import-pipeline-worker-01/results.json`: actual file inputs, independent
-selection/dependencies, cancellation, download hashes, unavailable-review data,
-and browser/offline agreement. Empty selection returns exact V2-14. No game files
-are uploaded; the temporary check servers are stopped. The export is unserved.
+`build/v3-import-pipeline-browser-04/build.json`, pinned to the repaired ABI-388
+cartridge. Five current-cartridge scope/browser-equivalence tests pass. The
+current headless Chromium worker check at
+`build/v3-import-pipeline-worker-02/results.json` reads actual game files and
+matches offline hashes for empty, all-available, villager/regular-item, and
+equipment-subset selections, with cancellation and invalid-input rejection.
+The unchanged interface retains its passing evidence at
+`build/v3-import-pipeline-interface-03/results.json`, including independent
+selection/dependencies, keyboard controls, unavailable-review data, and download
+lifecycle checks; twelve unchanged JavaScript checks retain passing evidence.
+Empty selection returns exact V2-14. No game files are uploaded; the temporary
+check servers are stopped. The export is unserved.
 
 The all-available offline profile is
-`build/v3-import-pipeline-profile-01/profile.json`; UPS reconstruction passes.
+`build/v3-import-pipeline-profile-04/profile.json`; UPS reconstruction passes.
 ROM SHA-256:
-`5159042cb4fa71b5d63523d6dd3c0e93ffffa542dcfdf66c5496798d48205a77`.
+`6e56a63e8e6b553f0a624a2a801bedd2fd94d1d615e88123e7eb01879e64eb7f`.
 UPS SHA-256:
-`8fe8177422d7c50bd1a1c57758b9fa6ea0df81858600511ce28cd48587a0b3ba`.
-It retains ABI 387, format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and older
+`4d5cb23d1dc7a200fbe7052cb2857bf8fffc4f1af9cd9b43d8048ef88ea88d5d`.
+It retains ABI 388, format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and older
 V3 readers cannot read these saves; preserve separate saves and backups. Browser
 composition does not prove ordinary gameplay, physical save/restart, or hardware.
 The current ROM's silent isolated boot check passes at
-`build/v3-import-pipeline-boot-01/results.json`: eight-MiB RAM, startup readiness,
+`build/v3-import-pipeline-boot-04/results.json`: eight-MiB RAM, startup readiness,
 translation/resident/save guards, zero native fault state before and after Start,
 and graceful shutdown. No dialogue is loaded in the sampled frame; the Start
 keypress is not proof of ordinary progression. The emitted blank FlashRAM file
@@ -93,20 +98,37 @@ loader first at `80AA01B0`, and does not check its result. Its reset path calls 
 synchronous writer and direct loader at `80A9FFB0`/`80A9FFB8`. The separate save
 menu calls the synchronous writer after gameplay cleanup clears the scene heap;
 the original writer did not allocate there. That save-menu allocation dependency
-is a concrete implementation defect. The title load's ordinary outcome and
-broader scene headroom remain unverified, not proved safe by the boot result.
+is a concrete implementation defect addressed by the private-bank repair below.
+Ordinary save/restart and broader scene headroom remain unverified, not proved
+safe by the boot result.
 
-The shared private-bank implementation at
-`build/v3-private-save-bank-prepared-02/prepared.json` preserves a complete
-65,536-byte bank with ownership and both guard boundaries, using no scene heap.
-Four focused host checks pass, including the sanitized allocator checks and
-retained save control flow. Its 356-byte MIPS code compiles and links within the
-retired 72,064-byte scratch reservation. The reservation scan finds only that
-retired owner there; actual obsolete scratch users still require authentication.
-The preparation is not installed, has no changed save format, and does not
-establish save/reload. The next connected work is startup initialization and
-binding the synchronous writers, diary preflight, and native allocated loader/
-release to this shared workspace. Do not replace the failed check with smaller
+The complete private-bank repair is installed at
+`build/v3-private-save-bank-installed-06/build-lock.json`, ABI 388. Its 356-byte
+MIPS code and guarded 65,536-byte workspace fit the retired 72,064-byte scratch
+reservation. All 23 former scratch-owner exports authenticate as redirects to
+the active diary owner. The existing console preload carries the initialized
+workspace and code, retaining 23 startup descriptors and a 676-byte bootstrap.
+Both synchronous writers, diary preflight, and native allocated loader/release
+use this bank independently of the scene heap. Saved formats, native I/O,
+asynchronous framebuffer ownership, all artwork, and import identities remain
+unchanged.
+
+The retained 64-byte save record resides at `806A9080..806A90C0`, separate from
+the native title replay at `807E9000..807ED830`. Ten authenticated high-address
+instruction changes retain the complete program's other instructions, entry
+addresses, and persistence format. Reservation scans cover RAM/end and pixel
+extents rather than using a neighbouring function's short code length.
+Six focused host checks, five installed-cartridge checks, and five current-build
+scope/browser-equivalence checks pass. The native check at
+`build/v3-import-pipeline-boot-04/results.json` passes all 26 steps: the normal
+Start/load path reads a complete bank, releases the workspace, and retains zero
+save error, all guards, and the relocated record. Its matching checkpoint
+contains the blank-chip bytes in the private bank and native replay bytes at the
+old conflicting address. This establishes the changed allocated-loader path,
+not ordinary write/restart compatibility. The exact same tested ROM is retained
+by the current profile; unchanged native evidence is reused without replay.
+Next verify the synchronous writing/diary consumers and ordinary save/restart,
+then finish the private handoff. Do not replace the failed check with smaller
 test buffers, replay exhausted fixtures, or silently omit a save consumer.
 
 ## Preserved experimental artifact and subsystem evidence

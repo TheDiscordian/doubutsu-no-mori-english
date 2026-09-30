@@ -6,9 +6,22 @@
   {"read":["8019C8D0",16],"expect":"AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
   {"read":["8046BFF0",16],"expect":"AF33C0DEAF33C0DEAF33C0DEAF33C0DE"},
   {"read":["8046C4E0",16],"expect":"AF53C0DEAF53C0DEAF53C0DEAF53C0DE"},
+  {"read":["804E3000",16],"expect":"4146504200000000AF53B0DEAF53B0DE"},
+  {"read":["804F3010",16],"expect":"AF53B0DEAF53B0DEAF53B0DEAF53B0DE"},
+  {"read":["806A9080",16],"expect":"41464241010408000000000000000000"},
+  {"read":["806A90B0",16],"expect":"AF4355DEAF4355DEAF4355DEAF4355DE"},
   {"key":"Return","duration":0.12},
   {"wait":8},
+  {"save_state":true},
+  {"command":"g"},
+  {"read":["804E3004",4],"expect":"00000000"},
+  {"read":["8046C004",4],"expect":"00000000"},
   {"snapshot_message":true},
   {"read":["8003CE34",4],"expect":"00000000"},
-  {"read":["8046C4E0",16],"expect":"AF53C0DEAF53C0DEAF53C0DEAF53C0DE"}
+  {"read":["8046C4E0",16],"expect":"AF53C0DEAF53C0DEAF53C0DEAF53C0DE"},
+  {"read":["804E3008",8],"expect":"AF53B0DEAF53B0DE"},
+  {"read":["804F3010",16],"expect":"AF53B0DEAF53B0DEAF53B0DEAF53B0DE"},
+  {"read":["806A9080",16],"expect":"41464241010408000000000000000000"},
+  {"read":["806A90B0",16],"expect":"AF4355DEAF4355DEAF4355DEAF4355DE"},
+  {"read":["8003CE34",4],"expect":"00000000"}
 ]

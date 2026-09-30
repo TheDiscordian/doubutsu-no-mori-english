@@ -1,6 +1,7 @@
 """Current-cartridge V3 regular-pool selection and browser/offline equivalence."""
 import copy
 import json
+import os
 from pathlib import Path
 import struct
 import subprocess
@@ -17,7 +18,7 @@ from v3_creature_choices import options as behaviour_options
 from v3_holiday_selection import groups
 from v3_import_scope import PIPELINE, FEATURE_CHOICES, availability, requested_options
 
-LOCK = ROOT/'build/v3-post-office-bank-installed-05/build-lock.json'
+LOCK = ROOT/os.environ.get('V3_IMPORT_SCOPE_LOCK', 'build/v3-post-office-bank-installed-05/build-lock.json')
 
 
 class ImportScopeTests(unittest.TestCase):

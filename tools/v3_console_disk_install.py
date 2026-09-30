@@ -24,6 +24,12 @@ def reservations(value):
             yield value['ram'],value['ram']+value['bytes']
         if type(value.get('start')) is int and type(value.get('end')) is int:
             yield value['start'],value['end']
+        # Some native buffers carry a code-function byte count alongside their
+        # RAM destination/end. The byte count is not their data reservation.
+        for first,last in (('ram','end'),('pixels_ram','pixels_end')):
+            if (type(value.get(first)) is int and type(value.get(last)) is int
+                    and 0x80000000<=value[first]<value[last]<=0x80800000):
+                yield value[first],value[last]
         for v in value.values():yield from reservations(v)
     elif isinstance(value,list):
         for v in value:yield from reservations(v)

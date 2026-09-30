@@ -47,10 +47,10 @@ synchronous writer/direct loader at `80A9FFB0`/`80A9FFB8`. The independent
 `SaveMenu` state calls the synchronous writer without initializing a scene arena,
 after `play_cleanup` clears that arena. The original synchronous writer used live
 data directly, with no heap allocation. The added scene-heap dependency therefore
-breaks the separate save-menu implementation; the ordinary title-load outcome
-remains unverified.
+requires the independent workspace below. Blank-chip title loading has focused
+native evidence; ordinary saved-town restart remains unverified.
 
-`overlays/v3/private_save_bank.c` prepares a shared temporary bank independent of
+`overlays/v3/private_save_bank.c` implements a shared temporary bank independent of
 that scene heap. It reserves 65,536 data bytes and 32 metadata/guard bytes, rejects
 overlapping acquisition, validates exact release ownership, and stops on damaged
 guards. Its initializer runs once during cartridge startup, not on town/profile
@@ -59,23 +59,36 @@ thread; this is not a general concurrent allocator. It does not change persisten
 records, compression, bank capacity, native I/O, or asynchronous framebuffer
 ownership.
 
-The candidate workspace begins at `804E3000` (bank at `804E3010`), with 356 bytes
+The installed workspace begins at `804E3000` (bank at `804E3010`), with 356 bytes
 of MIPS code at `804F3100`. Both fit inside the retained console storage's retired
 scratch reservation `804E3000..804F4980`; current complete storage compilation
 uses diary scratch at `80682000`. The checked reservation scan finds no other
-reported owner in that interval. Before installation, authenticate every former
-scratch reader/guard alias, load and initialize the code/workspace through shared
-startup, and bind both synchronous writers, diary preflight, and native allocated
-loader/free calls to the shared acquire/release entries. Keep the native payload
+reported owner in that interval. All 23 former scratch-owner exports authenticate
+as redirects to the active diary owner. Shared startup extends the existing
+console preload with the complete initialized workspace/code, retaining the
+23-descriptor, 676-byte bootstrap. Both synchronous writers, diary preflight,
+and native allocated loader/free calls bind to the shared acquire/release
+entries. Keep the native payload
 at `F980`, the private bank at `10000`, and all guards outside those transfers.
 
-`build/v3-private-save-bank-prepared-02/prepared.json` records the checked current
-base, compilation, and reservation. Four focused host checks pass, including
-sanitized complete-bank ownership/reuse/rejection/guard checks. The module is not
-installed, and ordinary save/reload is not established. The exhausted native
-save-check fixture remains retained and unverified; preparation does not restart
-its debugging budget. Earlier evidence below belongs to its recorded historical
-builds, not this current repair.
+The existing 64-byte save record resides at `806A9080..806A90C0`, outside the
+native title replay buffer. Ten authenticated high-address instruction changes
+retain the complete linked program's other instructions, entry addresses,
+resources, and saved format. Its existing save-reset initializer owns the record
+and guards. Reservation scans include full RAM/end and pixel ranges, even when a
+receipt's byte count describes a code function rather than its data buffer.
+
+`build/v3-private-save-bank-installed-06/build-lock.json` pins the installation,
+ABI 388. Six focused host and five installed-cartridge checks pass. The
+all-available profile is `build/v3-import-pipeline-profile-04/profile.json`.
+`build/v3-import-pipeline-boot-04/results.json` verifies the exact same ROM's
+normal Start/allocated-loader path: a complete bank read, released workspace,
+zero save error, and intact state/guards. Its checkpoint confirms native replay
+does not overwrite the relocated record. This is blank-chip loading, not ordinary
+save/restart, synchronous writing, or diary-preflight execution. The exhausted
+native save-check fixture remains retained and unverified; installation does not
+restart its debugging budget. Other evidence below applies only to its recorded
+builds, not to all current consumers.
 
 ## Memory and startup
 

@@ -195,13 +195,25 @@ def publish_bootstrap(equipment,blob,surface,output):
             raise ValueError('Changed resident player-exercise packet')
         extra+=(f'AF_PLAYER_EXERCISE_VROM=0x{p["vrom"]:X}u',f'AF_PLAYER_EXERCISE_CRC=0x{p["crc32"]:X}u',
                 f'AF_PLAYER_EXERCISE_BYTES=0x{p["bytes"]:X}u')
-    console=equipment.get('console_storage')
+    console=equipment.get('console_storage');private=equipment.get('private_save_bank')
     if console:
-        p=console['packet'];raw=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
-        if (sha256(raw)!=p['sha256'] or zlib.crc32(raw)!=p['crc32'] or
-                p['ram']!=0x804DE200 or p['bytes']!=0x4E00):
-            raise ValueError('Changed resident console-storage packet')
-        extra+=(f'AF_CONSOLE_STORAGE_VROM=0x{p["vrom"]:X}u',f'AF_CONSOLE_STORAGE_CRC=0x{p["crc32"]:X}u',
+        p=console['packet']
+        if private:
+            from v3_private_save_bank import CONSOLE_RAM,END
+            if (not private['installed'] or private['packet']!=p or
+                    not private['initialized_by_checked_preload'] or
+                    p['ram']!=CONSOLE_RAM or p['bytes']!=END-CONSOLE_RAM or
+                    p['physical']&15 or p['storage']!='physical-ROM' or
+                    not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
+                raise ValueError('Changed complete private-bank startup packet')
+            source=f'AF_CONSOLE_STORAGE_PHYSICAL=0x{p["physical"]:X}u'
+        else:
+            raw=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+            if (sha256(raw)!=p['sha256'] or zlib.crc32(raw)!=p['crc32'] or
+                    p['ram']!=0x804DE200 or p['bytes']!=0x4E00):
+                raise ValueError('Changed resident console-storage packet')
+            source=f'AF_CONSOLE_STORAGE_VROM=0x{p["vrom"]:X}u'
+        extra+=(source,f'AF_CONSOLE_STORAGE_CRC=0x{p["crc32"]:X}u',
                 f'AF_CONSOLE_STORAGE_BYTES=0x{p["bytes"]:X}u')
     images=equipment.get('console_images')
     if images:
@@ -473,6 +485,14 @@ def publish_bootstrap(equipment,blob,surface,output):
         if bank:
             from v3_bank_link import RAM as BANK_RAM,END as BANK_END
             from v3_bank_storage import STATE_RAM,STATE_BYTES,SCRATCH_RAM,SCRATCH_PRIOR,SCRATCH_BYTES
+            if private:
+                from v3_private_save_bank import RETAINED_STATE_RAM
+                moved=private['retained_state']
+                if (moved['previous_ram']!=STATE_RAM or moved['ram']!=RETAINED_STATE_RAM or
+                        moved['bytes']!=STATE_BYTES or not moved['pointer_only_changes'] or
+                        not moved['initialized_by_existing_save_reset']):
+                    raise ValueError('Changed retained-state relocation in shared save startup')
+                STATE_RAM=RETAINED_STATE_RAM
             if (not rewards or reward_end!=BANK_RAM or not bank['installed'] or bank['packet']!=p or
                     bank['ram']!=BANK_RAM or bank['end']!=BANK_END or
                     bank['packet_offset']!=expected or
