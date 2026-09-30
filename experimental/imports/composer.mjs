@@ -168,9 +168,9 @@ export function validatePlan(plan) {
     require(typeof row.id === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(row.id) && !behaviourIds.has(row.id),
       'Invalid or repeated behaviour setting.');
     behaviourIds.add(row.id);
-    if (row.v4_only !== undefined) require(pipeline && row.v4_only === true &&
+    if (row.pipeline_unavailable !== undefined) require(pipeline && row.pipeline_unavailable === true &&
       ['holiday-calendar', 'tournament-measurements', 'birthday-presentation'].includes(row.id),
-      'Invalid deferred feature setting.');
+      'Invalid unavailable behaviour setting.');
     for (const key of ['name', 'scope', 'description']) require(typeof row[key] === 'string' &&
       row[key].length > 0 && row[key].length < 1024, 'Invalid behaviour description.');
     require(row.values && Object.keys(row.values).length === 2 && row.values.N64 === 0 && row.values.GameCube === 1 &&
@@ -264,7 +264,7 @@ export function resolveSelection(plan, requested, behaviours = {}) {
   require(behaviours !== null && typeof behaviours === 'object' && !Array.isArray(behaviours), 'Invalid behaviour settings.');
   const definitions = new Map((plan.behaviours || []).map(row => [row.id, row]));
   require(Object.keys(behaviours).every(id => definitions.has(id)), 'Unknown or unavailable behaviour setting.');
-  require(Object.keys(behaviours).every(id => !definitions.get(id).v4_only), 'V4 feature setting is unavailable in V3.');
+  require(Object.keys(behaviours).every(id => !definitions.get(id).pipeline_unavailable), 'Behaviour setting is unavailable in this V3 profile.');
   const resolved = {}, rows = [...definitions.values()].sort((a, b) => a.id < b.id ? -1 : 1);
   for (const row of rows) {
     const value = Object.hasOwn(behaviours, row.id) ? behaviours[row.id] : row.default;

@@ -88,7 +88,7 @@ function changeSelection(change) {
 function addChoices(plan, review) {
   if (plan.save_compatibility) $('save-detail').textContent = plan.save_compatibility;
   for (const row of plan.behaviours || []) {
-    if (row.v4_only) continue;
+    if (row.pipeline_unavailable) continue;
     const label = document.createElement('label'), select = document.createElement('select');
     const caption = document.createElement('strong'), description = document.createElement('p');
     caption.textContent = row.name; description.textContent = row.description;

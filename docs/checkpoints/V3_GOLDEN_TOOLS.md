@@ -1,7 +1,7 @@
 # Golden-tool selection checkpoint
 
 Current development: ABI 372, saved format 20, on `v3/optional-imports`.
-Neither stable V2-14 patcher deployment changes.
+The stable V2-14 deployed patcher and ordinary local preview remain unchanged.
 
 - Lock: `build/v3-golden-tools-selection-06/build-lock.json`.
 - ROM SHA-256: `d037248ed512a0a8990c45f1cc6a5b18929f735e891dd50f8cd59af68b934288`.
@@ -225,7 +225,7 @@ the complete tree startup packet. Only the checked page-address word changes in
 that packet; loaded code, artwork, and RAM identities remain unchanged. The
 shared writer validates the exact old/new resources and revised page directory.
 The development build has 217 choices. All four golden tools are independently
-selectable. Both V2 deployments remain unchanged.
+selectable. The deployed patcher and local preview remain unchanged.
 
 ### Next connected consumers
 

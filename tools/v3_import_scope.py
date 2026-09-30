@@ -7,8 +7,8 @@ policy limits user-facing selections without treating all rewards as V4.
 DEVELOPMENT = 'development'
 PIPELINE = 'v3-pipeline'
 SCOPES = (PIPELINE, DEVELOPMENT)
-FEATURE_CHOICES = frozenset(('holiday-calendar', 'tournament-measurements',
-                             'birthday-presentation'))
+UNAVAILABLE_BEHAVIOURS = frozenset(('holiday-calendar', 'tournament-measurements',
+                                  'birthday-presentation'))
 
 
 def check_scope(scope):
@@ -29,6 +29,17 @@ def availability(catalog, report):
     e = report.get('equipment_resources', {})
     passive = {r['id'] for r in e.get('player_actions', {}).get('equipment_selection', {}).get('rows', [])
                if r['passive']}
+    equipment = set(passive)
+    golden = e.get('golden_tools', {})
+    rewards = e.get('carried_items', {}).get('quest', {}).get('rewards', {})
+    if (golden.get('shared_behaviour_installed') and rewards.get('installed')
+            and rewards.get('selectable')):
+        # These installed collection, Shrine, and tree routes extend existing
+        # systems. Their registry admission follows tool selection, not the
+        # optional holiday, Wisp, birthday, or savings-account activation.
+        from v3_held_catalogue import parent_readiness
+        ready, _ = parent_readiness(e)
+        equipment.update(ready)
     carried = {r['id']: r for r in e.get('carried_items', {}).get('rows', []) if not r['state_index']}
     outfits = {key for row in catalog.values() if row['kind'] == 'villager'
                for key in row['dependencies'] if catalog[key]['kind'] == 'clothing'}
@@ -46,7 +57,7 @@ def availability(catalog, report):
         elif kind in ('floor', 'wall'):
             ready = key in surfaces
         elif kind == 'equipment':
-            ready = key in passive
+            ready = key in equipment
         elif kind == 'carried':
             # Installed native categories: saplings, stationery, and fruit.
             # Event cards, cutlery, and spirit quests are not regular pools.
@@ -76,6 +87,6 @@ def check_requests(catalog, report, requested, behaviours):
     unavailable = [key for key in requested if key in states and not states[key]['selectable']]
     if unavailable:
         raise ValueError('Unavailable standalone V3 import: '+', '.join(unavailable))
-    if set(behaviours or {}) & FEATURE_CHOICES:
-        raise ValueError('GameCube feature settings are outside the V3 import pipeline')
+    if set(behaviours or {}) & UNAVAILABLE_BEHAVIOURS:
+        raise ValueError('Behaviour setting is not admitted by the current V3 selection policy')
     return states

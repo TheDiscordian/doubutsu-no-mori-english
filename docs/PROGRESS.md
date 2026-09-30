@@ -37,47 +37,58 @@ existing-system reward routes individually. See the
 ### Current import selections and verification
 
 Browser and offline builds default to the V3 pipeline scope. Both offer all
-twenty villagers and 135 independent item choices. Two exclusive
+twenty villagers and 139 independent item choices. Two exclusive
 starting-outfit resources follow their villagers as dependencies, not standalone
-item choices. Select all requests 155 choices and includes those two resources.
+item choices. Select all requests 159 choices and includes those two resources.
 Actual checked stock tables determine regular furniture, clothing, and surfaces;
 the remaining item categories use their installed native acquisition paths.
 Seven furniture choices use the existing native lottery, with checked donor
 membership and retained native selection code. They require no new event provider.
-The current filter leaves items outside its admitted regular categories
+The current filter leaves items outside its admitted acquisition categories
 unavailable; this is implemented selection behaviour, not proof that every
 excluded reward requires V4. Review those exclusions against existing-system
 acquisition. Prepared resources and stable identities are
 preserved; selection changes do not reconvert artwork or remove physical data.
-Experimental event/reward providers stay disabled, and their controls are hidden;
-this does not classify every reward as V4.
+The four golden-tool choices follow the installed shared readiness/provider
+checks. Tree, Shrine, and collection-completion gift routes extend existing
+systems, with registry admission keyed to tool selection. Selecting a tool does
+not enable the optional holiday, Wisp, birthday, or savings-account providers.
+Unavailable behaviour controls are hidden without a blanket V4 classification.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-05/build.json`, pinned to the repaired ABI-389
-cartridge. Six current-cartridge scope/browser-equivalence tests pass. The
+`build/v3-import-pipeline-browser-06/build.json`, pinned to the repaired ABI-389
+cartridge. Seven current-cartridge scope/browser-equivalence tests pass, covering
+four independent golden tools and rejection of missing providers. Nine actual
+browser/offline profiles match. The
 current headless Chromium worker check at
-`build/v3-import-pipeline-worker-03/results.json` reads actual game files and
+`build/v3-import-pipeline-worker-04/results.json` reads actual game files and
 matches offline hashes for empty, all-available, villager/regular-item, and
 equipment-subset selections, with cancellation and invalid-input rejection.
 The current interface check passes at
-`build/v3-import-pipeline-interface-05/results.json`, including independent
+`build/v3-import-pipeline-interface-06/results.json`, including independent
 selection/dependencies, keyboard controls, unavailable-review data, and download
-lifecycle checks. Twelve unchanged JavaScript checks retain passing evidence.
+lifecycle checks. Twelve focused JavaScript checks pass with Node's
+`--experimental-global-webcrypto` flag.
+<!-- Verification work record: the initial Node invocation lacks the required
+Web Crypto flag and fails before crypto-dependent assertions; the corrected
+invocation passes all twelve checks without changes to game code. -->
 Empty selection returns exact V2-14. No game files are uploaded; the temporary
 check servers are stopped. The export is unserved.
 
 The all-available offline profile is
-`build/v3-import-pipeline-profile-06/profile.json`; UPS reconstruction passes.
+`build/v3-import-pipeline-profile-07/profile.json`; UPS reconstruction passes.
 ROM SHA-256:
-`ccdf2274a65ec5005948dc6bcd807b4f6253305965de553e6fc279125386fabe`.
+`c7e99d7282043cd3108d1fabc5e6b9e7397b30e0bae9233d5fc7fa28be17d581`.
 UPS SHA-256:
-`a87f9a9edebeca2d372d360eb9baf6678ac95bf05e62925275d7047debcd0178`.
+`e4e817eeead9870f6be59b852350b5f22b5e79f629eee65cbb74777c15b1bb88`.
 It retains ABI 389, format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and
 format-20-or-earlier V3 readers cannot read these saves; preserve separate saves
 and backups. Supported older saves migrate forward. Browser composition does
 not establish hardware compatibility or comprehensive gameplay.
 
-The exact profile's silent ordinary controller-path checks pass at
+The retained 155-choice profile at
+`build/v3-import-pipeline-profile-06/profile.json` has passing silent ordinary
+controller-path checks at
 `build/v3-import-pipeline-ordinary-save-03/results.json` and
 `build/v3-import-pipeline-ordinary-reload-01/results.json`. A disposable older
 town loads normally, the gyroid offers Save & Quit, the native saving message
@@ -90,7 +101,14 @@ CRC, decompression, all three saved-record CRCs, canonical selected profiles,
 zero unused padding, and the preserved imported fan. Five focused scene/save
 tests pass, including that actual written-chip check. This verifies this town's
 ordinary save/restart, not every item behaviour, synchronous writing,
-diary-preflight execution, or hardware. No old creature fixture is replayed.
+diary-preflight execution, or hardware. The current 159-choice profile extends
+that selection with four golden tools, retaining the same ABI-389 runtime,
+physical resources, and save format. It has not repeated ordinary save/reload.
+The native format-20 golden reward/state and shovel-rule evidence remains at
+`build/v3-golden-rewards-native-01/results.json` and
+`build/v3-golden-rewards-native-storage-01/results.json`; those results do not
+establish ordinary gift conversations or format-21 physical saving of golden
+reward state. No old creature or golden fixture is replayed.
 The retained creature constructor timeout and scheduler disconnection remain
 unclassified, not established harness faults or passed gameplay checks.
 

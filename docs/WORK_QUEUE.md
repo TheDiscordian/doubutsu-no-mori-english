@@ -55,21 +55,29 @@ Current implementation task: finish existing-system acquisition selection,
 remaining focused save consumers, and the private import-pipeline handoff.
 The checked current build is
 `build/v3-scene-arena-installed-03/build-lock.json`, ABI 389. The all-available
-profile is `build/v3-import-pipeline-profile-06/profile.json`: twenty villagers
-and 135 independent item choices, plus two required starting-outfit resources.
+profile is `build/v3-import-pipeline-profile-07/profile.json`: twenty villagers
+and 139 independent item choices, plus two required starting-outfit resources.
 Seven included furniture rewards use the existing native lottery; no new event
 provider is enabled for those rewards. Ordinary regular-pool integration remains
 installed. Keep unsupported acquisition unavailable without calling every
 excluded reward V4.
+All four installed golden tools follow the shared readiness checks; missing
+acquisition dependencies or reward providers keep the affected choice unavailable.
+Their tree, Shrine, and collection-completion presentation routes do not require
+holiday, Wisp, birthday, or savings-account activation.
 
 Current real-file browser worker and interface checks pass:
-`build/v3-import-pipeline-browser-05/build.json`,
-`build/v3-import-pipeline-worker-03/results.json`, and
-`build/v3-import-pipeline-interface-05/results.json`. Browser hashes match offline
+`build/v3-import-pipeline-browser-06/build.json`,
+`build/v3-import-pipeline-worker-04/results.json`, and
+`build/v3-import-pipeline-interface-06/results.json`. Browser hashes match offline
 builds; empty selection returns V2-14. The private export is unserved.
-Six focused current-cartridge scope/browser-equivalence tests pass.
+Seven focused current-cartridge scope/browser-equivalence tests pass, including
+nine actual profile hashes and four standalone golden-tool selections.
+Twelve focused JavaScript checks pass. Unavailable behaviour controls no longer
+carry the misleading blanket V4 label.
 
-Ordinary save and fresh-process reload of the exact current profile pass at
+Ordinary save and fresh-process reload of the retained 155-choice profile
+`build/v3-import-pipeline-profile-06/profile.json` pass at
 `build/v3-import-pipeline-ordinary-save-03/results.json` and
 `build/v3-import-pipeline-ordinary-reload-01/results.json`. Normal controller
 input loads a disposable older town, selects gyroid Save & Quit, writes both
@@ -78,6 +86,10 @@ process loads that save without a checkpoint. Imported fan `2255`, pockets,
 and clothing survive. Full-chip validation checks both bank checksums, CRCs,
 complete decompression, all saved records, selected profiles, and zero padding.
 Five focused scene/save tests pass. Hardware and broad gameplay are unclaimed.
+The current selection adds four golden tools without changing installed runtime,
+resources, or saved format; ordinary save/reload of that larger profile is not
+claimed. Retained native golden-rule/state checks pass on their recorded
+format-20 build, without proving ordinary conversations or physical writes.
 
 The complete private-bank workspace and relocated retained record remain intact.
 Gameplay borrows the native title's exclusive workspace only while the title
@@ -90,9 +102,11 @@ failure or restart its budget.
 
 Remaining connected work:
 
-1. Review existing-system reward exclusions individually. Installed golden-tool
-   routes report no preparation dependencies, but current selection rejects all
-   non-passive tools. Event-stock membership alone does not prove each gift route.
+1. Review remaining existing-system reward exclusions individually. Golden-tool
+   admission is connected. Next trace the native consumer of shop group three:
+   donor `ftr_listEvent` also supplies Redd's stock, not just holiday gifts.
+   Group four is the train list; establish its acquisition dependency separately.
+   Pool names alone do not prove a new-feature requirement or a complete route.
    Separate dependencies on entirely new features from extensions to existing
    systems; do not resume savings accounts or other unrelated feature ports.
 2. Verify the actual synchronous writer and diary-preflight consumers using

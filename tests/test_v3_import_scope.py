@@ -16,7 +16,7 @@ import v3_optional_composition as composer
 import v3_browser_composition as browser
 from v3_creature_choices import options as behaviour_options
 from v3_holiday_selection import groups
-from v3_import_scope import PIPELINE, FEATURE_CHOICES, availability, requested_options
+from v3_import_scope import PIPELINE, UNAVAILABLE_BEHAVIOURS, availability, requested_options
 
 LOCK = ROOT/os.environ.get('V3_IMPORT_SCOPE_LOCK', 'build/v3-post-office-bank-installed-05/build-lock.json')
 
@@ -49,7 +49,8 @@ class ImportScopeTests(unittest.TestCase):
                          pool & {r['item_id'] for r in self.catalog.values() if r['kind'] == 'furniture'})
         self.assertEqual([r['id'] for r in self.plan['options'] if not r.get('dependency_only')], offered)
         self.assertTrue(all(g['forced_disabled'] for g in self.plan['runtime_groups']))
-        self.assertEqual({r['id'] for r in self.plan['behaviours'] if r.get('v4_only')}, FEATURE_CHOICES)
+        self.assertEqual({r['id'] for r in self.plan['behaviours'] if r.get('pipeline_unavailable')}, UNAVAILABLE_BEHAVIOURS)
+        self.assertTrue(all('v4_only' not in r for r in self.plan['behaviours']))
         self.assertTrue(all(not r['selectable'] and r['reason'] for r in self.plan['pending_options']))
 
     def test_existing_lottery_rewards_are_selectable_without_new_event_providers(self):
@@ -63,16 +64,35 @@ class ImportScopeTests(unittest.TestCase):
         self.assertTrue(all(group['forced_disabled'] for group in self.plan['runtime_groups']))
         self.assertTrue(all('deferred to V4' not in state['reason'] for state in self.states.values()))
 
-    def test_special_items_and_feature_settings_reject_before_composition(self):
+    def test_installed_golden_routes_are_independent_and_require_their_providers(self):
+        golden = self.report['equipment_resources']['golden_tools']['items']
+        self.assertEqual(len(golden), 4)
+        for key in golden:
+            self.assertTrue(self.states[key]['selectable'])
+            selected = self.select([key])
+            self.assertEqual(selected['enabled'], [key])
+            result, _, _ = composer.compose(self.image, self.report, self.catalog, selected)
+            for group in groups(self.image, self.report):
+                for field in group['fields']:
+                    self.assertEqual(struct.unpack_from('>I', result, field['offset'])[0], field['disabled'])
+            bad = copy.deepcopy(self.report)
+            bad['equipment_resources']['golden_tools']['items'][key]['pending'] = ['acquisition']
+            self.assertFalse(availability(self.catalog, bad)[key]['selectable'])
+        bad = copy.deepcopy(self.report)
+        bad['equipment_resources']['carried_items']['quest']['rewards']['installed'] = False
+        self.assertTrue(all(not availability(self.catalog, bad)[key]['selectable'] for key in golden))
+        self.assertTrue(all(self.states[key]['selectable'] for key in self.catalog
+                            if self.catalog[key]['kind'] == 'equipment' and key not in golden))
+
+    def test_unavailable_acquisition_and_behaviour_settings_reject_before_composition(self):
         rejected = [k for k,s in self.states.items() if not s['selectable']]
         self.assertIn('GAFE01-r0/item/3294', rejected)  # Savings mailbox, not regular stock.
         self.assertIn('GAFE01-r0/item/2530', rejected)  # Harvest cutlery.
-        self.assertIn('GAFE01-r0/item/2239', rejected)  # Golden axe.
         for key in rejected:
             with self.assertRaisesRegex(ValueError, 'Unavailable standalone'):
                 self.select([key])
-        for key in FEATURE_CHOICES:
-            with self.assertRaisesRegex(ValueError, 'outside the V3'):
+        for key in UNAVAILABLE_BEHAVIOURS:
+            with self.assertRaisesRegex(ValueError, 'not admitted'):
                 self.select([], {key:'GameCube'})
         with self.assertRaisesRegex(ValueError, 'Unknown import scope'):
             composer.resolve(self.catalog, [], scope='unrestricted-v3', report=self.report)
@@ -98,7 +118,7 @@ class ImportScopeTests(unittest.TestCase):
         self.assertEqual(sha256(result), self.plan['all_selected_sha256'])
         changed = copy.deepcopy(self.select(requested))
         changed['behaviours']['birthday-presentation'] = 'GameCube'
-        with self.assertRaisesRegex(ValueError, 'V4 feature'):
+        with self.assertRaisesRegex(ValueError, 'Unavailable behaviour'):
             composer.compose(self.image, self.report, self.catalog, changed)
         original = composer.inputs()[0]
         self.assertEqual(original, self.image)
@@ -110,8 +130,10 @@ class ImportScopeTests(unittest.TestCase):
         diary = next(k for k in offered if self.catalog[k]['kind'] == 'diary')
         fish = next(k for k in offered if self.catalog[k]['kind'] == 'fish')
         surface = next(k for k in offered if self.catalog[k]['kind'] == 'floor')
+        golden = list(self.report['equipment_resources']['golden_tools']['items'])
         profiles = [('empty', []), ('regular-all', offered), ('all-villagers', villagers),
-                    ('regular-furniture', [normal]), ('diary-and-creature', [diary, fish, surface])]
+                    ('regular-furniture', [normal]), ('diary-and-creature', [diary, fish, surface]),
+                    *((key.rsplit('/',1)[-1], [key]) for key in golden)]
         cases = []
         for name, requested in profiles:
             selection = self.select(requested)

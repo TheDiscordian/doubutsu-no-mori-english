@@ -23,6 +23,12 @@ if (fixture.plan.behaviours?.length) {
   for (const invalid of [{ unknown: 'N64' }, { [setting]: 'Unknown' }, { [setting]: 1 }, null, []]) {
     assert.throws(() => resolveSelection(fixture.plan, [], invalid), /behaviour/i);
   }
+  for (const row of fixture.plan.behaviours.filter(row => row.pipeline_unavailable)) {
+    assert.throws(() => resolveSelection(fixture.plan, [], { [row.id]: 'GameCube' }), /unavailable/i);
+    const changed = structuredClone(fixture.plan);
+    changed.behaviours.find(value => value.id === row.id).pipeline_unavailable = false;
+    assert.throws(() => resolveSelection(changed, []), /unavailable behaviour/i);
+  }
 }
 for (const row of fixture.cases) {
   const resolution = resolveSelection(fixture.plan, row.requested, row.behaviours);

@@ -198,7 +198,7 @@ def rules(image, report, *, scope='development'):
         selected, _, _ = composition.compose(image, report, catalog, full)
         result.update(all_selected_sha256=sha256(selected))
         if pending:result['pending_options']=list(pending_entries.values())
-    from v3_import_scope import PIPELINE, check_scope, availability, requested_options, FEATURE_CHOICES
+    from v3_import_scope import PIPELINE, check_scope, availability, requested_options, UNAVAILABLE_BEHAVIOURS
     check_scope(scope)
     if scope == PIPELINE:
         states = availability(catalog, report)
@@ -213,8 +213,8 @@ def rules(image, report, *, scope='development'):
                 deferred.append({**row, 'selectable':False, 'reason':state['reason']})
         result.update(scope=scope, options=offered, pending_options=deferred)
         for row in result.get('behaviours', []):
-            if row['id'] in FEATURE_CHOICES:
-                row['v4_only'] = True
+            if row['id'] in UNAVAILABLE_BEHAVIOURS:
+                row['pipeline_unavailable'] = True
         for group in result.get('runtime_groups', []):
             group['forced_disabled'] = True
         full = composition.resolve(catalog, requested_options(catalog, report),

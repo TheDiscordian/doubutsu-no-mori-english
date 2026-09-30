@@ -388,10 +388,10 @@ def compose(image, report, catalog, selection):
     scope = selection.get('scope', 'development')
     supplied_behaviours = selection.get('behaviours')
     if scope == 'v3-pipeline' and supplied_behaviours:
-        from v3_import_scope import FEATURE_CHOICES
-        if any(supplied_behaviours.get(key, 'N64') != 'N64' for key in FEATURE_CHOICES):
-            raise ValueError('V4 feature setting in V3 selection')
-        supplied_behaviours = {k:v for k,v in supplied_behaviours.items() if k not in FEATURE_CHOICES}
+        from v3_import_scope import UNAVAILABLE_BEHAVIOURS
+        if any(supplied_behaviours.get(key, 'N64') != 'N64' for key in UNAVAILABLE_BEHAVIOURS):
+            raise ValueError('Unavailable behaviour setting in V3 selection')
+        supplied_behaviours = {k:v for k,v in supplied_behaviours.items() if k not in UNAVAILABLE_BEHAVIOURS}
     expected=resolve(catalog,selection['requested'],behaviours=supplied_behaviours,
         behaviour_options=choices if 'behaviours' in selection else None, scope=scope, report=report)
     if selection != expected:

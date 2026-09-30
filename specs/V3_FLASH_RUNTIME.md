@@ -81,7 +81,7 @@ receipt's byte count describes a code function rather than its data buffer.
 
 `build/v3-private-save-bank-installed-06/build-lock.json` pins the installation,
 ABI 388. Six focused host and five installed-cartridge checks pass. The
-current all-available profile is `build/v3-import-pipeline-profile-06/profile.json`,
+current all-available profile is `build/v3-import-pipeline-profile-07/profile.json`,
 with the ABI-389 scene repair at
 `build/v3-scene-arena-installed-03/build-lock.json`.
 `build/v3-import-pipeline-boot-04/results.json` verifies the exact same ROM's
@@ -93,13 +93,17 @@ native save-check fixture remains retained and unverified; installation does not
 restart its debugging budget. Other evidence below applies only to its recorded
 builds, not to all current consumers.
 
-The current exact profile passes ordinary controller-path Save & Quit at
+The retained 155-choice `build/v3-import-pipeline-profile-06/profile.json` passes
+ordinary controller-path Save & Quit at
 `build/v3-import-pipeline-ordinary-save-03/results.json` and fresh-process reload
 at `build/v3-import-pipeline-ordinary-reload-01/results.json`. Both complete
 format-21 banks validate independently, including all decompressed records,
 checksums, CRCs, selected profiles, and imported fan `2255`. Pockets and clothing
 survive reload. This is ordinary save/restart evidence, not physical synchronous
 writer, diary-preflight, every-item, or original-hardware coverage.
+The current 159-choice profile adds four selected golden tools with unchanged
+runtime/resources and saved format. It has not repeated that native save/reload
+check; keep the tested profile identity attached to the retained evidence.
 
 ## Gameplay scene headroom
 
