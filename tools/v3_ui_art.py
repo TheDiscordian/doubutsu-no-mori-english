@@ -19,10 +19,11 @@ COMBINERS = {
     (0xFCFFFFFF,0xFFFDF6FB):0, (0xFCFFFFFF,0xFFFCF438):2,
     (0xFC30FFFF,0x5FFEF238):1, (0xFC12FFFF,0x3FFDF238):1,
     (0xFCFFB3FF,0xFF65FEFF):1, (0xFC30FE61,0x55FEF379):1,
+    (0xFCFFB3FF,0xFFFDFE38):1,  # Frame bubble: primitive colour and texture alpha.
     # Letter-frame setup: texture times shade, texture alpha, one tile.
     (0xFC127E24,0xFFFFF3F9):1,
 }
-RENDER_MODES = {0x0C1841C8,0x0C184240,0x0C192048,0x00504240,0x00552048,
+RENDER_MODES = {0x0C1841C8,0x0C184240,0x0C184A50,0x0C192048,0x00504240,0x00552048,
                 0x0F0A4000}  # Letter background: G_RM_OPA_SURF / SURF2.
 GEOMETRY = {(0xD9000000,0x00200404),(0xD9000000,0x00200004),
             (0xD9FFFFFF,0x00200004),(0xD9F0F9FE,0),(0xD9000000,0x00210405)}
@@ -38,7 +39,10 @@ def validate_state(a,b):
     valid = ((op==0xFC and (a,b) in COMBINERS) or
         (op==0xE2 and a==0xE200001C and b in RENDER_MODES) or
         (op==0xEF and (a,b) in OTHER_MODES) or
-        (op==0xE3 and (a,b)==(0xE3001001,0)) or  # G_TT_NONE for letter lines.
+        # Submenu frames explicitly select alpha comparison and CI/direct LUT.
+        # These are already native RDP words, not Dolphin texture transfers.
+        (op==0xE3 and (a,b) in ((0xE3001001,0),(0xE3001001,0x8000),
+                              (0xE3000A01,0),(0xE3000A01,0x100000))) or
         (op==0xD9 and (a,b) in GEOMETRY) or
         (op==0xE7 and (a,b)==(0xE7000000,0)) or
         (op==0xFA and a&0xFFFFFF00==0xFA000000) or
@@ -99,14 +103,21 @@ class Packet:
         roots=[(n,*self.source.symbol(n)) if isinstance(n,str) else tuple(n) for n in parts]
         raw,pointers,receipts=self.source.model_sequence(roots,expand_calls=True)
         rows=[];used=set();cache=[None]*32;current_vertex=None
-        textures=[];tmem=0;have_palette=bool(palette)
+        textures=[];tmem=0
+        # Existing callers use True for slot fifteen. A multi-CI frame declares
+        # every inherited slot explicitly; loaded palettes retain their source
+        # slot instead of overwriting another layer's palette.
+        palette_slots=set((15,) if palette is True else () if palette is False else palette)
+        if any(type(slot) is not int or not 0<=slot<=15 for slot in palette_slots):
+            raise ValueError('Invalid inherited UI palette slots')
         if texture is not None:
             if (len(texture)!=4 or tuple(texture[2:]) not in FORMATS or
                     any(type(n) is not int or n<=0 for n in texture[:2]) or
                     texture[0]*texture[1]*(4<<texture[3])//8>(2048 if texture[2]==2 else 4096) or
-                    texture[2]==2 and not have_palette):
+                    texture[2]==2 and not palette_slots):
                 raise ValueError('Invalid inherited UI texture')
             textures=[tuple(texture)]
+            tmem=((texture[0]*(4<<texture[3])+63)//64)*texture[1]
         if combiner is not None and tuple(combiner) not in COMBINERS:
             raise ValueError('Invalid inherited UI combiner')
         active=tuple(combiner) if combiner is not None else None
@@ -129,24 +140,31 @@ class Packet:
                     cache[slot:slot+count]=[(at,v) for v in range(first,first+count)]
                     current_vertex=at
                 elif op==0xF0:
-                    if a!=0xF08F4010:raise ValueError('Unsupported UI palette load')
-                    self.resource(target,'palette');have_palette=True
+                    slot=a>>16&15
+                    if a!=0xF0804010|slot<<16:raise ValueError('Unsupported UI palette load')
+                    self.resource(target,'palette');palette_slots.add(slot)
+                    if slot!=15:row['palette_slot']=slot
                 else:
                     shape=model_texture_shape(raw[pos:pos+8]);self.resource(target,'texture',shape)
                     if pos+16>len(raw):raise ValueError('Missing UI texture tile')
                     tile,zero=struct.unpack_from('>II',raw,pos+8)
                     index=tile>>16&7;pal=tile>>12&15;wraps=(tile>>10&3,tile>>8&3)
                     if (tile&0xFFF80000!=0xD2F00000 or zero or index not in (0,1) or 3 in wraps or
-                            pal not in ((15,) if shape[2]==2 else (0,15)) or
-                            shape[2]==2 and not have_palette):
+                            pal not in (palette_slots if shape[2]==2 else (0,15))):
                         raise ValueError('Unsupported UI texture tile/palette')
                     if index==0:textures=[];tmem=0
-                    if index!=len(textures) or index and any(t[2]==2 for t in textures+[shape]):
+                    if index>len(textures) or index and any((t[2]==2)!=(shape[2]==2) for t in textures[:index]):
                         raise ValueError('Incomplete or conflicting UI texture pair')
+                    # Replacing tile one preserves the existing tile-zero
+                    # background and its TLUT. Each replacement has a complete
+                    # checked load before its own geometry is emitted.
+                    textures=textures[:index]
+                    tmem=sum(((t[0]*(4<<t[3])+63)//64)*t[1] for t in textures)
                     words=((shape[0]*(4<<shape[3])+63)//64)*shape[1]
                     if tmem+words>(256 if shape[2]==2 else 512):raise ValueError('UI layers exceed TMEM')
                     row.update(shape=shape[:2],wrap_modes=wraps,tile_shifts=(tile>>4&15,tile&15),
                                ui_tile=index,ui_tmem=tmem)
+                    if shape[2]==2 and pal!=15:row['palette_slot']=pal
                     if shape[2]==4:row['intensity']=True
                     if shape[2:]==(4,1):row['i8']=True
                     if shape[2:]==(0,2):row['rgba16']=True

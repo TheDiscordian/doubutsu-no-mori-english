@@ -48,15 +48,22 @@ before changing shared delivery. Island acquisition remains separate and needs
 an explicit choice for the absent GameCube island system, not a substitute route.
 
 The category's checked preparation is
-`build/v3-post-office-category-prepared-04/prepared.json`, based on ABI 386.
-Actual donor numerical controls/transfer functions, a separately owned 48-byte
-account record, transactional wallet/pocket validation, and whole-table milestone
-receipts compile; two focused source/sanitized host checks pass. Native frontend,
-Pelly actions, saved-town ownership, official template creation, real inventory
-and mail I/O, scheduling, and ordinary gameplay remain unbound. The current ROM
-and selections do not change. The exact next consumer is the complete bank
-frontend/Pelly business path, preserving original repayment, followed by the
-connected saved-town and real mail owners. The
+`build/v3-post-office-category-prepared-04/prepared.json`, with the complete
+frontend/native adapters at
+`build/v3-post-office-bank-frontend-prepared-05/prepared.json`, based on ABI 386.
+All sixteen donor bank functions, complete source drawing/formatting/art,
+transactional controls, checked native menu/wallet/pocket adapters, the separately
+owned 48-byte account record, and whole-table milestone receipts compile. Four
+focused frontend checks pass with native I/O doubled; the original numerical and
+affected diary-resource checks retain passing evidence. Unrequested banking
+leaves original repayment untouched. The 24,224-byte art packet is reused,
+not reconverted. Pelly admission/actions, selected-mode/account providers,
+menu installation/reservations, saved-town ownership, official template creation,
+real mail I/O, scheduling, and ordinary gameplay remain unbound. The current ROM
+and selections do not change. The exact next consumer is Pelly's ordinary account
+admission/menu request and real eligibility/selection providers, preserving
+repayment; link the prepared frontend and bind the connected saved-town and real
+mail owners. The
 [category source map and remaining connections](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md#remaining-connected-consumers)
 cover all 23 staged records; do not rescan their unchanged artwork or turn each
 connection into a new category task. Bank preparation does not restart the spent

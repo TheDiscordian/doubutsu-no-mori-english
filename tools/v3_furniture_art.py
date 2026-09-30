@@ -891,7 +891,10 @@ def command_source(models, offsets):
                 palette = row['dynamic_palette'] if 'dynamic_palette' in row else SEGMENT + offsets[row['target']]
                 if 'dynamic_palette' in row and palette not in (0x08000000,0x09000000):
                     raise ValueError('Unreviewed dynamic palette segment')
-                emit(f"gsDPLoadTLUT_pal16(15, 0x{palette:08X})", 6)
+                slot=row.get('palette_slot',15)
+                if type(slot) is not int or not 0<=slot<=15:
+                    raise ValueError('Invalid native loaded palette slot')
+                emit(f"gsDPLoadTLUT_pal16({slot}, 0x{palette:08X})", 6)
             elif op == 0xFD:
                 texture=row.get('dynamic_texture',SEGMENT+offsets[row['target']])
                 if 'dynamic_texture' in row and texture not in (0x08000000,0x09000000):

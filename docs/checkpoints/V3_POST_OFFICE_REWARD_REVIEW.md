@@ -59,9 +59,9 @@ All sixteen bank functions, five Pelly owner functions, 55 conversation/action
 functions, and the complete milestone function/resource have donor receipts.
 Six complete bank numerical functions compile through a scoped source view:
 initialisation, money-bag totals, digit selection, amount display, controller
-input, and final redistribution. The ten frontend/lifecycle functions retain
-their source contracts but are not compiled or installed. A source view is not
-a native struct; no native offset is inferred from its layout.
+input, and final redistribution. The complete frontend preparation below also
+compiles the ten remaining frontend/lifecycle functions. A source view is not a
+native struct; no native offset is inferred from its layout.
 
 `overlays/v3/bank_account.c` owns a 48-byte, endian-neutral `AFBA` record:
 a sixteen-byte header and four eight-byte rows. Each row has a big-endian balance,
@@ -95,7 +95,56 @@ exact-success-only acknowledgement, and re-entrant mutation rejection. The
 numerical functions are real donor code; native inventory and mail I/O remain
 unbound. MIPS compilation produces 4,760 code bytes and 68 BSS bytes. The
 relocatable object still needs the ordinary native `memcpy`/`memset` bindings.
-No frontend, native gameplay, physical persistence, or hardware result is claimed.
+The numerical preparation alone does not install a frontend. No native gameplay,
+physical persistence, or hardware result is claimed.
+
+### Complete frontend and checked native adapters
+
+`tools/v3_bank_frontend.py` prepares all sixteen complete bank functions and the
+three complete source integer-formatting functions at
+`build/v3-post-office-bank-frontend-prepared-05/prepared.json`. It retains the
+genuine title, OK label, complete frame, cash/Bell/balance labels, and complete
+128-by-32 deposit/withdrawal textures. The shared UI converter preserves both
+source CI palette slots and checked tile-one replacement without overwriting
+the tile-zero background. Seven official-text/bitmap entries are checked in the
+single provenance catalogue. The 24,224-byte art packet has SHA-256
+`fa557558e2619f18bd64dd59e5a9337e5ef1c0c0098e64af80f6935752153de8`.
+Strict `--reuse-art` comparison reuses the complete unchanged packet and drawing
+receipts; this preparation does not reconvert artwork.
+
+`overlays/v3/bank_frontend_source.c` wraps actual donor Play dispatch in the
+existing checked transaction. A refused native commit restores preview state
+without closing or mutating the live wallet/account. Complete source drawing and
+lifecycle dispatch use explicit native motion/font/matrix services, checked
+phase/position values, graph headroom, and re-entry guards. The compiled donor
+formatter avoids substituting the incompatible native formatter ABI. The
+native integer string-width return is converted explicitly for the donor view.
+
+`overlays/v3/bank_native.c` reads actual N64 pockets at `14`, packed conditions at
+`34`, and wallet at `38`, never a cast of the source view. It rejects stale
+snapshots and protected-item changes before the reviewed native pocket setter
+and account publication. Loan `3C`, unused packed-condition bits, receipts, and
+other residents remain unchanged. Banking requests may own repayment submenu
+seven only explicitly; an unowned request leaves original repayment untouched.
+The adapter uses verified native menu/callback offsets and passes the actual
+game argument to the original pre-draw callback. An owned construction failure
+must reject the bank path, not fall through into repayment.
+
+Whole current repayment-owner/relocation guards and seven whole native service
+guards pass. Four focused frontend checks pass: complete donor/generated/art
+comparison with reuse/provenance, current native contract and mutation rejection,
+sanitized source lifecycle/transaction/drawing, and sanitized native-menu/pocket
+adapters. Native callbacks and pocket services are doubles in these host tests;
+this is not native execution. The two original numerical checks and two affected
+diary resource/state checks retain passing unchanged evidence.
+
+The combined relocatable MIPS object has 13,278 code bytes, 30 data bytes, and
+1,020 BSS bytes, SHA-256
+`adc257c07b2ac6b9824b9f02e94aee761578b65a0ee6859c70e30e986023db44`.
+It is not linked or installed. Native selected-mode/admission/account providers,
+fixed services, drawing roots, and menu/save ownership remain unbound. No native
+bank harness starts and no existing harness budget resets. The current ABI-386
+ROM, format 20/wire 7, selections, and both patcher deployments are unchanged.
 
 ## Remaining connected consumers
 
@@ -111,10 +160,13 @@ Keep selected-profile gating, successful-delivery-only acknowledgement, full
 queue retry, and one-time persistence. The existing catalogue-order/ticket
 wrapper in `POST_OFFICE_LETTERS.md` is not this savings-reward mechanism.
 
-Connect the complete bank frontend and Pelly's genuine business/deposit/closing
+Install the prepared complete bank frontend and connect Pelly's genuine business/deposit/closing
 actions, preserving repayment and the donor constructor's native-resident,
-paid-loan, house-size, and no-renewal admission. Bind native wallet/pockets through
-checked field readers and services, never a cast of the borrowed view. Attach
+paid-loan, house-size, and no-renewal admission. The exact next owner is Pelly's
+ordinary account admission and menu request, with real selected-mode/eligibility
+providers. Bind the checked wallet/pocket adapter and native services only through
+reviewed owners. Reserve and link complete code/state/art without assuming the
+old packet's remaining space fits the larger frontend. Attach
 `AFBA` to the whole saved-town transaction with a new supported envelope/wire,
 forward migration preserving all existing card/golden/console/town data, player
 deletion, town reset, preflight, and older-reader rejection. Account-required

@@ -136,16 +136,23 @@ are development artifacts, not the requested private assembled playtest handoff.
 
 The connected source-mail category has checked account/reward preparation at
 `build/v3-post-office-category-prepared-04/`, based on the current ABI 386.
-The actual donor numerical controls and complete money-bag transfer functions run
-through a scoped view with a separately owned 48-byte account record. Preview and
-cancel do not write balances/pockets; confirmation checks the same resident and
-complete money snapshot before conserving and publishing Bells. Whole-source
-milestone rows retain ordering and successful-submission-only receipts. Two
-focused source/sanitized host checks pass; native money and mail I/O remain
-unbound. Current Pelly status is checked and still lacks the donor banking branch.
-The full frontend, Pelly deposit actions, saved-town ownership/migration, official
-templates, real delivery/scheduling, and independent account/reward choices
-remain connected implementation work. No current ROM, saved format, selectable
+The complete sixteen-function donor frontend, source formatter/drawing/art, and
+checked native menu/wallet/pocket adapters compile at
+`build/v3-post-office-bank-frontend-prepared-05/`. The complete 24,224-byte art
+packet and receipts are reused. The guarded transaction uses a separately owned
+48-byte account record; preview/cancel do not write balances/pockets, and
+confirmation checks the same resident and complete money snapshot before
+conserving Bells. Refused commits preserve the open menu and preview state.
+Whole-source milestone rows retain ordering and successful-submission-only
+receipts. Four focused frontend source/sanitized host checks pass with native I/O
+doubled; the original numerical and affected diary-resource checks retain
+passing evidence. Native field and whole-service guards are checked, and
+unrequested banking preserves original repayment. The frontend is not linked or
+installed. Current Pelly status still lacks the donor banking branch. Pelly's
+ordinary admission/menu request and real eligibility/selection providers are
+next; menu reservations, saved-town ownership/migration, official templates,
+real delivery/scheduling, and independent account/reward choices remain connected
+implementation work. No current ROM, saved format, selectable
 count, or deployment changes. The
 [source checkpoint](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md) records the single
 remaining acquisition map and exact next consumer. No ordinary native bank/save
