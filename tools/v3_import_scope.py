@@ -35,6 +35,8 @@ def availability(catalog, report):
     password_ids=password_items(report)
     from v3_holiday_acquisition import exercise_items
     exercise=exercise_items(report)
+    from v3_harvest_acquisition import installed_items as harvest_items
+    harvest=harvest_items(report)
     summer_rewards = {r['item_id'] for r in report.get('furniture_rewards', {}).get('imports', [])
                       if r['route'] == 23}
     shirts = {item for group in report['clothing']['stock']['groups']
@@ -63,20 +65,20 @@ def availability(catalog, report):
         kind = row['kind']
         dependency_only = False
         if kind == 'furniture':
-            ready = row['item_id'] in shops or key in password_ids or key in exercise
+            ready = row['item_id'] in shops or key in password_ids or key in exercise or key in harvest
         elif kind == 'clothing':
             ready = int(row['item_id'], 16) in shirts
             # A villager's authentic starting outfit is part of that villager's
             # resources, not a separately offered exclusive-item import.
             dependency_only = not ready and key in outfits
         elif kind in ('floor', 'wall'):
-            ready = key in surfaces or key in password_ids
+            ready = key in surfaces or key in password_ids or key in harvest
         elif kind == 'equipment':
             ready = key in equipment
         elif kind == 'carried':
             # Installed native categories: saplings, stationery, and fruit.
             # Event cards, cutlery, and spirit quests are not regular pools.
-            ready = carried[key]['native_category'] in (48, 49, 50) or key in exercise
+            ready = carried[key]['native_category'] in (48, 49, 50) or key in exercise or key in harvest
         elif kind in ('villager', 'fish', 'insect', 'diary'):
             ready = True
         else:

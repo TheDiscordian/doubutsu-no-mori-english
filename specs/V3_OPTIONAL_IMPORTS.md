@@ -554,6 +554,18 @@ group, separate from acyclic resource dependencies, and record the added item
 as a requirement. Initial acquisition remains the full source stamp/reward route,
 without shop stock or catalogue ordering; ordinary gameplay/save verification
 remains pending.
+Ten Harvest furnishings and its rug/wall use the retained complete Franklin
+exchange with a cutlery dependency. Cutlery uses the native festival-table pickup
+and is also a standalone choice. Source lists, all 39 donor owner functions,
+retained official dialogue, live destinations/selection masks, complete art,
+native pickup hooks/services, and non-stock/non-orderable metadata authenticate.
+The checked event manager accepts its installed extension only after verifying
+the complete retained 75-control prefix/relocation, actual added row, precise
+superseding calendar/cleanup hooks, and unconditional forwarding to the retained
+Harvest calendar and descriptor. Native pickup services behind shared event
+redirects retain their complete original bodies. This adds no game code,
+allocation, artwork, ordering, or saved field. Ordinary gameplay/save and
+original hardware remain unverified.
 The shared draw-only scrolling category supplies backyard pool through its
 verified donor event-item route, with complete layered graphics and the same
 optional catalogue/save consumers. Well model remains inactive pending its

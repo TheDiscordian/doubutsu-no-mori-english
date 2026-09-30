@@ -1,5 +1,85 @@
 # Automatic furniture pipeline checkpoint
 
+## Current Harvest acquisition and retained native manager
+
+The current ABI-391 cartridge already installs the complete Franklin owner,
+festival-table cutlery pickup, ten furnishings, and rug/wall resources. Its
+historical verifier rejects legitimate manager growth and appended English banks.
+The current verifier authenticates the whole 76-control manager and relocation,
+reconstructs and hashes the complete retained 75-control prefix/relocation, checks
+the actual appended 32-byte row, and verifies every precisely superseding hook.
+Both complete existing calendar/descriptor wrappers authenticate, including the
+unconditional forwarding of Harvest independent of account mode. The retained
+manager hashes are recorded in the following section. No bank feature work occurs.
+
+All 36 actual official Harvest message records authenticate in their present
+banks. The live twelve-entry destination table agrees with complete donor lists.
+All 39 source owner functions, whole provider packets, Franklin models, native
+streaming/allocation instructions, actual pickup/player hooks, and canonical
+non-stock/non-orderable records authenticate. Two native cutlery services have
+legitimate shared-event entry redirects; authenticating those exact redirects,
+their complete wrapper, and restored complete original function bodies preserves
+the original source checks. No hash/cycle/resource check is disabled.
+
+V3 offers all twelve Harvest furniture/surface rewards and cutlery. Each reward
+adds `GAFE01-r0/item/2530`; cutlery can be selected alone through its table-pickup
+route. Only the existing shared event provider activates. The furniture and
+surface enable fields, both actual carried/event masks, and provider fields
+agree with selected identities. All game code, artwork, allocations, source
+resources, stable identities, saved fields, and shop/catalogue ordering remain
+unchanged. Ordinary Harvest gameplay, current profile save/reload, and hardware
+remain unverified. No exhausted native fixture is restarted.
+
+Seventeen focused current scope checks pass, with thirty-two actual browser/
+offline profiles including standalone furniture, flooring, wallpaper, and cutlery.
+Mutation checks cover retained controls even with a forged matching outer hash,
+actual calendar/cleanup/descriptor instructions, missing providers, altered
+metadata, unavailable acquisition, actual surface identities, official text, and
+native-service supersession. The initial new surface mutation assertion expects
+an exception for an item correctly excluded by eligibility; the correction checks
+that exclusion and rejects an altered live surface identity. Only that affected
+check is rerun, and passes. No game defect is inferred from that assertion error.
+The existing fifteen JavaScript checks remain passing unchanged evidence.
+
+Current private outputs, retaining raw ABI-391 lock
+`build/v3-nook-font-repaired-02/build-lock.json`:
+
+- `build/v3-import-pipeline-profile-15/profile.json`: 284 requested choices,
+  twenty villagers, 262 independent items, and the linked exercise pair, with
+  two additional required starting outfits. Receipt SHA-256:
+  `02a5de85d277061bbcee70b624e9ef8863adcf9d015e516d05a9e57e4e18066b`.
+  ROM SHA-256: `f8326d7f95843903ca615b6ce94e99bda2f38f057fdb31091830c4556f60b194`.
+  UPS SHA-256: `3ece7f830e95e6b52ae1c893d6e48aa2298927a365d2f906b25c827aeeec29e5`.
+  UPS reconstruction passes.
+- `build/v3-import-pipeline-browser-14/build.json`: unserved, 284 choices.
+  Plan SHA-256: `5aead46e9b61543c67c0db1a2d45677a69e5442d2c7a03781591ee133dfef7d8`.
+- `build/v3-import-pipeline-worker-12/results.json`: actual game inputs,
+  combined lamp/rug/wall request with required cutlery, matching offline ROM
+  `0942e13741aa2e81181038283499a56054fa40121cb6a9efd299f23067404d32`.
+  Result SHA-256: `00a5054522a2681980bfc8013aa39cda0d5098cbd20b45abef250f8c5f10bcfe`.
+  The temporary server stops; no browser error or upload occurs.
+
+The interface/composition code, styles, and cartridge recipes retain their
+previous hashes. The prior interface result is retained at its own export/build
+identity, not relabelled as a new Harvest-menu test. Format 21/wire 7, eight-MiB
+RAM, and FlashRAM remain unchanged. Removing selected carried families is not a
+save migration: profile-15 adds cutlery and should not be used with narrower
+profile 14. V2/format-20-or-earlier readers reject these saves. Keep matching
+profiles, separate builds/saves, and backups. No main lock, served recipe,
+deployed patcher, local preview, or service changes.
+
+Next consumer: assess the installed Wisp/spirit acquisition and its independent
+provider, without creating another feature. Remaining postal and summer routes
+retain unfinished acquisition and should stay unavailable unless the existing
+complete route is established; do not complete new feature ports merely to admit
+them. Then finish the distinct save-entry checks, classify retained creature
+failures, and prepare the private handoff. Retained scheduler results have only
+checkpoint/prelude records, without entry into the sound probe; retained fish
+results end after the ninth model/segment transfer. Neither result includes a
+recorded native fault or establishes the failure cause. Inspect the original
+runner/probe and checkpoint evidence before attributing either to the game or
+test setup. Do not replay exhausted fixtures or waive unresolved failures.
+
 ## Exercise-card/radio mutual selection
 
 The installed morning-exercise greeting gate in

@@ -54,6 +54,9 @@ class ImportScopeTests(unittest.TestCase):
         from v3_holiday_acquisition import exercise_items
         pool.update(self.catalog[k]['item_id'] for k in exercise_items(self.report)
                     if self.catalog[k]['kind']=='furniture')
+        from v3_harvest_acquisition import installed_items as harvest_items
+        pool.update(self.catalog[k]['item_id'] for k in harvest_items(self.report)
+                    if self.catalog[k]['kind']=='furniture')
         from v3_password_acquisition import installed_items as password_items
         password_ids=password_items(self.report)
         pool.update(r['item_id'] for r in self.catalog.values() if r['id'] in password_ids and r['kind']=='furniture')
@@ -297,7 +300,7 @@ class ImportScopeTests(unittest.TestCase):
     def test_unavailable_acquisition_and_behaviour_settings_reject_before_composition(self):
         rejected = [k for k,s in self.states.items() if not s['selectable']]
         self.assertIn('GAFE01-r0/item/3294', rejected)  # Savings mailbox, not regular stock.
-        self.assertIn('GAFE01-r0/item/2530', rejected)  # Harvest cutlery.
+        self.assertNotIn('GAFE01-r0/item/2530', rejected)  # Installed table-pickup route.
         for key in rejected:
             with self.assertRaisesRegex(ValueError, 'Unavailable standalone'):
                 self.select([key])
@@ -339,6 +342,72 @@ class ImportScopeTests(unittest.TestCase):
         bad[by_vrom(self.image)[BLOB].pstart+ITEMS+(row['runtime_index']-1024)*32+24]=8
         with self.assertRaisesRegex(ValueError,'metadata or ordering'):
             verify_installed_items(bad,self.report,self.catalog)
+
+    def test_harvest_rewards_require_cutlery_and_only_their_built_provider(self):
+        from v3_harvest_acquisition import installed_items,verify_installed_items
+        from v3_carried_selection import masks
+        cutlery='GAFE01-r0/item/2530';h=self.report['equipment_resources']['harvest']
+        wanted=set(h['reward_choices'])|{cutlery}
+        self.assertEqual(len(wanted),13)
+        self.assertEqual(installed_items(self.report),wanted)
+        self.assertEqual(verify_installed_items(self.image,self.report,self.catalog),wanted)
+        self.assertTrue(all(self.states[k]['selectable'] for k in wanted))
+        for key in ('GAFE01-r0/item/32D0','GAFE01-r0/item/2642','GAFE01-r0/item/2742',cutlery):
+            selected=self.select([key])
+            self.assertEqual(set(selected['enabled']),{key,cutlery})
+            self.assertEqual(selected['required'],[] if key==cutlery else [cutlery])
+            result,_,blob=composer.compose(self.image,self.report,self.catalog,selected)
+            for reward in h['reward_choices']:
+                row=self.catalog[reward]
+                self.assertEqual(int.from_bytes(blob[row['enable_offset']:row['enable_offset']+4],'big'),int(reward==key))
+            for mask in masks(self.image,self.report):
+                expected=sum(r['mask'] for r in mask['members'] if r['id']==cutlery)
+                self.assertEqual(struct.unpack_from('>I',result,mask['offset'])[0],expected)
+            for group in groups(self.image,self.report):
+                for field in group['fields']:
+                    self.assertEqual(struct.unpack_from('>I',result,field['offset'])[0],
+                        field['enabled'] if group['id']=='diary-holidays' else field['disabled'])
+        for part in ('hiding','registry','shared_motions','manager','text','npc'):
+            bad=copy.deepcopy(self.report);bad['equipment_resources']['harvest'][part]['installed']=False
+            self.assertEqual(installed_items(bad),set())
+        bad=copy.deepcopy(self.report)
+        bad['equipment_resources']['holiday_items']['pickup']['installed']=False
+        self.assertEqual(installed_items(bad),set())
+
+    def test_harvest_retains_controls_text_and_exact_superseding_native_hooks(self):
+        from v3_harvest_acquisition import verify_installed_items
+        from aflib import by_vrom,CODE_VROM,CODE_RAM,sha256
+        from v3_asset_loader import BLOB
+        from v3_import_storage import ITEMS
+        e=self.report['equipment_resources'];h=e['harvest'];m=h['manager'];files=by_vrom(self.image)
+        for address in (0x8007F630,0x8007F640,0x8007F660,0x80057E4C):
+            broken=bytearray(self.image);broken[files[CODE_VROM].pstart+address-CODE_RAM+3]^=1
+            with self.assertRaisesRegex(ValueError,'Harvest calendar binding'):
+                verify_installed_items(broken,self.report,self.catalog)
+        # Even a matching forged outer receipt cannot hide a changed retained prefix.
+        broken=bytearray(self.image);owner=files[m['vrom']]
+        broken[owner.pstart+128]^=1;bad=copy.deepcopy(self.report)
+        bad['equipment_resources']['harvest']['manager']['sha256']=sha256(owner.extract(broken))
+        with self.assertRaisesRegex(ValueError,'retained Harvest controls'):
+            verify_installed_items(broken,bad,self.catalog)
+        broken=bytearray(self.image);row=self.catalog['GAFE01-r0/item/32D0']
+        broken[files[BLOB].pstart+ITEMS+(row['runtime_index']-1024)*32+24]=8
+        with self.assertRaisesRegex(ValueError,'Harvest furniture identity'):
+            verify_installed_items(broken,self.report,self.catalog)
+        bad=copy.deepcopy(self.report)
+        next(r for r in bad['room_surfaces']['stock']['harvest'] if r['id']=='GAFE01-r0/item/2642')['harvest_acquisition']['destination_item']='264B'
+        from v3_harvest_acquisition import installed_items
+        self.assertNotIn('GAFE01-r0/item/2642',installed_items(bad))
+        bad_catalog=copy.deepcopy(self.catalog);bad_catalog['GAFE01-r0/item/2642']['item_id']='264B'
+        with self.assertRaisesRegex(ValueError,'Harvest surface identity'):
+            verify_installed_items(self.image,self.report,bad_catalog)
+        bad=copy.deepcopy(self.report);bad['equipment_resources']['harvest']['text']['rows'][0]['sha256']='0'*64
+        with self.assertRaisesRegex(ValueError,'retained official Harvest dialogue'):
+            verify_installed_items(self.image,bad,self.catalog)
+        bad=copy.deepcopy(self.report)
+        bad['equipment_resources']['npc_extra']['events']['demo']['hooks'][1]['before']='0'*16
+        with self.assertRaisesRegex(ValueError,'Harvest cutlery native service'):
+            verify_installed_items(self.image,bad,self.catalog)
 
     def test_exclusive_outfits_are_only_resources_of_the_selected_villager(self):
         villagers = [k for k,r in self.catalog.items() if r['kind'] == 'villager']
@@ -402,6 +471,8 @@ class ImportScopeTests(unittest.TestCase):
             profiles.append(('password-'+key.rsplit('/',1)[-1],[key]))
         for key in ('GAFE01-r0/item/2523','GAFE01-r0/item/1FCC'):
             profiles.append(('exercise-'+key.rsplit('/',1)[-1],[key]))
+        for key in ('GAFE01-r0/item/32D0','GAFE01-r0/item/2642','GAFE01-r0/item/2742','GAFE01-r0/item/2530'):
+            profiles.append(('harvest-'+key.rsplit('/',1)[-1],[key]))
         cases = []
         seasonal = self.report['equipment_resources'].get('seasonal_stock')
         if seasonal:

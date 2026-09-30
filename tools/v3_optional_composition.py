@@ -256,6 +256,8 @@ def catalogue(image, report):
     verify_password_items(image,report,result)
     from v3_holiday_acquisition import bind_exercise_selection
     bind_exercise_selection(image,report,result)
+    from v3_harvest_acquisition import verify_installed_items as verify_harvest_items
+    verify_harvest_items(image,report,result)
     return dict(sorted(result.items()))
 
 
