@@ -566,6 +566,15 @@ Harvest calendar and descriptor. Native pickup services behind shared event
 redirects retain their complete original bodies. This adds no game code,
 allocation, artwork, ordering, or saved field. Ordinary gameplay/save and
 original hardware remain unverified.
+The independent spirit choice reuses the already-installed Wisp acquisition.
+Its five carried states, actual current manager callbacks and shared registry,
+complete gameplay/save owners, native hooks, source reward lists and live
+destinations, official messages/choices, full artwork, and registered sound
+programs authenticate before composition. Selecting spirit activates only Wisp;
+it requires neither diary nor gift imports, and holiday rewards leave Wisp off.
+No new game feature, code, artwork, allocation, saved field, or substitute route
+is introduced. Ordinary Wisp gameplay and native save/travel remain unverified.
+Spirit saves require their matching carried family; removing it is not migration.
 The shared draw-only scrolling category supplies backyard pool through its
 verified donor event-item route, with complete layered graphics and the same
 optional catalogue/save consumers. Well model remains inactive pending its

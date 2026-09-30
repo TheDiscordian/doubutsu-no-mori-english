@@ -37,6 +37,8 @@ def availability(catalog, report):
     exercise=exercise_items(report)
     from v3_harvest_acquisition import installed_items as harvest_items
     harvest=harvest_items(report)
+    from v3_carried_selection import quest_items
+    spirits=quest_items(report)
     summer_rewards = {r['item_id'] for r in report.get('furniture_rewards', {}).get('imports', [])
                       if r['route'] == 23}
     shirts = {item for group in report['clothing']['stock']['groups']
@@ -78,7 +80,7 @@ def availability(catalog, report):
         elif kind == 'carried':
             # Installed native categories: saplings, stationery, and fruit.
             # Event cards, cutlery, and spirit quests are not regular pools.
-            ready = carried[key]['native_category'] in (48, 49, 50) or key in exercise or key in harvest
+            ready = carried[key]['native_category'] in (48, 49, 50) or key in exercise or key in harvest or key in spirits
         elif kind in ('villager', 'fish', 'insect', 'diary'):
             ready = True
         else:

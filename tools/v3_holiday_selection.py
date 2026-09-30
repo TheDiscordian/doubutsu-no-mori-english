@@ -55,9 +55,11 @@ def groups(image, report):
 
 
 def pipeline_allowed(group, report):
-    """Retain the built gift/diary provider without admitting unfinished systems."""
+    """Retain complete independent gift/diary and spirit providers."""
     from v3_holiday_acquisition import providers_installed
-    return group['id']=='diary-holidays' and providers_installed(report)
+    from v3_carried_selection import quest_items
+    return ((group['id']=='diary-holidays' and providers_installed(report)) or
+            (group['id']=='carried-quest' and bool(quest_items(report))))
 
 
 def active(group, enabled, behaviours, *, scope='development', report=None):

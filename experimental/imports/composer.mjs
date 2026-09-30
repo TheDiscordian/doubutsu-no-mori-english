@@ -219,7 +219,7 @@ export function validatePlan(plan) {
       'Invalid or repeated runtime group.');
     groupIds.add(group.id);
     require(pipeline ? typeof group.forced_disabled === 'boolean' &&
-      (group.forced_disabled || group.id === 'diary-holidays') : group.forced_disabled === undefined,
+      (group.forced_disabled || ['diary-holidays', 'carried-quest'].includes(group.id)) : group.forced_disabled === undefined,
       'Invalid feature activation scope.');
     array(group.any_imports, 0, 2048); array(group.any_behaviours, 0, 32); array(group.fields, 1, 64);
     require(group.any_imports.length + group.any_behaviours.length > 0 &&

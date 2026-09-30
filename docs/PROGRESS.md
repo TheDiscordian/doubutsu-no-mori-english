@@ -39,10 +39,10 @@ existing-system reward routes individually. See the
 ### Current import selections and verification
 
 Browser and offline builds default to the V3 pipeline scope. Both offer all
-twenty villagers, 262 independent item choices, and the linked exercise-card/radio
+twenty villagers, 263 independent item choices, and the linked exercise-card/radio
 pair. Two exclusive
 starting-outfit resources follow their villagers as dependencies, not standalone
-item choices. Select all requests 284 choices and includes those two resources.
+item choices. Select all requests 285 choices and includes those two resources.
 Actual checked stock tables determine regular furniture, clothing, and surfaces;
 the remaining item categories use their installed native acquisition paths.
 Seven furniture choices use the existing native lottery, with checked donor
@@ -100,6 +100,15 @@ shared event redirects. No shop stock, ordering, game code, artwork, allocation,
 or saved field is added. Ordinary Harvest gameplay/save remains unverified.
 The ten summer-camping rewards remain unavailable while their complete acquisition
 path is unfinished, not merely because the retained tent and scene are V4-type work.
+The spirit item uses the complete already-installed Wisp route as an independent
+choice. All five stack states, actual field spawning, native manager callbacks,
+the current shared registry, complete gameplay/save owners, ten native hooks,
+twenty external and two actor-local reward lists, live destination mappings,
+48 official messages, sixteen choices, full artwork, and registered shared sound
+programs authenticate before composition. Spirit-only selection activates Wisp,
+not holiday gifts or accounts; Mayor-only selection leaves Wisp off. No game code,
+artwork, allocation, saved field, or substitute reward route is added. Ordinary
+Wisp gameplay and native save/travel remain unverified.
 The current filter leaves items outside its admitted acquisition categories
 unavailable; this is implemented selection behaviour, not proof that every
 excluded reward requires V4. Review those exclusions against existing-system
@@ -112,19 +121,19 @@ not enable the optional holiday, Wisp, birthday, or savings-account providers.
 Unavailable behaviour controls are hidden without a blanket V4 classification.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-14/build.json`, pinned to the ABI-391
-cartridge. Seventeen current-cartridge scope/browser-equivalence checks pass,
+`build/v3-import-pipeline-browser-15/build.json`, pinned to the ABI-391
+cartridge. Eighteen current-cartridge scope/browser-equivalence checks pass,
 covering complete Redd stock routing, selected-only furniture
 lists, four independent
 golden tools, reward-provider/resource rejection, and the existing Gulliver/igloo
 routes, independent Mayor gifts/provider activation, password-only selections,
-both exercise-pair directions, and Harvest furniture/surface/cutlery selections.
-Thirty-two actual
+both exercise-pair directions, Harvest furniture/surface/cutlery selections,
+and independent spirit/provider selections. Thirty-four actual
 browser/offline profiles match. The current headless
 Chromium worker check at
-`build/v3-import-pipeline-worker-12/results.json` reads actual game files and
-matches the offline Harvest lamp, rug, and wall request, including required cutlery.
-Retained unchanged worker checks cover the exercise pair, password-only choices,
+`build/v3-import-pipeline-worker-13/results.json` reads actual game files and
+matches the offline spirit-only request with no additional imports.
+Retained worker checks cover Harvest lamp/rug/wall with cutlery, the exercise pair, password-only choices,
 cancellation, and invalid-input rejection.
 The retained interface check passes at
 `build/v3-import-pipeline-interface-13/results.json`, including independent
@@ -132,8 +141,10 @@ selection/dependencies, keyboard controls, unavailable-review data, and download
 lifecycle checks, the actual GameCube stock setting, its downloaded hash and
 receipt, both exercise-pair requirement displays/removal, its downloaded hash,
 and invalidation when settings change. That result targets export 12, not the
-new Harvest menu. The current export retains the same interface/composition code,
-styles, and cartridge recipes, with current generated eligibility, review data,
+current Harvest/spirit menu. The interface code,
+styles, and cartridge recipes retain their hashes. The composition validator
+admits the checked independent spirit group while keeping unknown groups guarded.
+The current export has generated eligibility, review data,
 and carried-family save warning. Current differential/worker checks verify its
 new selection data; unchanged interface checks are not replayed. Five focused seasonal checks
 pass, including the actual C wrapper under address/undefined-behaviour sanitizers
@@ -161,11 +172,11 @@ Empty selection returns exact V2-14. No game files are uploaded; the temporary
 check servers are stopped. The export is unserved.
 
 The all-available offline profile is
-`build/v3-import-pipeline-profile-15/profile.json`; UPS reconstruction passes.
+`build/v3-import-pipeline-profile-16/profile.json`; UPS reconstruction passes.
 ROM SHA-256:
-`f8326d7f95843903ca615b6ce94e99bda2f38f057fdb31091830c4556f60b194`.
+`53a90af277e5772a4a71387a623d565efd6deb5079ab71c62c1a1190eefba25b`.
 UPS SHA-256:
-`3ece7f830e95e6b52ae1c893d6e48aa2298927a365d2f906b25c827aeeec29e5`.
+`d744cf1431ce4c37dc663749a4fe489513d6a1bed31ca9d0476964f2941e1e2e`.
 It uses ABI 391 and retains format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and
 format-20-or-earlier V3 readers cannot read these saves; preserve separate saves
 and backups. Supported older saves migrate forward. Carried-item saves require
@@ -205,18 +216,18 @@ CRC, decompression, all three saved-record CRCs, canonical selected profiles,
 zero unused padding, and the preserved imported fan. Five focused scene/save
 tests pass, including that actual written-chip check. This verifies this town's
 ordinary save/restart, not every item behaviour, synchronous writing,
-diary-preflight execution, or hardware. The current 284-choice profile extends
+diary-preflight execution, or hardware. The current 285-choice profile extends
 that selection with four golden tools, twelve native Redd items, and the seasonal
 candle/flag, the Gulliver and winter-igloo rewards, fifty Mayor gifts, and eighteen
 password-only items, the linked exercise-card/radio pair, and thirteen Harvest
-reward/cutlery choices. Its stock adapter occupies
+reward/cutlery choices, and the independent spirit item. Its stock adapter occupies
 an existing preloaded gap, preserving complete artwork and save format;
 selected-only stock data stays connected.
 It has not repeated ordinary save/reload. Compatibility with ABI 389 is expected
 in both directions when import profiles and other behaviour settings match;
 cross-version save/restart is not verified.
 The added reward identities require a build selecting those same imports; a
-profile-15 save may be rejected by profile-14's narrower selection despite the
+profile-16 save may be rejected by profile-15's narrower selection despite the
 unchanged saved layout. Preserve separate builds, saves, and backups.
 The native format-20 golden reward/state and shovel-rule evidence remains at
 `build/v3-golden-rewards-native-01/results.json` and

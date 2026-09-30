@@ -106,7 +106,7 @@ test('mutual acquisition groups close selections without accepting dependency cy
   assert.throws(() => validatePlan(p), /cyclic/);
 });
 
-test('V3 retains the built gift provider while other runtime groups stay guarded', async () => {
+test('V3 retains independent built gift and spirit providers while unknown groups stay guarded', async () => {
   const { plan, source } = await fixture();
   const view = new DataView(source.buffer);
   view.setUint32(0x103200, 1);
@@ -123,8 +123,14 @@ test('V3 retains the built gift provider while other runtime groups stay guarded
     assert.equal(new DataView(output.buffer).getUint32(0x103200), expected);
   }
   const invalid = clone(plan);
-  invalid.runtime_groups[0].id = 'carried-quest';
+  invalid.runtime_groups[0].id = 'unreviewed-provider';
   assert.throws(() => validatePlan(invalid), /feature activation scope/);
+  for (const groupId of ['diary-holidays', 'carried-quest']) {
+    plan.runtime_groups[0].id = groupId;
+    validatePlan(plan);
+    const { output } = await composeSelection(source, plan, [A]);
+    assert.equal(new DataView(output.buffer).getUint32(0x103200), 1);
+  }
   invalid.runtime_groups[0].forced_disabled = true;
   validatePlan(invalid);
   delete invalid.runtime_groups[0].forced_disabled;

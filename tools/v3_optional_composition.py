@@ -258,6 +258,8 @@ def catalogue(image, report):
     bind_exercise_selection(image,report,result)
     from v3_harvest_acquisition import verify_installed_items as verify_harvest_items
     verify_harvest_items(image,report,result)
+    from v3_carried_selection import verify_quest_items
+    verify_quest_items(image,report)
     return dict(sorted(result.items()))
 
 

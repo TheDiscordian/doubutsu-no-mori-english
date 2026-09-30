@@ -65,7 +65,7 @@ class ImportScopeTests(unittest.TestCase):
                          pool & {r['item_id'] for r in self.catalog.values() if r['kind'] == 'furniture'})
         self.assertEqual([r['id'] for r in self.plan['options'] if not r.get('dependency_only')], offered)
         self.assertEqual({g['id']:g['forced_disabled'] for g in self.plan['runtime_groups']},
-                         {'diary-holidays':False,'carried-quest':True})
+                         {'diary-holidays':False,'carried-quest':False})
         self.assertEqual({r['id'] for r in self.plan['behaviours'] if r.get('pipeline_unavailable')}, UNAVAILABLE_BEHAVIOURS)
         self.assertTrue(all('v4_only' not in r for r in self.plan['behaviours']))
         self.assertTrue(all(not r['selectable'] and r['reason'] for r in self.plan['pending_options']))
@@ -310,6 +310,39 @@ class ImportScopeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unknown import scope'):
             composer.resolve(self.catalog, [], scope='unrestricted-v3', report=self.report)
 
+    def test_spirit_uses_complete_independent_wisp_services_and_selection(self):
+        from v3_carried_selection import quest_items,verify_quest_items
+        key='GAFE01-r0/item/2D28'
+        self.assertEqual(quest_items(self.report),{key})
+        self.assertEqual(verify_quest_items(self.image,self.report),{key})
+        self.assertEqual(self.catalog[key]['dependencies'],[])
+        for keys in ([key],['GAFE01-r0/item/1FC0'],[key,'GAFE01-r0/item/1FC0']):
+            selection=self.select(keys)
+            result,_,_=composer.compose(self.image,self.report,self.catalog,selection)
+            self.assertEqual(selection['required'],[])
+            for group in groups(self.image,self.report):
+                on={'carried-quest':key in keys,
+                    'diary-holidays':'GAFE01-r0/item/1FC0' in keys}[group['id']]
+                self.assertEqual(active(group,selection['enabled'],selection['behaviours'],scope=PIPELINE,report=self.report),on)
+                for field in group['fields']:
+                    self.assertEqual(struct.unpack_from('>I',result,field['offset'])[0],field['enabled'] if on else field['disabled'])
+            self.assertEqual(selection['carried_mask'],64 if key in keys else 0)
+        for owner,field in (('npc','installed'),('npc','native_services_bound'),('manager','npc_registered')):
+            bad=copy.deepcopy(self.report);bad['equipment_resources']['carried_items']['quest'][owner][field]=False
+            self.assertFalse(availability(self.catalog,bad)[key]['selectable'])
+        n=self.report['equipment_resources']['carried_items']['quest']['npc']
+        bad=copy.deepcopy(self.report);bad['equipment_resources']['carried_items']['quest']['npc']['unbound_services']=['missing']
+        self.assertFalse(availability(self.catalog,bad)[key]['selectable'])
+        bad=copy.deepcopy(self.report);bad['equipment_resources']['carried_items']['quest']['npc']['reward_destinations']['rows'][0]['item']^=4
+        with self.assertRaisesRegex(ValueError,'actual spirit reward destinations'):
+            verify_quest_items(self.image,bad)
+        bad=copy.deepcopy(self.report);bad['equipment_resources']['carried_items']['quest']['npc']['text']['rows'][0]['sha256']='0'*64
+        with self.assertRaisesRegex(ValueError,'official spirit dialogue'):
+            verify_quest_items(self.image,bad)
+        p=n['packet'];broken=bytearray(self.image);broken[p['physical']+123]^=1
+        with self.assertRaisesRegex(ValueError,'complete spirit acquisition dependency packet'):
+            verify_quest_items(broken,self.report)
+
     def test_password_only_choices_use_real_frontend_and_live_selection_gates(self):
         from v3_password_acquisition import installed_items,verify_installed_items
         from aflib import by_vrom
@@ -474,6 +507,8 @@ class ImportScopeTests(unittest.TestCase):
         for key in ('GAFE01-r0/item/32D0','GAFE01-r0/item/2642','GAFE01-r0/item/2742','GAFE01-r0/item/2530'):
             profiles.append(('harvest-'+key.rsplit('/',1)[-1],[key]))
         cases = []
+        profiles.extend([('spirit-only',['GAFE01-r0/item/2D28']),
+                         ('spirit-with-mayor',['GAFE01-r0/item/2D28','GAFE01-r0/item/1FC0'])])
         seasonal = self.report['equipment_resources'].get('seasonal_stock')
         if seasonal:
             for mode in ('N64', 'GameCube'):

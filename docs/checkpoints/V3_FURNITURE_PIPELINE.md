@@ -1,5 +1,59 @@
 # Automatic furniture pipeline checkpoint
 
+## Current independent spirit acquisition
+
+The ABI-391 cartridge retains its complete installed Wisp actor, field/spirit
+consumers, saved quest state, dialogue, artwork, and shared sound programs.
+The pipeline admits `GAFE01-r0/item/2D28` without new game code or assets.
+Its five carried states, complete current gameplay/save owners, ten native hooks,
+actual current manager row/callbacks, 28-owner shared registry identity, twenty
+external and two actor-local reward lists, destination table, 48 official messages,
+sixteen choices, complete artwork, and registered sound programs authenticate.
+The native manager verifier retains the complete extended manager and exact
+calendar/descriptor forwarding; account mode is not a Wisp prerequisite.
+
+Spirit-only selection activates only the independent spirit provider, Mayor-only
+keeps it off, and combined selection preserves both. Missing providers keep
+spirit unavailable. Altered packets, live reward destinations, or official text
+reject composition. The JavaScript validator accepts the two checked built groups,
+retaining forced-disable and unknown-group guards. Eighteen focused scope checks
+and thirty-four actual browser/offline profiles pass; fifteen JavaScript checks
+pass. The final focused spirit check also verifies official choice hashes and
+all five ready states. No exhausted native fixture is replayed.
+
+Current private outputs retain raw
+`build/v3-nook-font-repaired-02/build-lock.json`:
+
+- `build/v3-import-pipeline-profile-16/profile.json`: 285 requests, twenty
+  villagers, 263 independent items, the linked exercise pair, and two required
+  starting outfits. Carried mask 125. Receipt SHA-256:
+  `8c13bfdb7530c26f44836a5a1952b614c29b5c459ae078f2fe9ee62023cbcab1`.
+  ROM SHA-256: `53a90af277e5772a4a71387a623d565efd6deb5079ab71c62c1a1190eefba25b`.
+  UPS SHA-256: `d744cf1431ce4c37dc663749a4fe489513d6a1bed31ca9d0476964f2941e1e2e`.
+  UPS reconstruction passes.
+- `build/v3-import-pipeline-browser-15/build.json`: unserved, 285 choices.
+  Plan SHA-256: `38586de26d9280db57c425f8052d8a4919910acc1a677844d8f66524359586a5`.
+  Build receipt SHA-256: `8c4010bf3b2d4c84ac24e5151577756ccae666b269c2cfeb4c96c569e4f4a671`.
+- `build/v3-import-pipeline-worker-13/results.json`: real local game inputs,
+  spirit-only, no added imports, matching offline ROM SHA-256
+  `1890f459b269150681e6b02502ebf1cae3ace30eebcf3fe7e131bf161b5f799a`.
+  Result SHA-256: `6059e2451bc72019d4593351ceeb6edf32c1a1c08ff9dd9a833e7d223346aa48`.
+  No upload/browser error; the temporary server stops.
+
+Ordinary Wisp interaction and native save/travel remain unverified. Format 21,
+wire 7, eight-MiB RAM, FlashRAM, stable identities, and all allocations are
+unchanged. Profile-16 saves should not load with narrower profile 15: that profile
+does not admit the spirit family. Keep matching profiles, separate builds/saves,
+and backups; removing a carried family is not migration. V2 and format-20-or-earlier
+readers reject these saves. The retained interface result targets export 12, not
+the current menu; its unchanged interface code/styles/recipes remain retained
+evidence, while current differential/worker checks cover new eligibility and
+composition. No main lock, service, deployed patcher, or local preview changes.
+
+Next consumer: assess retained postal and summer reward acquisition without
+completing unrelated feature ports, then finish distinct save-entry checks,
+classify retained creature failures, and prepare the private handoff.
+
 ## Current Harvest acquisition and retained native manager
 
 The current ABI-391 cartridge already installs the complete Franklin owner,
