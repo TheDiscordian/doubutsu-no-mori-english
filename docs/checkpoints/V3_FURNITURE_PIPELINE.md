@@ -1,5 +1,72 @@
 # Automatic furniture pipeline checkpoint
 
+## Existing Gulliver and winter-igloo reward admission
+
+The checked ABI-390 cartridge at
+`build/v3-seasonal-stock-installed-03/build-lock.json` retains complete installed
+Gulliver and winter-igloo acquisition. V3 selection admits twenty Gulliver
+souvenirs and eight igloo rewards through those actual native handovers, with
+no new runtime installation, artwork conversion, building, or saved field.
+`tools/v3_furniture_rewards.py` checks readiness and authenticates the complete
+helper/guards, actual donor lists, canonical metadata, native Gulliver owner,
+descriptor and relocation, unchanged handover outside its two selection patches,
+and winter trade code, hooks, full owner/relocation, and allocation.
+Missing providers or incomplete item behaviour remove the affected choices.
+
+Summer route 23 remains unavailable. Its enterable tent and scene are new
+features, unlike the existing winter igloo. All ten actual furniture enable
+words are zero in the all-available composition; the preserved summer calendar
+and event-manager predicates read those words. Selecting Gulliver/igloo rewards
+does not activate that building or any unrelated event provider. The selector
+states this actual dependency instead of blanket-excluding all camper rewards.
+
+Eleven current scope checks pass across targeted runs. Nineteen actual
+browser/offline profiles match, including complete and sparse Gulliver/igloo
+selections, the existing seasonal modes, and golden tools. Mutation checks
+reject changed helper guards, handover, membership, and winter allocation;
+provider-removal and unfinished-behaviour checks reject admission.
+Two focused sanitizer checks execute the actual shared reward/trade C with
+native APIs doubled. The reward code SHA-256 remains
+`193943c60d253c8eacc76250d2960a902ff8e79d648efa10587a61b36fd430b1`,
+complete trade owner remains
+`1a6571128da3e3c8171a347af5a829eb8acaf3246362c0fcb5b7a5074056037e`,
+and trade relocation remains
+`f4a0fffe3564208ccd2ec1e95d65c8703a7f5efc54c62bbfbccad237bb5246bd`.
+The 162-step native result at
+`build/v3-furniture-camping-native-01/results.json` retains its original tested
+build and unchanged helper/trade evidence. No historical fixture is replayed
+or relabelled as fresh current-profile gameplay.
+
+Current all-available profile:
+`build/v3-import-pipeline-profile-10/profile.json`, 20 villagers, 181 independent
+items, and two required starting outfits. ROM SHA-256:
+`2ab4decb5a20c2a7013353e32543265cc4251d9ebc6141bcd3ab3f8d9a34bbd2`.
+UPS SHA-256:
+`1075ffe054e4ba59277c99a366d8e928fd872b0798a55fb6cb88ef20789b02d8`.
+UPS reconstruction passes. The unserved export is
+`build/v3-import-pipeline-browser-09/build.json`.
+The real-file worker result at
+`build/v3-import-pipeline-worker-07/results.json` matches a Gulliver souvenir
+and an igloo reward, including the legacy donor/additive-destination mapping.
+Result SHA-256:
+`f734bcec4284e1fa2ef19f882b1a0e72db85cefb7eabb7386b1cf4e77aa698a9`.
+The real UI check at `build/v3-import-pipeline-interface-09/results.json` passes
+independent selections, downloads, cancellation, setting-change invalidation,
+and exact V2-14 empty output. Result SHA-256:
+`a946f24c4190f6cce23403b852350953e401030c1b4a9d0bc1873c390738fb69`.
+Both private servers stop, with body-free local GETs, no game uploads, and no
+browser errors. The deployed patcher and local preview remain unchanged.
+
+ABI 390, format 21/wire 7, eight-MiB RAM, FlashRAM, and save runtime are unchanged.
+New reward identities require matching selected profiles; profile-10 saves can
+be rejected by profile-09's narrower selection. V2 and format-20-or-earlier
+readers cannot load these saves. Preserve separate builds, saves, and backups.
+Ordinary reward conversations, current-profile saving/restart, broad gameplay,
+and hardware remain unverified. Retained ordinary profile-06 and native seasonal
+results keep their exact build identities. Continue the actual remaining
+holiday/Mayor handover dependencies, distinct save consumers, retained creature
+failure classification, and private handoff, without resuming new V4 features.
+
 ## Existing late-December stock integration
 
 The complete shared festive-pair adapter is installed at

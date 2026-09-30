@@ -2573,6 +2573,20 @@ and state outside the two entry hooks remain unchanged at two relocation bases.
 The ten summer items come from source-derived records, not a runtime item array.
 Both camping categories stay non-orderable and outside ordinary shop stock.
 
+V3 selection admits the twenty Gulliver souvenirs and eight winter-igloo rewards
+only through the complete installed providers. `existing_system_items` checks
+provider readiness and each item's remaining behaviour requirements;
+`verify_existing_system_items` authenticates the complete helper/guards, actual
+donor lists, canonical metadata, unchanged native Gulliver handover outside its
+two selection patches, actor descriptor/relocation, and complete winter trade
+owner, hooks, code, relocation, and allocation. Neither route enables unrelated
+event providers. Sparse selections use the same actual profile flags as ordinary
+imports. Prepared summer-camping rewards remain unavailable: their enterable
+tent and scene are new features, not supplied by the existing winter igloo.
+Admission changes selection data only; installed artwork, native runtime, and
+saved layouts are retained. Keep older native evidence attached to its tested
+build and warn that narrower saved profiles can reject added reward identities.
+
 The code and guards occupy `80474BB0..80474FEF`, between catalogue framing and
 accessory artwork. Startup explicitly invalidates this new code range after its
 existing checked package transfer. Permanent RAM reservations do not grow.
@@ -2581,9 +2595,10 @@ the three regenerable terminal resources. Its VROM and relocation identities
 remain unchanged; future batches update this verified owner in place. Separate
 `owner_moves` receipts keep the three-resource tail-reuse contract intact.
 
-The train category appends source-identified items to the already existing
-native list 4; it needs no new runtime adapter. Catalogue orderability follows
-that actual list, while Gulliver souvenirs remain non-orderable.
+The train-named source category uses the existing fixed-ID Nook seasonal path,
+not a new train feature. Its selected pair and native fallbacks follow the
+[shared seasonal adapter](#shared-fixed-id-seasonal-stock). List insertion alone
+does not establish acquisition. Gulliver souvenirs remain non-orderable.
 
 ### Shared room-category runtime
 

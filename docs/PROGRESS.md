@@ -37,9 +37,9 @@ existing-system reward routes individually. See the
 ### Current import selections and verification
 
 Browser and offline builds default to the V3 pipeline scope. Both offer all
-twenty villagers and 153 independent item choices. Two exclusive
+twenty villagers and 181 independent item choices. Two exclusive
 starting-outfit resources follow their villagers as dependencies, not standalone
-item choices. Select all requests 173 choices and includes those two resources.
+item choices. Select all requests 201 choices and includes those two resources.
 Actual checked stock tables determine regular furniture, clothing, and surfaces;
 the remaining item categories use their installed native acquisition paths.
 Seven furniture choices use the existing native lottery, with checked donor
@@ -60,6 +60,14 @@ choice between original New Year stock and the selected festive pair. GameCube
 mode prioritises the selected donor pair. The additive mixture is an explicit
 platform adaptation, not the original N64 distribution. Other seasonal branches
 remain unchanged. Complete artwork and saved formats are retained.
+Twenty Gulliver souvenirs and eight winter-igloo rewards use their installed
+selection-aware native gift/trade routes. Admission authenticates the complete
+shared helper, donor lists, canonical metadata, native Gulliver handover/descriptor,
+and winter trade code, relocation, hooks, and allocation. Missing providers or
+unfinished item behaviour keep the affected imports unavailable. Selecting these
+rewards enables no unrelated event provider and adds no runtime or artwork.
+The ten summer-camping rewards remain unavailable because they require the new
+enterable tent and scene; the existing winter igloo does not supply that feature.
 The current filter leaves items outside its admitted acquisition categories
 unavailable; this is implemented selection behaviour, not proof that every
 excluded reward requires V4. Review those exclusions against existing-system
@@ -72,17 +80,18 @@ not enable the optional holiday, Wisp, birthday, or savings-account providers.
 Unavailable behaviour controls are hidden without a blanket V4 classification.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-08/build.json`, pinned to the ABI-390
-cartridge. Nine current-cartridge scope/browser-equivalence tests pass, covering
-complete Redd stock routing, selected-only furniture lists, four independent
-golden tools, and rejection of missing providers. Fifteen actual
-browser/offline profiles match. The
-current headless Chromium worker check at
-`build/v3-import-pipeline-worker-06/results.json` reads actual game files and
-matches the offline two-item seasonal selection. Retained unchanged worker
+`build/v3-import-pipeline-browser-09/build.json`, pinned to the ABI-390
+cartridge. Eleven current-cartridge scope/browser-equivalence checks pass across
+targeted runs, covering complete Redd stock routing, selected-only furniture
+lists, four independent
+golden tools, reward-provider/resource rejection, and the existing Gulliver/igloo
+routes. Nineteen actual browser/offline profiles match. The current headless
+Chromium worker check at
+`build/v3-import-pipeline-worker-07/results.json` reads actual game files and
+matches the offline Gulliver/igloo two-item selection. Retained unchanged worker
 checks cover cancellation and invalid-input rejection.
 The current interface check passes at
-`build/v3-import-pipeline-interface-08/results.json`, including independent
+`build/v3-import-pipeline-interface-09/results.json`, including independent
 selection/dependencies, keyboard controls, unavailable-review data, and download
 lifecycle checks, the actual GameCube stock setting, its downloaded hash and
 receipt, and invalidation when settings change. Five focused seasonal checks
@@ -92,6 +101,12 @@ with native I/O doubled. The silent native result at
 modes, independent selections, actual profile readers, RTC/RNG, complete native
 seasonal functions, and guards. Its checkpoint is restored before graceful
 shutdown. Ordinary seasonal purchases and save/restart remain unverified.
+Two focused sanitizer checks pass for the actual shared reward selector and
+camper trade C with native APIs doubled. The retained native reward/trade results
+at `build/v3-furniture-camping-native-01/results.json` keep their original build
+identity. Shared reward code, complete trade owner, and relocation hashes remain
+identical; this is retained unchanged evidence, not fresh current-profile gameplay.
+Ordinary Gulliver and igloo conversations/purchases remain unverified.
 Thirteen focused JavaScript checks pass with Node's
 `--experimental-global-webcrypto` flag.
 <!-- Verification work record: the initial Node invocation lacks the required
@@ -101,11 +116,11 @@ Empty selection returns exact V2-14. No game files are uploaded; the temporary
 check servers are stopped. The export is unserved.
 
 The all-available offline profile is
-`build/v3-import-pipeline-profile-09/profile.json`; UPS reconstruction passes.
+`build/v3-import-pipeline-profile-10/profile.json`; UPS reconstruction passes.
 ROM SHA-256:
-`346f5e87da9a622242af6d41f4bc2b533fa50aadcae69715206a7b041c0d3c59`.
+`2ab4decb5a20c2a7013353e32543265cc4251d9ebc6141bcd3ab3f8d9a34bbd2`.
 UPS SHA-256:
-`975f24753adf494822f7eb634435112dbefd5ee7393c6789d96cb9ba2e6cf79f`.
+`1075ffe054e4ba59277c99a366d8e928fd872b0798a55fb6cb88ef20789b02d8`.
 It uses ABI 390 and retains format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and
 format-20-or-earlier V3 readers cannot read these saves; preserve separate saves
 and backups. Supported older saves migrate forward. Browser composition does
@@ -126,13 +141,17 @@ CRC, decompression, all three saved-record CRCs, canonical selected profiles,
 zero unused padding, and the preserved imported fan. Five focused scene/save
 tests pass, including that actual written-chip check. This verifies this town's
 ordinary save/restart, not every item behaviour, synchronous writing,
-diary-preflight execution, or hardware. The current 173-choice profile extends
+diary-preflight execution, or hardware. The current 201-choice profile extends
 that selection with four golden tools, twelve native Redd items, and the seasonal
-candle/flag. Its stock adapter occupies an existing preloaded gap, preserving
-complete artwork and save format; selected-only stock data stays connected.
+candle/flag, plus the Gulliver and winter-igloo rewards. Its stock adapter occupies
+an existing preloaded gap, preserving complete artwork and save format;
+selected-only stock data stays connected.
 It has not repeated ordinary save/reload. Compatibility with ABI 389 is expected
 in both directions when import profiles and other behaviour settings match;
 cross-version save/restart is not verified.
+The added reward identities require a build selecting those same imports; a
+profile-10 save may be rejected by profile-09's narrower selection despite the
+unchanged ABI and saved layout. Preserve separate builds, saves, and backups.
 The native format-20 golden reward/state and shovel-rule evidence remains at
 `build/v3-golden-rewards-native-01/results.json` and
 `build/v3-golden-rewards-native-storage-01/results.json`; those results do not

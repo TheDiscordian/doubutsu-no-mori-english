@@ -55,8 +55,8 @@ Current implementation task: finish existing-system acquisition selection,
 remaining focused save consumers, and the private import-pipeline handoff.
 The checked current build is
 `build/v3-seasonal-stock-installed-03/build-lock.json`, ABI 390. The all-available
-profile is `build/v3-import-pipeline-profile-09/profile.json`: twenty villagers
-and 153 independent item choices, plus two required starting-outfit resources.
+profile is `build/v3-import-pipeline-profile-10/profile.json`: twenty villagers
+and 181 independent item choices, plus two required starting-outfit resources.
 Seven included furniture rewards use the existing native lottery; no new event
 provider is enabled for those rewards. Ordinary regular-pool integration remains
 installed. Keep unsupported acquisition unavailable without calling every
@@ -72,19 +72,30 @@ native seasons are unchanged; neither mode introduces a new feature or building.
 Five focused adapter checks and 38 silent native cases pass. Complete artwork,
 all 23 startup descriptors, scene allocation, and saved formats remain intact.
 Ordinary seasonal purchases and save/restart are not claimed.
+Twenty Gulliver souvenirs and eight winter-igloo rewards are admitted through
+the complete installed selection-aware helper and existing native handovers.
+Complete source lists, metadata, helper/guards, native owner/descriptor, winter
+trade code/relocation, hooks, and allocations authenticate before composition.
+Missing providers or unfinished item behaviour keep the affected items unavailable.
+The ten summer rewards require the new tent/scene and remain unavailable; no new
+summer building or unrelated event provider is enabled by these selections.
+Reward and trade code hashes match retained passing native evidence; no unchanged
+fixture is replayed. Ordinary conversations and current-profile saving are unclaimed.
 All four installed golden tools follow the shared readiness checks; missing
 acquisition dependencies or reward providers keep the affected choice unavailable.
 Their tree, Shrine, and collection-completion presentation routes do not require
 holiday, Wisp, birthday, or savings-account activation.
 
 Current real-file browser worker and interface checks pass:
-`build/v3-import-pipeline-browser-08/build.json`,
-`build/v3-import-pipeline-worker-06/results.json`, and
-`build/v3-import-pipeline-interface-08/results.json`. Browser hashes match offline
+`build/v3-import-pipeline-browser-09/build.json`,
+`build/v3-import-pipeline-worker-07/results.json`, and
+`build/v3-import-pipeline-interface-09/results.json`. Browser hashes match offline
 builds; empty selection returns V2-14. The private export is unserved.
-Nine focused current-cartridge scope/browser-equivalence tests pass, including
-fifteen actual profile hashes, both seasonal modes with each item selected alone,
-complete native Redd routing, stock selection, and four standalone golden tools.
+Eleven focused current-cartridge scope/browser-equivalence checks pass across
+targeted runs, including nineteen actual profile hashes, both seasonal modes
+with each item selected alone,
+complete native Redd routing, stock selection, four standalone golden tools,
+and complete/sparse Gulliver and igloo rewards. Two shared C sanitizer checks pass.
 The current interface check also verifies actual GameCube-mode downloads and
 setting-change invalidation. Thirteen focused JavaScript checks
 pass. Unavailable behaviour controls no longer
@@ -100,8 +111,9 @@ process loads that save without a checkpoint. Imported fan `2255`, pockets,
 and clothing survive. Full-chip validation checks both bank checksums, CRCs,
 complete decompression, all saved records, selected profiles, and zero padding.
 Five focused scene/save tests pass. Hardware and broad gameplay are unclaimed.
-The current selection adds four golden tools, twelve Redd items, and the festive
-pair. The new seasonal adapter fits an existing preloaded gap without changing
+The current selection adds four golden tools, twelve Redd items, the festive
+pair, twenty Gulliver souvenirs, and eight winter-igloo rewards. The seasonal
+adapter fits an existing preloaded gap without changing
 artwork, scene allocations, or saved format. Ordinary save/reload of that larger profile is not
 claimed. Retained native golden-rule/state checks pass on their recorded
 format-20 build, without proving ordinary conversations or physical writes.
@@ -118,9 +130,10 @@ failure or restart its budget.
 Remaining connected work:
 
 1. Review remaining existing-system reward exclusions individually. Golden-tool,
-   Redd, and fixed-ID seasonal stock admission are connected. Check the retained
-   Gulliver and camper selectors and their actual native dependencies next;
-   reuse installed resources and passing category evidence. Do not blanket-admit
+   Redd, fixed-ID seasonal stock, Gulliver, and winter-igloo admission are connected.
+   Review the actual holiday/Mayor gift dependencies next, distinguishing existing
+   native handovers from entirely new events or buildings. Reuse installed
+   resources and passing category evidence. Do not blanket-admit
    optional event providers or require completing entirely new V4 features.
    Pool names alone do not prove a new-feature requirement or a complete route.
    Separate dependencies on entirely new features from extensions to existing

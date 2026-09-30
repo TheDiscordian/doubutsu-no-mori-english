@@ -1,10 +1,12 @@
-# V3 summer campsite
+# Preserved summer campsite (V4)
 
 ## Purpose and boundary
 
-The ten camping furniture rewards belong to the donor's summer-camper
-conversations in an enterable tent. Install that acquisition route, not ordinary
-shop stock or an unrelated gift source. The decorative tent model `336C` and
+The ten summer-camping furniture rewards belong to the donor's conversations in
+an enterable tent, requiring a new building and scene. Those features are V4
+work; V3 keeps the rewards unavailable and preserves the experimental resources
+without resuming the feature port. Do not substitute ordinary shop stock or an
+unrelated gift source. The decorative tent model `336C` and
 collectible lantern `339C` do not supply the enterable building or scene light.
 
 `tools/v3_campsite_art.py` converts the complete exterior, projected shadow,
@@ -28,8 +30,9 @@ ABI 81 connects selected rewards and full-ID trade picking. ABI 82 connects
 native floor-sound routing and the donor's room-light parameters. ABI 83 connects
 the timed lamp lifecycle and point/diffuse/room-light transitions.
 Remaining masked NPC/quest readers,
-ordinary conversations/reward handovers, and combined scene acceptance remain unfinished. Neither
-served patcher changes without user testing and explicit approval.
+ordinary conversations/reward handovers, and combined scene acceptance remain
+unfinished. The deployed patcher and local preview remain unchanged without
+user testing and explicit approval.
 
 `overlays/v3/campsite_event.c` supplies the calendar, selection, and portable
 lifecycle reference. `campsite_calendar.c` binds the calendar to the native

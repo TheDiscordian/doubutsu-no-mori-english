@@ -243,6 +243,8 @@ def catalogue(image, report):
                 {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys() | surfaces.keys() | creatures.keys() | diaries.keys() | carried.keys())
     if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(report['clothing']['imports'])+len(held)+len(surfaces)+len(creatures)+len(diaries)+len(carried)):
         raise ValueError('Incomplete or duplicated installed development catalogue')
+    from v3_furniture_rewards import verify_existing_system_items
+    verify_existing_system_items(image, report)
     return dict(sorted(result.items()))
 
 

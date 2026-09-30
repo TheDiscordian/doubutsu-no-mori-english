@@ -2,7 +2,7 @@
 import struct
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
-from v3_asset_loader import BLOB, compile_part
+from v3_asset_loader import BLOB, ROOT, compile_part
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ITEMS, slot
 from v3_furniture_pipeline import REWARDS
 from v3_registry import furniture_source
@@ -25,6 +25,111 @@ DONOR_FUNCTIONS = {
     'mSP_SelectRandomItem_New': '9d17117981beb7afe86d3773783ea73c43fcaec1e24cd49c76468ccb7ff42b35',
     'mSP_CountElementInCommonList_collect': '2389abd1d02c8314d9bf7d16110d05a58f877e48b97855385992b589e41f7d78',
 }
+
+
+def existing_system_items(report):
+    """Admit existing Gulliver and winter-igloo routes, not the new summer scene."""
+    owner = report.get('furniture_rewards', {})
+    if (not owner.get('selected_profile_aware') or owner.get('entry') != RAM
+            or owner.get('reservation_start') != FIRST or owner.get('reservation_end') != END
+            or not owner.get('code', {}).get('symbols', {}).get('af_v3_furniture_reward_count')):
+        return set()
+    routes = {r['route'] for r in owner.get('routes', []) if r['route'] in ROUTES
+              and all(r.get(k) == v for k,v in ROUTES[r['route']].items())}
+    trade = report.get('camper_trade', {})
+    if (trade.get('winter_selection_installed') and trade.get('selected_rewards_installed')
+            and 19 in trade.get('shared_reward_categories', [])
+            and trade.get('reward_count_entry') == owner['code']['symbols']['af_v3_furniture_reward_count']):
+        routes.add(19)
+    installed = {r['item_id']:r for r in report['furniture']['imports']}
+    result = set()
+    for row in owner.get('imports', []):
+        item = installed.get(row['item_id'])
+        if (row['route'] in routes and item and item.get('runtime_installed')
+                and item.get('reward_route') == row['route']
+                and item['runtime_index'] == row['runtime_index']
+                and set(item.get('remaining', [])) <= {
+                    'representative native execution', 'ordinary gameplay and save/restart'}):
+            result.add(row['item_id'])
+    return result
+
+
+def verify_existing_system_items(image, report):
+    """Bind selection admission to complete installed resources and donor lists."""
+    admitted = existing_system_items(report)
+    if not admitted:
+        return admitted
+    files = by_vrom(image); blob = files[BLOB].extract(image)
+    owner = report['furniture_rewards']; compiled = owner['code']
+    start = PACKAGE+FIRST-PACKAGE_RAM; end = PACKAGE+END-PACKAGE_RAM
+    raw = blob[start:end]
+    if (len(raw) != END-FIRST or raw[:16] != GUARD or raw[-16:] != GUARD
+            or sha256(raw) != owner['reservation_sha256']
+            or not 0 < compiled['bytes'] <= END-RAM-16
+            or sha256(raw[RAM-FIRST:RAM-FIRST+compiled['bytes']]) != compiled['sha256']
+            or compiled['symbols']['af_v3_furniture_reward_goods'] != RAM):
+        raise ValueError('Changed complete existing-system reward helper')
+    from v3_furniture_pipeline import Source
+    source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                    (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    installed = {r['item_id']:r for r in report['furniture']['imports']}
+    route_rows = {r['route']:r for r in owner['routes']+owner.get('trade_routes', [])}
+    for row in owner['imports']:
+        if row['item_id'] not in admitted: continue
+        item = installed[row['item_id']]; route = route_rows[row['route']]
+        donor = source.raw(route['donor_list'])
+        members = struct.unpack('>'+str(len(donor)//2)+'H',donor)
+        at = ITEMS+slot(int(row['item_id'],16))*32
+        if (sha256(donor) != route['donor_list_sha256']
+                or item.get('donor_list') != route['donor_list']
+                or item.get('donor_list_sha256') != route['donor_list_sha256']
+                or members.count(furniture_source(item)[0]) != 1
+                or members[-1] or 0 in members[:-1]
+                or struct.unpack_from('>2H',blob,at) != (row['runtime_index'],int(row['item_id'],16))
+                or blob[at+7] != 1 or blob[at+24] != 0 or blob[at+27] != row['route']):
+            raise ValueError('Changed complete existing-system reward membership or metadata')
+    core = files[CODE_VROM].extract(image)
+    for route in owner['routes']:
+        if not any(r['route'] == route['route'] and r['item_id'] in admitted for r in owner['imports']):
+            continue
+        rule = ROUTES[route['route']]; data = files[route['vrom']].extract(image)
+        if (sha256(data) != route['output_sha256']
+                or sha256(files[route['reloc']].extract(image)) != rule['relocation_sha256']
+                or core[0x80100C90+rule['actor']*32-CODE_RAM:0x80100C90+rule['actor']*32-CODE_RAM+16]
+                    != struct.pack('>4I',rule['vrom'],rule['vrom']+len(data),rule['ram'],rule['ram']+rule['resident'])):
+            raise ValueError('Changed complete native Gulliver owner or descriptor')
+        patches = ((rule['argument'],0x240E0000|rule['fallback'],0x240E0000|(route['route']<<8)|rule['fallback']),
+                   (rule['call'],0x0C02FF3C,0x0C000000|((RAM>>2)&0x03FFFFFF)))
+        native = bytearray(data)
+        for address,before,after in patches:
+            at = address-rule['ram']
+            if u32(native,at) != after: raise ValueError('Changed native Gulliver reward hook')
+            struct.pack_into('>I',native,at,before)
+        if sha256(native) != rule['owner_sha256']:
+            raise ValueError('Changed native Gulliver handover outside reward selection')
+    if any(r['route'] == 19 and r['item_id'] in admitted for r in owner['imports']):
+        from v3_camper_trade import VROM, RELOC, QUEST, RAM as TRADE_RAM
+        trade = report['camper_trade']; data = files[VROM].extract(image)
+        relocation = files[RELOC].extract(image)
+        code = trade['code']; suffix = data[trade['original_bytes']:trade['original_bytes']+code['bytes']]
+        if (not trade.get('winter_selection_installed') or len(data) != trade['bytes']
+                or sha256(data) != trade['sha256'] or sha256(relocation) != trade['relocation_sha256']
+                or struct.unpack_from('>5I',relocation) != tuple(trade['sections'])
+                or sha256(suffix) != code['sha256']
+                or trade['reward_count_entry'] != compiled['symbols']['af_v3_furniture_reward_count']):
+            raise ValueError('Changed complete native winter trade owner or selector')
+        for hook in trade['hooks']:
+            at = hook['address']-TRADE_RAM
+            if data[at:at+8].hex() != hook['after']:
+                raise ValueError('Changed native winter trade entry')
+        quest = files[QUEST].extract(image)
+        if (u32(quest,0x2460) != VROM+len(data) or u32(quest,0x2468) != TRADE_RAM+len(data)):
+            raise ValueError('Changed complete native winter trade allocation')
+        donor = source.raw('ftr_listKamakura')
+        if not any(r.get('donor_list') == 'ftr_listKamakura' and r['donor_list_sha256'] == sha256(donor)
+                   for r in owner.get('trade_routes', [])):
+            raise ValueError('Missing complete native winter reward membership')
+    return admitted
 
 
 def install(original, base, prior, blob, imports, source, output):

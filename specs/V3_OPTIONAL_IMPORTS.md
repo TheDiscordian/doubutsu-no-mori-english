@@ -368,6 +368,12 @@ setting describes its additive native/imported mixture versus donor-priority
 pair. Neither alternative requires a new feature or building. See the
 [shared seasonal-stock contract](V3_FURNITURE_PIPELINE.md#shared-fixed-id-seasonal-stock).
 
+Gulliver souvenirs and winter-igloo rewards extend existing native handovers and
+are admitted when their complete installed shared providers and item behaviours
+are ready. Their independent selections enable no unrelated event features.
+Summer-camping rewards require the new enterable tent and scene and remain
+unavailable. See [shared optional rewards](V3_FURNITURE_PIPELINE.md#shared-optional-npc-rewards).
+
 The [shared room-alias discovery](V3_FURNITURE_PIPELINE.md#room-display-aliases)
 connects 48 donor display models to their actual parent items, including four
 balloons in the older furniture range. The full donor inventory also identifies

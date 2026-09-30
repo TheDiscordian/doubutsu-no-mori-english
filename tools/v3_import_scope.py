@@ -27,6 +27,10 @@ def availability(catalog, report):
     seasonal = report.get('equipment_resources', {}).get('seasonal_stock', {})
     if seasonal.get('installed'):
         shops.update(r['item_id'] for r in seasonal['source']['imports'])
+    from v3_furniture_rewards import existing_system_items
+    shops.update(existing_system_items(report))
+    summer_rewards = {r['item_id'] for r in report.get('furniture_rewards', {}).get('imports', [])
+                      if r['route'] == 23}
     shirts = {item for group in report['clothing']['stock']['groups']
               for item in group['items']}
     surfaces = {r['id'] for group in report.get('room_surfaces', {}).get('stock', {}).get('resources', [])
@@ -74,6 +78,8 @@ def availability(catalog, report):
         result[key] = dict(selectable=ready, dependency_only=dependency_only,
             reason=('Included only as an authentic villager starting-outfit resource; not a standalone item choice.'
                     if dependency_only else '' if ready else
+                    'Requires the new summer-camping building and scene, deferred to V4.'
+                    if kind == 'furniture' and row['item_id'] in summer_rewards else
                     'Acquisition is not admitted by the current V3 selection policy; existing-system reward routes require individual review.'))
     for key, row in catalog.items():
         if result[key]['selectable']:
