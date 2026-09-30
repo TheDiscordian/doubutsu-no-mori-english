@@ -35,7 +35,47 @@ lifecycle as tested merely because its town FlashRAM calls are connected.
 
 V3 saves use `NAF3` and require this format and compatible imports. V2 and older
 experimental V3 builds cannot safely load them. Keep backups and use disposable
-saves for development. Both web patchers remain on V2.
+saves for development. The deployed patcher and local preview remain on V2.
+
+## Current private-bank repair
+
+The current all-available pipeline build's scene arena has only 14,576 free
+bytes in its retained startup capture. This cannot supply the allocated loader's
+65,536-byte request. Retail `Animal_Logo` function `80AA01A4` calls that loader
+first at `80AA01B0`, without a result check; the title reset function calls the
+synchronous writer/direct loader at `80A9FFB0`/`80A9FFB8`. The independent
+`SaveMenu` state calls the synchronous writer without initializing a scene arena,
+after `play_cleanup` clears that arena. The original synchronous writer used live
+data directly, with no heap allocation. The added scene-heap dependency therefore
+breaks the separate save-menu implementation; the ordinary title-load outcome
+remains unverified.
+
+`overlays/v3/private_save_bank.c` prepares a shared temporary bank independent of
+that scene heap. It reserves 65,536 data bytes and 32 metadata/guard bytes, rejects
+overlapping acquisition, validates exact release ownership, and stops on damaged
+guards. Its initializer runs once during cartridge startup, not on town/profile
+reset while a bank may be held. Native save/load remains serialized by the game
+thread; this is not a general concurrent allocator. It does not change persistent
+records, compression, bank capacity, native I/O, or asynchronous framebuffer
+ownership.
+
+The candidate workspace begins at `804E3000` (bank at `804E3010`), with 356 bytes
+of MIPS code at `804F3100`. Both fit inside the retained console storage's retired
+scratch reservation `804E3000..804F4980`; current complete storage compilation
+uses diary scratch at `80682000`. The checked reservation scan finds no other
+reported owner in that interval. Before installation, authenticate every former
+scratch reader/guard alias, load and initialize the code/workspace through shared
+startup, and bind both synchronous writers, diary preflight, and native allocated
+loader/free calls to the shared acquire/release entries. Keep the native payload
+at `F980`, the private bank at `10000`, and all guards outside those transfers.
+
+`build/v3-private-save-bank-prepared-02/prepared.json` records the checked current
+base, compilation, and reservation. Four focused host checks pass, including
+sanitized complete-bank ownership/reuse/rejection/guard checks. The module is not
+installed, and ordinary save/reload is not established. The exhausted native
+save-check fixture remains retained and unverified; preparation does not restart
+its debugging budget. Earlier evidence below belongs to its recorded historical
+builds, not this current repair.
 
 ## Memory and startup
 

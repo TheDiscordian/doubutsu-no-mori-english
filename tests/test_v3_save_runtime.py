@@ -20,6 +20,17 @@ OUTPUT = ROOT / 'build/v3-save-runtime-02'
 
 
 class SaveRuntimeHostTests(unittest.TestCase):
+    def test_sanitized_private_complete_bank_ownership(self):
+        with tempfile.TemporaryDirectory(prefix='af-v3-private-bank-tests-') as directory:
+            binary = Path(directory) / 'test'
+            subprocess.run(['gcc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
+                '-fsanitize=address,undefined', '-fno-omit-frame-pointer',
+                str(ROOT / 'tests/v3_private_save_bank_test.c'), '-o', str(binary)],
+                check=True, capture_output=True)
+            result = subprocess.run([str(binary)], check=True, capture_output=True,
+                                    text=True, timeout=20)
+            self.assertIn('Private complete-bank ownership, reuse, and guards pass', result.stdout)
+
     def test_incompatible_seed_preserves_compatible_bank(self):
         from test_v3_save_codec import fixture, reference_pack
         source_bank, state = fixture()

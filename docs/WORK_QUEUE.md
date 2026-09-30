@@ -59,10 +59,19 @@ not establish save/reload or ordinary progression. The format-21 native save
 attempt at `build/v3-import-pipeline-save-write-01/results.json` stops before
 writes: its 16,640-byte transfer allocation cannot fit the captured native
 scene arena's 14,576 free bytes. The spring foreground owner now reserves
-149,024 bytes. The next consumer is ordinary scene/transition allocation and
-the real 65,536-byte synchronous-save/allocated-load request. Determine whether
-those ordinary contexts supply enough memory and fix any demonstrated game
-allocation failure. Do not reduce the diagnostic buffer and call save coverage
+149,024 bytes. The retail title actor calls the allocated loader immediately at
+`80AA01B0`, without checking its result. The separate save menu calls the
+synchronous writer after gameplay cleanup clears the scene arena; unlike the
+original writer, the installed writer requires an allocation from that arena.
+The shared guarded 65,536-byte private-bank implementation is prepared at
+`build/v3-private-save-bank-prepared-02/prepared.json` (356 MIPS code bytes),
+with four passing focused host checks. It is not installed. Next authenticate
+the retired scratch reservation's current users, install initialization through
+the shared startup, and bind both synchronous writers, diary preflight, and the
+native allocated loader/release to the shared private bank. Preserve complete
+data, native I/O, asynchronous framebuffer ownership, and save format 21.
+Verify the changed callers; ordinary scene headroom remains separate from this
+save workspace. Do not reduce the diagnostic buffer and call save coverage
 complete, skip the synchronous writer, replay exhausted fixtures, or reset this
 save-check harness's spent debugging budget. Retain its unverified adapter and
 exact failed output. Classify retained creature constructor/scheduler failures
@@ -182,7 +191,7 @@ remain unverified. Keep separate saves/profiles; ABI 382 ordinary forward/backwa
 compatibility is not established, nor ordinary compatibility with ABI 384.
 The retained holiday/card baseline uses format 20/wire 7; the current bank owner
 adds format 21 without changing wire 7. Older readers cannot load the current
-format-21 saves. Both patcher deployments remain stable V2-14.
+format-21 saves. The deployed patcher and local preview remain stable V2-14.
 <!-- Holiday work record: category-imports-01 stops on the catalogue allocation
 guard before producing a cartridge. Category-imports-02 is invalid: ordinary
 installation discards the new endpoint. Category-imports-03 retains that core

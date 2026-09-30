@@ -88,9 +88,26 @@ probes. This explains the diagnostic allocation failure, not ordinary save
 safety. The current spring foreground owner's checked 149,024-byte reservation
 matches its live allocation; the earlier checkpoint has a 74,688-byte allocation
 instead. The real synchronous save and allocated loader each request a complete
-65,536-byte bank. Verify those callers in their ordinary scene/transition context
-before classifying the reduced headroom as harmless. Do not replace that check
-with smaller test buffers or silently omit a required save consumer.
+65,536-byte bank. The retail title actor's `80AA01A4` function calls the allocated
+loader first at `80AA01B0`, and does not check its result. Its reset path calls the
+synchronous writer and direct loader at `80A9FFB0`/`80A9FFB8`. The separate save
+menu calls the synchronous writer after gameplay cleanup clears the scene heap;
+the original writer did not allocate there. That save-menu allocation dependency
+is a concrete implementation defect. The title load's ordinary outcome and
+broader scene headroom remain unverified, not proved safe by the boot result.
+
+The shared private-bank implementation at
+`build/v3-private-save-bank-prepared-02/prepared.json` preserves a complete
+65,536-byte bank with ownership and both guard boundaries, using no scene heap.
+Four focused host checks pass, including the sanitized allocator checks and
+retained save control flow. Its 356-byte MIPS code compiles and links within the
+retired 72,064-byte scratch reservation. The reservation scan finds only that
+retired owner there; actual obsolete scratch users still require authentication.
+The preparation is not installed, has no changed save format, and does not
+establish save/reload. The next connected work is startup initialization and
+binding the synchronous writers, diary preflight, and native allocated loader/
+release to this shared workspace. Do not replace the failed check with smaller
+test buffers, replay exhausted fixtures, or silently omit a save consumer.
 
 ## Preserved experimental artifact and subsystem evidence
 
