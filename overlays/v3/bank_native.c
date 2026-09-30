@@ -76,7 +76,7 @@ static void store_pointer(void *p,u32 at,void *v) {*(void **)((u8 *)p+at)=v;}
 #define pointer af_bank_test_pointer
 #define store_pointer af_bank_test_store_pointer
 #endif
-static struct {void *submenu,*overlay,*private,*game;u32 player;int requested,active,cancelled;} context;
+static struct {void *submenu,*overlay,*private,*game;u32 player;int requested,active,cancelled,rejected;} context;
 #define MENU 0x10280u
 static int owned(void *s) {
     return s && s==context.submenu && context.overlay==pointer(s,0x2C) &&
@@ -112,10 +112,25 @@ static void native_draw(void *s,void *g) {
         context.game=g;(void)af_bank_frontend_draw(g);context.game=0;
     }
 }
+static void rejected_move(void *s) {
+    if(!owned(s) || !context.overlay || !context.rejected)return;
+    u8 *o=context.overlay,*m=o+MENU;
+    if(pointer(o,MENU+0x0C))((void (*)(void *))pointer(o,MENU+0x0C))(s);
+    if(!context.cancelled && pointer(o,0x106B0)) {
+        ((void (*)(void *,int))pointer(o,0x106B0))(m,4);context.cancelled=1;
+    }
+    /* Native close sets status zero and next four; its ordinary motion must
+     * advance the slide-out before the end callback can release the menu. */
+    if(word(m+4)==0 && pointer(o,0x106A8))
+        ((void (*)(void *,void *))pointer(o,0x106A8))(s,m);
+    else if(word(m+4)==4 && pointer(o,0x106AC))
+        ((void (*)(void *,void *))pointer(o,0x106AC))(s,m);
+}
+static void rejected_draw(void *s,void *g) {(void)s;(void)g;}
 static int set_proc(void) {
-    if(!owned(context.submenu))return 0;
-    store_pointer(context.overlay,0x10670,(void *)native_move);
-    store_pointer(context.overlay,0x10674,(void *)native_draw);return 1;
+    if(!owned(context.submenu) || !context.overlay)return 0;
+    store_pointer(context.overlay,0x10670,(void *)(context.rejected?rejected_move:native_move));
+    store_pointer(context.overlay,0x10674,(void *)(context.rejected?rejected_draw:native_draw));return 1;
 }
 static int activate(void *v,void (*move)(void),int (*draw)(void *),const AFBankFrame *f) {
     if(v!=&context || !owned(context.submenu) || move!=af_bank_frontend_move || draw!=af_bank_frontend_draw ||
@@ -142,26 +157,34 @@ static void sound(void *v,u32 n) {if(v==&context && owned(context.submenu))af_ba
 static const AFBankFrontendOps ops={read,commit,frame,activate,transition,character,sound};
 int af_bank_native_request(void *s) {
     AFBankWallet wallet;
-    if(context.requested || context.active || !s || word((u8 *)s+4) || af_bank_player>=4 ||
+    if(context.requested || context.active || context.rejected || !s || word((u8 *)s+4) || af_bank_player>=4 ||
         af_bank_native_selected()!=1 || af_bank_native_eligible()!=1 ||
         !af_bank_valid(af_bank_native_account(),48) || !af_bank_native_wallet(af_bank_now_private,&wallet))return 0;
     context.submenu=s;context.private=af_bank_now_private;context.player=af_bank_player;
     context.requested=1;context.cancelled=0;return 1;
 }
+int af_bank_native_pending(void *s) {
+    return s && s==context.submenu && context.requested && !context.cancelled &&
+        word((u8 *)s+4)==7 && context.private==af_bank_now_private &&
+        context.player==af_bank_player && context.player<4;
+}
 int af_bank_native_construct(void *s) {
     if(!context.requested || context.submenu!=s || word((u8 *)s+4)!=7)return 0;
-    if(context.cancelled) {context.requested=0;context.submenu=0;return -1;}
     context.overlay=pointer(s,0x2C);context.requested=0;
-    if(!context.overlay || !af_bank_frontend_open(&ops,&context)) {context.submenu=0;return -1;}
+    if(context.cancelled || !context.overlay || !af_bank_frontend_open(&ops,&context)) {
+        context.rejected=1;context.cancelled=0;(void)set_proc();return -1;
+    }
     context.active=1;return 1;
 }
-int af_bank_native_set_proc(void *s) {return owned(s) && context.active && set_proc();}
+int af_bank_native_set_proc(void *s) {
+    return owned(s) && (context.active || context.rejected) && set_proc();
+}
 int af_bank_native_destruct(void *s) {
     if(s!=context.submenu)return 0;
     af_bank_frontend_destruct();
     if(af_bank_frontend_active())return -1;
     context.submenu=context.overlay=context.private=context.game=0;
-    context.requested=context.active=context.cancelled=0;return 1;
+    context.requested=context.active=context.cancelled=context.rejected=0;return 1;
 }
 int af_bank_native_cancel(void *s) {
     if(!s || s!=context.submenu)return 0;

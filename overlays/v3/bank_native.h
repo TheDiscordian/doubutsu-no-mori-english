@@ -17,6 +17,9 @@ int af_bank_native_commit(unsigned char *,const unsigned char *,const unsigned c
 /* Pelly requests this mode before opening the existing repayment slot. Each
  * native lifecycle wrapper falls through to original repayment when unowned. */
 int af_bank_native_request(void *);
+/* Opening queues program 7 before the native linker raises open_flag. Treat
+ * only this still-owned request as open while Pelly waits for construction. */
+int af_bank_native_pending(void *);
 int af_bank_native_construct(void *);
 int af_bank_native_set_proc(void *);
 int af_bank_native_destruct(void *);

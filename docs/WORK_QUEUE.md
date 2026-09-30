@@ -50,7 +50,7 @@ an explicit choice for the absent GameCube island system, not a substitute route
 The category's checked preparation is
 `build/v3-post-office-category-prepared-04/prepared.json`, with the complete
 frontend/native adapters at
-`build/v3-post-office-bank-frontend-prepared-12/prepared.json`, based on ABI 386.
+`build/v3-post-office-bank-frontend-prepared-14/prepared.json`, based on ABI 386.
 All sixteen donor bank functions, complete source drawing/formatting/art,
 transactional controls, checked native menu/wallet/pocket adapters, the separately
 owned 48-byte account record, whole-table milestone receipts, fifteen complete
@@ -69,12 +69,21 @@ reset/adoption, preflight, and migrations in source. Its prospective format 21
 retains card wire 7; old readers reject it, and removing required banking rejects
 before publication/writes. Separate account/guard and 48-byte scratch growth
 reservations are checked; actual MIPS storage compilation and both-mode sanitized
-save checks pass. Actual selected-mode/home/current-player bindings,
+save checks retain their passing evidence. Native opening honours the queued
+program before its delayed open flag. Rejected owned construction retains
+closing-only callbacks until destruction, without repayment fallback.
+`tools/v3_post_office_install.py` prepares all six native Pelly/menu consumers
+using local relocated shims and preserves complete original bodies/BSS.
+The complete retained submenu chain grows by 64 bytes for the menu shims.
+Seven focused frontend/dialogue/entry checks pass, including both load addresses;
+native I/O is doubled, and the entry checks use fixture destinations.
+Actual selected-mode/home/current-player bindings,
 text-bank/menu/lifecycle installation, cartridge saved ownership, official template creation,
 real mail I/O, scheduling, and ordinary gameplay remain unbound. The current ROM
-and selections do not change. The exact next connection is native menu/lifecycle
-and complete saved-owner installation, using the checked dialogue and reservations
-and preserving repayment. Link the
+and selections do not change. The exact next connection is complete packet linking
+and resource relocation, followed by text-bank and full saved-owner installation,
+using the prepared entry planner, checked dialogue, and reservations, while
+preserving repayment. Link the
 prepared complete route and bind the connected real mail owners. The
 [category source map and remaining connections](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md#remaining-connected-consumers)
 cover all 23 staged records; do not rescan their unchanged artwork or turn each

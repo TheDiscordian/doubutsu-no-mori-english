@@ -34,7 +34,8 @@ static AFBankPelly snapshot(void *actor,void *game,int action) {
     const u8 *a=actor,*p=af_bank_now_private,*r=af_bank_native_account();
     int next=source_action((int)word(a+0x93C));if(next<0)next=0;
     return (AFBankPelly){a[0x724],a[0x948]|4,action,next,a[0x94A],word(p+0x3C),
-        word(r+16+8*af_bank_player),game?((const u8 *)game)[0x1D98]:0,1};
+        word(r+16+8*af_bank_player),game?(((const u8 *)game)[0x1D98] ||
+            af_bank_native_pending((u8 *)game+0x1CBC)):0,1};
 }
 static void native_action(void *actor,void *game,int action) {
     ((void (*)(void *,void *,int))pointer(actor,0x944))(actor,game,action);
@@ -107,7 +108,7 @@ void af_bank_pelly_open_menu(AFBankPellySubmenu *view,int menu,int a,int b) {
     if(!owner.busy || !owner.actor || !owner.game || menu!=22 || a || b ||
         !af_bank_native_request((u8 *)owner.game+0x1CBC)) {owner.failed=1;return;}
     af_bank_pelly_native_open_menu((u8 *)owner.game+0x1CBC,7,0,0);
-    if(((u8 *)owner.game)[0x1D98]!=1)owner.failed=1;
+    if(!af_bank_native_pending((u8 *)owner.game+0x1CBC))owner.failed=1;
 }
 extern void *af_bank_pelly_window(void);
 int af_bank_pelly_message_number(void *w) {return af_bank_pelly_message_unmap(af_bank_pelly_native_number(w));}

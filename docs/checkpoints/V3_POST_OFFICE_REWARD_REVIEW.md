@@ -102,7 +102,7 @@ physical persistence, or hardware result is claimed.
 
 `tools/v3_bank_frontend.py` prepares all sixteen complete bank functions and the
 three complete source integer-formatting functions at
-`build/v3-post-office-bank-frontend-prepared-12/prepared.json`. It retains the
+`build/v3-post-office-bank-frontend-prepared-14/prepared.json`. It retains the
 genuine title, OK label, complete frame, cash/Bell/balance labels, and complete
 128-by-32 deposit/withdrawal textures. The shared UI converter preserves both
 source CI palette slots and checked tile-one replacement without overwriting
@@ -154,7 +154,7 @@ tables. A resident change or actor release requests ordinary bank closing withou
 publishing a preview. Menu ownership lasts until the real native destructor;
 cancelled pending construction returns an owned failure, never original repayment.
 
-Whole current repayment-owner/relocation guards and seven whole native service
+Whole current repayment-owner/relocation guards and nine whole native service
 guards pass. Four focused frontend checks pass: complete donor/generated/art
 comparison with reuse/provenance, current native contract and mutation rejection,
 sanitized source lifecycle/transaction/drawing, and sanitized native-menu/pocket
@@ -166,11 +166,11 @@ are doubles in these host tests; this is not native execution. The two original
 numerical checks pass against unchanged generated numerical functions. The two
 affected diary resource/state checks retain passing unchanged evidence.
 
-The combined relocatable MIPS object has 18,601 code bytes, 30 data bytes, and
-1,056 BSS bytes, SHA-256
-`726eb0ebf1939faf5f630c65e60abb06de1e957130fcf7bd63c5e743d8ee5606`.
+The combined relocatable MIPS object has 19,593 code bytes, 30 data bytes, and
+1,060 BSS bytes, SHA-256
+`318c8254a0a07b5cf5c6036b373031aadee95797b25062ca1b27b7ad064f5cfd`.
 It is not linked or installed. Selection/home/current-player/account bindings,
-fixed message/menu services, April Fools control, drawing roots, lifecycle hooks,
+fixed message/menu services, April Fools control, drawing roots, lifecycle installation,
 and cartridge menu/save ownership remain unbound. No native
 bank harness starts and no existing harness budget resets. The current ABI-386
 ROM, format 20/wire 7, selections, and both patcher deployments are unchanged.
@@ -187,7 +187,7 @@ retain their exact current text and action identities, including the N64
 Controller Pak letter-save interaction instead of the GameCube Memory Card menu.
 The single provenance catalogue contains exact official-source credits for all
 sixteen additions. The generated bidirectional map is compiled into preparation
-12; its complete source Pelly host check uses that map, not arithmetic message
+14; its complete source Pelly host check uses that map, not arithmetic message
 IDs. Actual text-bank installation/bounds and native services remain pending.
 
 `AF_V3_BANK_STORAGE` connects `AFBA` to `console_storage.c` and
@@ -224,6 +224,45 @@ requiring banking also needs banking enabled in its current profile. Preserve
 separate saves and builds; ordinary forward/backward compatibility is unverified.
 The current format-20 cartridge and existing saves are not modified.
 
+### Queued opening and native lifecycle entry plan
+
+Native `mSM_open_submenu` at `800C4D8C` calls `800C4DD8`, which queues the
+program/arguments without changing the open flag. Both complete service bodies
+have hash guards. Pelly holds its menu-wait action while the owned queued program
+awaits ordinary linking. Pending cancellation remains an owned rejection. An
+admitted construction that fails or sees a stale resident installs closing-only
+callbacks; subsequent native set-proc cannot reinstate repayment. Native closing
+queues status zero/next four; the rejection handler advances ordinary slide-out
+motion before invoking the end callback. The native
+destructor releases ownership before its original cleanup. Host fixtures retain
+the actual delayed opening rather than raising the flag inside the opening double.
+
+`overlays/v3/bank_entries.c` provides all six resident lifecycle wrappers:
+menu construction/destruction/set-proc and Pelly business/greeting/destruction.
+Original menu construction supplies the native common callbacks and retained
+numerical state without a wallet/loan transfer. Unrequested menus still run
+ordinary repayment. Greeting refreshes actual native mail/loan status before
+adding banking only to its borrowed source view.
+
+`tools/v3_post_office_install.py` prepares the complete native consumers together.
+Appended local shims pass relocated original function pointers, not nominal
+overlay RAM addresses, to the resident wrappers. Original code, data, BSS, and
+local fixups remain; the full native Pelly business/process, greeting callback,
+and destructor destinations are connected. Repayment's complete descriptor
+points to its local lifecycle shims. Its aligned allocation requires 64 additional
+submenu bytes, retaining the current complete arena contribution rather than
+replacing earlier growth. Whole owner/relocation guards and comparisons at two
+load addresses preserve every unrelated loaded byte, including the common menu.
+
+Seven current frontend/dialogue/entry checks pass, with sanitized native-I/O
+doubles and exact original-function/entry-address checks at both load bases.
+Entry-plan tests use distinct fixture destinations; no linked bank or installed
+cartridge is implied. The compiled frontend reuses the complete art packet.
+The unchanged saved-town and numerical evidence remains retained. Native
+banking, physical save I/O, ordinary gameplay, and hardware are unverified.
+The enlarged owners still require ordinary VROM/physical resource relocation,
+Pelly's complete allocation descriptor, and actual linked service/code ownership.
+
 ## Remaining connected consumers
 
 Implement a real deposit/withdrawal route and reviewed per-player saved balance
@@ -240,7 +279,8 @@ wrapper in `POST_OFFICE_LETTERS.md` is not this savings-reward mechanism.
 
 Install the prepared complete bank/Pelly route, preserving repayment and the
 reviewed resident/loan/house/renovation admission. The exact next connection is
-native menu/lifecycle and full saved-owner installation, using the prepared
+complete packet linking and native resource relocation, then text-bank and full
+saved-owner installation, using the prepared native entry planner,
 official dialogue and account provider above. Bind the
 compiled selection/admission adapters and checked wallet/pocket services only
 through reviewed owners. Reserve and link complete code/state/art without assuming

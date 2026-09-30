@@ -1,5 +1,6 @@
 #include "bank_native.h"
 #include "bank_pelly.h"
+#include "bank_entries.h"
 #include <assert.h>
 #include <string.h>
 typedef unsigned int u32;
@@ -9,6 +10,7 @@ void *af_bank_now_private;
 unsigned char af_bank_player;
 unsigned char af_bank_account_mode=1,af_bank_home_arrangement,af_bank_native_homes[4*0xB48];
 static int set_calls,pre_calls,draw_calls,move_calls,end_calls,close_calls;
+static int original_ctor_calls,original_dtor_calls,original_proc_calls;
 static void *pointers[16];static unsigned int offsets[16],pointer_count;
 static void *pointer_owners[16];
 static u32 word(const unsigned char *p) {return (u32)p[0]<<24|(u32)p[1]<<16|(u32)p[2]<<8|p[3];}
@@ -31,10 +33,20 @@ void af_bank_native_set_pocket(void *p,int slot,unsigned short item,unsigned int
 void af_bank_native_sound(unsigned int n) {assert(n);}
 static void pre(void *s) {assert(s==submenu);pre_calls++;}
 static void pre_draw(void *s,void *g) {assert(s==submenu && g);draw_calls++;}
-static void move(void *s,void *m) {assert(s==submenu && m==overlay+0x10280);move_calls++;put((unsigned char *)m+4,1);}
+static void move(void *s,void *m) {
+    assert(s==submenu && m==overlay+0x10280);move_calls++;
+    put((unsigned char *)m+4,word((unsigned char *)m+0x30));
+}
 static void end(void *s,void *m) {assert(s==submenu && m==overlay+0x10280);end_calls++;}
-static void close(void *m,int direction) {assert(m==overlay+0x10280 && direction==4);close_calls++;put((unsigned char *)m+4,4);}
+static void close(void *m,int direction) {
+    assert(m==overlay+0x10280 && direction==4);close_calls++;
+    /* Match mSM_move_chg_base: queue slide-out; do not finish it here. */
+    put((unsigned char *)m+4,0);put((unsigned char *)m+0x30,4);put((unsigned char *)m+0x34,4);
+}
 static void matrix(void *g) {assert(g);}
+static void original_ctor(void *s) {assert(s==submenu);original_ctor_calls++;}
+static void original_dtor(void *s) {assert(s==submenu);original_dtor_calls++;}
+static void original_proc(void *s) {assert(s==submenu);original_proc_calls++;}
 extern void af_bank_test_native_draw(void *,void (*)(void *,void *));
 void af_bank_native_test(void) {
     memset(private.bytes,0xA5,sizeof(private.bytes));memset(submenu,0,sizeof(submenu));memset(overlay,0,sizeof(overlay));
@@ -55,8 +67,15 @@ void af_bank_native_test(void) {
     af_bank_test_store_pointer(overlay,0x106B0,(void *)close);
     af_bank_test_store_pointer(overlay,0x106B4,(void *)matrix);
     assert(!af_bank_native_construct(submenu) && !af_bank_native_set_proc(submenu) && !af_bank_native_destruct(submenu));
-    assert(af_bank_native_request(submenu)==1);assert(af_bank_native_request(submenu)==0);put(submenu+4,7);
+    af_bank_menu_construct_entry(submenu,original_ctor);
+    af_bank_menu_set_proc_entry(submenu,original_proc);
+    af_bank_menu_destruct_entry(submenu,original_dtor);
+    assert(original_ctor_calls==1 && original_dtor_calls==1 && original_proc_calls==1);
+    assert(af_bank_native_request(submenu)==1);assert(!af_bank_native_pending(submenu));
+    assert(af_bank_native_request(submenu)==0);put(submenu+4,7);
+    assert(af_bank_native_pending(submenu));af_bank_player=1;assert(!af_bank_native_pending(submenu));af_bank_player=0;
     assert(af_bank_native_construct(submenu)==1 && af_bank_native_set_proc(submenu)==1);
+    assert(!af_bank_native_pending(submenu));
     assert(word(overlay+0x10284)==0 && word(overlay+0x102B0)==1 && word(overlay+0x102B4)==5);
     void (*mover)(void *)=af_bank_test_pointer(overlay,0x10670);
     mover(submenu);assert(pre_calls==1 && move_calls==1);
@@ -68,7 +87,8 @@ void af_bank_native_test(void) {
     assert(word(private.bytes+0x34)==0xC0000008u);
     for(u32 i=0;i<sizeof(private.bytes);i++)if(i!=0x14 && i!=0x15 && !(i>=0x38 && i<0x3C))
         assert(private.bytes[i]==before_private[i]);
-    mover(submenu);assert(end_calls==1);assert(af_bank_native_destruct(submenu)==1 && !af_bank_frontend_active());
+    mover(submenu);assert(!end_calls);mover(submenu);assert(end_calls==1);
+    assert(af_bank_native_destruct(submenu)==1 && !af_bank_frontend_active());
     /* Stale native state and malformed proposals reject before native setters. */
     unsigned char before[48],after[48];memcpy(before,record,48);memcpy(after,record,48);
     assert(af_bank_native_wallet(private.bytes,&wallet));AFBankWallet next=wallet;next.wallet--;
@@ -91,5 +111,21 @@ void af_bank_native_test(void) {
      * never an invitation to open the old loan repayment menu. */
     put(submenu+4,0);assert(af_bank_native_request(submenu)==1);
     assert(af_bank_native_cancel(submenu)==1);put(submenu+4,7);
-    assert(af_bank_native_construct(submenu)==-1 && !af_bank_frontend_active());
+    af_bank_menu_construct_entry(submenu,original_ctor);
+    assert(original_ctor_calls==2 && !af_bank_frontend_active());
+    assert(af_bank_native_set_proc(submenu));
+    af_bank_menu_set_proc_entry(submenu,original_proc);assert(original_proc_calls==1);
+    count=set_calls;int old_end=end_calls,old_close=close_calls,old_move=move_calls;
+    mover=af_bank_test_pointer(overlay,0x10670);mover(submenu);
+    assert(close_calls==old_close+1 && end_calls==old_end && move_calls==old_move+1 && set_calls==count);
+    mover(submenu);assert(close_calls==old_close+1 && end_calls==old_end+1);
+    assert(!af_bank_native_request(submenu));
+    af_bank_menu_destruct_entry(submenu,original_dtor);assert(original_dtor_calls==2);
+    /* A stale resident at construction also closes without numerical input or
+     * original repayment callbacks, even after native set-proc is called. */
+    put(submenu+4,0);assert(af_bank_native_request(submenu));put(submenu+4,7);af_bank_player=1;
+    af_bank_menu_construct_entry(submenu,original_ctor);
+    assert(!af_bank_frontend_active() && af_bank_native_set_proc(submenu));
+    mover=af_bank_test_pointer(overlay,0x10670);mover(submenu);assert(set_calls==count);
+    af_bank_menu_destruct_entry(submenu,original_dtor);af_bank_player=0;
 }

@@ -138,7 +138,7 @@ The connected source-mail category has checked account/reward preparation at
 `build/v3-post-office-category-prepared-04/`, based on the current ABI 386.
 The complete sixteen-function donor frontend, source formatter/drawing/art, and
 checked native menu/wallet/pocket adapters compile at
-`build/v3-post-office-bank-frontend-prepared-12/`. Fifteen complete Pelly
+`build/v3-post-office-bank-frontend-prepared-14/`. Fifteen complete Pelly
 conversation functions, actual resident/home/loan/renovation admission, and
 additive native bank-action dispatch also compile. The complete 24,224-byte art
 packet and receipts are reused. The guarded transaction uses a separately owned
@@ -161,8 +161,16 @@ full-town saved owner connects a separate AFBA record in source, with both-mode
 sanitized adoption/deletion/reset/preflight/profile rejection and older-format
 migration checks passing. Native storage compilation and distinct account/guard
 and scratch-growth reservation checks pass. Prospective format 21 keeps card
-wire 7; it is not installed, and older readers reject its saves. Native
-menu/lifecycle/text-bank and complete saved-owner installation are next;
+wire 7; it is not installed, and older readers reject its saves. The adapter
+honours queued native linking rather than requiring an immediate
+open flag. An owned rejected construction installs closing-only callbacks until
+destruction, never numerical repayment callbacks. The category entry planner
+connects all six Pelly/menu lifecycle consumers through local relocated shims,
+retaining original function bodies, BSS, and the full submenu allocation chain.
+Seven focused frontend/dialogue/entry checks pass; native services remain doubles,
+and entry-plan checks use fixture destinations, not linked cartridge code.
+The actual MIPS frontend compiles with reused artwork. Complete packet linking,
+resource relocation, text-bank and saved-owner installation are next;
 selection/admission bindings, official templates,
 real delivery/scheduling, and independent account/reward choices remain connected
 implementation work. No current ROM, saved format, selectable

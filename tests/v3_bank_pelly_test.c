@@ -1,10 +1,12 @@
 #include "bank_pelly_source.h"
 #include "bank_native.h"
 #include "bank_dialogue.h"
+#include "bank_entries.h"
 #include <assert.h>
 #include <string.h>
 static int window,number,continuing=1,disappeared,appeared,chosen=1,order_value=1;
 static int keep_mail,first_job,forced,unlocked,opened,showed,loan_calls,native_action_value;
+static int original_business_calls,original_talk_calls,original_destruct_calls,status_calls;
 static char free_str[12];
 static union {unsigned int align;unsigned char b[0x958];} actor;
 static union {unsigned int align;unsigned char b[0x1DAC];} game;
@@ -41,10 +43,15 @@ void af_bank_pelly_loan_balance(void) {loan_calls++;}
 AFBankPellyApril *af_bank_pelly_april_clip(void) {return 0;}
 void af_bank_pelly_native_open_menu(void *s,int n,int a,int b) {
     assert(s==game.b+0x1CBC && n==7 && !a && !b);opened++;
-    /* The native opening service is doubled. No emulator execution is claimed. */
-    game.b[0x1D98]=1;put(game.b+0x1CC0,7);
+    /* Match native mSM_open_submenu: queue the program, without changing the
+     * open flag. The native linker raises that flag several frames later. */
+    put(game.b+0x1CC0,7);
 }
 static void original_process(void *a,void *g) {assert(a==actor.b && g==game.b);}
+static void original_business(void *a,void *g) {original_process(a,g);original_business_calls++;}
+static void original_talk(void *a) {assert(a==actor.b);original_talk_calls++;}
+static void original_destruct(void *a,void *g) {original_process(a,g);original_destruct_calls++;}
+static void native_status(void *a) {assert(a==actor.b);actor.b[0x948]=0;status_calls++;}
 static void native_setup(void *a,void *g,int action) {
     assert(a==actor.b && g==game.b);native_action_value=action;
     put(actor.b+0x938,(unsigned int)action);
@@ -90,6 +97,12 @@ void af_bank_pelly_test(void) {
     number=af_bank_pelly_message_map(0x2DE0);
     af_bank_pelly_native_move(actor.b,game.b);assert(word(actor.b+0x938)==34 && disappeared);
     af_bank_pelly_native_move(actor.b,game.b);assert(word(actor.b+0x938)==35 && opened==1);
+    assert(!game.b[0x1D98] && af_bank_native_pending(game.b+0x1CBC));
+    for(int i=0;i<4;i++) {
+        af_bank_pelly_native_move(actor.b,game.b);
+        assert(word(actor.b+0x938)==35 && !forced && !showed && native_action_value==16);
+    }
+    game.b[0x1D98]=1;
     af_bank_pelly_native_move(actor.b,game.b);assert(word(actor.b+0x938)==35 && !forced);
     /* Present a changed account receipt from the separately tested transaction. */
     unsigned char *record=af_bank_native_account();record[8]=1;put(record+16,999999999);
@@ -109,8 +122,22 @@ void af_bank_pelly_test(void) {
     enter();assert(af_bank_pelly_native_business(actor.b,game.b));
     af_bank_pelly_native_move(actor.b,game.b);af_bank_pelly_native_move(actor.b,game.b);
     assert(opened==1 && af_bank_pelly_native_release(actor.b)==1);
+    assert(!af_bank_native_pending(game.b+0x1CBC));
     assert(af_bank_native_construct(game.b+0x1CBC)==-1 && !af_bank_frontend_active());
+    assert(af_bank_native_destruct(game.b+0x1CBC)==1);
     assert(!af_bank_pelly_native_release(actor.b));
+    /* The installed wrappers receive actual relocated original functions,
+     * refresh status before bank greeting, and preserve ordinary fallbacks. */
+    enter();actor.b[0x948]=2;
+    af_bank_pelly_talk_entry(actor.b,original_talk,native_status);
+    assert(status_calls==1 && !original_talk_calls && af_bank_pelly_message_unmap(number)==0x8D1);
+    af_bank_account_mode=0;
+    af_bank_pelly_talk_entry(actor.b,original_talk,native_status);assert(original_talk_calls==1);
+    af_bank_pelly_business_entry(actor.b,game.b,original_business);assert(original_business_calls==1);
+    af_bank_pelly_destruct_entry(actor.b,game.b,original_destruct);assert(original_destruct_calls==1);
+    af_bank_account_mode=1;chosen=3;
+    af_bank_pelly_business_entry(actor.b,game.b,original_business);
+    assert(original_business_calls==1 && native_action_value==1);
     /* The original source status function retains loan and mail-queue rules. */
     AFBankPelly s={0,0,0,0,0,100,0,0,1};keep_mail=5;first_job=0;
     assert(af_bank_pelly_step(&s,AF_BANK_PELLY_STATUS) && s.status==3 && loan_calls==1);

@@ -14,7 +14,7 @@ from v3_furniture_pipeline import Source
 from v3_bank_frontend import generate,artwork,native_contract,admission_contract,reuse_artwork,ROOTS
 from v3_post_office import pelly
 
-PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-12')
+PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-14')
 
 
 class BankFrontendTests(unittest.TestCase):
@@ -106,6 +106,7 @@ class BankFrontendTests(unittest.TestCase):
             if native:command+=['-DAF_BANK_TEST_NATIVE=1',str(ROOT/'overlays/v3/bank_native.c'),
                 str(ROOT/'tests/v3_bank_native_test.c'),str(PREPARED/'pelly_source.c'),
                 str(ROOT/'overlays/v3/bank_admission.c'),str(ROOT/'overlays/v3/bank_pelly_native.c'),
+                str(ROOT/'overlays/v3/bank_entries.c'),
                 str(ROOT/'tests/v3_bank_pelly_test.c')]
             if dialogue is not None:
                 self.assertTrue(native)

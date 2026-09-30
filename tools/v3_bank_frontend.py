@@ -32,6 +32,7 @@ SOURCES=('tools/v3_bank_frontend.py','tools/v3_post_office.py','tools/v3_ui_art.
     'overlays/v3/bank_pelly.h','overlays/v3/bank_pelly_source.h',
     'overlays/v3/bank_pelly_source.c','overlays/v3/bank_pelly_native.c','overlays/v3/bank_admission.c')
 SOURCES+=('tools/v3_bank_dialogue.py','overlays/v3/bank_dialogue.h',
+    'overlays/v3/bank_entries.c','overlays/v3/bank_entries.h',
     'tools/v3_bank_storage.py','overlays/v3/console_storage.c','overlays/v3/console_storage.h',
     'overlays/v3/save_compressed.c','overlays/v3/save_compressed.h','overlays/v3/save_runtime.c')
 ROOTS=('tyo_win_mode','tyo_win_model','tyo_win_moji2T_model','tyo_win_moji3T_model')
@@ -43,6 +44,8 @@ NATIVE_SERVICES={
     'af_bank_native_string_width':(0x800902CC,128,'9a28843e9e97310ebe6a2f16e9e9c4628458a8d83ca565727410ae9cf6313e16'),
     'af_bank_native_set_pocket':(0x800B8B08,132,'caea2a249bfff63d700b6ef34b0301ef01deed51c851aab13c4679e5d892dd24'),
     'af_bank_native_sound':(0x800D1A9C,40,'f474925e5fba40dfbbe8c72dcbdf15f05316a20526ee628a13bfde906513fc1f'),
+    'af_bank_pelly_native_open_menu':(0x800C4D8C,36,'09c573631217451168f7e96d22287f1cd1695a421db4fa5bce50c3b25c387528'),
+    'af_bank_open_queue':(0x800C4DD8,36,'f0827cdfe439f90459f5b7396d9b470b1ee8a1227db89176b0e3b7f099b259fd'),
 }
 
 
@@ -259,12 +262,13 @@ def prepare(output,lock,*,reuse_art=None,dialogue=None):
     run('gcc',*flags,'pelly_source.c','-o','pelly-source.o')
     run('gcc',*flags,'/source/overlays/v3/bank_pelly_native.c','-o','pelly-native.o')
     run('gcc',*flags,'/source/overlays/v3/bank_admission.c','-o','bank-admission.o')
+    run('gcc',*flags,'/source/overlays/v3/bank_entries.c','-o','bank-entries.o')
     additional=[]
     if dialogue is not None:
         write_new(output/'bank-dialogue.c',(dialogue/'bank-dialogue.c').read_bytes())
         run('gcc',*flags,'bank-dialogue.c','-o','bank-dialogue.o');additional.append('bank-dialogue.o')
     run('ld','-EB','-r','bank-source.o','bank-account.o','bank-native.o',
-        'pelly-source.o','pelly-native.o','bank-admission.o',*additional,'-o','post-office.o')
+        'pelly-source.o','pelly-native.o','bank-admission.o','bank-entries.o',*additional,'-o','post-office.o')
     unbound=run('nm','--undefined-only','post-office.o').strip().splitlines()
     if {line.split()[-1] for line in unbound}-{'memcpy','memset',*ROOTS,
             'af_bank_native_translate','af_bank_native_scale','af_bank_native_matrix',
