@@ -6,6 +6,9 @@ typedef signed short s16;
 #ifndef AF_V3_OBJECT_CAPACITY
 #define AF_V3_OBJECT_CAPACITY 430
 #endif
+#ifndef AF_V3_OBJECT_TABLE
+#define AF_V3_OBJECT_TABLE 0x80461000u
+#endif
 struct Object { u32 start, end; };
 struct Status {
     s16 id; u16 pad;
@@ -19,7 +22,7 @@ _Static_assert(__builtin_offsetof(struct Status, keep) == 0x50, "Native status l
 _Static_assert(__builtin_offsetof(struct Arena, next) == 0x1800, "Native arena layout");
 
 #ifdef __mips__
-#define objects ((const struct Object *)0x80461000u)
+#define objects ((const struct Object *)AF_V3_OBJECT_TABLE)
 #define entry ((volatile u32 *)0x800C5AA0u)
 #define writeback ((void (*)(void *, u32))0x8002FE00u)
 #define invalidate ((void (*)(void *, u32))0x80034CE0u)

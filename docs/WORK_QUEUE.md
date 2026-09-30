@@ -43,44 +43,60 @@ of the complete furniture and floor/wall family. Reuse installed artwork and
 behaviours; do not substitute shop stock or create per-item installers. Map the
 remaining connected consumers once before implementation.
 
-Harvest's complete actor/state/dialogue preparation is
-`build/v3-harvest-connected-prepared-09/`; its finally linked resources are
-`build/v3-harvest-connected-linked-05/connected.json`. These are source durability
-checkpoints, not installed acquisition. The full 39-function source owner,
-twelve mapped rewards, 36 official messages, and complete 125-frame motion share
-the 28-owner registry while retaining all 27 existing source callbacks and four
-resident imported motions. Franklin uses additive name `D0D1`, profile `F5`, and
-banks 460/461. His complete model is 12,480 bytes, textures are 4,128 bytes, actor
-is 2,420 bytes, and guarded pool is 2,704 bytes. Linked code/state uses 21,008
-bytes in the checked `807F0000..807FC000` reservation; the pool fits the separate
-`807FC000..80800000` tail. Nothing reserves or loads that new packet in the
-current cartridge yet.
+Harvest's current connected resource cartridge is ABI 379 at
+`build/v3-harvest-installed-07/build-lock.json`, using
+`build/v3-harvest-connected-linked-17/connected.json` and unchanged actor
+preparation `build/v3-harvest-connected-prepared-09/`. It installs the full
+39-function source owner, twelve mapped rewards, 36 official messages, complete
+125-frame motion, and 28-owner registry, retaining the 27 existing source owners
+and four resident imported motions. Franklin uses additive name `D0D1`, profile
+`F5`, and banks 460/461. Complete resources are 12,480 model bytes, 4,128 texture
+bytes, a 2,420-byte actor, 31,568 code/state bytes, and a guarded 2,704-byte pool.
+A checked 64-KiB startup packet owns `807F0000..80800000`; the pool begins at
+`807FC000`, and the complete 462-bank table occupies `807FD000..807FDE70`.
+All 460 existing table entries and adjacent villager flags/growth data remain
+intact. Both native NPC streaming table readers and the common scene allocator
+use the complete new table. The startup remains inside its original reservation.
 
-The nine-row native allocation/name readers compile with one C/assembly capacity
-definition. All six native identity callers are checked and rebound in the
-prepared owners; existing eight name records retain their order and contents.
-The focused complete-source fixture covers selected-only nonrepeating rewards,
-full saved identity initialization before the shared constructor, retained
-reward history, additive message comparisons, refused/accepted cutlery, and
-single reward insertion with native forty-byte area guards. Native services are
-recording doubles. The affected existing Wisp handover check passes. No physical
-save I/O, ordinary conversation, hiding, arrival, or hardware result is claimed.
+The complete source cover masks/classes, nearest-centre flat-unit search, actual
+ball/landmark exclusions, river/player fallbacks, and three relocation attempts
+are connected with placement ID `51`. Arrival retains its replacement acre
+instead of spawning remotely after a failed unit search. The five native manager
+slots bind the four complete source callback bodies and ordinary out/culling.
+Source event 108/native 116 occupies the appended 75th control; the daily cleanup
+bound includes it. All 74 existing controls, relocation entries, and the birthday
+hook remain intact. Six native identity callers use the nine-row readers.
+The original independent keep arrays are not indexed beyond their native bounds.
 
-Next connected consumer: extend the shared placement category with the complete
-source hiding masks/foreground classifiers and nearest-centre flat-unit search,
-seeded acre exclusions (including the actual ball), player and marine fallbacks,
-and after-conversation relocation. Bind source `make_actor_in_free_block_hide`,
-`show_actor_at_wade`, `walk_actor_at_wade_hide`, and the four Harvest manager
-callbacks together. Retain the source placement ID `51`; do not substitute an
-ordinary wandering placement or checkfgcol-only appearance. Then append source
-event 108/native 116 to the real manager references/daily calendar, install the
-prepared banks/pool/dialogue/public redirects, and admit all twelve independent
-family choices with their actual cutlery dependency. Current gameplay/save
-verification remains pending. The Harvest new-harness allowance and setup retry
-are exhausted; do not reset them or replay unchanged component checks.
+Focused source/host checks cover selection and reward cycling, full saved-record
+initialization/history, official dialogue, cutlery refusal/acceptance, single
+insertion, hiding masks, actual ball exclusion, blocked arrival replacement,
+failed/successful relocation, and placement guards. Native services are recording
+doubles. Current-cartridge checks verify complete resources, manager/core hooks,
+both streaming table pointers, named startup CRC/descriptor, retained records,
+and unchanged physical resources outside the two declared shared packet edits.
+The extended object-status and mixed VROM/physical startup fixtures pass under
+sanitizers. No native gameplay, physical save I/O, or hardware result is claimed.
+
+Next connected consumer: enlarge the complete native model reservation and its
+streaming allowance. Both native streaming routines clamp the transfer to their
+caller-supplied size; Franklin's 12,480-byte model exceeds the ordinary 10,240-byte
+allowance. Resolve both actual callers/reservations without truncating the model
+or removing bounds. The current build is an internal resource checkpoint, not
+a Franklin playtest handoff. Then admit all twelve independent furniture/surface
+choices through the ordinary shared category with the actual cutlery dependency.
+Keep the existing acquisition gate closed until that connected path is ready;
+gameplay/save verification remains pending. The Harvest new-harness allowance
+and setup retry are exhausted; do not reset them or replay unchanged checks.
 <!-- Harvest work record: new-harness window 2026-09-30 03:10:10..03:40:10 UTC.
 The corrected initial setup passes; no native gameplay harness is completed.
 Focused verification of actual game-defect repairs is not a new setup cycle. -->
+<!-- Harvest work record: installed-05 is invalid because resource-tail reuse
+discarded its object-table patch; installed-06 corrects the writer ordering;
+installed-07 additionally rebinds both complete native streaming table readers.
+The legacy asset-only startup fixture fails on its stale 03F00000 storage pin;
+the changed 462-bank object contract is verified separately without replaying
+that historical startup. No native-harness allowance is restarted. -->
 
 Nook's four front-counter code/result/handover bindings and complete shared
 keyboard/font/dialogue/audio resources are installed. ABI 378 additionally admits

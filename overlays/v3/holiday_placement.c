@@ -32,9 +32,9 @@ static int search(const AFHolidayField *f,const AFHolidayPlacementOps *o,unsigne
     for(int phase=3;phase>0;--phase)for(int cur=area;cur>0;--cur) {
         AFHolidayBlock b=p->block,u;
         if(wandering) {
-            int n=(int)(f->month*f->day+f->second)+(f->hour+cur)*3+seed*9;
-            if(n<0)n=-n;
-            n%=area;b.x=1+n%width;b.z=2+n/width;
+            unsigned int raw=f->month*f->day+f->second+(f->hour+(unsigned int)cur)*3u+(unsigned int)seed*9u;
+            if(raw&0x80000000u)raw=0u-raw;
+            int n=(int)(raw%(unsigned int)area);b.x=1+n%width;b.z=2+n/width;
         }
         if(phase>=2 && o->busy(o->context,b.x,b.z))continue;
         int excluded=0;
@@ -45,6 +45,11 @@ static int search(const AFHolidayField *f,const AFHolidayPlacementOps *o,unsigne
         p->block=b;p->unit=u;return 1;
     }
     return 0;
+}
+int af_holiday_placement_search(const AFHolidayField *f,const AFHolidayPlacementOps *o,
+        unsigned int type,AFHolidayPlace *p,int adjust,int seed) {
+    if(!p || !valid(f,o,type,0) || adjust<0 || adjust>7)return 0;
+    return search(f,o,type,p,1,adjust,seed);
 }
 int af_holiday_placement_make(const AFHolidayField *f,const AFHolidayPlacementOps *o,
         unsigned int type,unsigned int name,unsigned int id,unsigned int kind,int seed,AFHolidayPlace **out) {

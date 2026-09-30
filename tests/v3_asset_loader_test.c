@@ -4,7 +4,10 @@
 #include "../overlays/v3/asset.c"
 #include "../overlays/v3/startup.c"
 
-struct Object af_v3_objects[430];
+struct Object af_v3_objects[AF_V3_OBJECT_CAPACITY];
+#ifndef AF_TEST_OBJECT_ONLY
+#define AF_TEST_OBJECT_ONLY 0
+#endif
 volatile u32 af_v3_object_entry[2], af_v3_config[4], af_v3_installed, af_v3_memsize;
 _Alignas(16) unsigned char af_v3_memory[AF_V3_BLOB_SIZE];
 static _Alignas(16) unsigned char source[AF_V3_BLOB_SIZE];
@@ -85,7 +88,7 @@ static void object_tests(void) {
     struct Arena arena;
     memset(&status, 0xA5, sizeof(status));
     memset(&arena, 0x6C, sizeof(arena));
-    for (int i = 0; i < 430; ++i) {
+    for (int i = 0; i < AF_V3_OBJECT_CAPACITY; ++i) {
         af_v3_objects[i].start = 0x01000000u + (u32)i * 0x2000u;
         af_v3_objects[i].end = af_v3_objects[i].start + 5664;
         arena.next = 0x80300010; arena.end = 0x80310000;
@@ -97,10 +100,10 @@ static void object_tests(void) {
         assert(status.pad == before.pad && status.unknown == before.unknown);
         assert(!memcmp(status.reserved, before.reserved, sizeof(status.reserved)));
     }
-    reject(&status, &arena, -1); reject(&status, &arena, 430); reject(&status, &arena, 32767);
+    reject(&status, &arena, -1); reject(&status, &arena, AF_V3_OBJECT_CAPACITY); reject(&status, &arena, 32767);
     arena.next = 0x80300010; arena.end = 0x80310000;
-    assert(af_v3_object_status(&status, &arena, 0x123401ADu));
-    assert(status.id == -429 && status.vrom == af_v3_objects[429].start);
+    assert(af_v3_object_status(&status, &arena, 0x12340000u|(AF_V3_OBJECT_CAPACITY-1)));
+    assert(status.id == -(AF_V3_OBJECT_CAPACITY-1) && status.vrom == af_v3_objects[AF_V3_OBJECT_CAPACITY-1].start);
     af_v3_objects[410].start = af_v3_objects[410].end = 0;
     reject(&status, &arena, 410);
     af_v3_objects[410].start = 1;
@@ -116,7 +119,8 @@ static void object_tests(void) {
     assert(af_v3_object_status(&status, &arena, 0)); /* Retain native empty-bank semantics. */
 }
 int main(void) {
-    startup_tests(); object_tests();
+    if(!AF_TEST_OBJECT_ONLY)startup_tests();
+    object_tests();
     puts("V3 startup, native status layout, banks, bounds, caches, and rejection paths pass");
     return 0;
 }

@@ -726,7 +726,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     room_rigs_art=None, room_rigs_code=False, room_goods=None, room_carry=None, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
-                    password_runtime=None,password_editor=False,password_nook=None,room_effects=None,furniture_capacity=False,console_storage=False,
+                    password_runtime=None,password_editor=False,password_nook=None,harvest_connected=None,room_effects=None,furniture_capacity=False,console_storage=False,
                     console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None,carried_items=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
@@ -753,6 +753,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,room_rigs_code,room_goods is not None,room_carry is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None,password_editor,password_nook is not None,room_effects is not None,furniture_capacity,console_storage,console_images is not None,console_emulator))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if console_disk is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
+    if harvest_connected is not None:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if creature_items is not None:
@@ -797,7 +800,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if carried_items is not None:
+    if harvest_connected is not None:
+        import v3_harvest_install as equipment
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+            base,prior,blob,core,module,output,harvest_connected)
+        display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
+    elif carried_items is not None:
         import v3_carried_runtime as equipment
         equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
             base,prior,blob,core,module,output,carried_items)
@@ -1373,6 +1381,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         result=equipment.finish(result,base,prior,output,equipment_report,report_updates['physical_resources'])
     if password_nook is not None:
         result=equipment.finish(result,base,output,equipment_report,report_updates['physical_resources'])
+    if harvest_connected is not None:
+        result=equipment.finish(result,base,output,equipment_report,report_updates['physical_resources'])
     physical.verify(result,report_updates.get('physical_resources',prior.get('physical_resources',[])))
     fix_checksum(result);result=bytes(result)
     patch=make_ups(original,result)
@@ -1829,6 +1839,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             additional_system_font_bytes=nook['additional_system_font_bytes'])
         report['sources'].update(nook['source'])
         report['native_test']='pending focused installed Nook input/result/gift, glyph, and actor teardown checks'
+    if harvest_connected is not None:
+        harvest=equipment_report['harvest']
+        report['shared_runtime_refresh'].update(adapters=['harvest'],
+            additional_resident_bytes=harvest['packet']['bytes'],resource_allocations_changed=True)
+        report['sources'].update(harvest['sources'])
+        report['native_test']='pending selected Harvest admission, ordinary hiding/conversation/delivery, and save/restart'
     if report.get('resource_capacity'):
         report['resource_capacity']['resources']=capacity.text_records(result,report)
         capacity.checked_limit(result,report)
@@ -1922,6 +1938,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install two-row code entry without enabling Nook delivery')
     parser.add_argument('--password-nook',type=Path,
         help='With --refresh-runtime, connect prepared Nook code-entry, official results, and animated gift delivery')
+    parser.add_argument('--harvest-connected',type=Path,
+        help='With --refresh-runtime, install the complete linked Harvest actor, hiding, manager, and dialogue resources')
     parser.add_argument('--room-effects',type=Path,
         help='With --refresh-runtime, install prepared shared effects through the native controller')
     parser.add_argument('--furniture-capacity',action='store_true',
@@ -1981,6 +1999,7 @@ if __name__=='__main__':
     if args.password_runtime and not args.refresh_runtime:parser.error('--password-runtime requires --refresh-runtime')
     if args.password_editor and not args.refresh_runtime:parser.error('--password-editor requires --refresh-runtime')
     if args.password_nook and not args.refresh_runtime:parser.error('--password-nook requires --refresh-runtime')
+    if args.harvest_connected and not args.refresh_runtime:parser.error('--harvest-connected requires --refresh-runtime')
     if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
     if args.furniture_capacity and not args.refresh_runtime:parser.error('--furniture-capacity requires --refresh-runtime')
     if args.console_storage and not args.refresh_runtime:parser.error('--console-storage requires --refresh-runtime')
@@ -2004,7 +2023,7 @@ if __name__=='__main__':
                             furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art,
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
                             furniture_scoring=args.furniture_scoring,password_runtime=args.password_runtime,
-                            password_editor=args.password_editor,password_nook=args.password_nook,room_effects=args.room_effects,
+                            password_editor=args.password_editor,password_nook=args.password_nook,harvest_connected=args.harvest_connected,room_effects=args.room_effects,
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,

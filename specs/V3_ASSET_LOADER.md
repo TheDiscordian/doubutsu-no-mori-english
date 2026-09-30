@@ -2,6 +2,15 @@
 
 ## Implemented boundary
 
+The shared additional-NPC importer supports 462 banks. Its complete table at
+`807FD000..807FDE70` belongs to the checked Harvest startup packet; the common
+object allocator and both native reserved-bank streaming readers use that same
+table. The original resident table's 460-entry prefix, adjacent villager flags,
+and native growth permissions remain intact. Table relocation alone does not
+enlarge an NPC's caller-supplied model buffer. Franklin's complete 12,480-byte
+model requires a larger reservation/transfer allowance before acquisition is
+admitted. Resource installation is not complete native appearance or gameplay.
+
 The current [complete-villager asset variant](V3_COMPLETE_VILLAGER_ASSETS.md)
 extends capacity to 448 banks, installs all twenty textures, two custom models,
 and sixteen accessories, and relocates native growth permissions to `80461E80`.

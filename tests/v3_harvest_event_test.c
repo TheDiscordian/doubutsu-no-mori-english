@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "ev_turkey.c"
+#include "holiday_hiding.h"
+#include "harvest_manager.h"
 
 typedef struct {
     u32 birth,change_master,change_mode;
@@ -122,6 +124,131 @@ static void guards(void) {
     for(unsigned i=0;i<16;i++)assert(saved.before[i]==0xA5 && saved.after[i]==0xA5 &&
         common.before[i]==0xA5 && common.after[i]==0xA5);
 }
+/* Extend the existing complete-actor fixture for the changed placement risk.
+ * Native world services are recording doubles, not an emulator harness. */
+static struct {
+    u16 fg[256];u32 col[256];
+    struct {u32 before[4];AFHolidayPlace place;u32 after[4];} area;
+    AFHolidayBlock ball,marine,forward;
+    int present,indoors,busy,ball_valid,marine_valid,occupied,normal,free_ok,fail_reserve;
+    int errors,spawns,flattens,units,seed;
+} hide;
+static AFHolidayField hide_field={.maximum={9,7},.next={-1,-1},.shrine={2,3},
+    .excluded={{2,1},{2,2},{3,1},{2,3}},.exclusions=4,.month=11,.day=24,.hour=15,.second=7};
+static const u16 *hide_fg(void *c,int x,int z) {(void)c;(void)x;(void)z;return hide.fg;}
+static const u32 *hide_col(void *c,int x,int z) {(void)c;(void)x;(void)z;return hide.col;}
+static int hide_allowed(u16 fg,u32 attr) {return fg==0 && attr==1;}
+static int hide_outdoors(void *c) {(void)c;return !hide.indoors;}
+static int hide_busy(void *c,int x,int z) {(void)c;(void)x;(void)z;return hide.busy;}
+static int hide_other(void *c,unsigned type,AFHolidayBlock b) {(void)c;(void)b;assert(type==116);return 0;}
+static int hide_unit(void *c,int *x,int *z,int bx,int bz) {
+    (void)c;(void)bx;(void)bz;hide.units++;if(!hide.normal)return 0;*x=6;*z=6;return 1;
+}
+static int hide_height(void *c,int bx,int bz,int x,int z) {(void)c;(void)bx;(void)bz;(void)x;(void)z;return 1;}
+static AFHolidayPlace *hide_get(void *c,unsigned type,unsigned id) {
+    (void)c;assert(type==116 && id==0x51);return hide.present?&hide.area.place:0;
+}
+static AFHolidayPlace *hide_reserve(void *c,unsigned type,unsigned id) {
+    (void)c;assert(type==116 && id==0x51);
+    if(hide.fail_reserve)return 0;
+    hide.present=1;return &hide.area.place;
+}
+static int hide_forward(void *c,int *x,int *z) {(void)c;*x=hide.forward.x;*z=hide.forward.z;return 1;}
+static void hide_flatten(void *c,AFHolidayPlace *p) {(void)c;assert(p==&hide.area.place);hide.flattens++;}
+static int hide_spawn(void *c,AFHolidayPlace *p) {
+    (void)c;assert(p==&hide.area.place && p->block.x==hide.forward.x && p->block.z==hide.forward.z);
+    hide.spawns++;return 1;
+}
+static void hide_error(void *c,unsigned type) {(void)c;assert(type==116);hide.errors++;}
+static int hide_ball(void *c,AFHolidayBlock *b) {(void)c;*b=hide.ball;return hide.ball_valid;}
+static int hide_marine(void *c,AFHolidayBlock *b) {(void)c;*b=hide.marine;return hide.marine_valid;}
+static int hide_occupied(void *c,const AFHolidayPlace *p) {(void)c;(void)p;return hide.occupied;}
+static int hide_free(void *c,unsigned type,AFHolidayPlace *p,int seed) {
+    (void)c;assert(type==116);hide.seed=seed;
+    if(!hide.free_ok)return 0;
+    p->block=(AFHolidayBlock){5,4};p->unit=(AFHolidayBlock){6,6};return 1;
+}
+static AFHolidayHiding hide_ops={
+    {0,hide_outdoors,hide_busy,hide_other,hide_unit,hide_height,hide_get,hide_reserve,
+        hide_forward,hide_flatten,hide_spawn,hide_error},
+    hide_fg,hide_col,hide_allowed,hide_ball,hide_marine,hide_occupied,hide_free};
+static _Alignas(16) u8 manager_data[0x260];
+static int hide_fluctuation=-0x7654321;
+AFHolidayPlace *af_holiday_native_get_place(int type,u8 id) {return hide_get(0,type,id);}
+int af_holiday_hide_native_fluctuation(void *m,int *seed) {
+    assert(m==manager_data);*seed=hide_fluctuation;return 1;
+}
+int af_holiday_hide_native_make(void *m,u32 t,u32 name,u32 id,int seed,AFHolidayPlace **out) {
+    assert(m==manager_data && name==0xD0D1 && seed==108+0xD08D+0x51);
+    return af_holiday_hide_make(&hide_field,&hide_ops,t,name,id,seed,out);
+}
+int af_holiday_hide_native_walk(void *m,u32 t,u32 name,u32 id,int seed,AFHolidayPlace **out) {
+    assert(m==manager_data && name==0xD08D && seed==(int)((u32)hide_fluctuation+108));
+    return af_holiday_hide_walk(&hide_field,&hide_ops,t,name,id,seed,out);
+}
+int af_holiday_hide_native_show(void *m,u32 t,u32 id,int seed,AFHolidayBlock *b) {
+    assert(m==manager_data && seed==(int)((u32)hide_fluctuation+108+0x51));
+    return af_holiday_hide_show(&hide_field,&hide_ops,t,id,seed,b);
+}
+void af_hr_manager_native_set_status(int type,int bits) {assert(type==116);af_holiday_native_days[1].status|=bits;}
+void af_hr_manager_native_clear_status(int type,int bits) {assert(type==116);af_holiday_native_days[1].status&=~bits;}
+int af_hr_manager_native_check_status(int type,int bits) {assert(type==116);return af_holiday_native_days[1].status&bits;}
+static void hiding_checks(void) {
+    for(unsigned i=0;i<4;i++)hide.area.before[i]=hide.area.after[i]=0xA55AA55A;
+    for(unsigned i=0;i<256;i++)hide.col[i]=1; /* All five zero-height corners, allowed terrain. */
+    hide.fg[9*16+8]=0x804;
+    int x=-1,z=-1;
+    assert(af_holiday_hide_unit(&x,&z,1,3,2,&hide_ops) && x==8 && z==8);
+    hide.col[8*16+8]|=1u<<11; /* A single raised corner rejects the apparently empty spot. */
+    assert(!af_holiday_hide_unit(&x,&z,1,3,2,&hide_ops));hide.col[8*16+8]=1;
+    assert(!af_holiday_hide_unit(&x,&z,1,3,9,&hide_ops));
+    u16 mask[16];
+    const u16 objects[]={0x5000,0xF200,0x5829,0x580C,0x5849,0x5804,0x5808,0x5805,0x5806,0x5807,0x5843,7,12,14};
+    for(unsigned i=0;i<sizeof(objects)/sizeof(objects[0]);i++) {
+        memset(hide.fg,0,sizeof hide.fg);memset(mask,0,sizeof mask);
+        hide.fg[8*16+8]=objects[i];af_holiday_hide_mask(mask,hide.fg);
+        int bits=0;for(unsigned row=0;row<16;row++)bits+=mask[row]!=0;
+        assert(bits==1); /* Every supported building/board cover occupies its source row. */
+    }
+    for(unsigned i=0;i<2;i++) {
+        memset(hide.fg,0,sizeof hide.fg);memset(mask,0,sizeof mask);
+        hide.fg[8*16+8]=(u16)(i?0x584D:0x584A);af_holiday_hide_mask(mask,hide.fg);
+        for(unsigned row=0;row<16;row++)assert(!mask[row]);
+    }
+    memset(hide.fg,0,sizeof hide.fg);hide.fg[9*16+8]=0x804;
+    AFHolidayPlace *p=0,candidate={{0,0},{0,0},0xD0D1,1};
+    assert(af_holiday_hide_search(&hide_field,&hide_ops,116,&candidate,108+0xD08D+0x51));
+    hide.ball=candidate.block;hide.ball_valid=1;
+    assert(af_holiday_hide_make(&hide_field,&hide_ops,116,0xD0D1,0x51,108+0xD08D+0x51,&p)==1);
+    assert(p==&hide.area.place && (p->block.x!=hide.ball.x || p->block.z!=hide.ball.z));
+    hide.ball_valid=0;hide.forward=p->block;
+    assert(af_holiday_hide_show(&hide_field,&hide_ops,116,0x51,17,&candidate.block)==1 && hide.spawns==1);
+    hide.occupied=1;hide.free_ok=1;
+    assert(af_holiday_hide_show(&hide_field,&hide_ops,116,0x51,17,&candidate.block)==2 && hide.spawns==1);
+    assert(p->block.x==4 && p->block.z==5 && hide.seed==17); /* Preserve the source-bug repair. */
+    hide.forward=p->block;hide.normal=1;
+    assert(af_holiday_hide_show(&hide_field,&hide_ops,116,0x51,17,&candidate.block)==1 && hide.spawns==2);
+    assert(p->unit.x==6 && p->unit.z==6);hide.occupied=0;
+    AFHolidayControl control={.type=116};
+    *(int *)(manager_data+0x234)=0;
+    assert(!af_hr_manager_start(manager_data,&control));
+    assert((af_holiday_native_days[1].status&AF_HE_ERROR) && !(af_holiday_native_days[1].status&AF_HE_ACTIVE));
+    af_holiday_native_days[1].status=AF_HE_EXIST|AF_HE_ACTIVE;*(int *)(manager_data+0x234)=1;
+    hide.present=0;
+    assert(af_hr_manager_start(manager_data,&control)==1 && af_hr_manager_check_keep(116));
+    assert(af_hr_manager_start(manager_data,&control)==2);
+    p=&hide.area.place;hide.forward=p->block;assert(af_hr_manager_in(manager_data,&control)==1);
+    af_holiday_native_days[1].status|=64;hide.busy=1;
+    AFHolidayPlace before=*p;
+    assert(!af_hr_manager_behind(manager_data,&control) && !memcmp(p,&before,sizeof before));
+    assert(af_holiday_native_days[1].status&64); /* Failed relocation does not consume TALK. */
+    af_holiday_native_days[1].status&=~AF_HE_ERROR;hide.busy=0;
+    assert(af_hr_manager_behind(manager_data,&control)==1 && !(af_holiday_native_days[1].status&64));
+    assert(af_hr_manager_stop(manager_data,&control)==1 && af_hr_manager_stop(manager_data,&control)==2);
+    assert(!af_hr_manager_check_keep(116));
+    for(unsigned i=0;i<4;i++)assert(hide.area.before[i]==0xA55AA55A && hide.area.after[i]==0xA55AA55A);
+    puts("Full cover/flat-unit search, actual ball exclusion, repaired arrival fallback, source manager callbacks, failed/successful relocation, and placement guards pass with world services doubled.");
+}
 int main(void) {
     memset(&saved,0xA5,sizeof saved);memset(&common,0xA5,sizeof common);
     memset(af_holiday_native_index,255,sizeof af_holiday_native_index);
@@ -189,4 +316,5 @@ int main(void) {
     if(!setjmp(failure)) {af_hr_get_save(AF_HR_SOURCE,0);assert(0);}
     assert(halt_calls==1);guards();
     puts("Complete Franklin selection, additive dialogue, refused/accepted cutlery, single reward insertion, native event-area guards, and force-angle routing pass; native services are doubled.");
+    saved.data.given_present_bitfield=0;expected_halt=0;hiding_checks();
 }

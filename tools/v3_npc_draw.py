@@ -37,6 +37,28 @@ def patch_streaming(data, reloc_data, vrom, ram):
             'reserved_texture_bytes': 0x1620, 'allocation_and_dma_unchanged': True}
 
 
+def rebind_streaming_tables(base,changes,table_ram):
+    """Bind both complete native reserved-bank readers to an owned full table."""
+    files=by_vrom(base);rows=[]
+    if table_ram&15 or not 0x80400000<=table_ram<0x80800000:
+        raise ValueError('Invalid owned native NPC object-table address')
+    for vrom,reloc,ram,*_ in OWNERS:
+        start,end,address,digest=STREAMING[vrom]
+        data=bytearray(changes.get(vrom,files[vrom].extract(base)));at=address-ram
+        before=bytes.fromhex('3c0f804625ef1000')
+        normalized=bytearray(data[start-ram:end-ram]);pos=address-start
+        if data[at:at+8]!=before or {at,at+4}&relocation_offsets(files[reloc].extract(base),len(data)):
+            raise ValueError('Changed complete native NPC table reader')
+        normalized[pos:pos+8]=bytes.fromhex('3c0f801125efddd0')
+        if sha256(normalized)!=digest:
+            raise ValueError('Changed whole native reserved-bank streaming function')
+        after=struct.pack('>2I',0x3C0F0000|((table_ram+0x8000)>>16),0x25EF0000|(table_ram&65535))
+        data[at:at+8]=after;changes[vrom]=bytes(data)
+        rows.append(dict(vrom=vrom,ram=ram,address=address,before=before.hex(),after=after.hex(),
+            native_function_sha256=digest,relocations_unchanged=True))
+    return rows
+
+
 def draw_records(native, rel, symbols, artwork):
     table = symbol_data(rel, symbols.decode(), 'npc_draw_data_tbl')
     native_table = by_vrom(native)[NATIVE_DRAW_VROM].extract(native)

@@ -23,8 +23,11 @@ lock or publish experimental V3.
 
 ## Active development
 
-The current proposal is ABI 378 / format 20 at
-`build/v3-password-only-imports-01/password-destinations/build-lock.json`. Nook's four front counters
+The current proposal is ABI 379 / format 20 at
+`build/v3-harvest-installed-07/build-lock.json`. Harvest's complete connected
+resources are installed, but native full-model loading and twelve-choice
+admission remain unfinished. This is an internal development checkpoint, not
+the private gameplay handoff. Nook's four front counters
 have installed code-entry, official result dialogue, and native animated handover
 bindings. The complete keyboard, full donor-name font, original shop actions,
 and saved formats are retained. Shared admission adds sixteen password-only
@@ -39,25 +42,28 @@ hardware remain unverified. Continue the other source acquisition categories,
 beginning with the complete Harvest reward path. See
 [the Nook checkpoint](checkpoints/V3_NOOK_PASSWORDS.md).
 
-Harvest's full source owner and shared native adapters compile and finally link
-at `build/v3-harvest-connected-linked-05/connected.json`, using preparation
-`build/v3-harvest-connected-prepared-09/`. All 39 actor functions, twelve reward
-identities, 36 official messages, and the complete 125-frame motion are retained.
-The 28-owner registry keeps existing source callbacks/motions; Franklin's full
-model, textures, voice identity, and guarded 2,420-byte actor have prepared native
-records. Nine-row allocation/name/spawn readers compile, with six checked native
-identity caller rebindings and unchanged existing name records. The linked owner
-uses 21,008 code/state bytes and a 2,704-byte pool in checked upper memory.
-Complete-source host checks pass for reward filtering/cycling, safe first-record
-initialization and history retention, dialogue continuation, refused/accepted
-cutlery, single insertion, native-area guards, and queued player rotation.
-Native inventory/event/player services remain recording doubles. The affected
-existing Wisp handover check passes. Hiding/relocation, manager/calendar
-installation, family admission, and ordinary gameplay/save verification remain
-unfinished. These resources are not installed in ABI 378 and add no selectable
-choices. Both deployed patchers remain stable V2-14. The Harvest harness allowance
-and corrected setup retry are spent; continue the same connected category without
-a new setup cycle. See [the exact next consumers](WORK_QUEUE.md#execution-order).
+Harvest installs its complete owner, hiding/arrival/relocation adapters, five
+native manager slots, daily calendar entry/cleanup, official dialogue, NPC banks,
+guarded pool, and shared registry/motion redirects from
+`build/v3-harvest-connected-linked-17/connected.json`. The unchanged actor
+preparation is `build/v3-harvest-connected-prepared-09/`. All 39 actor functions,
+twelve reward identities, 36 official messages, and the complete 125-frame motion
+are retained. Existing 27 source owners, eight native NPC identities, 74 manager
+controls, and relocation/birthday bindings remain. The full 64-KiB startup owner
+contains 31,568 code/state bytes, a 2,704-byte pool, and the complete 462-bank
+table; adjacent villager flags remain untouched. The common allocator and both
+native NPC streaming readers use that table. Focused current-cartridge checks
+verify installed resources, hooks, guards, startup CRC/descriptor, and retained
+physical data. Source/host checks cover full hiding masks, ball exclusions,
+blocked arrival repair, relocation failure/success, reward filtering, saved-record
+history, dialogue/cutlery, and single insertion; native services remain doubles.
+Franklin's native model-loading allowance is still 10,240 bytes, below his full
+12,480-byte model. Enlarge both actual reservations/callers before admitting the
+twelve reward choices. No new choices or ordinary gameplay/save/hardware result
+is claimed. Format 20/wire 7 remain unchanged; that does not prove compatibility
+or physical save/restart. Both deployed patchers remain stable V2-14. The Harvest
+harness allowance and corrected setup retry remain spent. See
+[the exact next consumers](WORK_QUEUE.md#execution-order).
 
 The current native password helper passes 45 assertions and twelve selected-item
 cases, including complete DMA/CRC/cache loading, native RNG, saved-state

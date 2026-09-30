@@ -161,7 +161,7 @@ def install_banks(base,prior,blob,art_directory):
         directory=art_directory,model_bank=448,texture_bank=449)])
 
 
-def append_banks(base,prior,blob,entries,*,excluded_spans=()):
+def append_banks(base,prior,blob,entries,*,excluded_spans=(),object_table=None,object_table_ram=None):
     """Append a complete batch using its fixed, independently reserved banks.
 
     The existing helper contains later voice/audio edits. Retain those bytes;
@@ -177,7 +177,28 @@ def append_banks(base,prior,blob,entries,*,excluded_spans=()):
     expected=struct.pack('>4I',0x00063C00,0x00073C03,0x2CE30000|capacity,0x1060002B)
     if blob[start:start+16]!=expected:
         raise ValueError('Changed complete native object-status bounds prefix')
-    if any(blob[0x1000+capacity*8:0x1000+end*8]):raise ValueError('New NPC banks overwrite existing table data')
+    table=blob;table_start=0x1000;table_patch=None
+    if object_table is not None:
+        # A complete table can use a caller-owned startup reservation. Keep the
+        # original prefix and its adjacent selection/growth data unchanged.
+        if (not isinstance(object_table,bytearray) or len(object_table)!=end*8 or
+                object_table[:capacity*8]!=blob[0x1000:0x1000+capacity*8] or
+                type(object_table_ram)!=int or object_table_ram&15 or
+                not 0x80400000<=object_table_ram<object_table_ram+len(object_table)<=0x80800000):
+            raise ValueError('External NPC object table needs its complete retained prefix and owned RAM')
+        old_ram=prior['asset'].get('object_table_ram',BLOB_RAM+0x1000)
+        before=struct.pack('>2I',0x3C030000|((old_ram+0x8000)>>16),0x24630000|(old_ram&65535))
+        after=struct.pack('>2I',0x3C030000|((object_table_ram+0x8000)>>16),0x24630000|(object_table_ram&65535))
+        if blob[start+20:start+28]!=before:
+            raise ValueError('Changed complete native object-table address consumer')
+        blob[start+20:start+28]=after
+        table=object_table;table_start=0
+        table_patch=dict(address=BLOB_RAM+start+20,before=before.hex(),after=after.hex(),
+            ram=object_table_ram,bytes=len(table),retained_prefix_bytes=capacity*8)
+    elif object_table_ram is not None:
+        raise ValueError('Object-table RAM requires the complete table image')
+    if any(table[table_start+capacity*8:table_start+end*8]):
+        raise ValueError('New NPC banks overwrite existing table data')
     files=by_vrom(base);boot=files[0x1060].extract(base)
     contracts=((0x80026500,0x800266C4,PI_SHA),
         (0x800269E4,0x80026A64,'62a632b542b21e2894e796994d446f63a77723f7c97f3ded2d9fbfd6c0d0cdb9'),
@@ -212,7 +233,7 @@ def append_banks(base,prior,blob,entries,*,excluded_spans=()):
         row=physical.allocate(staging,physical_rows,data,'npc-'+kind+'-'+suffix,best_fit=True,
             excluded_spans=excluded_spans);physical_rows.append(row)
         staging[row['physical']:row['physical']+len(data)]=data;writes.append((row,data))
-        struct.pack_into('>2I',blob,0x1000+bank*8,vrom,vrom+len(data))
+        struct.pack_into('>2I',table,table_start+bank*8,vrom,vrom+len(data))
         records.append(dict(row,bank=bank,kind=kind,vrom=vrom,native_buffer_bytes=limit,identity=identity))
     struct.pack_into('>I',blob,12,end);struct.pack_into('>I',blob,start+8,0x2CE30000|end)
     asset=copy.deepcopy(prior['asset'])
@@ -220,6 +241,10 @@ def append_banks(base,prior,blob,entries,*,excluded_spans=()):
     asset['flags']=[f.replace(f'AF_V3_OBJECT_CAPACITY={capacity}',f'AF_V3_OBJECT_CAPACITY={end}') for f in asset['flags']]
     asset['npc_capacity_patch']=dict(address=BLOB_RAM+start+8,before=f'{0x2CE30000|capacity:08x}',after=f'{0x2CE30000|end:08x}',
         previous_sha256=prior['asset']['sha256'],retained_existing_hooks=True)
+    if table_patch:
+        asset.update(object_table_ram=object_table_ram,object_table_patch=table_patch)
+        asset['flags']=[f for f in asset['flags'] if not f.startswith('-DAF_V3_OBJECT_TABLE=')]
+        asset['flags'].append(f'-DAF_V3_OBJECT_TABLE=0x{object_table_ram:X}u')
     return records,asset,physical_rows,writes,staging
 
 

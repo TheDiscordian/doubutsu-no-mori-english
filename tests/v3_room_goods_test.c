@@ -49,29 +49,38 @@ static void draw(RoomRigGame *game,u16 item,const float *position,float scale) {
 #define AF_ROOM_GOODS_CRC 0x87654321u
 #define AF_ROOM_GOODS_BYTES 2048u
 #define AF_V3_EDITABLE_CHECKSUMS 1
+#define AF_HARVEST_PHYSICAL 0x01234000u
+#define AF_HARVEST_RAM 0x807F0000u
+#define AF_HARVEST_CRC 0xABCD1234u
+#define AF_HARVEST_BYTES 128u
 #include "../overlays/v3/surface_bootstrap.c"
 u32 af_test_surface_memory[AF_SURFACE_ITEMS_BYTES/4],af_test_goods_magic;
 unsigned char af_test_goods_code[AF_ROOM_GOODS_BYTES];
+unsigned char af_test_harvest[AF_HARVEST_BYTES];
 static unsigned stage,fail_stage,init_calls;
 static int init_result;
 static void check_io(const void *p,u32 n,unsigned op) {
     unsigned packet=stage/4;
-    assert(stage%4==op && packet<2);
-    assert(p==(packet ? (void *)af_test_goods_code : (void *)af_test_surface_memory));
-    assert(n==(packet ? AF_ROOM_GOODS_BYTES : AF_SURFACE_ITEMS_BYTES));
+    assert(stage%4==op && packet<3);
+    assert(p==(packet==2 ? (void *)af_test_harvest : packet ? (void *)af_test_goods_code : (void *)af_test_surface_memory));
+    assert(n==(packet==2 ? AF_HARVEST_BYTES : packet ? AF_ROOM_GOODS_BYTES : AF_SURFACE_ITEMS_BYTES));
 }
 int af_surface_dma(void *p,u32 source,u32 n) {
     check_io(p,n,0);assert(source==(stage ? AF_ROOM_GOODS_VROM : AF_SURFACE_ITEMS_VROM));
     return ++stage==fail_stage;
 }
+int af_surface_pi(u32 source,void *p,u32 n) {
+    check_io(p,n,0);assert(stage==8 && source==AF_HARVEST_PHYSICAL);
+    return ++stage==fail_stage;
+}
 u32 af_surface_crc(const void *p,u32 n) {
     check_io(p,n,1);stage++;
-    return stage==fail_stage ? 0 : (stage==2 ? AF_SURFACE_ITEMS_CRC : AF_ROOM_GOODS_CRC);
+    return stage==fail_stage ? 0 : (stage==2 ? AF_SURFACE_ITEMS_CRC : stage==6 ? AF_ROOM_GOODS_CRC : AF_HARVEST_CRC);
 }
 void af_surface_writeback(void *p,u32 n) {check_io(p,n,2);stage++;}
 void af_surface_invalidate(void *p,u32 n) {check_io(p,n,3);stage++;}
 int af_surface_prior_init(void) {
-    assert(stage++==8 && af_test_goods_magic==0);init_calls++;return init_result;
+    assert(stage++==12 && af_test_goods_magic==0);init_calls++;return init_result;
 }
 
 int main(void) {
@@ -122,11 +131,11 @@ int main(void) {
     af_test_room_goods_clip=NULL;assert(af_v3_goods_ctor(&owner)==34);
     for (int z=0;z<16;z++) for (int x=0;x<16;x++) assert(!af_v3_goods_get(z,x,1));
     af_v3_goods_destruct(&owner);assert(destroy_calls==3 && !af_test_room_goods.magic);
-    const unsigned failures[]={0,1,2,5,6};
+    const unsigned failures[]={0,1,2,5,6,9,10};
     for (unsigned i=0;i<sizeof(failures)/sizeof(*failures);i++) for (int result=0;result<2;result++) {
         stage=0;fail_stage=failures[i];init_calls=0;init_result=result;af_test_goods_magic=ROOM_GOODS_MAGIC;
         assert(af_v3_surface_init()==(fail_stage ? 0 : result));
-        assert(stage==(fail_stage ? fail_stage : 9));
+        assert(stage==(fail_stage ? fail_stage : 13));
         assert(init_calls==!fail_stage && af_test_goods_magic==(fail_stage ? ROOM_GOODS_MAGIC : 0));
     }
     printf("%u donor grid comparisons; all 34 categories, scoped drawing, drop, lifetime, and startup checks pass\n",comparisons);

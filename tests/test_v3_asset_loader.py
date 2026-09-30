@@ -17,6 +17,17 @@ from v3_asset_loader import (BASE_SHA, BLOB, BLOB_SIZE, CAPACITY, CONFIG, MODULE
 
 
 class LoaderHostTests(unittest.TestCase):
+    def test_current_extended_object_status_contract(self):
+        with tempfile.TemporaryDirectory(prefix='af-v3-objects-host-') as temp:
+            binary=Path(temp)/'check'
+            subprocess.run(['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-DAF_TEST_OBJECT_ONLY=1','-DAF_V3_OBJECT_CAPACITY=462',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
+                str(ROOT/'tests/v3_asset_loader_test.c'),str(ROOT/'runtime/crc32.c'),
+                '-o',str(binary)],check=True,capture_output=True)
+            result=subprocess.run([str(binary)],capture_output=True,text=True,timeout=20)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+
     def test_sanitized_startup_and_native_object_status_contract(self):
         with tempfile.TemporaryDirectory(prefix='af-v3-assets-host-') as temp:
             binary = Path(temp) / 'check'

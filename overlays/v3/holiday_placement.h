@@ -31,6 +31,10 @@ typedef struct {
 
 /* Decode the native manager, whose landmark order is pool/station/shrine/home. */
 int af_holiday_placement_field(const void *,const unsigned char rtc[8],AFHolidayField *);
+/* Ordinary appearance repair searches into the caller's candidate, without
+ * reserving or overwriting the existing common record before success. */
+int af_holiday_placement_search(const AFHolidayField *,const AFHolidayPlacementOps *,
+    unsigned int,AFHolidayPlace *,int,int);
 
 /* type/name are destination identities; source_seed preserves the donor's
  * deterministic free-acre selection despite additive IDs. */
