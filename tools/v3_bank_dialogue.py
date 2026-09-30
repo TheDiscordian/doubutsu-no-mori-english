@@ -19,7 +19,7 @@ from v3_holiday_dialogue import credit
 from v3_post_office import REFERENCES
 
 ROOTS=(0x8CF,0x8D0,0x8D1,0x8D2,0x8DD,0x8DE,0x8DF,0x8E0,
-       0x2DE0,0x2DE1,0x2DE2,0x2DE3)
+       0x2DE0,0x2DE1,0x2DE2,0x2DE3,0x3BAE,0x3BAF)
 CHOICES=(0x5B,0x1D5,0x9D,0x15)
 # These destinations already have ordinary N64 actions. In particular, the
 # donor Memory Card menu is not the native Controller Pak letter-save menu.
@@ -108,7 +108,7 @@ def prepare(image,prior,out):
             ('choices.bin',cv,new_c,cb),('choice-table.bin',CHOICE_TABLE,new_ct,ct)):
         write_new(out/name,data)
         resources.append(dict(file=name,vrom=v,bytes=len(data),sha256=sha256(data),previous_sha256=sha256(old)))
-    # Each direction maps only these twelve owned messages. Existing source
+    # Each direction maps only these owned messages. Existing source
     # destinations stay native, preserving message-number comparisons in both
     # the bank controller and the ordinary Pelly letter/Pak controllers.
     source='#include "bank_dialogue.h"\nstatic const unsigned short ids[][2]={\n'

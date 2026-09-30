@@ -4,7 +4,7 @@
 #include "holiday_native.h"
 /* Source 17 receives a separate additive event identity. The calendar/manager
  * installer must register that identity before construction is admitted. */
-enum {AF_BANK_APRIL_SOURCE=17,AF_BANK_APRIL_NATIVE=115};
+enum {AF_BANK_APRIL_SOURCE=17,AF_BANK_APRIL_NATIVE=117,AF_BANK_APRIL_PROFILE=0xF6};
 typedef struct {u16 talk_bitfield[4];} aAPC_event_save_data_c;
 typedef struct {
     int (*talk_chk_proc)(mActor_name_t);
@@ -34,6 +34,10 @@ extern u8 af_bank_account_mode;
 int af_bank_april_construct(ACTOR *,GAME *);
 int af_bank_april_destruct(ACTOR *,GAME *);
 int af_bank_april_player_clear(u32);
+int af_bank_april_calendar_before_cleanup(void);
+void *af_bank_april_descriptor(int);
+void af_bank_april_ctor(ACTOR *,GAME *),af_bank_april_dtor(ACTOR *,GAME *);
+void af_bank_april_step(ACTOR *,GAME *);
 #ifdef __mips__
 _Static_assert(sizeof(aAPC_event_save_data_c)==8,"Complete four-player April state");
 _Static_assert(sizeof(aAPC_Clip_c)==16,"Complete source April clip");

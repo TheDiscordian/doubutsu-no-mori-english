@@ -8,6 +8,10 @@ u8 af_bank_storage[AF_BANK_BYTES];
 u32 af_bank_storage_guard[4];
 static int selected=TEST_BANK_MODE;
 int af_bank_native_selected(void) {return selected;}
+/* Native event I/O is doubled here; the complete April fixture separately
+ * exercises the actual eight-byte event-cache deletion. */
+static u32 april_cleared;
+int af_bank_april_player_clear(u32 slot) {CHECK(slot<4);april_cleared|=1u<<slot;return 1;}
 extern u8 *af_bank_native_account(void);
 static void account_fill(u8 *p) {
     CHECK(af_bank_reset(p,AF_BANK_BYTES));CHECK(af_bank_bind(p,AF_BANK_BYTES,1));
@@ -75,6 +79,7 @@ int main(void) {
      * after all four accounts are empty, as do town-owned golden rewards. */
     for(u32 slot=0;slot<4;slot++) {
         af_v3_console_player_clear(af_console_players+slot*0xBD0);
+        CHECK(april_cleared==((1u<<(slot+1))-1));
         CHECK(af_bank_required(af_v3_bank_data(),AF_BANK_BYTES)==selected);
         for(u32 other=0;other<4;other++) {
             CHECK(af_bank_get(af_v3_bank_data(),AF_BANK_BYTES,other,&a));

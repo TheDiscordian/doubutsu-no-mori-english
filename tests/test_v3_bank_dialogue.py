@@ -23,9 +23,9 @@ class BankDialogueTests(unittest.TestCase):
         files=by_vrom(image);info=module_command_info(image)
         with tempfile.TemporaryDirectory(prefix='v3-bank-dialogue-',dir=ROOT/'build') as temp:
             out=Path(temp)/'dialogue';r=prepare(image,prior,out);check_provenance(r)
-            self.assertEqual((r['count'],r['choice_count']),(12,4))
+            self.assertEqual((r['count'],r['choice_count']),(14,4))
             self.assertEqual(set(r['mapping']),set(ROOTS));self.assertEqual(set(r['choice_mapping']),set(CHOICES))
-            self.assertFalse(r['installed']);self.assertEqual(r['max_expanded_bytes'],183)
+            self.assertFalse(r['installed']);self.assertEqual(r['max_expanded_bytes'],297)
             messages=Bank('messages',0,0,(out/'messages.bin').read_bytes(),(out/'message-table.bin').read_bytes()).entries()
             choices=Bank('choices',0,0,(out/'choices.bin').read_bytes(),(out/'choice-table.bin').read_bytes()).entries()
             old=Bank('messages',0,0,files[MESSAGE].extract(image),files[TABLE].extract(image)).entries()
@@ -48,7 +48,7 @@ class BankDialogueTests(unittest.TestCase):
             frontend.BankFrontendTests.frontend_fixture(self,native=True,dialogue=out/'bank-dialogue.c')
             for resource in r['resources']:
                 self.assertEqual(sha256((out/resource['file']).read_bytes()),resource['sha256'])
-            retained=json.loads((ROOT/'build/v3-post-office-bank-dialogue-01/dialogue.json').read_text())
+            retained=json.loads((ROOT/'build/v3-post-office-bank-dialogue-02/dialogue.json').read_text())
             self.assertEqual(json.loads(json.dumps(r)),retained)
 
 

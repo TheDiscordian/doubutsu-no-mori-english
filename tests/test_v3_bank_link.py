@@ -12,8 +12,10 @@ from aflib import sha256
 from v3_bank_link import layout,relocate_art,RAM,ART,END,CODE_GUARD,ART_GUARD
 from v3_furniture_install import inputs
 from v3_post_office_install import native_entries,ENTRIES
+from v3_bank_april_install import native_owners
+from aflib import CODE_VROM,CODE_RAM,by_vrom
 
-LINKED=ROOT/'build/v3-post-office-bank-linked-02'
+LINKED=ROOT/'build/v3-post-office-bank-linked-04'
 
 
 class BankLinkTests(unittest.TestCase):
@@ -40,6 +42,12 @@ class BankLinkTests(unittest.TestCase):
         self.assertEqual(sha256((LINKED/'checked-post-office.o').read_bytes()),self.preparation['object']['sha256'])
         changes,entry=native_entries(self.base,r['symbols'],code_bounds=(RAM,ART-16))
         self.assertEqual(entry,r['entries'])
+        april,april_report=native_owners(self.base,self.prior,r['symbols'],
+            code_bounds=(RAM,ART-16),entry_core=changes[CODE_VROM])
+        changes.update(april);self.assertEqual(april_report,r['april_entries'])
+        self.assertEqual(april_report['control_count'],76)
+        self.assertEqual(april_report['daily_type_bound'],118)
+        self.assertEqual(struct.unpack_from('>I',april[april_report['vrom']],len(april[april_report['vrom']])-32)[0],117)
         for row in r['owners']:
             data=changes[row['vrom']]
             self.assertEqual(data,(LINKED/f'owner-{row["vrom"]:08X}.bin').read_bytes())
@@ -49,6 +57,9 @@ class BankLinkTests(unittest.TestCase):
             self.assertNotEqual(code[address-RAM:address-RAM+8],bytes(8))
         modified=copy.deepcopy(self.prior);modified['bank_collision']={'ram':ART-16,'bytes':32}
         with self.assertRaisesRegex(ValueError,'overlaps retained'):layout(modified)
+        changed=bytearray(changes[CODE_VROM]);changed[0x80057E4C-CODE_RAM]^=1
+        with self.assertRaisesRegex(ValueError,'overlapping'):
+            native_owners(self.base,self.prior,r['symbols'],code_bounds=(RAM,ART-16),entry_core=changed)
 
     def test_full_art_resources_rebased_without_changing_segment_six(self):
         receipt=self.preparation['artwork'];original=(self.prepared/'bank-art.bin').read_bytes()

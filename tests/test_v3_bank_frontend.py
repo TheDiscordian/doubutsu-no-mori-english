@@ -14,7 +14,7 @@ from v3_furniture_pipeline import Source
 from v3_bank_frontend import generate,artwork,native_contract,admission_contract,reuse_artwork,ROOTS
 from v3_post_office import pelly
 
-PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-20')
+PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-23')
 
 
 class BankFrontendTests(unittest.TestCase):
@@ -45,10 +45,14 @@ class BankFrontendTests(unittest.TestCase):
         from v3_furniture_install import inputs
         image,prior=inputs(ROOT/'build/v3-holiday-card-prize-imports-01/password-destinations/build-lock.json')
         bound,receipt=native_bindings(image,prior)
-        april_bound,april_receipt=april_bindings(image);bound.update(april_bound)
+        april_bound,april_receipt=april_bindings(image,prior);bound.update(april_bound)
         april_report['native_bindings']=april_receipt
         self.assertEqual(json.loads(json.dumps(april_report)),prepared['april'])
         self.assertEqual(len(april_report['functions']),6)
+        self.assertEqual(len(april_report['manager_functions']),3)
+        self.assertEqual(april_report['native_type'],117)
+        self.assertEqual(april_report['identity']['profile'],0xF6)
+        self.assertEqual(april_report['schedule']['row_hex'],'040100000401001700000011')
         self.assertFalse(april_report['actor_installed']);self.assertFalse(april_report['calendar_installed'])
         self.assertEqual(receipt,prepared['native_bindings'])
         self.assertEqual(bound,prepared['object']['bound_native_services'])
@@ -67,7 +71,7 @@ class BankFrontendTests(unittest.TestCase):
             from v3_bank_storage import layout
             from v3_holiday_dialogue import check_provenance
             check_provenance(prepared['dialogue'])
-            self.assertEqual((prepared['dialogue']['count'],prepared['dialogue']['choice_count']),(12,4))
+            self.assertEqual((prepared['dialogue']['count'],prepared['dialogue']['choice_count']),(14,4))
             self.assertEqual(sha256((PREPARED/'bank-dialogue.c').read_bytes()),prepared['dialogue']['generated_sha256'])
             self.assertFalse(any(line.split()[-1] in ('af_bank_pelly_message_map','af_bank_pelly_message_unmap')
                 for line in prepared['object']['unbound_services']))

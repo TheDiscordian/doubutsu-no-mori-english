@@ -102,7 +102,7 @@ physical persistence, or hardware result is claimed.
 
 `tools/v3_bank_frontend.py` prepares all sixteen complete bank functions and the
 three complete source integer-formatting functions at
-`build/v3-post-office-bank-frontend-prepared-20/prepared.json`. It retains the
+`build/v3-post-office-bank-frontend-prepared-23/prepared.json`. It retains the
 genuine title, OK label, complete frame, cash/Bell/balance labels, and complete
 128-by-32 deposit/withdrawal textures. The shared UI converter preserves both
 source CI palette slots and checked tile-one replacement without overwriting
@@ -175,17 +175,18 @@ starts and no existing harness budget resets. The current ABI-386 ROM, format
 
 ### Official dialogue and saved account owner
 
-`tools/v3_bank_dialogue.py` prepares all twelve complete official bank greeting,
-continuation, deposit, and balance messages plus four official choices at
-`build/v3-post-office-bank-dialogue-01/dialogue.json`. Additive native message IDs
-are `33B2..33BD`; choices are `0220..0223`. Wording, pages, pauses, and source demo
-orders are retained. The largest expanded message is 183 bytes. Every existing
+`tools/v3_bank_dialogue.py` prepares fourteen complete official bank greeting,
+continuation, deposit, balance, and postal April messages plus four official choices at
+`build/v3-post-office-bank-dialogue-02/dialogue.json`. Additive native message IDs
+are `33B2..33BF`; choices are `0220..0223`. The first twelve IDs stay fixed;
+`33BE/33BF` map complete source Pelly/Phyllis `3BAE/3BAF`. Wording, pages, pauses, and source demo
+orders are retained. The largest expanded message is 297 bytes. Every existing
 message and choice remains intact. Eight checked native mail/Pak/exit destinations
 retain their exact current text and action identities, including the N64
 Controller Pak letter-save interaction instead of the GameCube Memory Card menu.
 The single provenance catalogue contains exact official-source credits for all
-sixteen additions. The generated bidirectional map is compiled into preparation
-14; its complete source Pelly host check uses that map, not arithmetic message
+eighteen additions. The generated bidirectional map is compiled into preparation
+23; its complete source Pelly host check uses that map, not arithmetic message
 IDs. Actual text-bank installation/bounds and native services remain pending.
 
 `AF_V3_BANK_STORAGE` connects `AFBA` to `console_storage.c` and
@@ -265,12 +266,12 @@ Pelly's complete allocation descriptor, and startup transfer ownership.
 ### Checked services and shared saved-object bindings
 
 The complete prepared MIPS object is
-`build/v3-post-office-bank-frontend-prepared-20/post-office.o`, SHA-256
-`fd526b9c5b59e1cdb412551308fba618e2fb82d443748c47d2f81deac61a1c23`.
-It contains 37,057 text/constant bytes, 118 data bytes, and 1,076 BSS bytes before
+`build/v3-post-office-bank-frontend-prepared-23/post-office.o`, SHA-256
+`0b0ecc1daadc763321b84dcbe03ea30cb03a005ac646196aa616f5552786025e`.
+It contains 38,217 text/constant bytes, 118 data bytes, and 1,148 BSS bytes before
 final layout. These object dimensions do not prove a final memory allocation.
 The 24,224-byte artwork packet is reused without conversion. The object binds
-42 real native APIs/globals and 23 retained saved-owner services; linker bindings
+51 real native APIs/globals and 23 retained saved-owner services; linker bindings
 only resolve genuine undefined references and never override compiled definitions.
 Every fixed native service has a complete body guard. The actual message-number
 getter is `8009DBB0`, not the continuation-terminal check at `8009DD8C`.
@@ -305,10 +306,10 @@ Cartridge save installation and fresh native persistence evidence remain absent.
 `tools/v3_bank_april.py` compiles the complete six-function source controller,
 eleven NPC identities/messages, and full four-pointer clip. The bank uses a
 distinct two-callback borrowed view, never a cast of the larger clip. The adapter
-maps source event 17 to reserved additive type 115, checks its real native daily
+maps source event 17 to reserved additive type 117, checks its real native daily
 row, and uses the genuine five-slot event cache. Each native slot has an eight-byte
 header and forty-byte payload; the four source talk bitfields occupy eight
-payload bytes, not private saved padding or another account record. All five
+payload bytes, not private saved padding or another account record. All nine
 native services have whole-body guards, including the actual expanded-index/day
 addresses read by reservation.
 
@@ -316,13 +317,37 @@ Construction preflights allocation before the donor constructor's unchecked
 clear. Inactive/unregistered/error rows, wrong dates, exhausted slots, changed
 cache ownership, and stale/invalid residents cannot expose callbacks. Existing
 saved talk flags survive reconstruction; deletion clears only the selected row.
-Calendar registration, actual actor creation/destruction, personal deletion, and
-official April message installation remain unbound. The source-numbered profile
-is provenance data, not a native registration; install the guarded lifecycle
-wrappers. Sanitized tests cover all eleven identities/messages for all four
+The full source calendar row, manager start/stop, and control-creation function
+compile alongside the controller. The native adapter decodes shrine existence at
+manager offset `234`, retains the current Harvest/Wisp calendar chain, and uses
+the real game pointer and actor-info offset `1C78`. Its independent keep flag
+does not index an unextended native keep-bit array. April uses profile `F6` and
+event 117; Wisp 115 and Franklin 116 remain unchanged. The complete resident
+descriptor/profile uses ordinary native allocation and guarded construction/
+destruction; the source-numbered profile is provenance data only. Inactive or
+stopped controllers retire through ordinary native deletion. Personal deletion
+is connected in the complete saved owner and clears only the named resident's
+event-cache row, including outside April or with banking disabled.
+
+`tools/v3_bank_april_install.py` prepares the complete native manager resources
+and caller hooks. All 75 installed controls remain intact, with April appended
+as row 76 and ordinary daily cleanup's exclusive type bound raised to 118.
+The complete 42,480-byte owner and 2,560-byte relocation retain both tested load
+addresses. No resident reservation or manager actor allocation grows.
+Descriptor lookup delegates through the authenticated existing registry chain,
+without changing the prior public entry or recursing into the new wrapper.
+The core edits merge with the bank menu plan only when their exact old bytes
+are unchanged; overlapping changes reject. Calendar/actor/text/save installation
+remains pending in the enclosing cartridge builder.
+
+Sanitized tests cover all eleven identities/messages for all four
 residents, visitor suppression, repeat talk, allocation failure, reconstruction,
 and actual Pelly/Phyllis source greeting calls. Phyllis uses `D012`, not the
-borrowed view's incorrect `D004`. Native event I/O remains doubled.
+borrowed view's incorrect `D004`. Source manager checks cover missing shrine,
+first/repeated stop, foreign control identities, real creation arguments,
+calendar inheritance/date/mode admission, guarded descriptor lookup, and
+retirement. Both-mode saved-town checks verify all four deletion callbacks.
+Native actor, event, and storage I/O remain doubled; no ordinary gameplay is proved.
 
 `tools/v3_bank_link.py` fully links the combined bank/save/controller packet at
 `807D8040..807E8040`, rejecting every retained-memory overlap. The original
@@ -331,13 +356,13 @@ native services are then applied only once. Re-linking the preview itself would
 apply absolute MIPS call addends twice and overflow call relocations. No
 truncated-relocation warning is ignored or bypassed.
 
-`build/v3-post-office-bank-linked-02/linked.json` owns the complete 65,536-byte
+`build/v3-post-office-bank-linked-04/linked.json` owns the complete 65,536-byte
 packet, SHA-256
-`55201c6e81d29c4405d62abd9a3f2c22183d6261b3e0a1cab3e8f4cbf15e928b`.
-Initialized code/data occupies 37,168 bytes, SHA-256
-`6bb88c3d1aa9ab446e59793de89bd21c453a28b98388f326c16229b3e5bea390`.
-Complete code/state uses 38,256 bytes; BSS `807E1170..807E15B0` is zeroed in the
-packet. The owned mode byte at `807E15A4` initially retains N64 mode, without an
+`b8bafbf61da1aa36de1c9c642a539e39b992a24ef28365b1593aa13895572faa`.
+Initialized code/data occupies 38,336 bytes, SHA-256
+`7f07aa7c9fa5b2b1df2e83ba35036105b6be426d04313b39c2562df0ef330cf9`.
+Complete code/state uses 39,488 bytes; BSS `807E1600..807E1A80` is zeroed in the
+packet. The owned mode byte at `807E1A7C` initially retains N64 mode, without an
 installed profile control. Code and art each have a sixteen-byte guard.
 
 All 24,224 prepared art bytes are reused. The 51 texture/palette/vertex pointers
@@ -349,9 +374,11 @@ checks verify full resources, pointer bounds, collision rejection, initialized
 state/guards, original-object matching, and the complete native entry plan.
 These are not native rendering or gameplay/save evidence. Startup transfer and
 enlarged resource relocation, text/full saved-owner redirects, April native
-lifecycle, real mail scheduling, and profile controls remain required. Failed
-preparation `19` and final link `01` retain their diagnostics; preparation `20`
-and linked packet `02` are current.
+lifecycle installation, real mail scheduling, and profile controls remain required.
+Preparation `23` and linked packet `04` are current. Preparation `21` retains its
+missing-source-status-constants diagnostic; `22`/`03` retain intermediate compiled
+resources. All unchanged bank artwork is reused. Eleven focused frontend/dialogue/
+entry/packet checks and both-mode saved-owner checks pass for the connected batch.
 
 ## Remaining connected consumers
 
@@ -369,10 +396,10 @@ wrapper in `POST_OFFICE_LETTERS.md` is not this savings-reward mechanism.
 
 Install the prepared complete bank/Pelly route, preserving repayment and the
 reviewed resident/loan/house/renovation admission. Bind source April event 17 as
-additive native type 115 without shifting retained identities. Connect actual
-April 1 calendar admission, manager start/stop, guarded actor construction and
-destruction, personal deletion, and complete official Pelly/Phyllis messages.
-Then attach the linked packet's startup transfer and native resource relocation,
+additive native type 117/profile `F6` without shifting retained identities, using
+the prepared complete April calendar/manager/descriptor resources and guarded
+actor lifecycle wrappers. Personal deletion and complete official Pelly/Phyllis
+messages are connected in the prepared owners. Attach the linked packet's startup transfer and native resource relocation,
 followed by text-bank and full
 saved-owner installation, using the prepared native entry planner,
 official dialogue and account provider above. Bind the

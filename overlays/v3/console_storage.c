@@ -435,6 +435,8 @@ void af_v3_console_player_clear(u8 *player) {
 #endif
 #ifdef AF_V3_BANK_STORAGE
         if(!af_bank_clear(bank_state,AF_BANK_BYTES,slot))af_v3_save_halt(AF_SAVE_ARGUMENT);
+        extern int af_bank_april_player_clear(u32);
+        if(af_bank_april_player_clear(slot)<0)af_v3_save_halt(AF_SAVE_ARGUMENT);
 #endif
     }
     original_clear(player);

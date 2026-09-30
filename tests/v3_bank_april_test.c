@@ -1,4 +1,4 @@
-#include "bank_april.h"
+#include "bank_april_manager.h"
 #include "bank_pelly.h"
 #include <assert.h>
 #include <string.h>
@@ -15,6 +15,33 @@ u8 af_holiday_native_index[128];
 u8 af_bank_april_native_slots[264] __attribute__((aligned(8)));
 int af_bank_april_test_foreigner;
 static int allocations,notifications,exhausted;
+static int calendars,appends,makes,deletes;
+static u8 game_bytes[0x2000] __attribute__((aligned(8)));
+GAME_PLAY *af_bank_april_game=(GAME_PLAY *)game_bytes;
+u8 af_bank_april_native_rtc[8];
+static APRILFOOL_CONTROL_ACTOR managed;
+int af_bank_april_prior_calendar(void) {calendars++;return 9;}
+int af_holiday_native_append(unsigned type,unsigned hours,unsigned begin,unsigned end) {
+    assert(type==117 && hours==0xFFFFFF && begin==0x401 && end==0x401);appends++;
+    return 1;
+}
+void *af_bank_april_previous_descriptor(int profile) {assert(profile!=0xF6);return (void *)game_bytes;}
+void af_bank_april_native_set_status(int type,int status) {
+    assert(type==117);af_holiday_native_days[2].status|=status;
+}
+void af_bank_april_native_clear_status(int type,int status) {
+    assert(type==117);af_holiday_native_days[2].status&=~status;
+}
+void af_bank_april_delete(ACTOR *actor) {assert(actor);deletes++;}
+ACTOR *af_bank_april_make(void *info,GAME *game,int profile,f32 x,f32 y,f32 z,
+        int rx,int ry,int rz,int bx,int bz,int arg,u16 name,int params,int npc,int extra) {
+    assert(info==game_bytes+0x1C78 && game==(GAME *)game_bytes && profile==0xF6);
+    assert(!x && !y && !z && !rx && !ry && !rz && bx==-1 && bz==-1 && arg==-1 &&
+        !name && params==-1 && npc==-1 && extra==-1);makes++;
+    memset(&managed,0,sizeof(managed));*(s16 *)&managed=profile;
+    *(void **)((u8 *)&managed+0x170)=af_bank_april_descriptor(profile);
+    af_bank_april_ctor(&managed.actor_class,game);return &managed.actor_class;
+}
 void *af_bank_april_native_get(int type,int id) {
     assert(type==AF_BANK_APRIL_NATIVE && !id);
     return af_bank_april_native_slots[23]&1?af_bank_april_native_slots+32:0;
@@ -96,4 +123,38 @@ void af_bank_april_test(void) {
     assert(!af_bank_april_destruct(&actor.actor_class,0));
     assert(af_bank_april_construct(&actor.actor_class,0));assert(saved->talk_bitfield[0]==retained);
     assert(af_bank_april_destruct(&actor.actor_class,0) && notifications==2);
+    day->status=0;af_bank_account_mode=0;
+    assert(af_bank_april_player_clear(1) && !saved->talk_bitfield[1]);
+    assert(saved->talk_bitfield[0]==retained && saved->talk_bitfield[2]==0x7FF &&
+        saved->talk_bitfield[3]==0x7FF);
+    af_bank_account_mode=1;day->status=AF_HE_ACTIVE;
+    /* Complete source manager and native lifecycle wrappers, with real source
+     * creation arguments, scalar keep ownership, and inherited scheduling. */
+    assert(af_bank_april_calendar_before_cleanup()==9 && calendars==1 && !appends);
+    af_bank_april_native_rtc[5]=4;af_bank_april_native_rtc[3]=1;
+    af_bank_account_mode=0;assert(af_bank_april_calendar_before_cleanup()==9 && !appends);
+    af_bank_account_mode=1;assert(af_bank_april_calendar_before_cleanup()==9 && appends==1);
+    af_bank_april_native_rtc[3]=2;assert(af_bank_april_calendar_before_cleanup()==9 && appends==1);
+    assert(af_bank_april_descriptor(0xF5)==game_bytes);
+    int manager[0x250/4]={0};AFHolidayControl control={.type=117};
+    day->status=AF_HE_ACTIVE;
+    assert(!af_bank_april_manager_start(manager,&control) && !makes);
+    assert(!(day->status&AF_HE_ACTIVE) && (day->status&AF_HE_ERROR));
+    assert(!af_bank_april_descriptor(0xF6));
+    manager[0x234/4]=1;day->status=AF_HE_ACTIVE;
+    assert(af_bank_april_manager_start(manager,&control)==1 && makes==1);
+    assert(af_bank_april_check_keep(117) && !af_bank_april_check_keep(115));
+    assert(af_bank_pelly_april_clip());
+    af_bank_april_step(&managed.actor_class,(GAME *)game_bytes);assert(!deletes);
+    assert(af_bank_april_manager_stop(manager,&control)==1 && !af_bank_april_check_keep(117));
+    assert(af_bank_april_manager_stop(manager,&control)==2);
+    af_bank_april_step(&managed.actor_class,(GAME *)game_bytes);assert(deletes==1);
+    af_bank_april_dtor(&managed.actor_class,(GAME *)game_bytes);
+    assert(!af_bank_pelly_april_clip() && notifications==3);
+    control.type=115;assert(!af_bank_april_manager_start(manager,&control));
+    assert(!af_bank_april_manager_stop(manager,&control));
+    control.type=117;af_bank_account_mode=0;
+    assert(!af_bank_april_descriptor(0xF6));
+    af_bank_april_ctor(&managed.actor_class,(GAME *)game_bytes);assert(deletes==2);
+    af_bank_account_mode=1;day->status=AF_HE_ACTIVE;
 }

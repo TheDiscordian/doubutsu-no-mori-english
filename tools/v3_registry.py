@@ -2,6 +2,7 @@
 from v3_storage import START as STORAGE
 
 REGISTRY_VERSION = 1
+BANK_APRIL_CONTROLLER = dict(source_profile=232, profile=246, source_event=17, event=117)
 # Keep native ordinary IDs 0..215 and the original two test IDs 216/217.
 # Literal reservations never change with selection order or donor availability.
 VILLAGERS = {

@@ -537,8 +537,12 @@ control. This packet is not installed in the current cartridge.
 The April controller retains its eleven source NPC/message rows and all four
 players' event-cache talk fields. Construction preflights native event allocation;
 the bank borrows a distinct two-callback view of the complete source clip. Actual
-April calendar/manager/actor registration, personal deletion, and official postal
-dialogue are required before that branch is playable. Phyllis retains source
+April calendar/manager/actor consumers compile and have a complete native resource
+plan for additive event 117/profile `F6`. Wisp 115 and Franklin 116 retain their
+identities. Native cleanup includes 117, and all 75 existing manager rows and
+relocations remain intact. Guarded lifecycle wrappers, saved-owner personal
+deletion, and complete official postal dialogue are connected in preparation;
+cartridge installation is required before that branch is playable. Phyllis retains source
 identity `D012`, independently of the postal draw-type field.
 
 Complete resource relocation and startup transfer, text/save entry installation,

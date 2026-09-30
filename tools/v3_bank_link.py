@@ -21,7 +21,8 @@ from v3_console_disk_install import reservations
 RAM,ART,END=0x807D8040,0x807E2040,0x807E8040
 CODE_GUARD=bytes.fromhex('424E4347')*4
 ART_GUARD=bytes.fromhex('424E4147')*4
-SOURCES=('tools/v3_bank_link.py','overlays/v3/bank_config.c','overlays/v3/bank.ld')
+SOURCES=('tools/v3_bank_link.py','tools/v3_bank_april_install.py',
+    'overlays/v3/bank_config.c','overlays/v3/bank.ld')
 
 
 def layout(prior):
@@ -94,7 +95,7 @@ def link(prepared,lock,output):
         if sha256((ROOT/path).read_bytes())!=digest:raise ValueError('Stale complete bank source: '+path)
     for path,digest in report['generated_sha256'].items():
         if sha256((prepared/path).read_bytes())!=digest:raise ValueError('Changed complete generated bank source: '+path)
-    fixed,receipt=native_bindings(base,prior);april,april_receipt=april_bindings(base);fixed.update(april)
+    fixed,receipt=native_bindings(base,prior);april,april_receipt=april_bindings(base,prior);fixed.update(april)
     if fixed!=report['object']['bound_native_services'] or receipt!=report['native_bindings'] or\
             april_receipt!=report['april']['native_bindings']:
         raise ValueError('Changed actual bank native bindings')
@@ -151,6 +152,13 @@ def link(prepared,lock,output):
     if any(packet[bss_start-RAM:bss_end-RAM]) or packet[mode-RAM]:
         raise ValueError('Complete bank transient state/configuration is not initialized')
     owners,entry_report=native_entries(base,symbols,code_bounds=(RAM,ART-16))
+    from aflib import CODE_VROM
+    from v3_bank_april_install import native_owners
+    april_owners,april_entries=native_owners(base,prior,symbols,code_bounds=(RAM,ART-16),
+        entry_core=owners[CODE_VROM])
+    if owners.keys()&april_owners.keys()!={CODE_VROM}:
+        raise ValueError('April/bank complete resources collide')
+    owners.update(april_owners)
     for vrom,data in owners.items():write_new(output/f'owner-{vrom:08X}.bin',data)
     write_new(output/'bank-packet.bin',packet);write_new(output/'bank-art-linked.bin',art)
     result=dict(format='AFV3-BANK-LINKED-1',base_abi=prior['runtime_abi'],base_sha256=sha256(base),
@@ -160,7 +168,8 @@ def link(prepared,lock,output):
             bss_start=bss_start,bss_end=bss_end),
         packet=dict(ram=RAM,bytes=len(packet),sha256=sha256(packet)),artwork=art_report,
         account_mode=dict(address=mode,bytes=1,initial_value=0,profile_control_installed=False),
-        entries=entry_report,owners=[dict(vrom=v,bytes=len(data),sha256=sha256(data)) for v,data in owners.items()],
+        entries=entry_report,april_entries=april_entries,
+        owners=[dict(vrom=v,bytes=len(data),sha256=sha256(data)) for v,data in owners.items()],
         original_objects={n:sha256((prepared/n).read_bytes()) for n in objects},
         native_services_bound_once=True,retained_services=services,
         compiler=IMAGE,sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES},

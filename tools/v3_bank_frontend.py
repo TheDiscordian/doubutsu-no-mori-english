@@ -40,6 +40,7 @@ SOURCES+=('tools/v3_bank_dialogue.py','overlays/v3/bank_dialogue.h',
     'overlays/v3/holiday_cards.c','overlays/v3/holiday_cards.h',
     'overlays/v3/carried_collection.c')
 SOURCES+=('tools/v3_bank_april.py','overlays/v3/bank_april.c','overlays/v3/bank_april.h')
+SOURCES+=('overlays/v3/bank_april_manager.h','tools/v3_registry.py')
 ROOTS=('tyo_win_mode','tyo_win_model','tyo_win_moji2T_model','tyo_win_moji3T_model')
 NATIVE_SERVICES={
     'af_bank_native_translate':(0x800E0314,264,'767212be165dde7a9be2467ffb03b98a80af114e9ad9d352e21998c6f9981ca2'),
@@ -300,7 +301,7 @@ def prepare(output,lock,*,reuse_art=None,dialogue=None):
         'pelly-native.o','bank-admission.o','bank-entries.o','bank-april.o',*saved_objects,*additional]
     from v3_post_office_install import native_bindings
     candidates,binding_report=native_bindings(base,prior)
-    april_candidates,april_services=april_bindings(base)
+    april_candidates,april_services=april_bindings(base,prior)
     if candidates.keys()&april_candidates.keys():raise ValueError('Duplicate native bank/April API binding')
     candidates.update(april_candidates);report['april']['native_bindings']=april_services
     undefined=set();defined=set()
