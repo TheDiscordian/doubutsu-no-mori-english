@@ -39,6 +39,7 @@ SOURCES+=('tools/v3_bank_dialogue.py','overlays/v3/bank_dialogue.h',
     'overlays/v3/save_compressed.c','overlays/v3/save_compressed.h','overlays/v3/save_runtime.c',
     'overlays/v3/holiday_cards.c','overlays/v3/holiday_cards.h',
     'overlays/v3/carried_collection.c')
+SOURCES+=('tools/v3_bank_april.py','overlays/v3/bank_april.c','overlays/v3/bank_april.h')
 ROOTS=('tyo_win_mode','tyo_win_model','tyo_win_moji2T_model','tyo_win_moji3T_model')
 NATIVE_SERVICES={
     'af_bank_native_translate':(0x800E0314,264,'767212be165dde7a9be2467ffb03b98a80af114e9ad9d352e21998c6f9981ca2'),
@@ -233,6 +234,9 @@ def prepare(output,lock,*,reuse_art=None,dialogue=None):
     native=native_contract(files[0x79B120].extract(base),files[0x79BF10].extract(base),files[CODE_VROM].extract(base))
     admission=admission_contract(files[0x8A6C10].extract(base),files[0x8A8A10].extract(base),files[CODE_VROM].extract(base))
     generated,report=generate(source);pg,pg_report=pelly(source);generated.update(pg)
+    from v3_bank_april import generate as april_generate,native_bindings as april_bindings
+    april,april_report=april_generate(source);generated.update(april)
+    report['april']=april_report
     report['pelly']=pg_report;report['admission']=admission
     if dialogue is not None:
         from v3_holiday_dialogue import check_provenance
@@ -275,6 +279,7 @@ def prepare(output,lock,*,reuse_art=None,dialogue=None):
     run('gcc',*flags,'/source/overlays/v3/bank_pelly_native.c','-o','pelly-native.o')
     run('gcc',*flags,'/source/overlays/v3/bank_admission.c','-o','bank-admission.o')
     run('gcc',*flags,'/source/overlays/v3/bank_entries.c','-o','bank-entries.o')
+    run('gcc',*flags,'april_source.c','-o','bank-april.o')
     # Compile the full saved-town owner into this same object. Its bank calls
     # resolve to this object's one account/transaction implementation, not a
     # second busy flag or synthetic function addresses in a separate save owner.
@@ -292,9 +297,12 @@ def prepare(output,lock,*,reuse_art=None,dialogue=None):
         write_new(output/'bank-dialogue.c',(dialogue/'bank-dialogue.c').read_bytes())
         run('gcc',*flags,'bank-dialogue.c','-o','bank-dialogue.o');additional.append('bank-dialogue.o')
     objects=['bank-source.o','bank-account.o','bank-native.o','pelly-source.o',
-        'pelly-native.o','bank-admission.o','bank-entries.o',*saved_objects,*additional]
+        'pelly-native.o','bank-admission.o','bank-entries.o','bank-april.o',*saved_objects,*additional]
     from v3_post_office_install import native_bindings
     candidates,binding_report=native_bindings(base,prior)
+    april_candidates,april_services=april_bindings(base)
+    if candidates.keys()&april_candidates.keys():raise ValueError('Duplicate native bank/April API binding')
+    candidates.update(april_candidates);report['april']['native_bindings']=april_services
     undefined=set();defined=set()
     for obj in objects:
         undefined.update(line.split()[-1] for line in run('nm','--undefined-only',obj).splitlines())
@@ -316,7 +324,8 @@ def prepare(output,lock,*,reuse_art=None,dialogue=None):
         raise ValueError('Full source Pelly loan formatter is not compiled')
     for name in ('af_bank_native_account','af_v3_bank_data','af_v3_save_pack',
             'af_v3_save_check','af_v3_console_storage_commit','af_v3_console_player_clear',
-            'af_v3_save_compress_bank','af_v3_save_expand_bank','af_v3_save_measure_bank'):
+            'af_v3_save_compress_bank','af_v3_save_expand_bank','af_v3_save_measure_bank',
+            'af_bank_pelly_april_clip','af_bank_april_construct','af_bank_april_destruct','af_bank_april_player_clear'):
         if definitions.get(name,(0,''))[1]!='T':
             raise ValueError('Full saved-bank owner is not compiled: '+name)
     unbound=run('nm','--undefined-only','post-office.o').strip().splitlines()

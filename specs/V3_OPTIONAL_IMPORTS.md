@@ -523,6 +523,32 @@ the shared native start-disabled placement rule with source C-stock acquisition
 and catalogue reordering. These category implementations do not establish
 ordinary gameplay or original-hardware acceptance.
 
+### Post-office account and source mail acquisition
+
+The complete donor banking/Pelly frontend, source April talk controller, and
+format-21 saved-town owner have a bounded combined native link. The separate
+48-byte account record and enlarged save scratch retain checked reservations.
+Actual linked menu/Pelly entries preserve original repayment and use the genuine
+native wallet, pocket, text, and drawing APIs. The complete bank artwork uses
+physical packet pointers without taking the native submenu's segment six.
+Bank configuration has owned initialized storage, but no installed profile
+control. This packet is not installed in the current cartridge.
+
+The April controller retains its eleven source NPC/message rows and all four
+players' event-cache talk fields. Construction preflights native event allocation;
+the bank borrows a distinct two-callback view of the complete source clip. Actual
+April calendar/manager/actor registration, personal deletion, and official postal
+dialogue are required before that branch is playable. Phyllis retains source
+identity `D012`, independently of the postal draw-type field.
+
+Complete resource relocation and startup transfer, text/save entry installation,
+genuine successful-mail acknowledgement and scheduling, and independent mechanic/
+reward controls remain connected acquisition work. The source milestone does
+not become lifetime earnings or random post-office stock. Prospective format-21
+saves migrate older supported records forward with empty accounts; format-20-or-
+earlier readers cannot load format 21, even when banking is disabled. Preserve
+separate builds/saves. See the [current source-mail checkpoint](../docs/checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md).
+
 ## Browser implementation
 
 Keep all ROM/disc reading and conversion inside the browser worker. The existing

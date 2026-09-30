@@ -138,7 +138,7 @@ The connected source-mail category has checked account/reward preparation at
 `build/v3-post-office-category-prepared-04/`, based on the current ABI 386.
 The complete sixteen-function donor frontend, source formatter/drawing/art, and
 checked native menu/wallet/pocket adapters compile at
-`build/v3-post-office-bank-frontend-prepared-18/`. Sixteen complete Pelly
+`build/v3-post-office-bank-frontend-prepared-20/`. Sixteen complete Pelly
 conversation functions, actual resident/home/loan/renovation admission, and
 additive native bank-action dispatch also compile. The complete 24,224-byte art
 packet and receipts are reused. The guarded transaction uses a separately owned
@@ -153,8 +153,8 @@ variants, largest balance, house/identity/renovation rejection, stale residents,
 and original-action restoration. Forced cancellation preserves bank-menu
 ownership until the ordinary native destructor; cancelled pending construction
 rejects instead of falling into repayment. Native field and whole-service guards are checked, and
-unrequested banking preserves original repayment. The frontend is not linked or
-installed. Current cartridge Pelly status still lacks the donor banking branch.
+unrequested banking preserves original repayment. The frontend is fully linked,
+but not installed. Current cartridge Pelly status still lacks the donor banking branch.
 All twelve official bank messages/four choices now have compiled additive maps
 and exact provenance, preserving existing native mail/Pak destinations. The
 full-town saved owner connects a separate AFBA record in source, with both-mode
@@ -167,16 +167,30 @@ open flag. An owned rejected construction installs closing-only callbacks until
 destruction, never numerical repayment callbacks. The category entry planner
 connects all six Pelly/menu lifecycle consumers through local relocated shims,
 retaining original function bodies, BSS, and the full submenu allocation chain.
-Nine focused frontend/dialogue/entry checks pass; host native services remain doubles,
-and entry-plan checks use fixture destinations, not linked cartridge code.
-The combined MIPS object binds 34 checked native APIs/globals and 23 retained
+Eleven focused frontend/dialogue/entry/packet checks pass; host native services
+remain doubles. Packet checks use actual linked entries, alongside the retained
+two-load-base fixtures. The combined MIPS object binds 42 checked native APIs/globals and 23 retained
 saved-owner services. It includes the complete loan formatter with its full
 seven-byte buffer and the complete format-21 saved-town owner, resolving account
 access to the same compiled transaction implementation. The sixteen-byte field
 setter is checked through its entire startup-installed text owner and CRC;
 message selection preserves the complete installed shared announcement owner.
-Artwork is reused. Account-mode configuration and the source April dialogue
-clip remain unbound, alongside final art addresses. Complete packet linking,
+The complete six-function April controller and all eleven NPC/message rows
+compile. Its borrowed clip uses genuine event storage and refuses unregistered,
+inactive, corrupt, or exhausted native slots. Both postal-clerk greetings and
+all four residents pass with native event I/O doubled. Phyllis retains source
+identity `D012`, not `D004`. April calendar/actor registration, official messages,
+and personal-deletion binding remain unfinished.
+`build/v3-post-office-bank-linked-02/linked.json` owns the fully linked 64-KiB
+packet at `807D8040..807E8040`, with 38,256 code/state bytes, initialized BSS,
+separate code/art guards, and all 24,224 reused art bytes. All 51 drawing resource
+pointers bind to physical packet addresses without taking native segment six or
+changing resource contents. The account-mode byte has owned storage initialized
+to N64 mode, but no installed profile control. Native services are bound once
+from authenticated original objects, avoiding absolute-call relocation overflow
+from re-linking the partially bound preview. Packet SHA-256 is
+`55201c6e81d29c4405d62abd9a3f2c22183d6261b3e0a1cab3e8f4cbf15e928b`.
+April native lifecycle/calendar binding, startup transfer and
 resource relocation, text-bank and saved-owner installation are next;
 selection/admission bindings, official templates,
 real delivery/scheduling, and independent account/reward choices remain connected

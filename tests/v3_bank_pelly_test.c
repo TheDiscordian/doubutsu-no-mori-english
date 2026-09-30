@@ -45,8 +45,14 @@ void *af_bank_pelly_choice_window(void) {return &window;}
 int af_bank_pelly_choice(void *w) {assert(w==&window);return chosen;}
 int af_bank_pelly_mail_count(void) {return keep_mail;}
 int af_bank_pelly_first_job(void) {return first_job;}
+#ifdef AF_BANK_TEST_APRIL
+extern int af_bank_april_test_foreigner;
+extern void af_bank_april_test(void);
+int af_bank_pelly_foreigner(void) {return af_bank_player>=4 || af_bank_april_test_foreigner;}
+#else
 int af_bank_pelly_foreigner(void) {return af_bank_player>=4;}
 AFBankPellyApril *af_bank_pelly_april_clip(void) {return 0;}
+#endif
 void af_bank_pelly_native_open_menu(void *s,int n,int a,int b) {
     assert(s==game.b+0x1CBC && n==7 && !a && !b);opened++;
     /* Match native mSM_open_submenu: queue the program, without changing the
@@ -158,4 +164,7 @@ void af_bank_pelly_test(void) {
     s.loan=0;assert(af_bank_pelly_step(&s,AF_BANK_PELLY_STATUS) && s.status==5);
     s.has_bank_account=0;assert(af_bank_pelly_step(&s,AF_BANK_PELLY_STATUS) && s.status==1);
     s.action=30;assert(!af_bank_pelly_step(&s,AF_BANK_PELLY_MOVE));
+#ifdef AF_BANK_TEST_APRIL
+    af_bank_april_test();
+#endif
 }

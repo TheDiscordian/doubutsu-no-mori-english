@@ -14,7 +14,7 @@ from v3_furniture_pipeline import Source
 from v3_bank_frontend import generate,artwork,native_contract,admission_contract,reuse_artwork,ROOTS
 from v3_post_office import pelly
 
-PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-18')
+PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-20')
 
 
 class BankFrontendTests(unittest.TestCase):
@@ -26,6 +26,8 @@ class BankFrontendTests(unittest.TestCase):
     def test_whole_frontend_and_shared_resource_contract(self):
         generated,report=generate(self.source);prepared=json.loads((PREPARED/'prepared.json').read_bytes())
         pg,pg_report=pelly(self.source);generated.update(pg)
+        from v3_bank_april import generate as april_generate,native_bindings as april_bindings
+        april,april_report=april_generate(self.source);generated.update(april)
         self.assertEqual(json.loads(json.dumps(pg_report)),prepared['pelly'])
         self.assertEqual(len(pg_report['functions']),16)
         self.assertEqual(pg_report['full_loan_field_bytes'],7)
@@ -43,12 +45,18 @@ class BankFrontendTests(unittest.TestCase):
         from v3_furniture_install import inputs
         image,prior=inputs(ROOT/'build/v3-holiday-card-prize-imports-01/password-destinations/build-lock.json')
         bound,receipt=native_bindings(image,prior)
+        april_bound,april_receipt=april_bindings(image);bound.update(april_bound)
+        april_report['native_bindings']=april_receipt
+        self.assertEqual(json.loads(json.dumps(april_report)),prepared['april'])
+        self.assertEqual(len(april_report['functions']),6)
+        self.assertFalse(april_report['actor_installed']);self.assertFalse(april_report['calendar_installed'])
         self.assertEqual(receipt,prepared['native_bindings'])
         self.assertEqual(bound,prepared['object']['bound_native_services'])
         unresolved={line.split()[-1] for line in prepared['object']['unbound_services']}
         self.assertFalse(unresolved&bound.keys())
         self.assertNotIn('af_bank_pelly_loan_balance',unresolved)
         self.assertNotIn('af_bank_native_account',unresolved)
+        self.assertNotIn('af_bank_pelly_april_clip',unresolved)
         self.assertTrue(prepared['saved_owner']['shared_account_implementation'])
         self.assertTrue(prepared['saved_owner']['compiled'])
         self.assertFalse(prepared['saved_owner']['installed'])
@@ -127,6 +135,8 @@ class BankFrontendTests(unittest.TestCase):
                 str(ROOT/'overlays/v3/bank_admission.c'),str(ROOT/'overlays/v3/bank_pelly_native.c'),
                 str(ROOT/'overlays/v3/bank_entries.c'),
                 str(ROOT/'tests/v3_bank_pelly_test.c')]
+            if native:command+=['-DAF_BANK_TEST_APRIL=1',str(PREPARED/'april_source.c'),
+                str(ROOT/'tests/v3_bank_april_test.c')]
             if dialogue is not None:
                 self.assertTrue(native)
                 command+=['-DAF_BANK_TEST_DIALOGUE=1',str(dialogue)]

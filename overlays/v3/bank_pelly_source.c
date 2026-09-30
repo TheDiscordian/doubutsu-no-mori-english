@@ -16,7 +16,8 @@ int af_bank_pelly_step(AFBankPelly *state,int operation) {
     af_pg_busy=1;
     AFBankPellyPrivate private={{state->loan},state->balance};af_pg_private=&private;
     NPC_POSTGIRL_ACTOR p={{{state->draw_type}},state->status,state->desk_full,state->has_bank_account,
-        state->action,state->next_action,af_pg_setup,(unsigned short)(0xD003+state->draw_type)};
+        state->action,state->next_action,af_pg_setup,
+        (unsigned short)(state->draw_type?SP_NPC_POST_GIRL2:SP_NPC_POST_GIRL)};
     GAME_PLAY game={{state->submenu_open}};
     if(operation==AF_BANK_PELLY_STATUS)aPG_set_post_status(&p);
     else if(operation==AF_BANK_PELLY_TALK)aPG_set_talk_info(&p);

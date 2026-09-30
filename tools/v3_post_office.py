@@ -150,8 +150,13 @@ def pelly(source):
     body=body.replace('u8 str[2];','u8 str[aPG_LOAN_STR_LEN];')
     if body.count('Now_Private')!=4:raise ValueError('Changed Pelly borrowed account/loan consumers')
     body=body.replace('Now_Private','af_pg_private')
-    macros=constants(body,report['references'],headers=('types.h','ac_npc_post_girl.h',
-        'm_msg.h','m_msg_enum.h','m_choice.h','m_demo.h','m_submenu.h','m_post_office.h','m_font.h'))
+    macros=constants(body+'\nSP_NPC_POST_GIRL SP_NPC_POST_GIRL2',report['references'],headers=('types.h','ac_npc_post_girl.h',
+        'm_msg.h','m_msg_enum.h','m_choice.h','m_demo.h','m_submenu.h','m_post_office.h','m_font.h',
+        'm_name_table.h'))
+    # The borrowed greeting actor carries source identities, not draw-type
+    # arithmetic: Phyllis is D012, not D004 (the latter is a different NPC).
+    if report['references']['include/m_name_table.h']['sha256']!=HEADER_REFERENCES['include/m_name_table.h']:
+        raise ValueError('Changed complete Pelly source identities')
     for name,digest in PELLY_HEADERS.items():
         if report['references']['include/'+name]['sha256']!=digest:raise ValueError('Changed complete Pelly constants: '+name)
     rows=[row for row in report['functions']['src/actor/npc/ac_npc_post_girl.c_inc'] if row['symbol'] in PELLY]

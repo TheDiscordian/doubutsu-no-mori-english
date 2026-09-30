@@ -102,7 +102,7 @@ physical persistence, or hardware result is claimed.
 
 `tools/v3_bank_frontend.py` prepares all sixteen complete bank functions and the
 three complete source integer-formatting functions at
-`build/v3-post-office-bank-frontend-prepared-18/prepared.json`. It retains the
+`build/v3-post-office-bank-frontend-prepared-20/prepared.json`. It retains the
 genuine title, OK label, complete frame, cash/Bell/balance labels, and complete
 128-by-32 deposit/withdrawal textures. The shared UI converter preserves both
 source CI palette slots and checked tile-one replacement without overwriting
@@ -166,14 +166,12 @@ are doubles in these host tests; this is not native execution. The two original
 numerical checks pass against unchanged generated numerical functions. The two
 affected diary resource/state checks retain passing unchanged evidence.
 
-The combined relocatable MIPS object has 19,593 code bytes, 30 data bytes, and
-1,060 BSS bytes, SHA-256
-`318c8254a0a07b5cf5c6036b373031aadee95797b25062ca1b27b7ad064f5cfd`.
-It is not linked or installed. Selection/home/current-player/account bindings,
-fixed message/menu services, April Fools control, drawing roots, lifecycle installation,
-and cartridge menu/save ownership remain unbound. No native
-bank harness starts and no existing harness budget resets. The current ABI-386
-ROM, format 20/wire 7, selections, and both patcher deployments are unchanged.
+The current combined MIPS preparation and complete packet are described below.
+Native services, shared saved ownership, source April callbacks, art roots, and
+configuration storage have real linked addresses. Calendar/actor registration
+and cartridge menu/save ownership remain unfinished. No native bank harness
+starts and no existing harness budget resets. The current ABI-386 ROM, format
+20/wire 7, selections, and both patcher deployments are unchanged.
 
 ### Official dialogue and saved account owner
 
@@ -254,24 +252,25 @@ submenu bytes, retaining the current complete arena contribution rather than
 replacing earlier growth. Whole owner/relocation guards and comparisons at two
 load addresses preserve every unrelated loaded byte, including the common menu.
 
-Nine current frontend/dialogue/entry checks pass, with sanitized native-I/O
+Eleven current frontend/dialogue/entry/packet checks pass, with sanitized native-I/O
 doubles and exact original-function/entry-address checks at both load bases.
-Entry-plan tests use distinct fixture destinations; no linked bank or installed
-cartridge is implied. The compiled frontend reuses the complete art packet.
+Entry-plan tests use distinct fixture destinations and actual linked packet
+entries; no installed cartridge is implied. The compiled frontend reuses the
+complete art packet.
 The unchanged saved-town and numerical evidence remains retained. Native
 banking, physical save I/O, ordinary gameplay, and hardware are unverified.
 The enlarged owners still require ordinary VROM/physical resource relocation,
-Pelly's complete allocation descriptor, and actual linked service/code ownership.
+Pelly's complete allocation descriptor, and startup transfer ownership.
 
 ### Checked services and shared saved-object bindings
 
 The complete prepared MIPS object is
-`build/v3-post-office-bank-frontend-prepared-18/post-office.o`, SHA-256
-`42ef261e2fe35a0b24ba2e0f51369958b418bd484854002486e4c23ad2d78cfe`.
-It contains 35,185 text/constant bytes, 30 data bytes, and 1,060 BSS bytes before
+`build/v3-post-office-bank-frontend-prepared-20/post-office.o`, SHA-256
+`fd526b9c5b59e1cdb412551308fba618e2fb82d443748c47d2f81deac61a1c23`.
+It contains 37,057 text/constant bytes, 118 data bytes, and 1,076 BSS bytes before
 final layout. These object dimensions do not prove a final memory allocation.
 The 24,224-byte artwork packet is reused without conversion. The object binds
-34 real native APIs/globals and 23 retained saved-owner services; linker bindings
+42 real native APIs/globals and 23 retained saved-owner services; linker bindings
 only resolve genuine undefined references and never override compiled definitions.
 Every fixed native service has a complete body guard. The actual message-number
 getter is `8009DBB0`, not the continuation-terminal check at `8009DD8C`.
@@ -298,14 +297,61 @@ format-21 codec, preserving every current storage compiler define and the checke
 separate account/scratch reservations. Its account provider and save operations
 resolve to this object's single account/transaction implementation. No second
 account busy flag or synthetic account-function addresses are linked. This is
-combined MIPS compilation and partial linking, not final placement, cartridge
-save installation, or fresh native persistence evidence.
+combined MIPS compilation; its final linked placement is described below.
+Cartridge save installation and fresh native persistence evidence remain absent.
 
-Only account-mode configuration, the source April dialogue clip, and the four
-final art-model addresses remain undefined in the combined object. The April
-provider requires real source/calendar/state bindings; an empty clip is not a
-faithful completed donor branch. Failed preparation `16` remains preserved with
-its missing font-constant diagnostic; `18` is the current complete preparation.
+### Complete April callbacks and bounded final packet
+
+`tools/v3_bank_april.py` compiles the complete six-function source controller,
+eleven NPC identities/messages, and full four-pointer clip. The bank uses a
+distinct two-callback borrowed view, never a cast of the larger clip. The adapter
+maps source event 17 to reserved additive type 115, checks its real native daily
+row, and uses the genuine five-slot event cache. Each native slot has an eight-byte
+header and forty-byte payload; the four source talk bitfields occupy eight
+payload bytes, not private saved padding or another account record. All five
+native services have whole-body guards, including the actual expanded-index/day
+addresses read by reservation.
+
+Construction preflights allocation before the donor constructor's unchecked
+clear. Inactive/unregistered/error rows, wrong dates, exhausted slots, changed
+cache ownership, and stale/invalid residents cannot expose callbacks. Existing
+saved talk flags survive reconstruction; deletion clears only the selected row.
+Calendar registration, actual actor creation/destruction, personal deletion, and
+official April message installation remain unbound. The source-numbered profile
+is provenance data, not a native registration; install the guarded lifecycle
+wrappers. Sanitized tests cover all eleven identities/messages for all four
+residents, visitor suppression, repeat talk, allocation failure, reconstruction,
+and actual Pelly/Phyllis source greeting calls. Phyllis uses `D012`, not the
+borrowed view's incorrect `D004`. Native event I/O remains doubled.
+
+`tools/v3_bank_link.py` fully links the combined bank/save/controller packet at
+`807D8040..807E8040`, rejecting every retained-memory overlap. The original
+unbound objects must reproduce the authenticated partially bound preview; fixed
+native services are then applied only once. Re-linking the preview itself would
+apply absolute MIPS call addends twice and overflow call relocations. No
+truncated-relocation warning is ignored or bypassed.
+
+`build/v3-post-office-bank-linked-02/linked.json` owns the complete 65,536-byte
+packet, SHA-256
+`55201c6e81d29c4405d62abd9a3f2c22183d6261b3e0a1cab3e8f4cbf15e928b`.
+Initialized code/data occupies 37,168 bytes, SHA-256
+`6bb88c3d1aa9ab446e59793de89bd21c453a28b98388f326c16229b3e5bea390`.
+Complete code/state uses 38,256 bytes; BSS `807E1170..807E15B0` is zeroed in the
+packet. The owned mode byte at `807E15A4` initially retains N64 mode, without an
+installed profile control. Code and art each have a sixteen-byte guard.
+
+All 24,224 prepared art bytes are reused. The 51 texture/palette/vertex pointers
+relocate to physical packet addresses without taking native segment six or
+changing resource contents. Linked art SHA-256 is
+`05678195fb0197779738bdc9d6184f6163183179a2f592f3ab73eead1c26f595`.
+All six native Pelly/menu entry shims use actual linked functions. Two packet
+checks verify full resources, pointer bounds, collision rejection, initialized
+state/guards, original-object matching, and the complete native entry plan.
+These are not native rendering or gameplay/save evidence. Startup transfer and
+enlarged resource relocation, text/full saved-owner redirects, April native
+lifecycle, real mail scheduling, and profile controls remain required. Failed
+preparation `19` and final link `01` retain their diagnostics; preparation `20`
+and linked packet `02` are current.
 
 ## Remaining connected consumers
 
@@ -322,14 +368,16 @@ queue retry, and one-time persistence. The existing catalogue-order/ticket
 wrapper in `POST_OFFICE_LETTERS.md` is not this savings-reward mechanism.
 
 Install the prepared complete bank/Pelly route, preserving repayment and the
-reviewed resident/loan/house/renovation admission. Bind the source April dialogue
-provider and actual account-mode configuration, then complete packet linking
-and native resource relocation, followed by text-bank and full
+reviewed resident/loan/house/renovation admission. Bind source April event 17 as
+additive native type 115 without shifting retained identities. Connect actual
+April 1 calendar admission, manager start/stop, guarded actor construction and
+destruction, personal deletion, and complete official Pelly/Phyllis messages.
+Then attach the linked packet's startup transfer and native resource relocation,
+followed by text-bank and full
 saved-owner installation, using the prepared native entry planner,
 official dialogue and account provider above. Bind the
 compiled selection/admission adapters and checked wallet/pocket services only
-through reviewed owners. Reserve and link complete code/state/art without assuming
-the old packet's remaining space fits the larger frontend. Attach
+through reviewed owners. Retain the checked complete packet and guards. Attach
 the format-21 saved owner and its checked account/scratch reservations to all
 current save entry points, retaining forward migration, complete existing
 card/golden/console/town data, and older-reader rejection. Do not discard balances

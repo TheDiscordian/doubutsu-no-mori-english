@@ -50,7 +50,7 @@ an explicit choice for the absent GameCube island system, not a substitute route
 The category's checked preparation is
 `build/v3-post-office-category-prepared-04/prepared.json`, with the complete
 frontend/native adapters at
-`build/v3-post-office-bank-frontend-prepared-18/prepared.json`, based on ABI 386.
+`build/v3-post-office-bank-frontend-prepared-20/prepared.json`, based on ABI 386.
 All sixteen donor bank functions, complete source drawing/formatting/art,
 transactional controls, checked native menu/wallet/pocket adapters, the separately
 owned 48-byte account record, whole-table milestone receipts, sixteen complete
@@ -75,22 +75,36 @@ closing-only callbacks until destruction, without repayment fallback.
 `tools/v3_post_office_install.py` prepares all six native Pelly/menu consumers
 using local relocated shims and preserves complete original bodies/BSS.
 The complete retained submenu chain grows by 64 bytes for the menu shims.
-Nine focused frontend/dialogue/entry checks pass, including both load addresses;
-host native I/O is doubled, and the entry checks use fixture destinations.
-The combined MIPS object binds 34 checked native APIs/globals and 23 retained
+Eleven focused frontend/dialogue/entry/packet checks pass, including both load
+addresses, actual linked entries, complete packet guards, initialized BSS, and
+art pointer bounds. Host native I/O remains doubled.
+The combined MIPS object binds 42 checked native APIs/globals and 23 retained
 saved services. Complete loan formatting uses a safe seven-byte source buffer;
 the full saved-town owner resolves account access to the same compiled bank
 implementation. The complete extended text owner/startup CRC and shared
 announcement dispatcher are checked, not replaced by obsolete native bodies.
-Account-mode configuration, source April dialogue support, and final art addresses
-remain unbound. Complete packet linking,
+The complete six-function source April controller supplies the actual borrowed
+clip, with native event-save allocation preflight, daily-row validation, and all
+four residents' talk fields. Pelly/Phyllis use their real source identities;
+Phyllis is `D012`, not `D004`. Native calendar/actor registration, April messages,
+and personal deletion are not installed. The fully linked 64-KiB packet at
+`807D8040..807E8040` is `build/v3-post-office-bank-linked-02/linked.json`, with
+38,256 code/state bytes, separate code/art guards, and all 24,224 reused art bytes.
+Its 51 resource pointers use physical addresses without taking native segment
+six. Native API addresses bind once from authenticated original objects, not
+again to a partially bound preview. Owned account-mode storage initially retains
+N64 mode; profile control remains uninstalled. Startup/resource relocation,
 text-bank/menu/lifecycle installation, cartridge saved ownership, official template creation,
 real mail I/O, scheduling, and ordinary gameplay remain unbound. The current ROM
-and selections do not change. Resolve the source April dialogue provider and
-account-mode configuration without an empty provider, then complete packet linking
-and resource relocation, followed by text-bank and full saved-owner installation,
+and selections do not change. Bind source event 17 as additive native type 115
+without shifting any existing event identity, including actual April 1 calendar
+admission, manager start/stop, guarded controller construction/destruction,
+player deletion, and complete official Pelly/Phyllis messages. Do not register
+the source-numbered profile directly or bypass allocation-preflight wrappers.
+Then attach the linked packet's startup transfer and complete native overlay
+resource relocation, followed by text-bank and full saved-owner installation,
 using the prepared entry planner, checked dialogue, and reservations, while
-preserving repayment. Link the
+preserving repayment. Install the
 prepared complete route and bind the connected real mail owners. The
 [category source map and remaining connections](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md#remaining-connected-consumers)
 cover all 23 staged records; do not rescan their unchanged artwork or turn each
