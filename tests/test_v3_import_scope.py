@@ -51,6 +51,9 @@ class ImportScopeTests(unittest.TestCase):
         pool.update(existing_system_items(self.report))
         from v3_holiday_acquisition import installed_items
         pool.update(installed_items(self.report))
+        from v3_holiday_acquisition import exercise_items
+        pool.update(self.catalog[k]['item_id'] for k in exercise_items(self.report)
+                    if self.catalog[k]['kind']=='furniture')
         from v3_password_acquisition import installed_items as password_items
         password_ids=password_items(self.report)
         pool.update(r['item_id'] for r in self.catalog.values() if r['id'] in password_ids and r['kind']=='furniture')
@@ -205,7 +208,7 @@ class ImportScopeTests(unittest.TestCase):
         self.assertEqual(len(gifts),50)
         self.assertEqual(sum(r['catalogue_orderable'] for r in gifts),12)
         self.assertTrue(all(self.states[r['id']]['selectable'] for r in gifts))
-        self.assertFalse(self.states['GAFE01-r0/item/1FCC']['selectable'])
+        self.assertTrue(self.states['GAFE01-r0/item/1FCC']['selectable'])
         for key in ('GAFE01-r0/item/1FC0','GAFE01-r0/item/30A8','GAFE01-r0/item/3378'):
             for mode in ('N64','GameCube'):
                 selection=self.select([key],{'holiday-calendar':mode})
@@ -252,6 +255,44 @@ class ImportScopeTests(unittest.TestCase):
         bad['equipment_resources']['npc_extra']['events']['selection']['groups'][0]['fields'].pop()
         with self.assertRaisesRegex(ValueError,'provider activation fields'):
             verify_installed_items(self.image,bad)
+
+    def test_exercise_pair_uses_complete_controller_and_mutual_selection(self):
+        from v3_holiday_acquisition import exercise_items,bind_exercise_selection
+        from v3_carried_selection import masks
+        pair={'GAFE01-r0/item/2523','GAFE01-r0/item/1FCC'}
+        self.assertEqual(exercise_items(self.report),pair)
+        warning=composer.save_compatibility(self.report)
+        self.assertIn('Carried-item saves require every carried family',warning)
+        self.assertIn('Removing a family is not a save migration',warning)
+        self.assertEqual(self.plan['save_compatibility'],warning)
+        self.assertEqual(self.plan['import_groups'],[dict(id='summer-exercise',members=sorted(pair))])
+        for key in sorted(pair):
+            selected=self.select([key])
+            self.assertEqual(set(selected['enabled']),pair)
+            self.assertEqual(selected['required'],sorted(pair-{key}))
+            result,_,_=composer.compose(self.image,self.report,self.catalog,selected)
+            for mask in masks(self.image,self.report):
+                expected=sum(r['mask'] for r in mask['members'] if r['id'] in pair)
+                self.assertEqual(struct.unpack_from('>I',result,mask['offset'])[0],expected)
+            for group in groups(self.image,self.report):
+                for field in group['fields']:
+                    self.assertEqual(struct.unpack_from('>I',result,field['offset'])[0],
+                        field['enabled'] if group['id']=='diary-holidays' else field['disabled'])
+        for part in ('action_installed','prepared_core_installed'):
+            bad=copy.deepcopy(self.report)
+            bad['equipment_resources']['player_motion']['exercise'][part]=False
+            if part=='action_installed':self.assertEqual(exercise_items(bad),set())
+            else:
+                with self.assertRaisesRegex(ValueError,'player exercise dependencies'):
+                    bind_exercise_selection(self.image,bad,copy.deepcopy(self.catalog))
+        bad=copy.deepcopy(self.report)
+        next(r for r in bad['furniture']['imports'] if r['id']=='GAFE01-r0/item/1FCC')['donor_list_sha256']='0'*64
+        with self.assertRaisesRegex(ValueError,'exercise card/prize identity'):
+            bind_exercise_selection(self.image,bad,copy.deepcopy(self.catalog))
+        part=self.report['equipment_resources']['npc_extra']['events']['exercise']['packet']
+        broken=bytearray(self.image);broken[part['physical']+123]^=1
+        with self.assertRaisesRegex(ValueError,'complete holiday acquisition packet'):
+            bind_exercise_selection(broken,self.report,copy.deepcopy(self.catalog))
 
     def test_unavailable_acquisition_and_behaviour_settings_reject_before_composition(self):
         rejected = [k for k,s in self.states.items() if not s['selectable']]
@@ -359,6 +400,8 @@ class ImportScopeTests(unittest.TestCase):
         profiles.append(('mayor-calendar-gc',['GAFE01-r0/item/1FC0'],{'holiday-calendar':'GameCube'}))
         for key in ('GAFE01-r0/item/331C','GAFE01-r0/item/1DCC','GAFE01-r0/item/2640'):
             profiles.append(('password-'+key.rsplit('/',1)[-1],[key]))
+        for key in ('GAFE01-r0/item/2523','GAFE01-r0/item/1FCC'):
+            profiles.append(('exercise-'+key.rsplit('/',1)[-1],[key]))
         cases = []
         seasonal = self.report['equipment_resources'].get('seasonal_stock')
         if seasonal:

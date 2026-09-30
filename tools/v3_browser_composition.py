@@ -223,6 +223,12 @@ def rules(image, report, *, scope='development'):
             behaviour_options=behaviours or None, scope=scope, report=report)
         selected, _, _ = composition.compose(image, report, catalog, full)
         result['all_selected_sha256'] = sha256(selected)
+    offered={row['id'] for row in result['options']}
+    linked=composition.selection_groups(catalog)
+    if any(set(g['members']) & offered and not set(g['members']) <= offered for g in linked):
+        raise ValueError('Partially available mutual import group')
+    linked=[g for g in linked if set(g['members']) <= offered]
+    if linked:result['import_groups']=linked
     return result
 
 

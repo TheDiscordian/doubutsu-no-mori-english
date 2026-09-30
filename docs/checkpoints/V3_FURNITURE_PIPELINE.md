@@ -1,5 +1,83 @@
 # Automatic furniture pipeline checkpoint
 
+## Exercise-card/radio mutual selection
+
+The installed morning-exercise greeting gate in
+`overlays/v3/holiday_exercise_world.c` requires both the card and radio destination.
+The old card-only selection cannot offer the actual stamp/prize route. The shared
+Python/browser import pipeline now declares an explicit mutual group rather than
+weakening resource-dependency cycle rejection. Selecting either `2523` or `1FCC`
+includes both and records the added item as a requirement. Removing that request
+clears both. Other choices remain independent.
+
+Admission authenticates both complete donor prize branches, all seventeen source
+card functions, every installed event packet and conversation redirect, radio
+destination/metadata/non-orderability, carried state identities, and complete
+native player exercise hooks/calendar supersession/allocation/preload. Missing
+providers, unfinished behaviour, mutated metadata, or altered packets reject.
+All thirteen saved stamp states, complete artwork, actual game code, allocations,
+saved fields, and the retained calendar choice remain unchanged. No new feature
+or replacement stock/gift route is built.
+
+Fifteen current scope checks pass, with twenty-eight actual browser/offline
+profiles, including either direction, saved/physical selection masks, provider
+activation, and mutation rejection. Fifteen JavaScript checks pass, including
+malformed mutual groups and retained cyclic-dependency rejection. The focused
+current warning assertion also passes. No native fixture is started or replayed;
+ordinary exercise acquisition, combined profile save/reload, and hardware are
+unverified.
+
+Current ABI-391 private outputs:
+
+- `build/v3-import-pipeline-profile-14/profile.json`: 271 requested choices,
+  comprising twenty villagers, 249 independent items, and the linked pair, with
+  two additional required starting outfits. Receipt SHA-256:
+  `f8b7083fc6a513b5040f7fe5300829576f6f42042ccf4fa61a99848768f67051`.
+  ROM SHA-256: `69e15521beab1e200ab92044f2831960d2b1f19f9fc15eaa66f0d4ef0872c141`.
+  UPS SHA-256: `45953815b836189bc1a26408dc8073842d95b13fbdde8b79ef6eae731040793b`.
+  UPS reconstruction passes.
+- `build/v3-import-pipeline-browser-13/build.json`: unserved export, 271 choices.
+  Plan SHA-256: `4cc041827f0a65ad87fe75206368790404c392f10639db5694a7b1487c80a1db`.
+- `build/v3-import-pipeline-worker-11/results.json`: real-input card-only request
+  matches the offline paired ROM
+  `5ebeea2ca1feb20d561325d34513ce8de1612192c0bda7530c3e40a0bc250a49`.
+  Result SHA-256: `4040896c91b56244ecdf359fb5c2a62f53bc5cb4cedd6e76ef89c576618e8002`.
+- `build/v3-import-pipeline-interface-13/results.json`: both selection directions,
+  visible/disabled required peer, removal, paired download/receipt, other existing
+  selection/download checks, no uploads/browser errors. Result SHA-256:
+  `64d0556b75d03d40d22d58399e8b86ce4f73cacf889310f1de78199ff1e76ed6`.
+  This targets browser export 12. Export 13 differs only in the carried-family
+  save warning and associated manifest hash; all exported code, styles, review
+  data, and cartridge recipes are checked identical. The current focused worker
+  and warning assertion pass without replaying unchanged interface checks.
+
+The warning restores the actual carried-family requirement lost from the enclosing
+save warning. Format 21/wire 7, eight-MiB RAM, and FlashRAM remain unchanged.
+Removing a selected carried family is not a save migration: profile-14 saves
+include exercise cards and should not be used with narrower profile 12. V2 and
+format-20-or-earlier readers cannot load these saves. Preserve matching profiles,
+separate saves/builds, and backups. No main lock, served recipe, deployed patcher,
+local preview, or service changes.
+
+Next consumer: authenticate the retained extended Harvest manager and actual
+calendar/cleanup hooks, then review its installed acquisition choices. The actual
+76-control manager and relocation match current report hashes. Reconstructing
+the retained 75-control prefix requires removing the appended 32-byte control and
+restoring the count word; its pinned SHA-256 is
+`d075c6a4e3847edf166e5ccd61b5759c34a677018b40c2d3d26402c5815caede`.
+Restoring the relocation's first size word yields the retained relocation SHA-256
+`d01f8df69836529cbc3ffbd3be4b108c30126f411d3ae0c3af96c4327c97fbe3`.
+The existing wrapper at `overlays/v3/bank_april.c:91` unconditionally forwards
+the prior Harvest calendar before its separate disabled account check; verify
+that actual linked call and precise superseding hooks, not the obsolete 75-count
+hook bytes. This is checking an already-built chain, not resuming bank development.
+The whole historical Harvest English-bank hashes are also stale after later
+appends; authenticate its 36 actual retained official message entries as the
+holiday verifier does. Preserve complete manager/resources, English text, and
+cycle rejection. Remaining work also includes Wisp acquisition review, distinct
+save entries, retained creature-failure classification, and the private handoff.
+Do not replay exhausted fixtures or reset budgets.
+
 ## Complete font/save collision repair and password-only selection
 
 The installed Nook name-glyph buffer at `807D9000..807E811F` overlaps live

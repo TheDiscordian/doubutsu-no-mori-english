@@ -43,6 +43,61 @@ def installed_items(report):
         not set(r.get('remaining',[]))-{'representative native execution','ordinary gameplay and save/restart'}}
 
 
+def exercise_items(report):
+    """The retained card/prize controller needs both selectable destinations."""
+    if not providers_installed(report):return set()
+    e=report['equipment_resources'];events=e['npc_extra']['events']
+    if (not events.get('exercise',{}).get('installed') or
+        not e.get('player_motion',{}).get('exercise',{}).get('action_installed')):return set()
+    group=next((g for g in events['selection']['groups'] if g['id']=='diary-holidays'),None)
+    cards=[r for r in e.get('carried_items',{}).get('rows',[]) if r['family']==2]
+    prizes=[r for r in report['furniture']['imports']
+            if r.get('holiday_acquisition',{}).get('route')=='exercise-card']
+    if not group or len(cards)!=13 or len(prizes)!=1:return set()
+    prize=prizes[0];a=prize['holiday_acquisition'];key=cards[0]['id']
+    if (a.get('dependencies')!=[key] or not a.get('native_delivery_installed') or
+        a.get('destination_item')!=prize['item_id'] or not prize.get('runtime_installed') or
+        set(prize.get('remaining',[]))-{'representative native execution','ordinary gameplay and save/restart'} or
+        not all(r.get('ready') and r['id']==key for r in cards) or
+        not {key,prize['id']} <= set(group['any_imports'])):return set()
+    return {key,prize['id']}
+
+
+def bind_exercise_selection(image,report,catalog):
+    """Authenticate the installed route, then declare its mutual import group."""
+    items=exercise_items(report)
+    if not items:return
+    from v3_furniture_pipeline import Source
+    from v3_furniture_install import catalogue_record,order_mask
+    from v3_import_storage import ITEMS
+    from v3_asset_loader import BLOB
+    from v3_player_exercise import checked_native
+    from v3_registry import furniture_source,CARRIED_ITEMS
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    binding=checked(source,image,report);exercise=binding['exercise']
+    expected={f'GAFE01-r0/item/{exercise[k]:04X}' for k in ('item','card')}
+    if items!=expected or not expected <= catalog.keys() or not checked_native(image,report):
+        raise ValueError('Incomplete installed exercise-card/prize acquisition')
+    row=next(r for r in report['furniture']['imports'] if r['id']==f'GAFE01-r0/item/{exercise["item"]:04X}')
+    donor,_=furniture_source(row);destination=binding['exercise_destinations'].get(donor)
+    record=catalogue_record(row);slot=row['runtime_index']-1024
+    blob=by_vrom(image)[BLOB].extract(image);metadata=blob[ITEMS+slot*32:ITEMS+(slot+1)*32]
+    card=catalog[f'GAFE01-r0/item/{exercise["card"]:04X}']
+    if (not destination or destination['item']!=int(row['item_id'],16) or
+        destination['index']!=row['runtime_index'] or not catalogue_source(source,donor,slot,record) or
+        row['donor_list_sha256']!=sha256(acquisition_bytes(source,exercise['symbol'])) or
+        row['ordinary_stock'] or row['stock_group']!=255 or row['reward_route']!=0 or
+        struct.unpack_from('>2H',metadata)!=(row['runtime_index'],destination['item']) or
+        metadata[7]!=1 or metadata[24]!=order_mask(record) or metadata[27]!=0 or
+        card['kind']!='carried' or card['carried_mask']!=4 or
+        int(card['item_id'],16)!=CARRIED_ITEMS[exercise['card']]):
+        raise ValueError('Changed installed exercise card/prize identity or metadata')
+    # The existing greeting gate deliberately refuses an impossible stamp/prize
+    # promise when either destination is disabled. Keep that game code intact.
+    for key in expected:catalog[key]['selection_group']='summer-exercise'
+
+
 def verify_installed_items(image,report):
     """Authenticate all admitted gift identities, providers, English text, and ordering."""
     items=installed_items(report)

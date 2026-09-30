@@ -33,6 +33,8 @@ def availability(catalog, report):
     shops.update(installed_items(report))
     from v3_password_acquisition import installed_items as password_items
     password_ids=password_items(report)
+    from v3_holiday_acquisition import exercise_items
+    exercise=exercise_items(report)
     summer_rewards = {r['item_id'] for r in report.get('furniture_rewards', {}).get('imports', [])
                       if r['route'] == 23}
     shirts = {item for group in report['clothing']['stock']['groups']
@@ -61,7 +63,7 @@ def availability(catalog, report):
         kind = row['kind']
         dependency_only = False
         if kind == 'furniture':
-            ready = row['item_id'] in shops or key in password_ids
+            ready = row['item_id'] in shops or key in password_ids or key in exercise
         elif kind == 'clothing':
             ready = int(row['item_id'], 16) in shirts
             # A villager's authentic starting outfit is part of that villager's
@@ -74,7 +76,7 @@ def availability(catalog, report):
         elif kind == 'carried':
             # Installed native categories: saplings, stationery, and fruit.
             # Event cards, cutlery, and spirit quests are not regular pools.
-            ready = carried[key]['native_category'] in (48, 49, 50)
+            ready = carried[key]['native_category'] in (48, 49, 50) or key in exercise
         elif kind in ('villager', 'fish', 'insect', 'diary'):
             ready = True
         else:
@@ -87,7 +89,9 @@ def availability(catalog, report):
                     'Acquisition is not admitted by the current V3 selection policy; existing-system reward routes require individual review.'))
     for key, row in catalog.items():
         if result[key]['selectable']:
-            for child in row['dependencies']:
+            for child in row['dependencies']+[k for k,r in catalog.items()
+                    if k!=key and row.get('selection_group') and
+                    r.get('selection_group')==row['selection_group']]:
                 if not (result[child]['selectable'] or result[child]['dependency_only']):
                     raise ValueError('V3 import requires unavailable acquisition: '+key+' -> '+child)
     return result

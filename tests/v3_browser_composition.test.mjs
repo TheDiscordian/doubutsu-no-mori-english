@@ -81,6 +81,31 @@ test('dependencies, reasons, duplicates, removal, and order independence', async
   assert.throws(() => resolveSelection(plan, 'all'), /list/);
 });
 
+test('mutual acquisition groups close selections without accepting dependency cycles', async () => {
+  const { plan } = await fixture();
+  plan.import_groups = [{ id: 'paired-acquisition', members: [B, C] }];
+  for (const requested of [[B], [C], [B, C]]) {
+    const selected = resolveSelection(plan, requested);
+    assert.deepEqual(selected.enabled, [B, C]);
+    assert.deepEqual(selected.required, [B, C].filter(id => !requested.includes(id)));
+    assert.deepEqual(selected.dependency_reasons, { [B]: [C], [C]: [B] });
+  }
+  assert.deepEqual(resolveSelection(plan, []).enabled, []);
+  assert.deepEqual(resolveSelection(plan, [A]).enabled, [A]);
+  for (const groups of [
+    [{ id: 'paired-acquisition', members: [B] }],
+    [{ id: 'paired-acquisition', members: [B, B] }],
+    [{ id: 'paired-acquisition', members: [B, 'missing'] }],
+    [{ id: 'paired-acquisition', members: [B, C] }, { id: 'other', members: [A, B] }],
+    [{ id: 'paired-acquisition', members: [B, C] }, { id: 'paired-acquisition', members: [A, C] }],
+  ]) {
+    const p = clone(plan); p.import_groups = groups;
+    assert.throws(() => validatePlan(p));
+  }
+  const p = clone(plan); p.options[1].dependencies = [C];
+  assert.throws(() => validatePlan(p), /cyclic/);
+});
+
 test('V3 retains the built gift provider while other runtime groups stay guarded', async () => {
   const { plan, source } = await fixture();
   const view = new DataView(source.buffer);

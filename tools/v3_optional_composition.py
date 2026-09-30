@@ -66,7 +66,12 @@ def save_compatibility(report):
     version = report['save_codec']['format_version']
     if version >= 3:
         travel=report.get('equipment_resources',{}).get('creature_fish',{}).get('world',{}).get('creature_travel',{})
-        return report['save_warning']+(' '+travel['warning'] if travel else '')
+        warning=report['save_warning']
+        if (report.get('equipment_resources',{}).get('carried_items',{}).get('optional_selection') and
+                'Carried-item saves require every carried family' not in warning):
+            warning+=' Carried-item saves require every carried family selected when the save was written. '
+            warning+='Removing a family is not a save migration; keep the matching selection profile and separate saves.'
+        return warning+(' '+travel['warning'] if travel else '')
     return (f'Format {version}: equal or larger profiles accepted by codec; missing dependencies rejected. '
             'Do not load imported saves in V2. Ordinary cross-profile reload is unverified.')
 
@@ -249,7 +254,20 @@ def catalogue(image, report):
     verify_installed_items(image, report)
     from v3_password_acquisition import verify_installed_items as verify_password_items
     verify_password_items(image,report,result)
+    from v3_holiday_acquisition import bind_exercise_selection
+    bind_exercise_selection(image,report,result)
     return dict(sorted(result.items()))
+
+
+def selection_groups(catalog):
+    """Mutually needed acquisition choices, separate from resource dependency DAGs."""
+    groups={}
+    for key,row in catalog.items():
+        group=row.get('selection_group')
+        if group:groups.setdefault(group,[]).append(key)
+    if any(len(members)<2 for members in groups.values()):
+        raise ValueError('Incomplete mutual import group')
+    return [dict(id=group,members=sorted(members)) for group,members in sorted(groups.items())]
 
 
 def resolve(catalog, selected, *, behaviours=None, behaviour_options=None,
@@ -266,10 +284,12 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None,
             raise ValueError('V3 pipeline selection requires the checked installed report')
         check_requests(catalog, report, requested, behaviours)
     enabled, reasons = set(requested), {}
+    peers={key:[child for child in g['members'] if child!=key]
+           for g in selection_groups(catalog) for key in g['members']}
     pending = list(requested)
     while pending:
         parent = pending.pop()
-        for child in catalog[parent]['dependencies']:
+        for child in sorted(set(catalog[parent]['dependencies']) | set(peers.get(parent,[]))):
             if child not in catalog:
                 raise ValueError('Missing compiled import dependency')
             reasons.setdefault(child, set()).add(parent)

@@ -59,8 +59,9 @@ Current implementation task: finish existing-system acquisition selection,
 remaining focused save consumers, and the private import-pipeline handoff.
 The checked current build is
 `build/v3-nook-font-repaired-02/build-lock.json`, ABI 391. The all-available
-profile is `build/v3-import-pipeline-profile-12/profile.json`: twenty villagers
-and 249 independent item choices, plus two required starting-outfit resources.
+profile is `build/v3-import-pipeline-profile-14/profile.json`: twenty villagers,
+249 independent item choices, the linked exercise-card/radio pair, and two
+required starting-outfit resources.
 Seven included furniture rewards use the existing native lottery; no new event
 provider is enabled for those rewards. Ordinary regular-pool integration remains
 installed. Keep unsupported acquisition unavailable without calling every
@@ -99,15 +100,23 @@ admission adds no runtime code, artwork, allocation, or save field. Unrelated
 selections leave this provider off; Wisp and the savings account remain independent.
 
 Current real-file browser worker and interface checks pass:
-`build/v3-import-pipeline-browser-11/build.json`,
-`build/v3-import-pipeline-worker-09/results.json`, and
-`build/v3-import-pipeline-interface-12/results.json`. Browser hashes match offline
+`build/v3-import-pipeline-browser-13/build.json`,
+`build/v3-import-pipeline-worker-11/results.json`, and
+`build/v3-import-pipeline-interface-13/results.json`. Browser hashes match offline
 builds; empty selection returns V2-14. The private export is unserved.
-Fourteen focused current-cartridge scope/browser-equivalence checks pass,
-including twenty-six actual profile hashes, both seasonal modes
+Fifteen focused current-cartridge scope/browser-equivalence checks pass,
+including twenty-eight actual profile hashes, both seasonal modes
 with each item selected alone,
 complete native Redd routing, stock selection, four standalone golden tools,
-complete/sparse Gulliver and igloo rewards, and independent Mayor gifts.
+complete/sparse Gulliver and igloo rewards, independent Mayor gifts, and both
+exercise-pair directions. Selecting card or radio includes the pair, matching
+the retained actual acquisition guard, with an explicit added requirement.
+The interface result verifies export 12; current export 13 changes only the
+carried-family save warning and its manifest hash. Its code, review, styles, and
+cartridge recipes remain identical, with a current focused warning/worker check.
+No native code, artwork, allocation, or saved field changes. Fifteen JavaScript
+checks pass. Ordinary exercise acquisition/save remains unverified. Keep matching
+selection profiles and separate saves; removing a carried family is not migration.
 Sixteen password-only furniture imports and two HomePage surfaces use the
 complete installed Nook frontend and live destination/selection gates, without
 substitute shop stock or catalogue ordering. The complete name font uses three
@@ -121,7 +130,7 @@ connected world/reward C also passes on current installed data with inventory
 I/O doubled. Ordinary Mayor conversations remain unverified; no exhausted holiday
 native fixture is replayed.
 The current interface check also verifies actual GameCube-mode downloads and
-setting-change invalidation. Fourteen focused JavaScript checks
+setting-change invalidation. Fifteen focused JavaScript checks
 pass. Unavailable behaviour controls no longer
 carry the misleading blanket V4 label.
 
@@ -157,7 +166,8 @@ Remaining connected work:
    Redd, fixed-ID seasonal stock, Gulliver, and winter-igloo admission are connected.
    The fifty installed Mayor gifts and their existing calendar choice are admitted.
    Password acquisition admission and its font/save-code collision repair are connected.
-   Review the remaining exercise-card/radio, Harvest, Wisp, postal,
+   Exercise-card/radio admission and mutual selection are connected.
+   Review the remaining Harvest, Wisp, postal,
    and retained summer-camping acquisition routes against their actual
    acquisition dependencies, retaining already-built features. The current
    Harvest resource check rejects its historical manager receipt after later
@@ -284,8 +294,9 @@ from complete aligned resources, retaining every existing arena contribution.
 Four focused checks pass, including seven browser/offline profiles and the
 existing sanitized world fixture's 128 handovers with native inventory doubled.
 Actual allocation words, complete capacity chains, and mutation rejection pass.
-The radio's only required import is the exercise card; card-only selection does
-not enable the radio. It remains non-orderable and outside shop stock. Three
+The radio requires the exercise card; selecting the card also includes the radio
+because the actual installed acquisition guard requires both destinations.
+It remains non-orderable and outside shop stock. Three
 focused checks pass, including six browser/offline profiles, both source prize
 branches, all seventeen installed source card functions, actual enabled fields,
 unchanged physical owners/save codec/menu capacity, and mutation rejection.
@@ -356,7 +367,7 @@ The current build is an internal resource checkpoint, not a Franklin playtest
 handoff. Focused checks prove the four installed capacity instructions against
 complete retail caller/helper/reservation spans and unchanged relocations; they
 do not establish scene headroom, ordinary rendering, or gameplay.
-V4 continuation only: ordinary conversation, hiding/arrival, reward
+Unverified ordinary paths: conversation, hiding/arrival, reward
 delivery, and save/restart verification. Experimental selection does not claim
 playable-import acceptance. The Harvest new-harness allowance
 and setup retry are exhausted; do not reset them or replay unchanged checks.

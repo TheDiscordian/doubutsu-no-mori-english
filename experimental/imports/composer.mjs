@@ -121,6 +121,20 @@ export function validatePlan(plan) {
     visiting.delete(id); visited.add(id);
   }
   for (const id of options.keys()) visit(id);
+  // Acquisition can require two item choices together. Declare that group
+  // explicitly rather than accepting a cycle in resource dependencies.
+  if (plan.import_groups !== undefined) array(plan.import_groups, 1, 32);
+  const linkedIds = new Set(), linkedMembers = new Set();
+  for (const group of plan.import_groups || []) {
+    require(typeof group.id === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(group.id) &&
+      !linkedIds.has(group.id), 'Invalid or repeated mutual import group.');
+    linkedIds.add(group.id); array(group.members, 2, 2048);
+    for (const id of group.members) {
+      require(options.has(id) && !options.get(id).dependency_only && !linkedMembers.has(id),
+        'Missing, repeated, or unavailable mutual import member.');
+      linkedMembers.add(id);
+    }
+  }
   field(plan.profile, 192, 192);
   const fullProfile = new Uint8Array(192);
   const installed = [...options.values(), ...pendingRows.values()].filter(row => row.profile_hex !== undefined);
@@ -246,9 +260,12 @@ export function resolveSelection(plan, requested, behaviours = {}) {
   require(requested.every(id => typeof id === 'string' && options.has(id) && !options.get(id).dependency_only),
     'Unknown or unimplemented standalone import.');
   const chosen = [...new Set(requested)].sort(), enabled = new Set(chosen), reasons = new Map(), pending = [...chosen];
+  const peers = new Map();
+  for (const group of plan.import_groups || []) for (const id of group.members)
+    peers.set(id, group.members.filter(child => child !== id));
   while (pending.length) {
     const id = pending.pop();
-    for (const dependency of options.get(id).dependencies) {
+    for (const dependency of new Set([...options.get(id).dependencies, ...(peers.get(id) || [])])) {
       if (!reasons.has(dependency)) reasons.set(dependency, new Set());
       reasons.get(dependency).add(id);
       if (!enabled.has(dependency)) { enabled.add(dependency); pending.push(dependency); }

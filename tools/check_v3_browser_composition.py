@@ -16,7 +16,7 @@ PROBE = b'<!doctype html><meta charset="utf-8"><title>Private worker check</titl
 
 
 def check_interface(page, origin, out, expected, catalog, review, *, scope='development', extra_item=None,
-                    behaviour_case=None):
+                    behaviour_case=None, import_groups=()):
     """Exercise the actual UI; keep native gameplay checks out of this batch."""
     results = {}
     page.add_init_script('''(() => {
@@ -141,6 +141,25 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
         build_and_download('equipment-subset')
         page.locator('#clear-all').click()
         page.locator('#kind').select_option('all')
+    for group in import_groups:
+        page.locator('#search').fill('')
+        for chosen in group['members']:
+            page.locator(f'[data-id="{chosen}"] input').check()
+            assert page.locator('.option input:checked').count()==len(group['members'])
+            for peer in group['members']:
+                checkbox=page.locator(f'[data-id="{peer}"] input')
+                assert checkbox.is_checked() and checkbox.is_disabled()==(peer!=chosen)
+                if peer!=chosen:
+                    assert catalog[peer]['name'] in page.locator('#dependency-list').inner_text()
+            page.locator('#clear-all').click()
+            assert page.locator('.option input:checked').count()==0
+        chosen=group['members'][0]
+        page.locator(f'[data-id="{chosen}"] input').check()
+        page.locator('#save-ack').check()
+        selection=build_and_download('linked-group-'+group['id'])
+        assert selection['requested']==[chosen]
+        assert selection['required']==sorted(set(group['members'])-{chosen})
+        page.locator('#clear-all').click()
     if behaviour_case:
         page.locator('#search').fill('')
         for key in behaviour_case['requested']:
@@ -277,6 +296,9 @@ def check(export, output, *, interface=False, selected=None):
                 (subset_name, ['GAFE01-r0/villager/00EB', extra_item])]
     equipment=[key for key,row in menu.items() if row['kind']=='equipment']
     if equipment:profiles.append(('equipment-subset',[equipment[1],equipment[-1]]))
+    import_groups=plan.get('import_groups',[])
+    for group in import_groups:
+        profiles.append(('linked-group-'+group['id'],[group['members'][0]]))
     if focused:
         if interface:raise ValueError('Choose a focused worker profile or the complete interface check')
         resolve(selected)
@@ -336,7 +358,7 @@ def check(export, output, *, interface=False, selected=None):
                 if interface:
                     results['interface'] = check_interface(page, origin, out, expected, menu,
                         json.loads(resources['data/review.json']), scope=scope, extra_item=extra_item,
-                        behaviour_case=behaviour_case)
+                        behaviour_case=behaviour_case, import_groups=import_groups)
                 else:
                     if not focused:
                         cancelled = worker(profiles[-1][1], cancel=True)

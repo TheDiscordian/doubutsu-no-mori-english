@@ -547,8 +547,11 @@ members retain catalogue ordering after collection; no gift enters shop stock.
 Ordinary conversation, acquisition/ordering, and physical save/restart remain
 unverified. The source summer-exercise radio prize has ordinary admission with
 its actual exercise-card dependency, retaining the complete installed controller,
-room lifecycle, music, and indoor exercise. Card-only selection does not select
-the radio. Initial acquisition remains the full source stamp/reward route,
+room lifecycle, music, and indoor exercise. Selecting either card or prize includes
+both: the retained acquisition controller requires both destinations before
+offering the stamp/prize route. Both composers use an explicit mutual import
+group, separate from acyclic resource dependencies, and record the added item
+as a requirement. Initial acquisition remains the full source stamp/reward route,
 without shop stock or catalogue ordering; ordinary gameplay/save verification
 remains pending.
 The shared draw-only scrolling category supplies backyard pool through its

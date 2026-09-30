@@ -39,9 +39,10 @@ existing-system reward routes individually. See the
 ### Current import selections and verification
 
 Browser and offline builds default to the V3 pipeline scope. Both offer all
-twenty villagers and 249 independent item choices. Two exclusive
+twenty villagers, 249 independent item choices, and the linked exercise-card/radio
+pair. Two exclusive
 starting-outfit resources follow their villagers as dependencies, not standalone
-item choices. Select all requests 269 choices and includes those two resources.
+item choices. Select all requests 271 choices and includes those two resources.
 Actual checked stock tables determine regular furniture, clothing, and surfaces;
 the remaining item categories use their installed native acquisition paths.
 Seven furniture choices use the existing native lottery, with checked donor
@@ -77,6 +78,15 @@ GameCube calendar choice remains available. No actor code, artwork, allocation,
 or saved field is added by this admission. Complete provider packets, activation
 fields, donor selectors/membership, destination identities, retained English text,
 and canonical metadata authenticate before composition.
+The exercise card and its radio prize reuse their complete installed controller,
+English text, native handover, player exercise, and thirteen saved stamp states.
+Selecting either includes both and records the other item as a requirement: the
+actual acquisition guard declines the stamp/prize route when either destination
+is unavailable. Shared mutual import groups preserve acyclic resource dependencies.
+Both source prize branches, all seventeen donor functions, complete installed
+packets, live destinations/metadata, and actual player hooks authenticate before
+admission. No game code, artwork, allocation, or saved field is added. Ordinary
+exercise acquisition, the larger profile's save/reload, and hardware remain unverified.
 The ten summer-camping rewards remain unavailable while their complete acquisition
 path is unfinished, not merely because the retained tent and scene are V4-type work.
 The current filter leaves items outside its admitted acquisition categories
@@ -91,22 +101,27 @@ not enable the optional holiday, Wisp, birthday, or savings-account providers.
 Unavailable behaviour controls are hidden without a blanket V4 classification.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-11/build.json`, pinned to the ABI-391
-cartridge. Fourteen current-cartridge scope/browser-equivalence checks pass,
+`build/v3-import-pipeline-browser-13/build.json`, pinned to the ABI-391
+cartridge. Fifteen current-cartridge scope/browser-equivalence checks pass,
 covering complete Redd stock routing, selected-only furniture
 lists, four independent
 golden tools, reward-provider/resource rejection, and the existing Gulliver/igloo
-routes, independent Mayor gifts/provider activation, and password-only selections. Twenty-six actual
+routes, independent Mayor gifts/provider activation, password-only selections,
+and both exercise-pair directions. Twenty-eight actual
 browser/offline profiles match. The current headless
 Chromium worker check at
-`build/v3-import-pipeline-worker-09/results.json` reads actual game files and
-matches the offline Nintendo-code furniture, HomePage NES, and flooring selection. Retained unchanged worker
-checks cover cancellation and invalid-input rejection.
+`build/v3-import-pipeline-worker-11/results.json` reads actual game files and
+matches the offline exercise-card request, including its required radio. Retained
+unchanged worker checks cover password-only choices, cancellation, and invalid-input rejection.
 The current interface check passes at
-`build/v3-import-pipeline-interface-12/results.json`, including independent
+`build/v3-import-pipeline-interface-13/results.json`, including independent
 selection/dependencies, keyboard controls, unavailable-review data, and download
 lifecycle checks, the actual GameCube stock setting, its downloaded hash and
-receipt, and invalidation when settings change. Five focused seasonal checks
+receipt, both exercise-pair requirement displays/removal, its downloaded hash,
+and invalidation when settings change. That result targets export 12; the current
+export has identical code, styles, review data, and cartridge recipes. Its only
+plan change is the restored carried-family save warning, with a current focused
+assertion and worker check. Five focused seasonal checks
 pass, including the actual C wrapper under address/undefined-behaviour sanitizers
 with native I/O doubled. The silent native result at
 `build/v3-seasonal-stock-native-02/results.json` passes 38 cases across both
@@ -123,7 +138,7 @@ shared world/reward C passes its connected sanitizer check on current installed
 data, including 128 handovers, four-player receipts, visitors, full/stale inventory,
 and resource gates, with native inventory I/O doubled. No exhausted holiday native
 fixture is replayed or relabelled as passing gameplay.
-Fourteen focused JavaScript checks pass with Node's
+Fifteen focused JavaScript checks pass with Node's
 `--experimental-global-webcrypto` flag.
 <!-- Verification work record: the initial Node invocation lacks the required
 Web Crypto flag and fails before crypto-dependent assertions; the corrected
@@ -132,14 +147,17 @@ Empty selection returns exact V2-14. No game files are uploaded; the temporary
 check servers are stopped. The export is unserved.
 
 The all-available offline profile is
-`build/v3-import-pipeline-profile-12/profile.json`; UPS reconstruction passes.
+`build/v3-import-pipeline-profile-14/profile.json`; UPS reconstruction passes.
 ROM SHA-256:
-`8409eec4131de56d4786546e020c94139c210853469beec10a57ebaa405c9e95`.
+`69e15521beab1e200ab92044f2831960d2b1f19f9fc15eaa66f0d4ef0872c141`.
 UPS SHA-256:
-`928d89e02244424dbb1e70a2b94e3bb8d59501abac9f70a5627f49b514012f20`.
+`45953815b836189bc1a26408dc8073842d95b13fbdde8b79ef6eae731040793b`.
 It uses ABI 391 and retains format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and
 format-20-or-earlier V3 readers cannot read these saves; preserve separate saves
-and backups. Supported older saves migrate forward. Browser composition does
+and backups. Supported older saves migrate forward. Carried-item saves require
+every carried family selected when written; removing a family is not a migration.
+Profile-14 saves include exercise cards and should not be used with profile 12.
+Browser composition does
 not establish hardware compatibility or comprehensive gameplay.
 
 Sixteen complete password-only furniture imports and two HomePage surfaces are
@@ -172,17 +190,17 @@ CRC, decompression, all three saved-record CRCs, canonical selected profiles,
 zero unused padding, and the preserved imported fan. Five focused scene/save
 tests pass, including that actual written-chip check. This verifies this town's
 ordinary save/restart, not every item behaviour, synchronous writing,
-diary-preflight execution, or hardware. The current 269-choice profile extends
+diary-preflight execution, or hardware. The current 271-choice profile extends
 that selection with four golden tools, twelve native Redd items, and the seasonal
 candle/flag, the Gulliver and winter-igloo rewards, fifty Mayor gifts, and eighteen
-password-only items. Its stock adapter occupies
+password-only items and the linked exercise-card/radio pair. Its stock adapter occupies
 an existing preloaded gap, preserving complete artwork and save format;
 selected-only stock data stays connected.
 It has not repeated ordinary save/reload. Compatibility with ABI 389 is expected
 in both directions when import profiles and other behaviour settings match;
 cross-version save/restart is not verified.
 The added reward identities require a build selecting those same imports; a
-profile-12 save may be rejected by profile-11's narrower selection despite the
+profile-14 save may be rejected by profile-12's narrower selection despite the
 unchanged saved layout. Preserve separate builds, saves, and backups.
 The native format-20 golden reward/state and shovel-rule evidence remains at
 `build/v3-golden-rewards-native-01/results.json` and
