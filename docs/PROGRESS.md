@@ -72,6 +72,26 @@ is not a game-save/reload test. No old creature fixture is replayed.
 The retained creature constructor timeout and scheduler disconnection remain
 unclassified, not established harness faults or passed gameplay checks.
 
+The current save-check adapter follows the installed format-21 owner, complete
+canonical format-eight creature state, selected regular furniture identities,
+and current extended-record/scratch dimensions. Its native attempt at
+`build/v3-import-pipeline-save-write-01/results.json` stops before transfer or
+FlashRAM writes: the 16,640-byte diagnostic allocation returns zero. Startup,
+retained FlashRAM code, current save-state guard, and scratch/hash guards pass;
+the write/read path does not execute and remains unverified. Preserve the failed
+attempt and its checkpoint; the save-check harness debugging budget is spent.
+
+Read-only inspection of that checkpoint verifies an initialized native scene
+arena, 109 valid allocation nodes, 14,576 free bytes, and zero recorded fault
+state. The earlier creature checkpoints each have 76,832 free bytes before their
+probes. This explains the diagnostic allocation failure, not ordinary save
+safety. The current spring foreground owner's checked 149,024-byte reservation
+matches its live allocation; the earlier checkpoint has a 74,688-byte allocation
+instead. The real synchronous save and allocated loader each request a complete
+65,536-byte bank. Verify those callers in their ordinary scene/transition context
+before classifying the reduced headroom as harmless. Do not replace that check
+with smaller test buffers or silently omit a required save consumer.
+
 ## Preserved experimental artifact and subsystem evidence
 
 The current proposal is ABI 387 / format 21 at

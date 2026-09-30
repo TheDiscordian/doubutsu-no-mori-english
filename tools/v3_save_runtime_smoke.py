@@ -36,13 +36,34 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
     state_guard = STATE_RAM + state_bytes - 16
     profile_bytes = 192 if console else PROFILE
     expected_console = None
+    expected_extra = b''
+    disk_format = report['save_codec']['format_version']
+    modern = console and disk_format == 21
+    extra_records = []
+    scratch_guard = console['scratch']['guard'] if console else None
+    if modern:
+        # Follow the installed owner, not the retained format-five receipt.
+        e = report['equipment_resources']
+        memory = e['bank']['memory']
+        symbols = report['save_codec']['active_storage_code']['symbols']
+        diary = console['diary_state']
+        extra_records = [('diary', diary['ram'], diary['bytes']),
+                         ('retained fishing', symbols['af_v3_fishing_state'], 176),
+                         ('retained cards', symbols['af_v3_card_state'], 64),
+                         ('disabled account', memory['account']['ram'], memory['account']['record_bytes'])]
+        scratch_guard = memory['scratch']['ram'] + memory['scratch']['bytes'] - 16
+        if (disk_format != console['save_format'] or report['save_codec']['canonical_format_version'] != 8 or
+                sum(row[2] for row in extra_records) + 72064 != memory['scratch']['bytes'] - 16):
+            raise ValueError('Current save fixture dimensions disagree with installed ownership')
 
     def logical_bank(bank):
         if not console:
             return bank
         ext = bank[SAVE_BYTES:]
-        if (len(bank) != BANK or ext[:16] != struct.pack('>4I', 0x41465333, 0x00050680, 3, 72064)
-                or struct.unpack_from('>I', ext, 20)[0] != 1 or any(ext[36:])):
+        total = 72064 + len(expected_extra)
+        registry = report['save_codec']['registry_version'] if modern else 3
+        if (len(bank) != BANK or ext[:16] != struct.pack('>4I', 0x41465333, disk_format << 16 | 0x680, registry, total)
+                or struct.unpack_from('>I', ext, 20)[0] != 1 or any(ext[40 if modern else 36:])):
             raise ValueError('Native compressed save has invalid metadata')
         seal = bytearray(bank); seal[18:20] = bytes(2); seal[SAVE_BYTES+24:SAVE_BYTES+28] = bytes(4)
         if zlib.crc32(seal) != struct.unpack_from('>I', ext, 24)[0] or sum(struct.unpack('>31936H', bank[:SAVE_BYTES])) & 65535:
@@ -51,11 +72,14 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
         stream = bank[20:0x2F68] + bank[0x2F6A:SAVE_BYTES]
         if not 0 < length <= len(stream) or any(stream[length:]):
             raise ValueError('Native compressed save exceeds capacity or has dirty padding')
-        decoded = yaz0_decode(b'Yaz0' + struct.pack('>I', 72064) + bytes(8) + stream[:length])
-        if (zlib.crc32(decoded[:BANK]), zlib.crc32(decoded[BANK:])) != struct.unpack_from('>2I', ext, 28):
+        decoded = yaz0_decode(b'Yaz0' + struct.pack('>I', total) + bytes(8) + stream[:length])
+        if (zlib.crc32(decoded[:BANK]), zlib.crc32(decoded[BANK:72064])) != struct.unpack_from('>2I', ext, 28):
             raise ValueError('Native decoded town/console checksum mismatch')
-        if decoded[BANK:] != expected_console:
+        if decoded[BANK:72064] != expected_console:
             raise ValueError('Native save loses independent console progress')
+        if modern and (decoded[72064:] != expected_extra or
+                       zlib.crc32(decoded[72064:]) != struct.unpack_from('>I', ext, 36)[0]):
+            raise ValueError('Native save loses the complete extended record set')
         return decoded[:BANK]
 
     def check(label, at, expected):
@@ -79,10 +103,14 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
         if console:
             canonical = logical_bank(bank)
             ext = bytearray(0x680)
-            struct.pack_into('>3I', ext, 0, 0x41465333, 0x00040680, 3)
+            struct.pack_into('>3I', ext, 0, 0x41465333, 0x00080680 if modern else 0x00040680, 5 if modern else 3)
             ext[0x18:0xB8]=state[:160]; ext[0xC0:0x2C0]=state[192:704]
             ext[0x2C0:0x2E0]=state[160:192]; ext[0x2E0:0x360]=state[704:832]
             ext[0x360:0x390]=state[832:880]; ext[0x390:0x4D0]=state[880:1200]
+            if modern:
+                if len(state) != 1232:
+                    raise ValueError('Current save fixture requires complete creature state')
+                ext[0x4D0:0x4F0] = state[1200:1232]
             payload=bytearray(canonical[:SAVE_BYTES]);payload[18:20]=bytes(2)
             struct.pack_into('>I',ext,12,zlib.crc32(payload))
             struct.pack_into('>I',ext,16,zlib.crc32(ext))
@@ -101,7 +129,12 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
         check('complete console startup packet',packet['ram'],all_blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
         check('console state initialized',console['state']['ram'],struct.pack('>4I',0x41464335,0,0,0))
         for workspace in ('scratch','hash'):
-            check('console '+workspace+' guard',console[workspace]['guard'],bytes.fromhex('AF4355DE')*4)
+            check('console '+workspace+' guard',scratch_guard if workspace == 'scratch' else console[workspace]['guard'],bytes.fromhex('AF4355DE')*4)
+        for name, address, length in extra_records:
+            value = debug.read_memory(address, length)
+            if len(value) != length:
+                raise ValueError('Incomplete extended startup state: '+name)
+            expected_extra += value
     call(0x800CDBE0, expected=1)
     size = 0x4100 if writing else 0x10100
     allocation = call(0x8009BFC0, [size])
@@ -138,13 +171,19 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
             # Storage fixtures: preserve the rest of the cold-boot payload,
             # install a synthetic town ID, and store the actual imported IDs.
             modified[0x2F68:0x2F6A] = bytes.fromhex('3012')
-            struct.pack_into('>H', modified, 0x34, 0x3225)
-            struct.pack_into('>H', modified, 0x20 + 0xBD0 + 0x14, 0x32BB)
+            items = [0x3225, 0x32BB]
+            if modern:
+                items = [int(row['item_id'],16) for row in report['composition']['destinations']
+                         if row['kind'] == 'furniture'][:2]
+                if len(items) != 2:
+                    raise ValueError('Current fixture needs two selected regular furniture imports')
+            struct.pack_into('>H', modified, 0x34, items[0])
+            struct.pack_into('>H', modified, 0x20 + 0xBD0 + 0x14, items[1])
             debug.write_memory(SAVE_RAM, bytes(modified))
             state = bytearray(old_runtime[16:-16]) if console else bytearray.fromhex(report['save_runtime']['profile_hex']) + bytearray(512)
-            state[profile_bytes + (137 >> 3)] |= 1 << (137 & 7)
-            state[profile_bytes + 128 + (174 >> 3)] |= 1 << (174 & 7)
-            state[profile_bytes + 384 + (137 >> 3)] |= 1 << (137 & 7)
+            indices = [(item & 0xFFF) >> 2 for item in items] if modern else [137,174]
+            for player,index in ((0,indices[0]), (1,indices[1]), (3,indices[0])):
+                state[profile_bytes + player*128 + (index >> 3)] |= 1 << (index & 7)
             debug.write_memory(STATE_RAM + 16, bytes(state))
         if test_sync:
             # The diagnostic transfer buffer must not consume memory needed by
@@ -215,8 +254,11 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
             'native_collection_populated_catalogue': collect_items,
             'ordinary_save_menu_tested': False, 'hardware_tested': False}
         if console:
-            manifest.update(console_hex=expected_console.hex(),save_format=5,
+            manifest.update(console_hex=expected_console.hex(),save_format=disk_format,
                 canonical_bank_sha256=sha256(logical_bank(expected_bank)))
+            if modern:
+                manifest.update(extended_hex=expected_extra.hex(), extended_records=[
+                    dict(name=name, ram=address, bytes=length) for name,address,length in extra_records])
         (export_directory / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
         debug.write_memory(SAVE_RAM, original)
         debug.write_memory(STATE_RAM, old_runtime)
@@ -230,6 +272,10 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
         bank = initial[:BANK]
         state = bytes.fromhex(manifest['working_state_hex'])
         if console:expected_console=bytes.fromhex(manifest['console_hex'])
+        if modern:
+            expected_extra = bytes.fromhex(manifest['extended_hex'])
+            if len(expected_extra) != sum(row[2] for row in extra_records):
+                raise ValueError('Current seed has incomplete extended records')
         validate(bank, state)
         if initial != bank * 2:
             raise ValueError('Export does not contain two matching complete banks')
@@ -248,6 +294,11 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
             call(address, expected=1)
             check('complete native decoded payload', SAVE_RAM, logical_bank(bank)[:SAVE_BYTES])
             if console:check('all four console players restored',console['state']['ram']+16,expected_console)
+            if modern:
+                offset = 0
+                for name,address,length in extra_records:
+                    check('fresh load restores '+name,address,expected_extra[offset:offset+length])
+                    offset += length
             check('separate live catalogue/profile state', STATE_RAM + 16, state)
             check('load commits ready/town', STATE_RAM + 8, struct.pack('>II', 1, 0x3012))
             check('unnamed native RAM tail unchanged', SAVE_RAM + SAVE_BYTES, tail)
@@ -265,7 +316,7 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
     check('runtime end guard retained', state_guard, bytes.fromhex('AF53C0DE') * 4)
     if console:
         for workspace in ('scratch','hash'):
-            check('console '+workspace+' guard retained',console[workspace]['guard'],bytes.fromhex('AF4355DE')*4)
+            check('console '+workspace+' guard retained',scratch_guard if workspace == 'scratch' else console[workspace]['guard'],bytes.fromhex('AF4355DE')*4)
         check('console state guard retained',console['state']['ram']+console['state']['bytes']-16,bytes.fromhex('AF4355DE')*4)
     for at in guards:
         check('private/stack guard', at, edge)

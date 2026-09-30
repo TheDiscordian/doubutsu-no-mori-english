@@ -55,8 +55,18 @@ including all twenty villagers, plus two required outfit resources). Preserve
 these results and disabled special-item selections. Complete the exact current
 cartridge's bounded save check. Its boot/RAM/startup/guard/fault check passes at
 `build/v3-import-pipeline-boot-01/results.json`; the blank FlashRAM output does
-not establish save/reload or ordinary progression. Classify retained creature constructor/
-scheduler failures from evidence without replaying exhausted old fixtures.
+not establish save/reload or ordinary progression. The format-21 native save
+attempt at `build/v3-import-pipeline-save-write-01/results.json` stops before
+writes: its 16,640-byte transfer allocation cannot fit the captured native
+scene arena's 14,576 free bytes. The spring foreground owner now reserves
+149,024 bytes. The next consumer is ordinary scene/transition allocation and
+the real 65,536-byte synchronous-save/allocated-load request. Determine whether
+those ordinary contexts supply enough memory and fix any demonstrated game
+allocation failure. Do not reduce the diagnostic buffer and call save coverage
+complete, skip the synchronous writer, replay exhausted fixtures, or reset this
+save-check harness's spent debugging budget. Retain its unverified adapter and
+exact failed output. Classify retained creature constructor/scheduler failures
+from evidence without replaying exhausted old fixtures.
 Fix demonstrated game faults and record remaining limits honestly. Do not treat
 missing special acquisition as a pipeline defect or resume source mail, banking,
 or other GameCube feature ports for V3.
