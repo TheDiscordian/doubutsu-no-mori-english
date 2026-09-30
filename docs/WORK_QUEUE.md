@@ -54,9 +54,9 @@ runtime alternatives; other substantial differences still need real bindings.
 Current implementation task: finish existing-system acquisition selection,
 remaining focused save consumers, and the private import-pipeline handoff.
 The checked current build is
-`build/v3-scene-arena-installed-03/build-lock.json`, ABI 389. The all-available
-profile is `build/v3-import-pipeline-profile-08/profile.json`: twenty villagers
-and 151 independent item choices, plus two required starting-outfit resources.
+`build/v3-seasonal-stock-installed-03/build-lock.json`, ABI 390. The all-available
+profile is `build/v3-import-pipeline-profile-09/profile.json`: twenty villagers
+and 153 independent item choices, plus two required starting-outfit resources.
 Seven included furniture rewards use the existing native lottery; no new event
 provider is enabled for those rewards. Ordinary regular-pool integration remains
 installed. Keep unsupported acquisition unavailable without calling every
@@ -65,19 +65,28 @@ Twelve included furniture imports use the existing native Redd stock group.
 Browser and offline composition filter all six furniture stock lists by actual
 selection, retaining native prefixes, pointers, terminators, rarity/RNG code,
 artwork, and allocations. Ordinary Redd shopping remains unverified.
+The festive candle/flag pair uses the existing December 26–31 Nook replacement
+with independent selection and native fallback. One WebUI setting chooses N64
+additive native/imported pair mixing or donor-priority GameCube stock. Other
+native seasons are unchanged; neither mode introduces a new feature or building.
+Five focused adapter checks and 38 silent native cases pass. Complete artwork,
+all 23 startup descriptors, scene allocation, and saved formats remain intact.
+Ordinary seasonal purchases and save/restart are not claimed.
 All four installed golden tools follow the shared readiness checks; missing
 acquisition dependencies or reward providers keep the affected choice unavailable.
 Their tree, Shrine, and collection-completion presentation routes do not require
 holiday, Wisp, birthday, or savings-account activation.
 
 Current real-file browser worker and interface checks pass:
-`build/v3-import-pipeline-browser-07/build.json`,
-`build/v3-import-pipeline-worker-05/results.json`, and
-`build/v3-import-pipeline-interface-07/results.json`. Browser hashes match offline
+`build/v3-import-pipeline-browser-08/build.json`,
+`build/v3-import-pipeline-worker-06/results.json`, and
+`build/v3-import-pipeline-interface-08/results.json`. Browser hashes match offline
 builds; empty selection returns V2-14. The private export is unserved.
 Nine focused current-cartridge scope/browser-equivalence tests pass, including
-eleven actual profile hashes, complete native Redd routing, stock selection,
-and four standalone golden-tool selections. Thirteen focused JavaScript checks
+fifteen actual profile hashes, both seasonal modes with each item selected alone,
+complete native Redd routing, stock selection, and four standalone golden tools.
+The current interface check also verifies actual GameCube-mode downloads and
+setting-change invalidation. Thirteen focused JavaScript checks
 pass. Unavailable behaviour controls no longer
 carry the misleading blanket V4 label.
 
@@ -91,9 +100,9 @@ process loads that save without a checkpoint. Imported fan `2255`, pockets,
 and clothing survive. Full-chip validation checks both bank checksums, CRCs,
 complete decompression, all saved records, selected profiles, and zero padding.
 Five focused scene/save tests pass. Hardware and broad gameplay are unclaimed.
-The current selection adds four golden tools and twelve Redd items without
-changing installed runtime, artwork, or saved format; selected-only stock data
-changes. Ordinary save/reload of that larger profile is not
+The current selection adds four golden tools, twelve Redd items, and the festive
+pair. The new seasonal adapter fits an existing preloaded gap without changing
+artwork, scene allocations, or saved format. Ordinary save/reload of that larger profile is not
 claimed. Retained native golden-rule/state checks pass on their recorded
 format-20 build, without proving ordinary conversations or physical writes.
 
@@ -108,17 +117,11 @@ failure or restart its budget.
 
 Remaining connected work:
 
-1. Review remaining existing-system reward exclusions individually. Golden-tool
-   and Redd admission are connected. Group four's festive candle/flag do not
-   become obtainable by list insertion: the checked native Nook stock builder
-   calls its existing seasonal replacement at `800C073C -> 800BF7EC`, whose
-   December branches choose fixed native IDs. The donor's `mSP_SetSeasonFTR`
-   gives its candle/flag after December 25. Extend that existing seasonal stock
-   path with independent import selection and native fallback; do not invent
-   a train feature. Preserve the other native seasonal branches. Complete source
-   routines and current disassembly are in
-   `local/ac-decomp/src/game/m_shop.c:139` and
-   `build/v3-acquisition-trace-01/core/code.asm:112115`.
+1. Review remaining existing-system reward exclusions individually. Golden-tool,
+   Redd, and fixed-ID seasonal stock admission are connected. Check the retained
+   Gulliver and camper selectors and their actual native dependencies next;
+   reuse installed resources and passing category evidence. Do not blanket-admit
+   optional event providers or require completing entirely new V4 features.
    Pool names alone do not prove a new-feature requirement or a complete route.
    Separate dependencies on entirely new features from extensions to existing
    systems; do not resume savings accounts or other unrelated feature ports.

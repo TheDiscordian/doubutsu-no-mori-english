@@ -15,7 +15,8 @@ ROOT = composer.ROOT
 PROBE = b'<!doctype html><meta charset="utf-8"><title>Private worker check</title><input id="n64" type="file"><input id="disc" type="file">'
 
 
-def check_interface(page, origin, out, expected, catalog, review, *, scope='development', extra_item=None):
+def check_interface(page, origin, out, expected, catalog, review, *, scope='development', extra_item=None,
+                    behaviour_case=None):
     """Exercise the actual UI; keep native gameplay checks out of this batch."""
     results = {}
     page.add_init_script('''(() => {
@@ -120,6 +121,7 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
         results[label] = {'sha256': expected[label], 'profile_sha256': sha256(profile.read_bytes()),
                           'enabled': selection['enabled']}
         print(json.dumps({'interface_case': label, 'sha256': expected[label], 'downloads_verified': True}), flush=True)
+        return selection
 
     build_and_download('villager-and-regular-subset' if scope == 'v3-pipeline' else 'villager-and-seasonal-subset')
     old_urls = page.evaluate('window.__lifecycle.created.slice()')
@@ -139,6 +141,22 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
         build_and_download('equipment-subset')
         page.locator('#clear-all').click()
         page.locator('#kind').select_option('all')
+    if behaviour_case:
+        page.locator('#search').fill('')
+        for key in behaviour_case['requested']:
+            page.locator(f'[data-id="{key}"] input').check()
+        control = page.locator(f'select[aria-describedby="behaviour-description-{behaviour_case["id"]}"]')
+        assert control.input_value() == 'N64'
+        control.select_option('GameCube')
+        assert not page.locator('#save-ack').is_checked() and page.locator('#build').is_disabled()
+        page.locator('#save-ack').check()
+        selection = build_and_download(behaviour_case['label'])
+        assert selection['behaviours'][behaviour_case['id']] == 'GameCube'
+        assert selection['requested'] == sorted(behaviour_case['requested'])
+        control.select_option('N64')
+        assert page.locator('#success').is_hidden() and not page.locator('#receipt').get_attribute('href')
+        results['behaviour_change_revokes_downloads'] = True
+        page.locator('#clear-all').click()
     build_and_download('no-imports')
     old_urls = page.evaluate('window.__lifecycle.created.slice()')
     # Actually change the input. Re-selecting the identical file can leave the
@@ -250,8 +268,11 @@ def check(export, output, *, interface=False, selected=None):
                       and key not in catalog['GAFE01-r0/villager/00EB']['dependencies'])
     subset_name = 'villager-and-regular-subset' if scope == 'v3-pipeline' else 'villager-and-seasonal-subset'
     if scope != 'v3-pipeline':extra_item = 'GAFE01-r0/item/31D4'
-    def resolve(selected):
-        return composer.resolve(catalog, selected, scope=scope, report=report)
+    from v3_creature_choices import options as behaviour_options
+    choices = behaviour_options(base, report)
+    def resolve(selected, behaviours=None):
+        return composer.resolve(catalog, selected, scope=scope, report=report,
+            behaviour_options=choices if behaviours else None, behaviours=behaviours)
     profiles = [('no-imports', []), ('all-installed', available),
                 (subset_name, ['GAFE01-r0/villager/00EB', extra_item])]
     equipment=[key for key,row in menu.items() if row['kind']=='equipment']
@@ -265,6 +286,14 @@ def check(export, output, *, interface=False, selected=None):
         if interface and name == 'all-installed': continue
         result, _, _ = composer.compose(base, report, catalog, resolve(selected))
         expected[name] = sha256(result)
+    behaviour_case = None
+    seasonal = report.get('equipment_resources', {}).get('seasonal_stock')
+    if interface and seasonal:
+        behaviour_case = dict(id=seasonal['choice']['id'], label='seasonal-stock-GameCube',
+                              requested=[row['id'] for row in seasonal['source']['imports']])
+        selection = resolve(behaviour_case['requested'], {behaviour_case['id']:'GameCube'})
+        result, _, _ = composer.compose(base, report, catalog, selection)
+        expected[behaviour_case['label']] = sha256(result)
     requests, errors, results = [], [], {}
     out.mkdir(parents=True)
     with ThreadingHTTPServer(('127.0.0.1', 0), Handler) as server:
@@ -306,7 +335,8 @@ def check(export, output, *, interface=False, selected=None):
 
                 if interface:
                     results['interface'] = check_interface(page, origin, out, expected, menu,
-                        json.loads(resources['data/review.json']), scope=scope, extra_item=extra_item)
+                        json.loads(resources['data/review.json']), scope=scope, extra_item=extra_item,
+                        behaviour_case=behaviour_case)
                 else:
                     if not focused:
                         cancelled = worker(profiles[-1][1], cancel=True)

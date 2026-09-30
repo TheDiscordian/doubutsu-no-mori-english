@@ -148,6 +148,9 @@ def options(image,report):
         at=start+row['ram']-p['ram']
         if image[at:at+4]!=bytes(4):raise ValueError('Changed pinned stationery quantity default')
         result.append({**row,'offset':at,'before':image[at:at+4].hex()})
+    from v3_seasonal_stock import option
+    seasonal=option(image,report)
+    if seasonal:result.append(seasonal)
     return result
 
 
@@ -198,10 +201,14 @@ def checksum_fields(image,report):
         if u32(image,at)!=p['crc32'] or zlib.crc32(image[start:start+p['bytes']])!=p['crc32']:
             raise ValueError('Changed installed global stationery checksum')
         fields.append(dict(offset=at,before=image[at:at+4].hex(),start=start,length=p['bytes']))
+    from v3_seasonal_stock import checksum_field
+    fields.extend(checksum_field(image,report))
     return fields
 
 
 def update_report(image,blob,report,resolved):
+    from v3_seasonal_stock import update_report as update_seasonal
+    update_seasonal(image,report,resolved)
     world=report['equipment_resources']['creature_fish']['world'];p=world['packet']
     packet=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
     p.update(sha256=sha256(packet),crc32=zlib.crc32(packet))

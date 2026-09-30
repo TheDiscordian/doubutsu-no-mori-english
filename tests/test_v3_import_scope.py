@@ -44,6 +44,9 @@ class ImportScopeTests(unittest.TestCase):
         offered = requested_options(self.catalog, self.report)
         self.assertEqual(sum(self.catalog[k]['kind'] == 'villager' for k in offered), 20)
         pool = {r['item_id'] for r in self.report['shops']['imports'] if r['group'] in (0, 1, 2, 3, 5)}
+        seasonal = self.report['equipment_resources'].get('seasonal_stock', {})
+        if seasonal.get('installed'):
+            pool.update(r['item_id'] for r in seasonal['source']['imports'])
         self.assertEqual({r['item_id'] for k,r in self.catalog.items()
                           if r['kind'] == 'furniture' and k in offered},
                          pool & {r['item_id'] for r in self.catalog.values() if r['kind'] == 'furniture'})
@@ -183,10 +186,17 @@ class ImportScopeTests(unittest.TestCase):
                     ('redd-stock', redd), ('one-redd-item', redd[-1:]),
                     *((key.rsplit('/',1)[-1], [key]) for key in golden)]
         cases = []
-        for name, requested in profiles:
-            selection = self.select(requested)
+        seasonal = self.report['equipment_resources'].get('seasonal_stock')
+        if seasonal:
+            for mode in ('N64', 'GameCube'):
+                for row in seasonal['source']['imports']:
+                    profiles.append((mode+'-'+row['donor_item_id'], [row['id']], {'late-december-stock':mode}))
+        for profile in profiles:
+            name, requested = profile[:2]
+            selection = self.select(requested, profile[2] if len(profile)>2 else None)
             result, _, _ = composer.compose(self.image, self.report, self.catalog, selection)
-            cases.append(dict(name=name, requested=requested, selection=selection, sha256=sha256(result)))
+            cases.append(dict(name=name, requested=requested, selection=selection, sha256=sha256(result),
+                              behaviours=profile[2] if len(profile)>2 else {}))
         with tempfile.TemporaryDirectory(prefix='v3-pipeline-scope-') as directory:
             path = Path(directory)/'fixture.json'
             path.write_bytes(composer.canonical(dict(plan=self.plan, cases=cases,

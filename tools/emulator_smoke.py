@@ -1432,6 +1432,13 @@ def main():
                     raise ValueError('V3 save-codec probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_seasonal_stock'):
+                from v3_seasonal_stock_smoke import exercise
+                if (not args.expansion_pak or not (out/'test.bs1').is_file() or
+                        args.seed_save or args.seed_state or args.allow_test_flash_write):
+                    raise ValueError('Seasonal stock probes require eight MiB, a checkpoint, and blank isolated storage')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,args.rom,record))
             if action.get('test_v3_golden_rewards') or action.get('test_v3_golden_rewards_storage'):
                 from v3_golden_rewards_smoke import exercise
                 if (not args.expansion_pak or not (out/'test.bs1').is_file() or

@@ -24,6 +24,9 @@ def availability(catalog, report):
     # Group four still needs the existing fixed-ID seasonal stock adapter;
     # membership in the donor's train-named list does not install that route.
     shops = {r['item_id'] for r in report['shops']['imports'] if r['group'] in (0, 1, 2, 3, 5)}
+    seasonal = report.get('equipment_resources', {}).get('seasonal_stock', {})
+    if seasonal.get('installed'):
+        shops.update(r['item_id'] for r in seasonal['source']['imports'])
     shirts = {item for group in report['clothing']['stock']['groups']
               for item in group['items']}
     surfaces = {r['id'] for group in report.get('room_surfaces', {}).get('stock', {}).get('resources', [])

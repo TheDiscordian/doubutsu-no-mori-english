@@ -85,7 +85,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'scene_arena': ('af_v3_scene_init', 0x804F3280),
+    entry, expected = {'seasonal_stock': ('af_v3_seasonal_stock', 0x804F3500),
+                       'scene_arena': ('af_v3_scene_init', 0x804F3280),
                        'private_save_bank': ('af_v3_private_bank_init', 0x804F3100),
                       'paged_dma': ('af_v3_paged_dma', (link_symbols or {}).get('AF_RESOURCE_DMA_RAM',0)),
                       'carried_quest': ('af_cw_calendar_before_cleanup', 0x807B2000),

@@ -1,5 +1,81 @@
 # Automatic furniture pipeline checkpoint
 
+## Existing late-December stock integration
+
+The complete shared festive-pair adapter is installed at
+`build/v3-seasonal-stock-installed-03/build-lock.json`, ABI 390.
+Raw ROM SHA-256:
+`9db1910567a40fa2cc54088d774cf35e20f3301b99b2cd2c9c3681187e44cc95`.
+Raw UPS SHA-256:
+`374eefaa3b92eca5276dcae6dc77fdee1ea4814b923c6c12fa8f70481f61afcf`.
+
+Complete donor functions `mSP_SetSeasonFTR` and its local December pair helper
+are bound by source bytes/relocations and their actual half-probability constant.
+Their operand pairs supply donor identities `3298`/`327C`. Installed profiles,
+model hashes, complete `ftr_listTrain` membership, and the whole matching category
+are validated without reconversion. Complete native pair, seasonal replacement,
+and random-stock routines are pinned. Only the exact seasonal JAL at `800C073C`
+changes; its delay slot and all other seasonal instructions remain intact.
+
+The 756-byte code/records/setting image uses `804F3500..804F37F4`, with a guard
+at `804F3800..804F3810`, inside an unused preloaded packet gap. The existing
+92,032-byte startup packet and all 23 descriptors remain complete. No extra
+scene allocation, saved field, actor, artwork, or native allocator change is
+introduced. Stock mode is at `804F37F0`. Independent selections use the installed
+furniture predicate; unchecked pair members retain native `1220`/`1224`.
+N64 mode explicitly mixes original and selected donor pairs equally; GameCube
+mode prioritises the selected donor pair. Other native dates remain unchanged.
+The additive mixture is a platform adaptation, not original N64 stock odds.
+
+Five focused checks in `tests/test_v3_seasonal_stock.py` pass: actual C under
+address/undefined-behaviour sanitizers with 7,680 doubled-native cases; complete
+native call/routine preservation; whole-packet aliases, unchanged retained bytes,
+guards and startup CRC; independent composition in both modes and missing-provider
+rejection; and UPS reconstruction. Nine current-cartridge scope checks pass,
+including fifteen actual browser/offline profile hashes. Thirteen JavaScript
+checks pass. The differential fixture carries its requested behaviour override
+to both composers; it does not compare a custom offline mode to browser defaults.
+
+`build/v3-seasonal-stock-native-02/results.json` passes 290 recorded steps,
+including 38 category cases and 206 assertions. Actual installed profile readers,
+RTC, RNG, native seasonal routines, and pair helper run in both modes with
+neither/either/both imports selected. Single/two-slot results, exact RNG advances,
+other seasonal dates, full buffers, and guards pass. Original state and the
+complete checkpoint are restored; graceful shutdown passes. Result SHA-256:
+`ab078a68fc2d87bd341d888701ec6bb6c5f8b54f5118f0f3c654555adb33fd90`.
+<!-- Native harness work record: construction began 2026-09-30 20:42 UTC.
+The initial invocation names a nonexistent selected-ROM filename and stops before
+emulator startup. Its single concrete corrected retry uses the actual generated
+filename and passes within the connected batch's 30-minute budget. No old fixture
+or exhausted budget is replayed. -->
+
+The all-available profile is `build/v3-import-pipeline-profile-09/profile.json`:
+20 villagers, 153 independent items, and two required outfits. ROM SHA-256:
+`346f5e87da9a622242af6d41f4bc2b533fa50aadcae69715206a7b041c0d3c59`.
+UPS SHA-256:
+`975f24753adf494822f7eb634435112dbefd5ee7393c6789d96cb9ba2e6cf79f`.
+The unserved export is `build/v3-import-pipeline-browser-08/build.json`.
+`build/v3-import-pipeline-worker-06/results.json` reads actual inputs and matches
+the offline seasonal-pair selection, with result SHA-256
+`ac552371eaf447af177694c89300639faa05acc1a8cf80f6fcf2eb6d69521760`.
+`build/v3-import-pipeline-interface-08/results.json` passes actual UI downloads,
+including GameCube-mode pair ROM
+`32ad6ad5a3da55c386e0f7d1c79e46b079454ae91c9d0bdab3f34877ffd8b293`,
+behaviour receipts/invalidation, independent selections, cancellation, and V2-14
+empty output. Interface result SHA-256:
+`1e0540798f6005d68d6489e4074b10ba3b1e9e562587176a1131b5a9c8866a1b`.
+Both private test servers stop; requests are body-free local GETs, with no game
+uploads or browser errors. The deployed patcher and local preview remain unchanged.
+
+Format 21/wire 7, eight-MiB RAM, and FlashRAM remain unchanged. Matching profiles
+and other behaviour settings are expected to be save-compatible with ABI 389
+in both directions; cross-build saving is not verified. V2 and format-20-or-earlier
+readers cannot read these saves; retain backups and separate test saves. Ordinary
+purchases, current-profile save/restart, broad gameplay, and hardware are unclaimed.
+Retained profile-06 ordinary save/reload and old golden evidence keep their exact
+build identities. Continue the remaining actual existing-system reward exclusions,
+distinct save consumers, creature-failure classification, and private handoff.
+
 ## Installed native player exercise
 
 The shared player-action stage installs the complete radio exercise interaction
