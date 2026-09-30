@@ -138,7 +138,7 @@ The connected source-mail category has checked account/reward preparation at
 `build/v3-post-office-category-prepared-04/`, based on the current ABI 386.
 The complete sixteen-function donor frontend, source formatter/drawing/art, and
 checked native menu/wallet/pocket adapters compile at
-`build/v3-post-office-bank-frontend-prepared-09/`. Fifteen complete Pelly
+`build/v3-post-office-bank-frontend-prepared-12/`. Fifteen complete Pelly
 conversation functions, actual resident/home/loan/renovation admission, and
 additive native bank-action dispatch also compile. The complete 24,224-byte art
 packet and receipts are reused. The guarded transaction uses a separately owned
@@ -154,10 +154,16 @@ and original-action restoration. Forced cancellation preserves bank-menu
 ownership until the ordinary native destructor; cancelled pending construction
 rejects instead of falling into repayment. Native field and whole-service guards are checked, and
 unrequested banking preserves original repayment. The frontend is not linked or
-installed. Current Pelly status still lacks the donor banking branch. Official
-bank dialogue/choice remapping, the real saved-town account provider, and native
-menu/lifecycle installation are next; selection/admission bindings, menu
-reservations, saved-town ownership/migration, official templates,
+installed. Current cartridge Pelly status still lacks the donor banking branch.
+All twelve official bank messages/four choices now have compiled additive maps
+and exact provenance, preserving existing native mail/Pak destinations. The
+full-town saved owner connects a separate AFBA record in source, with both-mode
+sanitized adoption/deletion/reset/preflight/profile rejection and older-format
+migration checks passing. Native storage compilation and distinct account/guard
+and scratch-growth reservation checks pass. Prospective format 21 keeps card
+wire 7; it is not installed, and older readers reject its saves. Native
+menu/lifecycle/text-bank and complete saved-owner installation are next;
+selection/admission bindings, official templates,
 real delivery/scheduling, and independent account/reward choices remain connected
 implementation work. No current ROM, saved format, selectable
 count, or deployment changes. The

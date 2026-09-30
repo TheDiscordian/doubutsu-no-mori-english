@@ -50,7 +50,11 @@ static void profile(u32 mask) {
     for(u32 i=0;i<4;i++)r[i]=(AFCarryItem){.item=0x2040+i,.source=0x2003+i*64,
         .parent=0x2040,.family=0,.state=i,.category=49,.price=40*(i+1),.icon=AF_CARRY_ICON+i*576};
 }
+#ifdef AF_V3_BANK_STORAGE
+int retained_carried_tests(void) {
+#else
 int main(void) {
+#endif
     profile(127);init();fill_console();
 #ifdef AF_V3_PAPER_PACKS
     /* Native saved pockets retain every quantity, including partial packs.

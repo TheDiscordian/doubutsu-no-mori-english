@@ -1,5 +1,6 @@
 #include "bank_pelly_source.h"
 #include "bank_native.h"
+#include "bank_dialogue.h"
 #include <assert.h>
 #include <string.h>
 static int window,number,continuing=1,disappeared,appeared,chosen=1,order_value=1;
@@ -17,8 +18,10 @@ int af_bank_pelly_disappeared(void *w) {assert(w==&window);return disappeared;}
 int af_bank_pelly_appeared(void *w) {assert(w==&window);return appeared;}
 void af_bank_pelly_unlock(void *w) {assert(w==&window);unlocked++;}
 void af_bank_pelly_force(void *w) {assert(w==&window);forced++;}
+#ifndef AF_BANK_TEST_DIALOGUE
 int af_bank_pelly_message_map(int n) {return n+0x4000;}
 int af_bank_pelly_message_unmap(int n) {return n-0x4000;}
+#endif
 void af_bank_pelly_native_continue(void *w,int n) {assert(w==&window);number=n;}
 void af_bank_pelly_native_change(void *w,int n) {assert(w==&window);number=n;}
 void af_bank_pelly_native_message(int n) {number=n;}

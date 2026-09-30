@@ -14,7 +14,7 @@ from v3_furniture_pipeline import Source
 from v3_bank_frontend import generate,artwork,native_contract,admission_contract,reuse_artwork,ROOTS
 from v3_post_office import pelly
 
-PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-09')
+PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-12')
 
 
 class BankFrontendTests(unittest.TestCase):
@@ -36,6 +36,17 @@ class BankFrontendTests(unittest.TestCase):
             self.assertEqual(text.encode(),(PREPARED/name).read_bytes())
             self.assertEqual(sha256(text.encode()),prepared['generated_sha256'][name])
         self.assertEqual(sha256((PREPARED/'post-office.o').read_bytes()),prepared['object']['sha256'])
+        if 'dialogue' in prepared:
+            from v3_bank_storage import layout
+            from v3_holiday_dialogue import check_provenance
+            check_provenance(prepared['dialogue'])
+            self.assertEqual((prepared['dialogue']['count'],prepared['dialogue']['choice_count']),(12,4))
+            self.assertEqual(sha256((PREPARED/'bank-dialogue.c').read_bytes()),prepared['dialogue']['generated_sha256'])
+            self.assertFalse(any(line.split()[-1] in ('af_bank_pelly_message_map','af_bank_pelly_message_unmap')
+                for line in prepared['object']['unbound_services']))
+            from v3_furniture_install import inputs
+            _,prior=inputs(ROOT/'build/v3-holiday-card-prize-imports-01/password-destinations/build-lock.json')
+            self.assertEqual(prepared['saved_owner_memory'],layout(prior))
         p=artwork(self.source);actual=prepared['artwork'];data=(PREPARED/'bank-art.bin').read_bytes()
         self.assertEqual(reuse_artwork(self.source,p,PREPARED)[0],data)
         self.assertEqual(sha256(data),actual['sha256']);self.assertEqual(len(data),actual['bytes'])
@@ -84,7 +95,7 @@ class BankFrontendTests(unittest.TestCase):
     def test_sanitized_native_menu_and_money_adapters(self):
         self.frontend_fixture(native=True)
 
-    def frontend_fixture(self,*,native):
+    def frontend_fixture(self,*,native,dialogue=None):
         with tempfile.TemporaryDirectory(prefix='v3-bank-frontend-') as temp:
             output=Path(temp)/'frontend'
             command=['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
@@ -96,6 +107,9 @@ class BankFrontendTests(unittest.TestCase):
                 str(ROOT/'tests/v3_bank_native_test.c'),str(PREPARED/'pelly_source.c'),
                 str(ROOT/'overlays/v3/bank_admission.c'),str(ROOT/'overlays/v3/bank_pelly_native.c'),
                 str(ROOT/'tests/v3_bank_pelly_test.c')]
+            if dialogue is not None:
+                self.assertTrue(native)
+                command+=['-DAF_BANK_TEST_DIALOGUE=1',str(dialogue)]
             build=subprocess.run(command,capture_output=True,text=True,timeout=60)
             self.assertEqual(build.returncode,0,build.stdout+build.stderr)
             run=subprocess.run([str(output)],capture_output=True,text=True,timeout=30)

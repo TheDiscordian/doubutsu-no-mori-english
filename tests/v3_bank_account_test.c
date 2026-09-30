@@ -25,6 +25,8 @@ static void cursor(unsigned player,int n) {
 }
 static void record_and_ownership(void) {
     reset();assert(af_bank_valid(ledger,sizeof ledger));assert(!af_bank_required(ledger,sizeof ledger));
+    assert(af_bank_profile(ledger,sizeof ledger,0) && af_bank_profile(ledger,sizeof ledger,1));
+    assert(!af_bank_bind(ledger,sizeof ledger,2) && !af_bank_required(ledger,sizeof ledger));
     for(unsigned p=0;p<4;p++)assert(!balance(p) && !received(p));
     assert(!af_bank_valid(ledger,sizeof ledger-1));
     for(unsigned p=0;p<4;p++) {
@@ -34,6 +36,8 @@ static void record_and_ownership(void) {
         assert(step(p,0x1000)==AF_BANK_CONFIRM);assert(balance(p)==1000);assert(wallet.wallet==p);
     }
     assert(af_bank_required(ledger,sizeof ledger)==1);
+    assert(!af_bank_profile(ledger,sizeof ledger,0) && !af_bank_bind(ledger,sizeof ledger,0));
+    assert(af_bank_profile(ledger,sizeof ledger,1) && af_bank_bind(ledger,sizeof ledger,1));
     assert(af_bank_clear(ledger,sizeof ledger,1));assert(!balance(1));assert(balance(0)==1000);
     assert(balance(2)==1000 && balance(3)==1000);assert(af_bank_required(ledger,sizeof ledger)==1);
     unsigned char old[AF_BANK_BYTES];memcpy(old,ledger,sizeof old);
@@ -115,6 +119,7 @@ static int submit(void *ctx,unsigned player,unsigned item,unsigned paper,unsigne
     (void)ctx;assert(paper==0x2000);last_player=player;last_item=item;last_template=template;mail_attempts++;
     /* Re-entrant account mutation cannot race the real delivery/receipt boundary. */
     assert(!af_bank_clear(ledger,sizeof ledger,player));assert(!af_bank_reset(ledger,sizeof ledger));
+    assert(!af_bank_bind(ledger,sizeof ledger,1));
     return mail_success;
 }
 static void source_milestones_and_receipts(void) {

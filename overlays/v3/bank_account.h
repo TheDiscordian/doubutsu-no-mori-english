@@ -34,6 +34,8 @@ int af_bank_reset(af_bank_u8 *,af_bank_u32);
 int af_bank_clear(af_bank_u8 *,af_bank_u32,af_bank_u32);
 int af_bank_get(const af_bank_u8 *,af_bank_u32,af_bank_u32,AFBankAccount *);
 int af_bank_required(const af_bank_u8 *,af_bank_u32);
+int af_bank_profile(const af_bank_u8 *,af_bank_u32,af_bank_u32);
+int af_bank_bind(af_bank_u8 *,af_bank_u32,af_bank_u32);
 int af_bank_eligible(af_bank_u32 resident,af_bank_u32 loan,af_bank_u32 house_size,af_bank_u32 renewing);
 int af_bank_begin(const af_bank_u8 *,af_bank_u32,af_bank_u32,int,
     const AFBankWallet *,AFBankTransaction *);

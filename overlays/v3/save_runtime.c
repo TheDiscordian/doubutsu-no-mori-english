@@ -44,7 +44,11 @@ void af_v3_save_halt(int reason) {
     runtime->error = reason;
 #ifdef __mips__
     const char *message = reason == AF_SAVE_PROFILE_MISSING ?
+#ifdef AF_V3_BANK_STORAGE
+        "V3 save needs other settings.\n\nPower off. Rebuild with the\nsame imports and behaviour\nsettings. Keep your save." :
+#else
         "V3 save needs other imports.\n\nPower off. Rebuild with the\nsame imports, or add the\nmissing ones. Keep your save." :
+#endif
 #ifdef AF_V3_CONSOLE_STORAGE
         reason == AF_SAVE_CAPACITY ?
         "V3 save needs more space.\n\nNo save data was written.\nPower off and keep a backup.\nReport this with your profile." :

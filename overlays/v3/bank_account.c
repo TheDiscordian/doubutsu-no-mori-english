@@ -36,6 +36,13 @@ int af_bank_get(const u8 *data,u32 bytes,u32 player,AFBankAccount *out) {
     out->balance=word(data+16+player*8);out->received=data[20+player*8];return 1;
 }
 int af_bank_required(const u8 *data,u32 bytes) {return af_bank_valid(data,bytes)?data[8]:-1;}
+int af_bank_profile(const u8 *data,u32 bytes,u32 enabled) {
+    return enabled<=1 && af_bank_valid(data,bytes) && (!data[8] || enabled);
+}
+int af_bank_bind(u8 *data,u32 bytes,u32 enabled) {
+    if(busy || !af_bank_profile(data,bytes,enabled))return 0;
+    data[8]|=(u8)enabled;return 1;
+}
 int af_bank_eligible(u32 resident,u32 loan,u32 size,u32 renewing) {
     return resident==1 && !loan && size>=3 && !renewing;
 }

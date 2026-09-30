@@ -50,7 +50,7 @@ an explicit choice for the absent GameCube island system, not a substitute route
 The category's checked preparation is
 `build/v3-post-office-category-prepared-04/prepared.json`, with the complete
 frontend/native adapters at
-`build/v3-post-office-bank-frontend-prepared-09/prepared.json`, based on ABI 386.
+`build/v3-post-office-bank-frontend-prepared-12/prepared.json`, based on ABI 386.
 All sixteen donor bank functions, complete source drawing/formatting/art,
 transactional controls, checked native menu/wallet/pocket adapters, the separately
 owned 48-byte account record, whole-table milestone receipts, fifteen complete
@@ -61,13 +61,20 @@ affected diary-resource checks retain passing evidence. Unrequested banking
 leaves original repayment untouched. The 24,224-byte art packet is reused,
 not reconverted. Forced closing preserves menu ownership until its ordinary
 native destructor; cancelled pending construction cannot fall into repayment.
-Actual selected-mode/home/current-player/account bindings,
-official dialogue remapping, menu/lifecycle installation/reservations,
-saved-town ownership, official template creation,
+Twelve complete official bank messages and four choices have additive maps,
+preserving every existing native mail/Pak destination. The map compiles into the
+frontend and passes its complete source Pelly sequence with native I/O doubled.
+The full-town saved owner now connects the independent AFBA record, deletion,
+reset/adoption, preflight, and migrations in source. Its prospective format 21
+retains card wire 7; old readers reject it, and removing required banking rejects
+before publication/writes. Separate account/guard and 48-byte scratch growth
+reservations are checked; actual MIPS storage compilation and both-mode sanitized
+save checks pass. Actual selected-mode/home/current-player bindings,
+text-bank/menu/lifecycle installation, cartridge saved ownership, official template creation,
 real mail I/O, scheduling, and ordinary gameplay remain unbound. The current ROM
-and selections do not change. The exact next connections are the official bank
-greeting/deposit/closing message and choice remapping, the saved-town account
-provider, and native menu/lifecycle installation, preserving repayment. Link the
+and selections do not change. The exact next connection is native menu/lifecycle
+and complete saved-owner installation, using the checked dialogue and reservations
+and preserving repayment. Link the
 prepared complete route and bind the connected real mail owners. The
 [category source map and remaining connections](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md#remaining-connected-consumers)
 cover all 23 staged records; do not rescan their unchanged artwork or turn each

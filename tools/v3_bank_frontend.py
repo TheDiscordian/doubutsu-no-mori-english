@@ -31,6 +31,9 @@ SOURCES=('tools/v3_bank_frontend.py','tools/v3_post_office.py','tools/v3_ui_art.
     'translations/provenance.json','tools/v3_password_policy.py',
     'overlays/v3/bank_pelly.h','overlays/v3/bank_pelly_source.h',
     'overlays/v3/bank_pelly_source.c','overlays/v3/bank_pelly_native.c','overlays/v3/bank_admission.c')
+SOURCES+=('tools/v3_bank_dialogue.py','overlays/v3/bank_dialogue.h',
+    'tools/v3_bank_storage.py','overlays/v3/console_storage.c','overlays/v3/console_storage.h',
+    'overlays/v3/save_compressed.c','overlays/v3/save_compressed.h','overlays/v3/save_runtime.c')
 ROOTS=('tyo_win_mode','tyo_win_model','tyo_win_moji2T_model','tyo_win_moji3T_model')
 NATIVE_SERVICES={
     'af_bank_native_translate':(0x800E0314,264,'767212be165dde7a9be2467ffb03b98a80af114e9ad9d352e21998c6f9981ca2'),
@@ -204,7 +207,7 @@ def generate(source):
     return {'bank_source.c':text,'bank_constants.h':macros},report
 
 
-def prepare(output,lock,*,reuse_art=None):
+def prepare(output,lock,*,reuse_art=None,dialogue=None):
     from v3_furniture_install import inputs
     output=Path(output).resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):raise ValueError('Use a fresh ignored bank frontend preparation')
@@ -216,6 +219,21 @@ def prepare(output,lock,*,reuse_art=None):
     admission=admission_contract(files[0x8A6C10].extract(base),files[0x8A8A10].extract(base),files[CODE_VROM].extract(base))
     generated,report=generate(source);pg,pg_report=pelly(source);generated.update(pg)
     report['pelly']=pg_report;report['admission']=admission
+    if dialogue is not None:
+        from v3_holiday_dialogue import check_provenance
+        from v3_bank_storage import layout
+        dialogue=Path(dialogue).resolve()
+        if not dialogue.is_relative_to(ROOT/'build'):raise ValueError('Bank dialogue must belong to ignored preparation')
+        text=json.loads((dialogue/'dialogue.json').read_bytes());check_provenance(text)
+        if sha256((dialogue/'bank-dialogue.c').read_bytes())!=text['generated_sha256']:
+            raise ValueError('Changed generated bank dialogue mapping')
+        for row in text['resources']:
+            data=(dialogue/row['file']).read_bytes()
+            if (len(data)!=row['bytes'] or sha256(data)!=row['sha256'] or
+                sha256(files[row['vrom']].extract(base))!=row['previous_sha256']):
+                raise ValueError('Changed complete bank dialogue resource or native predecessor')
+        report['dialogue']=dict(text,prepared=str(dialogue.relative_to(ROOT)))
+        report['saved_owner_memory']=layout(prior)
     prepared=artwork(source);output.mkdir(parents=True)
     for name,data in generated.items():write_new(output/name,data.encode())
     write_new(output/'post-office-rewards.bin',source.raw('l_mml_postoffice_info'))
@@ -241,8 +259,12 @@ def prepare(output,lock,*,reuse_art=None):
     run('gcc',*flags,'pelly_source.c','-o','pelly-source.o')
     run('gcc',*flags,'/source/overlays/v3/bank_pelly_native.c','-o','pelly-native.o')
     run('gcc',*flags,'/source/overlays/v3/bank_admission.c','-o','bank-admission.o')
+    additional=[]
+    if dialogue is not None:
+        write_new(output/'bank-dialogue.c',(dialogue/'bank-dialogue.c').read_bytes())
+        run('gcc',*flags,'bank-dialogue.c','-o','bank-dialogue.o');additional.append('bank-dialogue.o')
     run('ld','-EB','-r','bank-source.o','bank-account.o','bank-native.o',
-        'pelly-source.o','pelly-native.o','bank-admission.o','-o','post-office.o')
+        'pelly-source.o','pelly-native.o','bank-admission.o',*additional,'-o','post-office.o')
     unbound=run('nm','--undefined-only','post-office.o').strip().splitlines()
     if {line.split()[-1] for line in unbound}-{'memcpy','memset',*ROOTS,
             'af_bank_native_translate','af_bank_native_scale','af_bank_native_matrix',
@@ -276,7 +298,8 @@ def main():
     parser.add_argument('--base-lock',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--reuse-art',type=Path)
-    args=parser.parse_args();report=prepare(args.output,args.base_lock,reuse_art=args.reuse_art)
+    parser.add_argument('--dialogue',type=Path)
+    args=parser.parse_args();report=prepare(args.output,args.base_lock,reuse_art=args.reuse_art,dialogue=args.dialogue)
     print(json.dumps({k:report[k] for k in ('base_abi','compiled_frontend','native_frontend_installed','object')}))
 
 

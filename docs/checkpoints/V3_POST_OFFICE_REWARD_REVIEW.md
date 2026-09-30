@@ -67,8 +67,8 @@ native struct; no native offset is inferred from its layout.
 a sixteen-byte header and four eight-byte rows. Each row has a big-endian balance,
 the source receipt bits `04/08/10/20`, and three zero reserved bytes. Header byte
 eight records required account support. Player clearing affects only its row and
-does not remove that support requirement. This record is prepared, not attached
-to a live saved-town owner or installed in the current cartridge.
+does not remove that support requirement. The full saved-town owner below owns
+this record in source; installation in the current cartridge remains pending.
 
 The account transaction runs the complete donor controls and transfer algorithm,
 including all four money-bag denominations, condition-aware pockets, withdrawal
@@ -102,7 +102,7 @@ physical persistence, or hardware result is claimed.
 
 `tools/v3_bank_frontend.py` prepares all sixteen complete bank functions and the
 three complete source integer-formatting functions at
-`build/v3-post-office-bank-frontend-prepared-09/prepared.json`. It retains the
+`build/v3-post-office-bank-frontend-prepared-12/prepared.json`. It retains the
 genuine title, OK label, complete frame, cash/Bell/balance labels, and complete
 128-by-32 deposit/withdrawal textures. The shared UI converter preserves both
 source CI palette slots and checked tile-one replacement without overwriting
@@ -166,14 +166,63 @@ are doubles in these host tests; this is not native execution. The two original
 numerical checks pass against unchanged generated numerical functions. The two
 affected diary resource/state checks retain passing unchanged evidence.
 
-The combined relocatable MIPS object has 18,269 code bytes, 30 data bytes, and
+The combined relocatable MIPS object has 18,601 code bytes, 30 data bytes, and
 1,056 BSS bytes, SHA-256
-`7340e585f1fc74cfbeb2efd31d33cf9b523b660de6c002f4218f55de13937617`.
+`726eb0ebf1939faf5f630c65e60abb06de1e957130fcf7bd63c5e743d8ee5606`.
 It is not linked or installed. Selection/home/current-player/account bindings,
-official dialogue remapping, fixed message/menu services, April Fools control,
-drawing roots, lifecycle hooks, and menu/save ownership remain unbound. No native
+fixed message/menu services, April Fools control, drawing roots, lifecycle hooks,
+and cartridge menu/save ownership remain unbound. No native
 bank harness starts and no existing harness budget resets. The current ABI-386
 ROM, format 20/wire 7, selections, and both patcher deployments are unchanged.
+
+### Official dialogue and saved account owner
+
+`tools/v3_bank_dialogue.py` prepares all twelve complete official bank greeting,
+continuation, deposit, and balance messages plus four official choices at
+`build/v3-post-office-bank-dialogue-01/dialogue.json`. Additive native message IDs
+are `33B2..33BD`; choices are `0220..0223`. Wording, pages, pauses, and source demo
+orders are retained. The largest expanded message is 183 bytes. Every existing
+message and choice remains intact. Eight checked native mail/Pak/exit destinations
+retain their exact current text and action identities, including the N64
+Controller Pak letter-save interaction instead of the GameCube Memory Card menu.
+The single provenance catalogue contains exact official-source credits for all
+sixteen additions. The generated bidirectional map is compiled into preparation
+12; its complete source Pelly host check uses that map, not arithmetic message
+IDs. Actual text-bank installation/bounds and native services remain pending.
+
+`AF_V3_BANK_STORAGE` connects `AFBA` to `console_storage.c` and
+`save_compressed.c`, including ordinary pack/check/adoption, diary capacity
+preflight, player deletion, town reset/change, and `af_bank_native_account`.
+The account allocation is independent of native player padding and card bytes.
+Format 21 appends 48 bytes after the complete 64-byte format-20 card record;
+the card wire remains seven. CRCs and capacity measurement include the new tail.
+Older compressed/canonical towns and format-14..20 envelopes initialise empty
+accounts while retaining their existing data. Account-support requirements
+survive deletion of all residents. Removing banking rejects a required-account
+save before caller state, live accounts, or device writes change.
+
+`tools/v3_bank_storage.py` checks a separate 64-byte account/guard reservation at
+`807E9080..807E90BF` against all retained owners. Save scratch at `80682000`
+requires 120,416 bytes including its existing sixteen-byte guard, an increase
+of exactly 48 bytes. These reservations are checked preparation, not installed
+memory. MIPS compilation requires an explicit account reservation; the existing
+event-storage linker still forbids unowned data/BSS growth.
+
+Nine focused bank/frontend/dialogue/account/storage checks pass. Actual MIPS
+storage compilation retains every current format-20 compiler define. Sanitized
+full-town host checks cover both banking modes, both physical-bank reads with
+device I/O doubled, all four residents, maximum balances/receipts, probe-only
+reads, adoption, deletion, new towns, formats 14–20, older compressed/canonical
+migration, required-mode rejection, guard corruption, and capacity preflight.
+The unchanged format-20 golden/card transaction also passes in both paper modes.
+No emulator bank/save or original-hardware verification is claimed.
+
+**Compatibility warning for the prospective installation:** supported older
+saves migrate forward with empty bank accounts. Format-21 saves cannot be loaded
+by format-20-or-earlier V3 or V2 readers, even when banking is disabled. A save
+requiring banking also needs banking enabled in its current profile. Preserve
+separate saves and builds; ordinary forward/backward compatibility is unverified.
+The current format-20 cartridge and existing saves are not modified.
 
 ## Remaining connected consumers
 
@@ -190,16 +239,16 @@ queue retry, and one-time persistence. The existing catalogue-order/ticket
 wrapper in `POST_OFFICE_LETTERS.md` is not this savings-reward mechanism.
 
 Install the prepared complete bank/Pelly route, preserving repayment and the
-reviewed resident/loan/house/renovation admission. The exact next connections are
-the official bank greeting/deposit/closing message and choice remapping, the real
-saved-town account provider, and native menu/lifecycle installation. Bind the
+reviewed resident/loan/house/renovation admission. The exact next connection is
+native menu/lifecycle and full saved-owner installation, using the prepared
+official dialogue and account provider above. Bind the
 compiled selection/admission adapters and checked wallet/pocket services only
 through reviewed owners. Reserve and link complete code/state/art without assuming
 the old packet's remaining space fits the larger frontend. Attach
-`AFBA` to the whole saved-town transaction with a new supported envelope/wire,
-forward migration preserving all existing card/golden/console/town data, player
-deletion, town reset, preflight, and older-reader rejection. Account-required
-saves must reject a build without account support rather than discard balances.
+the format-21 saved owner and its checked account/scratch reservations to all
+current save entry points, retaining forward migration, complete existing
+card/golden/console/town data, and older-reader rejection. Do not discard balances
+or remove the required banking profile when installing the compiled providers.
 Publish real mechanic controls and independent milestone selections only after
 these native owners and the actual mail delivery/acknowledgement path are installed.
 

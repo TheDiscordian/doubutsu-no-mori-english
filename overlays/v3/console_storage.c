@@ -20,6 +20,31 @@ extern u8 af_v3_card_state[AF_HC_BYTES];
 #define extended_expand af_v3_save_expand_cards
 #define extended_compress af_v3_save_compress_cards
 #define extended_measure af_v3_save_measure_cards
+#ifdef AF_V3_BANK_STORAGE
+/* A separate checked reservation, never an enlargement of native players,
+ * the card record, or the existing event-storage code region. */
+#ifdef __mips__
+#ifndef AF_BANK_STATE_RAM
+#error Bank storage requires an explicit checked state reservation
+#endif
+#define bank_state ((u8 *)AF_BANK_STATE_RAM)
+#define bank_guard ((u32 *)(AF_BANK_STATE_RAM+AF_BANK_BYTES))
+#else
+extern u8 af_bank_storage[AF_BANK_BYTES];
+extern u32 af_bank_storage_guard[4];
+#define bank_state af_bank_storage
+#define bank_guard af_bank_storage_guard
+#endif
+extern int af_bank_native_selected(void);
+#define bank_profile(p) af_bank_profile(p,AF_BANK_BYTES,af_bank_native_selected())
+#define bank_bind(p) af_bank_bind(p,AF_BANK_BYTES,af_bank_native_selected())
+#undef extended_expand
+#undef extended_compress
+#undef extended_measure
+#define extended_expand af_v3_save_expand_bank
+#define extended_compress af_v3_save_compress_bank
+#define extended_measure af_v3_save_measure_bank
+#endif
 #else
 #define extended_expand af_v3_save_expand_fishing
 #define extended_compress af_v3_save_compress_fishing
@@ -96,6 +121,9 @@ static int external(const void *p,u32 n) {
 #endif
 #ifdef AF_V3_CARD_STORAGE
         && separate(p,n,af_v3_card_state,AF_HC_BYTES)
+#ifdef AF_V3_BANK_STORAGE
+        && separate(p,n,bank_state,AF_BANK_BYTES+16)
+#endif
 #endif
         ;
 }
@@ -122,6 +150,10 @@ static int guards(void) {
     if(af_v3_card_state[4]!=2 || af_v3_card_state[7]!=af_holiday_cards_enabled())return 0;
 #endif
 #endif
+#ifdef AF_V3_BANK_STORAGE
+    for(u32 i=0;i<4;i++)if(bank_guard[i]!=GUARD)return 0;
+    if(!bank_profile(bank_state))return 0;
+#endif
     return 1;
 }
 void af_v3_console_storage_reset(void) {
@@ -139,6 +171,10 @@ void af_v3_console_storage_reset(void) {
 #ifdef AF_V3_EVENT_ITEM_PROFILE
     (void)cards_bind(af_v3_card_state);
 #endif
+#endif
+#ifdef AF_V3_BANK_STORAGE
+    for(u32 i=0;i<4;i++)bank_guard[i]=GUARD;
+    if(!af_bank_reset(bank_state,AF_BANK_BYTES) || !bank_bind(bank_state))af_v3_save_halt(AF_SAVE_ARGUMENT);
 #endif
 }
 int af_v3_console_storage_valid(void) {return guards() && !storage->busy;}
@@ -181,6 +217,9 @@ static int expand(const u8 *bank,const u8 **logical) {
         || version==0x00130680
 #ifdef AF_V3_GOLDEN_REWARD_STORAGE
         || version==0x00140680
+#ifdef AF_V3_BANK_STORAGE
+        || version==0x00150680
+#endif
 #endif
 #endif
 #endif
@@ -204,6 +243,9 @@ static int expand(const u8 *bank,const u8 **logical) {
             result==AF_CZ_ARGUMENT?AF_SAVE_ARGUMENT:AF_SAVE_CRC;
 #ifdef AF_V3_EVENT_ITEM_PROFILE
         if(!cards_profile(scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA))return AF_SAVE_PROFILE_MISSING;
+#endif
+#ifdef AF_V3_BANK_STORAGE
+        if(!bank_profile(scratch+AF_CZ_RAW+AF_CZ_CARD_EXTRA))return AF_SAVE_PROFILE_MISSING;
 #endif
         *logical=scratch;
     }
@@ -245,6 +287,13 @@ int af_v3_save_pack(u8 *bank,u32 size,const u8 *state) {
 #ifdef AF_V3_EVENT_ITEM_PROFILE
     if(!cards_bind(cards))return leave(AF_SAVE_PROFILE_MISSING);
 #endif
+#ifdef AF_V3_BANK_STORAGE
+    u8 *account=scratch+AF_CZ_RAW+AF_CZ_CARD_EXTRA;
+    if(storage->ready && storage->town!=id) {
+        if(!af_bank_reset(account,AF_BANK_BYTES))return leave(AF_SAVE_ARGUMENT);
+    } else copy(account,bank_state,AF_BANK_BYTES);
+    if(!bank_bind(account))return leave(AF_SAVE_PROFILE_MISSING);
+#endif
 #endif
     result=extended_compress(bank,AF_SAVE_BANK,scratch,AF_CZ_BANK,
         scratch+AF_CZ_BANK,AF_CZ_CONSOLE,(const u8 *)candidate,hash,AF_CZ_WORK_BYTES);
@@ -268,12 +317,18 @@ int af_v3_save_pack(u8 *bank,u32 size,const u8 *state) {
 #ifdef AF_V3_CARD_STORAGE
     copy(af_v3_card_state,scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,AF_HC_BYTES);
 #endif
+#ifdef AF_V3_BANK_STORAGE
+    copy(bank_state,scratch+AF_CZ_RAW+AF_CZ_CARD_EXTRA,AF_BANK_BYTES);
+#endif
     storage->town=id;storage->ready=1;
     return leave(AF_SAVE_OK);
 }
 
 int af_v3_console_storage_commit(const u8 *bank,const u8 *profile,u8 *state,const u8 **logical) {
     const u8 *decoded;int result;
+#ifdef AF_V3_BANK_STORAGE
+    u8 candidate_bank[AF_BANK_BYTES];
+#endif
     if(!logical || !external(logical,sizeof(*logical)) || !external(bank,AF_SAVE_BANK) ||
        !external(profile,AF_SAVE_PROFILE) || !external(state,AF_SAVE_STATE) ||
        !separate(state,AF_SAVE_STATE,bank,AF_SAVE_BANK) ||
@@ -282,6 +337,13 @@ int af_v3_console_storage_commit(const u8 *bank,const u8 *profile,u8 *state,cons
        !separate(logical,sizeof(*logical),profile,AF_SAVE_PROFILE) ||
        !separate(logical,sizeof(*logical),state,AF_SAVE_STATE) || !enter())return AF_SAVE_ARGUMENT;
     result=expand(bank,&decoded);
+#ifdef AF_V3_BANK_STORAGE
+    if(result==0) {
+        if(decoded==scratch)copy(candidate_bank,scratch+AF_CZ_RAW+AF_CZ_CARD_EXTRA,AF_BANK_BYTES);
+        else if(!af_bank_reset(candidate_bank,AF_BANK_BYTES))return leave(AF_SAVE_ARGUMENT);
+        if(!bank_bind(candidate_bank))return leave(AF_SAVE_PROFILE_MISSING);
+    }
+#endif
     if(result==0)result=canonical_check(decoded,AF_SAVE_BANK,profile,state);
     if(result<0)return leave(result);
     if(decoded==scratch)copy(storage->players,scratch+AF_CZ_BANK,AF_CZ_CONSOLE);
@@ -301,6 +363,9 @@ int af_v3_console_storage_commit(const u8 *bank,const u8 *profile,u8 *state,cons
     (void)cards_bind(af_v3_card_state);
 #endif
 #endif
+#ifdef AF_V3_BANK_STORAGE
+    copy(bank_state,candidate_bank,AF_BANK_BYTES);
+#endif
     storage->town=town(decoded);storage->ready=1;*logical=decoded;
     return leave(result);
 }
@@ -315,6 +380,10 @@ u8 *af_v3_fishing_data(void) {af_v3_require_save_state();return af_v3_fishing_st
 #endif
 #ifdef AF_V3_CARD_STORAGE
 u8 *af_v3_card_data(void) {af_v3_require_save_state();return af_v3_card_state;}
+#endif
+#ifdef AF_V3_BANK_STORAGE
+u8 *af_v3_bank_data(void) {af_v3_require_save_state();return bank_state;}
+u8 *af_bank_native_account(void) {return af_v3_bank_data();}
 #endif
 int af_v3_diary_measure(const u8 *bank,const u8 *state,const AFDiary *candidate) {
     if(!external(bank,AF_SAVE_BANK) || !external(state,AF_SAVE_STATE) ||
@@ -331,6 +400,9 @@ int af_v3_diary_measure(const u8 *bank,const u8 *state,const AFDiary *candidate)
     copy(scratch+AF_CZ_RAW+AF_DIARY_BYTES,af_v3_fishing_state,AF_HF_BYTES);
 #ifdef AF_V3_CARD_STORAGE
     copy(scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,af_v3_card_state,AF_HC_BYTES);
+#endif
+#ifdef AF_V3_BANK_STORAGE
+    copy(scratch+AF_CZ_RAW+AF_CZ_CARD_EXTRA,bank_state,AF_BANK_BYTES);
 #endif
     result=extended_measure(scratch,AF_CZ_BANK,storage->players,AF_CZ_CONSOLE,
         scratch+AF_CZ_RAW,hash,AF_CZ_WORK_BYTES);
@@ -360,6 +432,9 @@ void af_v3_console_player_clear(u8 *player) {
 #endif
 #ifdef AF_V3_CARD_STORAGE
         if(!af_holiday_cards_clear(af_v3_card_state,slot))af_v3_save_halt(AF_SAVE_ARGUMENT);
+#endif
+#ifdef AF_V3_BANK_STORAGE
+        if(!af_bank_clear(bank_state,AF_BANK_BYTES,slot))af_v3_save_halt(AF_SAVE_ARGUMENT);
 #endif
     }
     original_clear(player);

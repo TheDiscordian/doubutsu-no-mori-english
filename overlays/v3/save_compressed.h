@@ -70,6 +70,23 @@ int af_v3_save_compress_cards(unsigned char *,unsigned int,const unsigned char *
 int af_v3_save_measure_cards(const unsigned char *,unsigned int,const unsigned char *,unsigned int,
     const unsigned char *,unsigned int *,unsigned int);
 int af_v3_save_expand_cards(const unsigned char *,unsigned int,unsigned char *,unsigned int);
+#ifdef AF_V3_BANK_STORAGE
+#ifndef AF_V3_GOLDEN_REWARD_STORAGE
+#error Bank storage requires the complete format-twenty card record
+#endif
+#include "bank_account.h"
+enum { AF_CZ_BANK_EXTRA=AF_CZ_CARD_EXTRA+AF_BANK_BYTES,
+       AF_CZ_BANK_RAW=AF_CZ_RAW+AF_CZ_BANK_EXTRA };
+/* Format twenty-one appends a distinct AFBA record after the complete card
+ * record. Cards keep wire seven and every existing byte/offset. Earlier
+ * envelopes acquire empty accounts; previous readers reject format twenty-one.
+ * Profile/admission checks precede live adoption, not structural expansion. */
+int af_v3_save_compress_bank(unsigned char *,unsigned int,const unsigned char *,unsigned int,
+    const unsigned char *,unsigned int,const unsigned char *,unsigned int *,unsigned int);
+int af_v3_save_measure_bank(const unsigned char *,unsigned int,const unsigned char *,unsigned int,
+    const unsigned char *,unsigned int *,unsigned int);
+int af_v3_save_expand_bank(const unsigned char *,unsigned int,unsigned char *,unsigned int);
+#endif
 #endif
 #endif
 #endif
