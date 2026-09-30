@@ -709,6 +709,24 @@ Original-item correspondence, display aliases, frontend, and actual
 handover remain required. An unavailable destination never becomes a substitute
 item or bypasses the active profile.
 
+The ordinary acquisition adapter binds the complete installed Nook frontend to
+the actual five-entry HomePage list and all birth-34 furniture records. The
+birth directory is validated as a byte directory, never interpreted as a
+sixteen-bit stock list. Catalogue non-orderability and absent ordinary stock are
+retained. Full staged models and installed behaviours are promoted without
+reconversion. After ordinary admission, the dependency planner refreshes the
+shared password map using actual live enable fields and checked unchanged Nook
+entry addresses. Both prepared HomePage surfaces use the same binding, retain
+their complete banks and stock resources, and update existing catalogue counts
+and CRC fields without reallocating or recompiling those owners.
+
+Relinking the current combined cartridge validates the complete menu-allocation
+chain, including later carried menus and the password editor. Known diary and
+calendar hooks are normalized only after full current owner/packet checks; the
+unchanged complete native dependencies must still match their frozen hashes.
+Physical-only owners and all pending placements remain excluded when regenerated
+catalogue/relocation/shop resources use checked zero gaps inside the cartridge.
+
 ### Complete donor scoring themes
 
 `--refresh-runtime --furniture-scoring` extends the current checked HRA owner

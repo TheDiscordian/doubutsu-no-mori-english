@@ -104,11 +104,33 @@ def source_lifecycle(source, profile):
         source_floor_offset=0x28591, start_disabled=False, callback_installed=False)
 
 
-def native_contract(image):
+def restore_diary_contact(owner,image,report):
+    """Normalize only the verified installed diary A-tap call for old contracts."""
+    diary=(report or {}).get('equipment_resources',{}).get('diaries',{})
+    if not diary.get('installed'):return owner
+    hook=diary['room'];packet=diary['packets']['ui']
+    target=diary['ui_compiled']['symbols']['af_diary_room_move']
+    before=bytes.fromhex('0c24f6d98fa70034')
+    after=struct.pack('>2I',0x0C000000|(target>>2 & 0x3FFFFFF),0x8FA70034)
+    offset=0x80942060-0x80936710
+    if (not hook.get('installed') or hook['room_vrom']!=0x82D7F0 or
+            hook['room_ram']!=0x80936710 or hook['hook_address']!=0x80942060 or
+            hook['hook_before']!=before.hex() or hook['target']!=target or
+            hook['hook_after']!=after.hex() or owner[offset:offset+8]!=after or
+            sha256(owner)!=hook['installed_owner_sha256'] or
+            not packet['ram']<=target<packet['ram']+packet['bytes'] or
+            sha256(image[packet['physical']:packet['physical']+packet['bytes']])!=packet['sha256']):
+        raise ValueError('Changed installed diary contact binding')
+    return owner[:offset]+before+owner[offset+8:]
+
+
+def native_contract(image, report=None):
     files = by_vrom(image)
     blocks = []
     for name, vrom, ram, address, size, digest in NATIVE_BLOCKS:
-        raw = files[vrom].extract(image)[address-ram:address-ram+size]
+        owner = files[vrom].extract(image)
+        if name=='contact_layers':owner=restore_diary_contact(owner,image,report)
+        raw = owner[address-ram:address-ram+size]
         if len(raw) != size or sha256(raw) != digest:
             raise ValueError('Changed complete native contact/floor dependency: '+name)
         blocks.append(dict(name=name, vrom=vrom, address=address, bytes=size, sha256=digest))
@@ -168,7 +190,7 @@ def prepare_lifecycle(source, profile, image, report=None):
     if contract is None:
         return None
     floors = floor_bindings(image, contract, report)
-    return dict(category=CATEGORY,source=contract, native=native_contract(image), floors=floors,
+    return dict(category=CATEGORY,source=contract, native=native_contract(image,report), floors=floors,
         dependencies_complete=all(r['native_index'] is not None for r in floors),
         runtime_installed=False)
 

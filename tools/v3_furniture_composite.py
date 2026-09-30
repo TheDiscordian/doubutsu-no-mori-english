@@ -42,7 +42,7 @@ def dual_native_contract(image,report):
             campsite.get('native_contract',{}).get('scene')!=35 or
             sha256(blob[at:at+580])!='744685bfa708808c700dabac0fb22ac0a6878766cf8ede0c7020763e03cc1735'):
         raise ValueError('Changed complete added-scene selector')
-    return dict(contact=native_contract(image),scene_pointer=0x80126EB4,npc_scene=6,
+    return dict(contact=native_contract(image,report),scene_pointer=0x80126EB4,npc_scene=6,
         original_scene_table_sha256=sha256(scene),original_scene_count=35,additional_scene=35,
         additional_scene_kind='summer campsite',additional_scene_code_sha256=sha256(blob[at:at+580]),
         absent_native_scenes=['island cottage','basement'],native_basement_scroll_stop=False)

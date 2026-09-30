@@ -80,7 +80,7 @@ def packet_layout(runtime):
 def motion_binding(source,base,report,rows):
     from v3_furniture_motion import native_contract
     from v3_room_movement import checked_binding
-    contract=native_contract(base,report['equipment_resources']['room_rigs']);sounds=checked_binding(source,base,report)
+    contract=native_contract(base,report['equipment_resources']['room_rigs'],report);sounds=checked_binding(source,base,report)
     ids=[r['source_item_id'] for r in rows if r.get('mode')==5]
     if any(sounds.get(donor,{}).get('mode')!=1 for donor in ids):
         raise ValueError('Rolling motion needs its complete movement sound integration')
@@ -435,6 +435,8 @@ def bind_profiles(source,base,report):
     import v3_furniture_static as static
     import v3_console_room as consoles
     source.runtime_profiles={}
+    from v3_password_acquisition import checked as checked_password_acquisition
+    source.password_acquisition=checked_password_acquisition(source,base,report)
     source.creature_runtime_bindings=None
     if report.get('equipment_resources',{}).get('creature_items'):
         from v3_creature_items import checked as checked_creatures
@@ -506,7 +508,7 @@ def bind_profiles(source,base,report):
             raise ValueError('Changed profile-owned rig source engine or native dispatcher')
         if runtime.get('embedded_dispatch'):
             from v3_furniture_motion import native_contract as motion_contract
-            motion_contract(base,runtime)
+            motion_contract(base,runtime,report)
             target=runtime['code']['symbols']['af_v3_room_rig_move_allowed']
             if (runtime['embedded_dispatch']['target']!=target or
                     f'-DAF_ROOM_MOVE_ALLOWED=0x{target:X}u' not in runtime['bootstrap']['flags']):

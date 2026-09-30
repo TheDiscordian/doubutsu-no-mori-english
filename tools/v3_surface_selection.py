@@ -10,7 +10,8 @@ from v3_surface_items import RAM,BOOT,BOOT_END
 
 SOURCES=('tools/v3_surface_selection.py','tools/v3_surface_runtime.py',
     'tools/v3_optional_composition.py','tools/v3_browser_composition.py',
-    'tools/v3_furniture_install.py','overlays/v3/surface_bootstrap.c','overlays/v3/startup.c')
+    'tools/v3_furniture_install.py','tools/v3_password_acquisition.py',
+    'overlays/v3/surface_bootstrap.c','overlays/v3/startup.c')
 
 
 def profile(rows):
@@ -28,6 +29,13 @@ def ready(surface):
     for stage in ('application','save','menu','scoring','sound','stock'):
         if not surface.get(stage):raise ValueError('Surface selection lacks '+stage)
     stock=surface['stock'];result={r['id'] for g in stock['resources'] for r in g['imports']}
+    for row in stock.get('passwords',[]):
+        if (row['id'] in result or row.get('group')!=16 or
+                row.get('ordinary_stock') is not False or
+                row.get('catalogue_orderable') is not False or
+                not row.get('password_acquisition',{}).get('native_delivery_installed')):
+            raise ValueError('Incomplete password-only surface acquisition')
+        result.add(row['id'])
     pending={r['id']:r['dependency'] for r in stock['pending']}
     if (result&pending.keys() or result|pending.keys()!={r['id'] for r in surface['rows']} or
             not stock['selected_only'] or surface['save']['format_version']!=4):
@@ -130,6 +138,8 @@ def update_report(image,blob,report,selection,tables):
 
 
 def install(base,prior,blob,output):
+    if prior['room_surfaces'].get('optional_selection'):
+        return promote_passwords(base,prior,blob,output)
     surface=copy.deepcopy(prior['room_surfaces']);enabled,pending=ready(surface)
     if surface.get('optional_selection'):raise ValueError('Surface optional selections already installed')
     files=by_vrom(base);items=surface['items'];start=items['blob_offset']
@@ -178,3 +188,78 @@ def install(base,prior,blob,output):
     surface['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
     return {CAT_VROM:bytes(data)},dict(room_surfaces=surface,catalogue=cat,equipment_resources=equipment,
         saved_format_changed=False)
+
+
+def promote_passwords(base,prior,blob,output):
+    """Admit every prepared HomePage surface without fabricating shop stock."""
+    del output # Existing code and complete artwork are unchanged.
+    from v3_furniture_pipeline import Source
+    from v3_password_acquisition import checked
+    from v3_surface_stock import list_items
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    binding=checked(source,base,prior)
+    if binding is None:raise ValueError('HomePage surfaces require complete installed Nook delivery')
+    options(blob,prior)
+    surface=copy.deepcopy(prior['room_surfaces']);stock=surface['stock']
+    if stock.get('passwords'):raise ValueError('Password-only surfaces are already admitted')
+    origins={r['id']:r for r in surface['rows']};admitted=[];pending=[]
+    for row in stock['pending']:
+        if row['group']!=16:pending.append(row);continue
+        origin=origins[row['id']];donor=int(row['source_item_id'],16)
+        data=source.raw(row['source_symbol']);ids=list_items(data,0)
+        acquire=origin['acquisition']
+        if (len(acquire)!=1 or acquire[0]['table_index']!=16 or
+                acquire[0]['symbol']!=row['source_symbol'] or len(data)%2 or
+                not data.endswith(bytes(2)) or len(set(ids))!=len(ids) or ids.count(donor)!=1 or
+                any(i>>8!=donor>>8 for i in ids) or sha256(data)!=row['source_sha256'] or
+                row['item_id']!=origin['destination_item_id'] or not binding['matrix'][donor]&4):
+            raise ValueError('Changed complete donor HomePage surface acquisition')
+        record=dict(row);record.pop('dependency')
+        record.update(ordinary_stock=False,catalogue_orderable=False,
+            password_acquisition=dict(route='homepage-surface',permission_mask=binding['matrix'][donor],
+                native_delivery_installed=True,ordinary_gameplay_tested=False))
+        admitted.append(record)
+    if len(admitted)!=2 or {r['kind'] for r in admitted}!={'floor','wall'}:
+        raise ValueError('Incomplete donor password-only surface category')
+    stock.update(passwords=admitted,pending=pending)
+    enabled,remaining=ready(surface)
+    files=by_vrom(base);items=surface['items'];start=items['blob_offset']
+    packet=bytearray(blob[start:start+items['bytes']])
+    for row in items['rows']:
+        row['enabled']=row['id'] in enabled;struct.pack_into('>I',packet,row['offset']+4,int(row['enabled']))
+        row['record_sha256']=sha256(packet[row['offset']:row['offset']+24])
+    cat=copy.deepcopy(prior['catalogue']);data=bytearray(files[CAT_VROM].extract(base))
+    if sha256(data)!=cat['output_sha256']:raise ValueError('Changed retained surface catalogue')
+    for row in surface['menu']['tables']:
+        at=row['offset'];pos=row['descriptor']-CAT_RAM
+        if (sha256(packet[at:at+row['bytes']])!=row['sha256'] or
+                struct.unpack_from('>2I',data,pos)!=(row['ram'],row['rows'])):
+            raise ValueError('Changed retained surface catalogue table/count')
+        row['imports']=[r for r in row['available_imports'] if 'GAFE01-r0/item/'+r['source_item_id'] in enabled]
+        values=list(range(64))+[r['index'] for r in row['imports']];row['rows']=len(values)
+        if len(values)>row['capacity']:raise ValueError('Password surfaces exceed their catalogue reservation')
+        table=struct.pack('>'+str(row['capacity'])+'H',*values,*([0]*(row['capacity']-len(values))))
+        packet[at:at+len(table)]=table;row['sha256']=sha256(table)
+        struct.pack_into('>I',data,pos+4,row['rows'])
+    cat['surface_menu']['tables']=copy.deepcopy(surface['menu']['tables']);cat['output_sha256']=sha256(data)
+    equipment=copy.deepcopy(prior['equipment_resources']);ea=equipment['blob_offset']
+    ep=bytearray(blob[ea:ea+equipment['bytes']]);boot=items['bootstrap'];code=boot['code']
+    if sha256(ep)!=equipment['sha256']:raise ValueError('Changed retained surface startup packet')
+    at=code['symbols']['af_v3_surface_crc_expected']-equipment['ram']
+    if struct.unpack_from('>I',ep,at)[0]!=items['crc32']:
+        raise ValueError('Changed retained surface startup CRC field')
+    struct.pack_into('>I',ep,at,zlib.crc32(packet))
+    offset=boot['ram']-equipment['ram'];code['sha256']=sha256(ep[offset:offset+code['bytes']])
+    blob[ea:ea+len(ep)]=ep;blob[start:start+len(packet)]=packet
+    items.update(sha256=sha256(packet),crc32=zlib.crc32(packet),enabled_items=len(enabled),
+        table_sha256=sha256(packet[items['table_offset']:items['table_offset']+items['table_bytes']]))
+    equipment.update(sha256=sha256(ep),crc32=zlib.crc32(ep),surface_bootstrap=copy.deepcopy(boot))
+    bits=profile([r for r in items['rows'] if r['enabled']])
+    surface['optional_selection'].update(identities=sorted(enabled),pending=remaining,
+        profile_hex=bits.hex(),profile_sha256=sha256(bits),
+        ordinary_password_delivery_tested=False,ordinary_save_reload_tested=False)
+    surface['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
+    updates=dict(room_surfaces=surface,catalogue=cat,equipment_resources=equipment,saved_format_changed=False)
+    options(blob,dict(prior,**updates))
+    return {CAT_VROM:bytes(data)},updates

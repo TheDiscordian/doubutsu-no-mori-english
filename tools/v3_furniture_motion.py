@@ -76,9 +76,9 @@ def publish_embedded_dispatch(base,prior,equipment,changes):
         runtime['music']['binding']['owner_sha256']=sha256(data)
 
 
-def native_contract(image, runtime=None):
+def native_contract(image, runtime=None, report=None):
     from v3_furniture_contact import native_contract as contact_contract
-    contract=contact_contract(image);owner=by_vrom(image)[OWNER].extract(image)
+    contract=contact_contract(image,report);owner=by_vrom(image)[OWNER].extract(image)
     if runtime:owner=restore_embedded_dispatch(owner,runtime)
     blocks=[]
     for name,at,n,digest in NATIVE_BLOCKS:

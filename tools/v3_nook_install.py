@@ -127,20 +127,18 @@ def install(base,prior,blob,core,module,original,output,directory,lock):
         raise ValueError('Changed complete Nook font owner or source pixels')
     if (font['pixels_ram']<password['ram']+password['bytes'] or font['pixels_ram']&15 or
             font['pixels_end']!=font['pixels_ram']+len(pixels) or
-            font['pixels_end']>prior['furniture']['bank_pool']['start'] or
+            font['pixels_end']>0x80800000 or
             font['pixel_allocation_bytes']!=0):
         raise ValueError('Nook glyphs overlap the password packet or furniture banks')
     title=font['title_buffer'];start=title['function']-CODE_RAM
-    rigs=prior['equipment_resources']['room_rigs']
-    live_owners=[password,rigs['packet']]
-    live_owners.extend(rigs[k]['state'] for k in ('reactions','colours') if rigs.get(k))
-    for owner in live_owners:
+    from v3_console_disk_install import reservations
+    for owner_first,owner_last in reservations(prior):
         for first,last in ((font['pixels_ram'],font['pixels_end']),(title['ram'],title['end'])):
-            if first<owner['ram']+owner['bytes'] and owner['ram']<last:
-                raise ValueError('Nook resident buffers overlap live password/room code or state')
+            if first<owner_last and owner_first<last:
+                raise ValueError('Nook resident buffers overlap a retained RAM reservation')
     if (title['ram']<font['pixels_end'] or title['ram']&15 or
             title['end']!=title['ram']+title['resource_bytes'] or
-            title['end']>prior['furniture']['bank_pool']['start'] or
+            title['end']>0x80800000 or
             sha256(core[start:start+title['bytes']])!=title['sha256'] or
             sha256(files[title['resource_vrom']].extract(base))!=title['resource_sha256']):
         raise ValueError('Changed complete native title-buffer binding or Expansion Pak bounds')

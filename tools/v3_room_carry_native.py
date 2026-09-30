@@ -118,9 +118,48 @@ def checked_packet(equipment,blob):
 def checked_binding(image,report):
     files=by_vrom(image);equipment=report['equipment_resources'];carry=equipment.get('room_carry',{})
     result=checked_packet(equipment,files[BLOB].extract(image))
-    if goods_contract(image,report)!=carry['goods']:
-        raise ValueError('Changed installed carrying goods dependency')
+    goods=goods_contract(image,report)
+    if goods!=carry['goods']:
+        current=equipment['room_goods'];packet=current['packet']
+        blob=files[BLOB].extract(image)
+        raw=bytearray(blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
+        diary=equipment.get('diary_items',{});art=diary.get('room_art',{})
+        dispatch=current['compiled'].get('diary_dispatch',[])
+        p=diary.get('packet',{})
+        if (goods['exports']!=carry['goods']['exports'] or not art.get('installed') or
+                dispatch!=art.get('dispatch') or not dispatch or
+                sha256(files[art['vrom']].extract(image))!=art['sha256'] or
+                sha256(image[p['physical']:p['physical']+p['bytes']])!=p['sha256']):
+            raise ValueError('Changed installed carrying goods dependency')
+        expected={name for name in current['compiled']['symbols'] if name.startswith('af_v3_goods_')}
+        if {row['name'] for row in dispatch}!=expected or len(dispatch)!=len(expected):
+            raise ValueError('Incomplete diary goods dispatch')
+        for row in dispatch:
+            target=art['compiled']['symbols'][row['name']]
+            at=row['address']-packet['ram'];after=struct.pack('>2I',jump(target),0)
+            if (row['address']!=current['compiled']['symbols'][row['name']] or
+                    row['target']!=target or not 0<=at<=len(raw)-8 or
+                    row['after']!=after.hex() or raw[at:at+8]!=after or
+                    not p['ram']<=target<p['ram']+p['bytes']):
+                raise ValueError('Changed installed diary goods entry')
+            raw[at:at+8]=bytes.fromhex(row['before'])
+        if sha256(raw)!=carry['goods']['packet_sha256']:
+            raise ValueError('Changed complete carrying goods dependency outside diary entries')
     owner=files[VROM].extract(image);reloc=files[RELOC].extract(image);binding=carry['binding']
+    from v3_furniture_contact import restore_diary_contact
+    owner=restore_diary_contact(owner,image,report)
+    diary=equipment.get('diaries',{})
+    if diary.get('installed'):
+        hook=diary['room'];removed=0x4400B950
+        header=list(struct.unpack_from('>5I',reloc))
+        entries=list(struct.unpack_from('>'+str(header[4])+'I',reloc,20))
+        if (hook['remove_relocation']!=removed or removed in entries or
+                sha256(reloc)!=hook['installed_relocation_sha256']):
+            raise ValueError('Changed installed diary contact relocation')
+        at=next(i for i,entry in enumerate(entries) if entry>>30==removed>>30 and
+            (entry&0xFFFFFF)>(removed&0xFFFFFF))
+        entries.insert(at,removed);header[4]=len(entries)
+        reloc=(struct.pack('>5I',*header)+struct.pack('>'+str(len(entries))+'I',*entries)).ljust(len(reloc)-4,b'\0')+reloc[-4:]
     runtime=equipment.get('room_rigs',{})
     if runtime.get('music'):
         from v3_room_music import restore_owner

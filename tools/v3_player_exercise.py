@@ -263,6 +263,28 @@ def checked_native(image,report):
     if not exercise.get('action_installed'):return False
     native=exercise['native'];packet=native['packet'];files=by_vrom(image)
     blob=files[BLOB].extract(image);core=files[CODE_VROM].extract(image);owner=files[PLAYER_VROM].extract(image)
+    events=equipment.get('npc_extra',{}).get('events',{})
+    calendar=events.get('calendar',{})
+    if calendar.get('installed'):
+        core=bytearray(core)
+        observer=next(r for r in calendar['observers'] if r['address']==0x8007FF08)
+        target=calendar['code']['symbols']['af_holiday_calendar_status']
+        p=calendar['packet'];at=observer['address']-CODE_RAM
+        after=struct.pack('>2I',0x08000000|(target>>2 & 0x3FFFFFF),0)
+        if (observer['target']!=target or observer['after']!=after.hex() or
+                core[at:at+8]!=after or observer['before']!='afa5000400052c00' or
+                sha256(image[p['physical']:p['physical']+p['bytes']])!=p['sha256']):
+            raise ValueError('Changed exercise shared-calendar observer')
+        core[at:at+8]=bytes.fromhex(observer['before'])
+        if sha256(core[at:at+132])!=observer['function_sha256']:
+            raise ValueError('Changed complete exercise calendar dependency')
+        directory=events['native_directory'];days=directory['days_ram']
+        for address,before,after in ((0x8007FF20,0x3C0F8014,0x3C0F0000|((days+32768)>>16)),
+                (0x8007FF24,0x25EF9F98,0x25EF0000|(days&65535))):
+            patch=next(r for r in directory['core_hooks'] if r['address']==address)
+            if patch['before']!=before or patch['after']!=after or u32(core,address-CODE_RAM)!=after:
+                raise ValueError('Changed exercise shared event-storage pointer')
+            struct.pack_into('>I',core,address-CODE_RAM,before)
     raw=blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']]
     module=blob[equipment['blob_offset']:equipment['blob_offset']+equipment['bytes']]
     if (sha256(raw)!=packet['sha256'] or zlib.crc32(raw)!=packet['crc32'] or

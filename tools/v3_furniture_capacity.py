@@ -95,6 +95,8 @@ def checked(base, report):
         equipment=report.get('equipment_resources',{})
         controls=equipment.get('holiday_items',{}).get('controls')
         allocations=(controls['metadata'] if controls else [])+equipment.get('carried_items',{}).get('menu_allocations',[])
+        late_chain=[dict(address=POOL_WORD,before=r['pool_patch']['before']-extra,
+            after=r['pool_patch']['after']-extra) for r in allocations if r['additional_pool_bytes']]
         if allocations:
             parent=files[0x7749C0].extract(base)
             descriptors={}
@@ -107,12 +109,47 @@ def checked(base, report):
                     raise ValueError('Broken event-menu submenu allocation chain')
                 descriptors[row['offset']]=row['after']
                 tail_word=patch['after']
+            # Held ordering grows within the catalogue's reserved pool rather
+            # than adding another arena increment. Keep the six other words.
+            for offset,value in list(descriptors.items()):
+                words=list(struct.unpack('>8I',bytes.fromhex(value)))
+                if words[0]!=catalogue.VROM:continue
+                current=report['catalogue'];size=current['bytes']
+                if (size!=len(cat) or sha256(cat)!=current['output_sha256'] or size%16 or
+                        current['conservative_pool_required']>current['pool_reserved']):
+                    raise ValueError('Catalogue exceeds its retained submenu reservation')
+                words[1]=words[0]+size;words[3]=words[2]+size
+                descriptors[offset]=struct.pack('>8I',*words).hex()
             if any(parent[offset:offset+32].hex()!=value for offset,value in descriptors.items()):
                 raise ValueError('Broken event-menu submenu allocation chain')
         later_extra=tail_word-(int(patches[POOL_WORD]['after'],16)+delta)
         actual_bound=bound+delta+later_extra
+        editor=report.get('password_editor')
+        if editor:
+            keyboard=hooks['menus']['keyboard']
+            resize=next(r for r in editor['owner_resizes'] if r['vrom']==editor['vrom'])
+            growth=resize['bytes']-resize['previous_bytes']
+            if (editor['previous_pool_bound']!=actual_bound or
+                    editor['pool_bound']!=actual_bound+editor['additional_menu_pool_bytes'] or
+                    growth!=editor['additional_menu_pool_bytes'] or growth<=0 or growth%64 or
+                    keyboard['owner_after'][:4]!=[editor['vrom'],editor['vrom']+resize['bytes'],
+                        editor['ram'],editor['ram']+resize['bytes']] or
+                    parent[keyboard['owner_at']:keyboard['owner_at']+28]!=struct.pack('>7I',*keyboard['owner_after']) or
+                    sha256(files[editor['vrom']].extract(base))!=resize['sha256']):
+                raise ValueError('Broken password-editor menu reservation')
+            actual_bound=editor['pool_bound']
+            tail_word=0x25CE0000|(actual_bound&65535)
+            late_chain.append(dict(address=POOL_WORD,
+                before=(0x25CE0000|(editor['previous_pool_bound']&65535))-extra,
+                after=tail_word-extra))
+        expected_word=int(patches[POOL_WORD]['after' if in_chain else 'before'],16)+delta
+        if in_chain:
+            observed=chain[chain.index(retained)+1:]
+            if observed:
+                if observed!=late_chain:raise ValueError('Broken retained later submenu allocation chain')
+                expected_word=tail_word
         if (set(patches) != {0x800C4AFC, POOL_WORD} or
-                (int(patches[POOL_WORD]['after' if in_chain else 'before'],16)+delta != word) or
+                expected_word != word or
                 bound-hooks['previous_pool_bound'] != hooks['additional_pool_bytes'] or
                 hooks['additional_pool_bytes'] <= 0 or
                 int(patches[POOL_WORD]['after'], 16) != 0x25CE0000|(bound & 0xFFFF) or

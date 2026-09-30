@@ -23,17 +23,20 @@ lock or publish experimental V3.
 
 ## Active development
 
-The current development proposal is ABI 375 / format 20 at
-`build/v3-nook-password-installed-10/build-lock.json`. Nook's four front counters
+The current proposal is ABI 378 / format 20 at
+`build/v3-password-only-imports-01/password-destinations/build-lock.json`. Nook's four front counters
 have installed code-entry, official result dialogue, and native animated handover
 bindings. The complete keyboard, full donor-name font, original shop actions,
-and saved formats are retained. Five current installation checks and three
-private browser/offline profiles pass, including exact V2-14 for empty/default
-selection and the complete 217-choice cartridge. Font and title buffers occupy
-checked space after the live room-rig packet; they do not overwrite room code or
-reaction/colour state. Controller-driven code entry, full gift handover, ordinary
-save/restart, and hardware remain unverified. Continue this connected category
-task and shared admission of its staged password-only records. See
+and saved formats are retained. Shared admission adds sixteen password-only
+furniture records and two HomePage surfaces, with no substitute shop stock or
+catalogue ordering. Their staged artwork is reused. Ten focused acquisition
+checks pass, including five current browser/offline profiles, exact V2-14 for
+empty/default selection, and the complete 235-choice cartridge. Font and title
+buffers use checked upper RAM, avoiding every retained owner; a silent native
+check verifies the complete carrying/storage/title contents and CPU fault fields.
+Controller-driven code entry, full gift handover, ordinary save/restart, and
+hardware remain unverified. Continue the other source acquisition categories,
+beginning with the complete Harvest reward path. See
 [the Nook checkpoint](checkpoints/V3_NOOK_PASSWORDS.md).
 
 The current native password helper passes 45 assertions and twelve selected-item
@@ -50,8 +53,8 @@ growth/drop, net/rod through the collection-completion mayor presentation, and
 axe through the Shrine's perfect-town assessment and Farley handover.
 The catalogue admits the three additional tools within its existing allocation,
 without changing menu code, other categories, or retained artwork. There are
-217 development choices. Nine browser/offline profiles agree, including each
-tool alone and the independent birthday-only setting. N64 birthday mail is the
+217 choices in the retained golden-tool batch. Its nine browser/offline profiles
+agree, including each tool alone and the independent birthday-only setting. N64 birthday mail is the
 default; GameCube adds the villager presentation and its associated giver/year
 mail policy, without requiring any tool.
 Two current silent native probes pass 51 and 48 records. They verify loaded

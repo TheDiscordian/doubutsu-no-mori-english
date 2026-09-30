@@ -200,18 +200,21 @@ inventory exchange are connected. Full-index base weights retain native values
 and add exact donor points; all five additive matching pairs and complete donor
 theme/base-point categories are connected. Full-index player/NPC footstep and drag readers preserve original
 mappings and bind complete donor programs/instruments with bounded audio storage.
-HomePage/Harvest acquisition and ordinary persistence
-remain required before these become optional playable imports.
+HomePage password admission supplies two additional experimental selections.
+Harvest acquisition and ordinary persistence remain required; experimental
+selection does not establish playable-import acceptance.
 
 The [shared password modules](V3_PASSWORDS.md) link the complete donor code
 transform, eligibility rules, Nook results, and selected destination mapping for
-197 implemented imports and 1,425 checked native correspondences. Bounded MIPS
+215 implemented imports and 1,425 checked native correspondences. Bounded MIPS
 code and sanitized donor comparisons are verified. The native engine passes 45
 assertions across twelve cases for selected destinations, real DMA/CRC/cache,
 RNG, preserved saved fields, guards, and cleanup. Four front counters have installed
 input, official dialogue, and native animated handover bindings. Ordinary code
-entry/delivery, shared admission of pending password-only records, and persistence
-remain required before claiming usable password rewards. See
+entry/delivery and persistence remain required before claiming usable password
+rewards. Shared admission installs all sixteen password-only furniture records
+and both HomePage surfaces without substituting shop stock. Five current
+browser/offline profiles agree for 235 experimental choices. See
 [the connected checkpoint](../docs/checkpoints/V3_NOOK_PASSWORDS.md) for the
 incomplete enclosing scenario and retained setup allowance.
 
@@ -478,10 +481,11 @@ selections for twenty installed villagers and 127 installed logical items,
 including required outfits, house furnishings, and twenty-four equipment parents.
 Mannequin and equipment catalogue representations are dependencies, not separate
 choices.
-The six selectable surfaces have genuine A/C/event acquisition and independent
-format-4 saved-profile bits. Floor/wall catalogue counts and selected-only stock
-follow the same private selection records. The Mario/Harvest pairs remain
-unavailable until their real delivery and complete theme categories are installed.
+Six selectable surfaces have genuine A/C/event acquisition; two more use their
+actual HomePage password path. All eight have independent format-4 saved-profile
+bits. Floor/wall catalogue counts and selected-only stock follow the same private
+selection records. The Harvest pair remains unavailable until its real delivery
+is installed. Ordinary acquisition and save/restart remain unverified.
 Ten ordinary legacy furniture imports use explicit source-to-destination
 registry records; their browser identities retain the GameCube IDs while native
 records and saved bits use additive N64 destinations. The shared pipeline

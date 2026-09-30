@@ -93,8 +93,11 @@ the other-code rule. Nintendo-code birth category 34 contains Nintendo bench
 and ten Mario pieces. The ten Mario furniture records have other-code
 permission despite no stock-list membership and an
 empty `ftr_listMario`. Source acquisition must use those actual rules, not the
-name or emptiness of one list. The ordinary metadata importer still needs the
-linked password-acquisition adapter before enabling these records.
+name or emptiness of one list. The ordinary metadata importer uses
+`tools/v3_password_acquisition.py` to bind all sixteen furniture records and
+both HomePage surfaces to the complete installed frontend. It verifies whole
+source tables, eligibility, native owners, and packet hashes, keeps them outside
+shop stock and catalogue ordering, and retains pending ordinary gameplay evidence.
 
 The separate `AFPM` version-2 packet binds implemented imports and checked native
 correspondences from the current composition catalogue. Its 16-byte header
@@ -106,8 +109,8 @@ correspondences have width zero; selected byte/word fields require exactly one
 when the mask is zero, or an enabled masked bit otherwise. Disabled, malformed,
 or missing records resolve to zero. The reader retains version-1 exact-row
 support. The map is build-specific, not a stable saved format; equal IDs alone
-never establish correspondence. The checked map contains 197 import identities
-and 1,425 native correspondences in 298 ranges; pending imports remain absent.
+never establish correspondence. The checked map contains 215 import identities
+and 1,425 native correspondences in 316 ranges; pending imports remain absent.
 
 `overlays/v3/password_policy.c` validates both packets, resolves selected
 destinations through a supplied read-only accessor, and implements Nook's
@@ -132,7 +135,10 @@ import map, verifies the retained donor matrix against its known digest, and
 links the shared modules without changing their donor rules. No native item is
 inferred from equal source/destination numbers. The map must be refreshed when
 the ordinary importer adds supported identities; installation alone does not
-permit enabling password-only acquisition metadata.
+permit enabling password-only acquisition metadata. The ordinary category
+importer refreshes this map after password-only admission. Installed frontend
+entry addresses must remain unchanged or require explicit rebinding; live
+conversation bindings are retained, while execution evidence is not fabricated.
 
 The 32-KiB packet occupies `804C0000..804C7FFF`, beyond scenery, room rigs,
 scrolling materials, and the full surface packet, before furniture banks at
@@ -208,10 +214,10 @@ English pages and necessary platform adaptations. Full donor/native name
 conversion retains eight-byte comparison fields and every source character.
 The installed font retains its old glyphs and adds all 256 complete donor glyphs.
 Its image fits the existing checked `80450010` font reservation. Pixels own
-`804DA000..804E911F`; native title replay owns `804EA000..804EE82F`. Both lie
-after the complete room-rig packet at `804D0000..804D8FFF`, outside live reaction
-and colour state, and before furniture banks at `80500000`. The installer rejects
-overlapping buffers. The title's checked allocation call uses its separate
+`807D9000..807E811F`; native title replay owns `807E9000..807ED82F`. Both fit
+eight-MiB RAM after the upper resident packets. The installer rejects overlap
+with every retained reservation, including carrying and console storage, rather
+than checking only the room-rig packet. The title's checked allocation call uses its separate
 Expansion Pak buffer while preserving the complete `BC8000` replay data and
 ordinary native playback. No font pixel allocation consumes the ordinary heap.
 

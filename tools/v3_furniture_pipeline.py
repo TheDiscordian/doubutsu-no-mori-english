@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 38
+VERSION = 39
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -1384,10 +1384,12 @@ def metadata(source, item, profile, identity):
                 if ids[-1] or 0 in ids[:-1] or ids.count(item) != 1:
                     raise ReviewRequired('ambiguous acquisition list')
                 lists.append((key, sha256(raw)))
-    if len(lists) != 1 or lists[0][0] not in STOCK | REWARDS:
+    from v3_password_acquisition import furniture as password_furniture
+    password=password_furniture(source,item,index,lists)
+    if not password and (len(lists) != 1 or lists[0][0] not in STOCK | REWARDS):
         raise ReviewRequired('acquisition needs an adapter: ' + ', '.join(r[0] for r in lists))
-    group = (STOCK | REWARDS)[lists[0][0]]
-    reward = REWARDS.get(lists[0][0], 0)
+    group = 255 if password else (STOCK | REWARDS)[lists[0][0]]
+    reward = 0 if password else REWARDS.get(lists[0][0], 0)
     catalogue = list(struct.iter_unpack('>HH', source.raw('mCL_furniture_list')))
     entries = [(position, mode) for position,(i,mode) in enumerate(catalogue) if i == index]
     if len(entries) != 1:
@@ -1418,14 +1420,16 @@ def metadata(source, item, profile, identity):
         **({'native_artwork_variant':variant} if variant else {}),
         layer_type=layer_type, interaction_flags=profile['interaction_flags'],
         price=price, size_code=profile['size_code'], footprint=('1x1','2x1','2x2')[profile['size_code']],
-        donor_list=lists[0][0], donor_list_sha256=lists[0][1], stock_group=group,
+        donor_list=password['donor_list'] if password else lists[0][0],
+        donor_list_sha256=password['donor_list_sha256'] if password else lists[0][1], stock_group=group,
         reward_route=reward, ordinary_stock=group < 3,
         donor_catalogue_position=entries[0][0], preview_mode=preview,
         donor_preview_scalar_hex=framing.hex(),
-        catalogue_orderable=not reward, donor_hra_hex=f'{hra:08x}', native_hra_hex=f'{native_hra:08x}',
+        catalogue_orderable=not reward and not password, donor_hra_hex=f'{hra:08x}', native_hra_hex=f'{native_hra:08x}',
         feng_hex=feng.hex(), series=series, birth_category=birth, donor_birth_category=donor_birth, surface=surface,
         donor_series_hex=source.raw('mMkRm_series_info')[series*3:series*3+3].hex(),
         identity_worksheet_row=number, behaviour=profile['behaviour'],
+        **({'password_acquisition':password['password_acquisition']} if password else {}),
         **({k:binding[k] for k in ('room_runtime','room_lifecycle','room_placement') if k in binding} if binding else {}))
 
 
@@ -1826,6 +1830,10 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
         convert(source,worksheet,art,ready,installed,reuse_assets=cache)
         report=build(output/'cartridge',art,current);current=output/'cartridge'/'build-lock.json'
         steps.append(dict(stage='ordinary-import',lock=str(current.relative_to(ROOT)),sha256=report['output_sha256']))
+        if any(r.get('password_acquisition') for r in report['automatic_furniture']['imports']):
+            # The current selection rows and saved identities must exist before
+            # the checked shared map can bind their actual live enable fields.
+            refresh('password-destinations',password_runtime=ROOT/'build/v3-password-policy-prepared-03')
     if not steps:raise ValueError('No supported new imports or missing implemented category dependencies')
     result=dict(format='AFV3-CATEGORY-IMPORT-BATCH-1',plan=plan,steps=steps,imported=ready,
         pending=[dict(item_id=r['item_id'],name=r['name'],reason=r['reason']) for r in matches if r['status']!='supported'],

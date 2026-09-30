@@ -139,6 +139,10 @@ def refresh(image,prior,blob,original,output,directory,lock):
         f'AF_PW_MAP_BYTES={len(destinations)}')
     code,compiled=compile_part('password_runtime',output/'password_runtime',
         extra_sources=('overlays/v3/password.c','overlays/v3/password_policy.c','overlays/v3/nook_password.c'),defines=defines)
+    if p.get('acquisition_installed'):
+        for name in ('af_v3_password_decode','af_nook_password_step','af_nook_password_begin'):
+            if compiled['symbols'][name]!=p['code']['symbols'][name]:
+                raise ValueError('Password map refresh requires rebinding installed Nook entry: '+name)
     packet=bytearray(SIZE)
     parts=((0,TABLES,code),(TABLES,POLICY,tables),(POLICY,MAP,permissions),(MAP,CONVERSATION,destinations))
     for start,end,data in parts:
@@ -160,7 +164,8 @@ def refresh(image,prior,blob,original,output,directory,lock):
         bootstrap=dict(ram=BOOT,cache=CACHE,code=bootstrap),
         parts=[dict(offset=a,bytes=len(d),sha256=sha256(d)) for a,_,d in parts],
         conversation=dict(ram=RAM+CONVERSATION,bytes=SIZE-16-CONVERSATION,
-            shared_session_gift_count=True,saved=False,native_bindings_installed=False),
+            shared_session_gift_count=True,saved=False,
+            native_bindings_installed=p.get('conversation',{}).get('native_bindings_installed',False)),
         native_execution_tested=False,ordinary_gameplay_tested=False,
         sources={path:sha256((ROOT/path).read_bytes()) for path in SOURCES})
     result.update(sha256=sha256(ep),crc32=zlib.crc32(ep),additional_resident_bytes=0)

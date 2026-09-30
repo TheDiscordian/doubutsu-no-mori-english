@@ -34,11 +34,11 @@ import v3_shops as shops
 import v3_resource_capacity as capacity
 import v3_physical_resources as physical
 
-VERSION = 21
+VERSION = 22
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-SOURCES = capacity.SOURCES + physical.SOURCES + ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/map_artwork.py', 'tools/v3_room_aliases.py',
+SOURCES = capacity.SOURCES + physical.SOURCES + ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/v3_password_acquisition.py', 'tools/map_artwork.py', 'tools/v3_room_aliases.py',
     'tools/v3_furniture_rigs.py', 'tools/v3_furniture_materials.py', 'tools/v3_furniture_scroll.py', 'tools/v3_keyframes.py',
     'tools/v3_furniture_art.py', 'tools/v3_furniture_composite.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
@@ -157,7 +157,8 @@ def catalogue_record(row):
         donor_preview_mode=row['preview_mode'],donor_preview_scalar_hex=row['donor_preview_scalar_hex'],
         preview_override=row['preview_mode']!=0,preview_define='AF_V3_CATALOGUE_PREVIEW_RECORDS',
         ordinary_shop_list=row['donor_list'] if row['ordinary_stock'] else None,
-        shop_list_sha256=row['donor_list_sha256'], catalogue_orderable=row['catalogue_orderable'])
+        shop_list_sha256=row['donor_list_sha256'], catalogue_orderable=row['catalogue_orderable'],
+        **({'password_acquisition':row['password_acquisition']} if row.get('password_acquisition') else {}))
 
 
 def order_mask(row):
@@ -389,9 +390,18 @@ def place_resource_tail(base,prior,blob,resources,limit,*,reservations=(),placem
                 original_sha256=sha256(entry.extract(base))))
             writes[vrom]=data
         else:pending.append((vrom,data));writes[vrom]=data
-    moved.extend(owner_tail_storage(base,files,pending,
-        minimum_end=max(files[BLOB].pstart+len(blob),
-            prior.get('resource_capacity',{}).get('reserved_physical_end',0)),reservations=reservations))
+    # Physical-only resources occupy the upper cartridge now. Allocate complete
+    # regenerated owners in checked zero gaps rather than assuming a free tail.
+    excluded=[(files[BLOB].pstart,files[BLOB].pstart+len(blob))]
+    excluded.extend((r['physical'],r['physical']+r['bytes']) for r in moved)
+    for vrom,data in pending:
+        _,plan=relocate_resource_plan(base,files,vrom,data,minimum_physical=0x100000,
+            reservations=reservations,append_only=False,allow_compressed=True,
+            excluded_spans=excluded)
+        moved.append(dict(vrom=vrom,bytes=len(data),physical=plan['physical'],
+            storage='checked-zero-gap',sha256=plan['sha256'],
+            original_sha256=plan['previous_sha256']))
+        excluded.append((plan['physical'],plan['physical']+len(data)))
     moved.sort(key=lambda r:order.index(r['vrom']))
     return moved,writes,dict(blob_offset=first,bytes=len(blob)-first)
 
@@ -449,6 +459,13 @@ def build(output, art_path, lock=LOCK):
     imports = all_furniture['imports']+[prior['speed_bag']]
     cat_rows = prior['catalogue']['imports']+[catalogue_record(r) for r in installed]
     for row in cat_rows:
+        if row.get('representation'):
+            # Carried-parent catalogue forms retain their own canonical reader
+            # and ordering metadata; they are not ordinary furniture records.
+            category=prior['equipment_resources'].get(row['representation']+'_items',{}).get('catalogue',{})
+            if row not in category.get('imports',[]):
+                raise ValueError('Unbound carried-parent catalogue representation')
+            continue
         at = ITEMS+slot(int(row['item_id'],16))*32
         old = blob[at+24]
         if old not in (0,order_mask(row)) or any(blob[at+28:at+32]):
@@ -465,7 +482,8 @@ def build(output, art_path, lock=LOCK):
     changes.update(cat_changes)
     stock_rows = prior['shops']['imports']+[dict(item_id=r['item_id'],group=r['stock_group'],
         **{k:r[k] for k in ('donor_item_id','donor_runtime_index') if k in r},
-        donor_list=r['donor_list'],donor_list_sha256=r['donor_list_sha256']) for r in installed if not r['reward_route']]
+        donor_list=r['donor_list'],donor_list_sha256=r['donor_list_sha256']) for r in installed
+        if not r['reward_route'] and not r.get('password_acquisition')]
     stock_ids = {r['item_id'] for r in stock_rows}
     goods,table_at,stock_rows = shops.goods(stable,source.rel,source.symbols.encode(),
         [r for r in imports if r['item_id'] in stock_ids],reviewed_rows=stock_rows)
@@ -1070,6 +1088,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         publish_owner(base,prior,equipment_report,owner_changes)
     if equipment_report and equipment_report.get('carried_items',{}).get('paper',{}).get('quantities'):
         from v3_paged_dma import install as repair_paged_dma
+        report_updates.setdefault('physical_resources',copy.deepcopy(prior.get('physical_resources',[])))
         physical_writes.extend(repair_paged_dma(base,blob,equipment_report,
             report_updates['physical_resources'],output))
     allocation_base=physical.retire_dma_copies(base,prior.get('physical_resources',[]),

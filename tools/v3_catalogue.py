@@ -138,11 +138,17 @@ def table_from_records(base, rel, symbols, furniture, records):
         found = [(n,m) for n,(i,m) in enumerate(donor) if i == donor_index]
         group = row.get('donor_acquisition_list') or row['ordinary_shop_list']
         goods = symbol_data(rel, symbols.decode(), group)
-        ids = list(struct.unpack('>'+str(len(goods)//2)+'H', goods))
+        if group=='mRmTp_birth_type':
+            from v3_furniture_pipeline import Source
+            from v3_password_acquisition import catalogue_source
+            member=catalogue_source(Source(rel,symbols),donor_item,donor_index,row)
+        else:
+            ids = list(struct.unpack('>'+str(len(goods)//2)+'H', goods))
+            member=not ids[-1] and 0 not in ids[:-1] and ids.count(donor_item)==1
         if (index != 1024+(item-0x3000)//4 or row['runtime_index'] != index
                 or row['catalogue_index'] != (item-0x1000)//4 or row['mode'] != 0
-                or found != [(row['donor_position'], mode)] or ids[-1] or 0 in ids[:-1]
-                or ids.count(donor_item) != 1 or sha256(goods) != row['shop_list_sha256']
+                or found != [(row['donor_position'], mode)] or not member
+                or sha256(goods) != row['shop_list_sha256']
                 or mode and (not row.get('preview_override') or
                     draw[mode*8:mode*8+8].hex() != row.get('donor_preview_scalar_hex'))):
             raise ValueError('Catalogue record differs from the checked donor')

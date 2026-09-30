@@ -36,20 +36,24 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: connect Nook's actual code-entry/result/animated
-gift path to the installed shared password engine, then admit every supported
-password-only furniture/surface record through the ordinary importer. Preserve
-the prepared codec, eligibility matrix, staged artwork, stable identities,
-donor result classes, name rules, three-gift limit, and one-insertion handover.
-Keep real unavailable delivery routes explicit; do not substitute shop stock.
+Current implementation task: complete the source Harvest acquisition category,
+connecting its existing calendar/participant/cutlery services, Franklin's actual
+conversation and reward handover, persistent reward state, and ordinary admission
+of the complete furniture and floor/wall family. Reuse installed artwork and
+behaviours; do not substitute shop stock or create per-item installers. Map the
+remaining connected consumers once before implementation.
 
-All four front-counter code/result/handover bindings and complete shared
-keyboard/font/dialogue/audio resources are installed in ABI 375. Five current
-installation checks and three private browser/offline profiles pass. Ordinary
-controller-driven entry and complete animated delivery remain unverified;
-the native engine check does not establish those paths. The complete font/title
-buffers must remain outside the existing room-rig code and mutable state. Resume
-the same category task and native-harness allowance, not a fresh setup cycle.
+Nook's four front-counter code/result/handover bindings and complete shared
+keyboard/font/dialogue/audio resources are installed. ABI 378 additionally admits
+all sixteen source password-only furniture records and both HomePage surfaces.
+The checked live map covers 215 imports and 1,425 native correspondences in 316
+ranges. Ten focused acquisition checks and five current browser/offline profiles
+pass; 235 choices are available for development. The complete font/title buffers
+use upper RAM beyond all retained owners. Silent native checks verify complete
+carrying, console-storage, and title contents, font/guard fields, and no CPU fault.
+Ordinary controller-driven entry, complete animated delivery, and save/restart
+remain unverified. The Nook native-harness allowance and setup retry are spent;
+retain those pending checks, not a fresh setup cycle.
 See [the Nook checkpoint](checkpoints/V3_NOOK_PASSWORDS.md).
 
 The four golden-tool behaviour/reward paths are connected through the shared
@@ -97,8 +101,8 @@ The policy and fixed pack identities are installed and selectable in development
 Do not mutate quantities during ordinary transfers or load. See the
 [stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
 
-The current proposal is ABI 375 / format 20 at
-`build/v3-nook-password-installed-10/build-lock.json`, with 217 selectable development
+The current proposal is ABI 378 / format 20 at
+`build/v3-password-only-imports-01/password-destinations/build-lock.json`, with 235 selectable development
 entries. All four golden tools are independently selectable. Shared held ordering
 keeps its 64-entry capacity, complete code, physical mapping, and other categories.
 Nine current browser/offline profiles agree, including each tool alone and
@@ -786,17 +790,19 @@ and both patcher deployments target it. See the
 hold does not apply to stable V2 fixes. Current imported V3 already includes both
 fixes; align its pinned empty-selection V2-12 baseline with V2-13 before handoff.
 
-The connected password engine and Nook frontend are ABI 375 at
-`build/v3-nook-password-installed-10/build-lock.json`. Its 32-KiB packet, native
+The connected password engine, Nook frontend, and password-only admission are ABI 378 at
+`build/v3-password-only-imports-01/password-destinations/build-lock.json`. Its 32-KiB packet, native
 RNG, selected-import reader, lazy loader, keyboard, official result pages, complete
 name glyphs, and four native front-counter handover bindings are installed.
-Complete ordinary input/delivery verification and shared metadata admission.
+Shared metadata admission is installed; ordinary input/delivery remains unverified.
 The loader entry is `804B4D00`; code input is 28 ASCII bytes and both names are
 eight-byte donor-font fields. Convert native saved/keyboard bytes explicitly.
 Preserve the checked existing-native/display correspondence and keep destination packets
 updated when the ordinary bulk importer adds more supported identities.
 
-Five current installation checks and three browser/offline profiles pass.
+Five safe-frontend installation checks, ten acquisition checks, and five current
+browser/offline profiles pass. Complete carrying/storage/title memory checks also
+pass on the assembled cartridge without a CPU fault.
 The complete native engine helper passes 45 assertions across twelve cases,
 including saved-field preservation and allocator cleanup. Its enclosing scenario
 retains an obsolete save-extension guard expectation and is not a full pass.
@@ -818,8 +824,11 @@ See `specs/V3_PASSWORDS.md` for verified native integration bindings.
 The HomePage furniture list contains five Famicom-only rewards; its floor/wall
 use other codes. Ten Mario furniture entries use Nintendo-code birth category
 34 despite the empty `ftr_listMario` and absent ordinary stock membership.
-Extend the shared metadata/acquisition adapter by this actual category once
-native delivery is installed. The linked engine alone enables no new choice.
+The shared metadata/acquisition adapter admits these actual categories and the
+Nintendo bench, reusing all staged artwork. Both HomePage surfaces use their
+real lists. None gains ordinary stock or catalogue orderability. Shared map
+refresh binds their actual independent live fields. The linked engine alone is
+not the admission gate; complete frontend and resource checks remain required.
 
 The retained scoring proposal is ABI 196 at
 `build/v3-birth-scoring-runtime-02/build-lock.json`. Shared source-derived

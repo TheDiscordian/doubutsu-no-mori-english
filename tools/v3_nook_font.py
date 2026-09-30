@@ -18,7 +18,7 @@ from toolchain import IMAGE
 from v3_asset_loader import ROOT,MODULE
 
 VROM,RAM=0x03400000,0x80C00000
-PIXELS_RAM,TITLE_RAM=0x804DA000,0x804EA000
+PIXELS_RAM,TITLE_RAM=0x807D9000,0x807E9000
 PREFIX=27744
 IMAGE_SHA='66f4bf55eb09ae4d241c275c7d7eaf9ed54b02dc4b65eb226f98682c876e1991'
 REL_SHA='4757b124e5687488c35bd8eed5ac8e4e4e1f8acfef66ce3a5f0bd4a4a113cbe9'
@@ -100,7 +100,8 @@ def prepare(image,source,out,*,physical_resources,card_message=None,dialogue_fau
     from v3_physical_resources import allocate
     physical=allocate(image,physical_resources,pixels,'nook-name-font',best_fit=True)
     pixels_ram=PIXELS_RAM
-    if pixels_ram+len(pixels)>0x80500000:raise ValueError('Nook glyphs exceed the owned Expansion Pak gap')
+    if pixels_ram+len(pixels)>TITLE_RAM or TITLE_RAM+0x4830>0x80800000:
+        raise ValueError('Nook glyph/title buffers exceed their Expansion Pak reservations')
     generated=(f'#define AF_NP_PIXELS_BYTES {len(pixels)}u\n'
         f'#define AF_NP_PIXELS_RAM 0x{pixels_ram:X}u\n'
         f'#define AF_NP_TITLE_RAM 0x{TITLE_RAM:X}u\n#define AF_NP_TITLE_BYTES 0x4830u\n'

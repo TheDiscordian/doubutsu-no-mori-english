@@ -25,8 +25,8 @@ from v3_nook_native import SHOPS
 from v3_sound_programs import installed_resource
 from v3_physical_resources import verify
 
-OUT=ROOT/os.environ.get('V3_NOOK_INSTALLED','build/v3-nook-password-installed-10')
-PREPARED=ROOT/os.environ.get('V3_NOOK_PREPARED','build/v3-nook-password-prepared-12')
+OUT=ROOT/os.environ.get('V3_NOOK_INSTALLED','build/v3-nook-password-installed-11')
+PREPARED=ROOT/os.environ.get('V3_NOOK_PREPARED','build/v3-nook-password-prepared-13')
 
 
 class NookInstalledTests(unittest.TestCase):
@@ -118,17 +118,22 @@ class NookInstalledTests(unittest.TestCase):
         self.assertEqual(self.nook['additional_font_owner_bytes'],2752)
         self.assertEqual(self.nook['additional_resident_font_bytes'],61728)
         font=self.nook['font']
-        self.assertEqual(font['pixels_ram'],0x804DA000)
-        self.assertEqual(font['pixels_end'],0x804E9120)
+        self.assertEqual(font['pixels_ram'],0x807D9000)
+        self.assertEqual(font['pixels_end'],0x807E8120)
         self.assertEqual(font['pixel_allocation_bytes'],0)
         self.assertEqual(self.nook['additional_resident_title_bytes'],18480)
         self.assertLessEqual(font['pixels_end'],font['title_buffer']['ram'])
-        self.assertLessEqual(font['title_buffer']['end'],0x80500000)
+        self.assertLessEqual(font['title_buffer']['end'],0x80800000)
         rigs=self.report['equipment_resources']['room_rigs']
         for owner in (rigs['packet'],rigs['reactions']['state'],rigs['colours']['state']):
             for first,last in ((font['pixels_ram'],font['pixels_end']),
                     (font['title_buffer']['ram'],font['title_buffer']['end'])):
                 self.assertFalse(first<owner['ram']+owner['bytes'] and owner['ram']<last)
+        from v3_console_disk_install import reservations
+        for a,b in reservations(self.prior):
+            for first,last in ((font['pixels_ram'],font['pixels_end']),
+                    (font['title_buffer']['ram'],font['title_buffer']['end'])):
+                self.assertFalse(first<b and a<last)
 
     def test_current_private_browser_and_offline_profiles_agree(self):
         import v3_optional_composition as composition

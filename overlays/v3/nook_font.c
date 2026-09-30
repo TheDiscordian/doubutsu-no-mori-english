@@ -16,7 +16,7 @@ static const u8 *af_np_pixels __attribute__((section(".data")))=0;
 static int af_np_load_pixels(void) {
     u32 a=AF_NP_PIXELS_RAM;
     if(af_np_pixels)return 1;
-    if(a<0x804DA000u || (a&15u) || a>0x80500000u || AF_NP_PIXELS_BYTES>0x80500000u-a)return 0;
+    if(a<0x807D9000u || (a&15u) || a>0x80800000u || AF_NP_PIXELS_BYTES>0x80800000u-a)return 0;
     if(af_v3_resource_read((void *)a,AF_NP_PIXELS_ROM,AF_NP_PIXELS_BYTES,
             (int (*)(void *,unsigned int,unsigned int))0x80026B44u) ||
             af_crc32((const unsigned char *)a,AF_NP_PIXELS_BYTES)!=AF_NP_PIXELS_CRC)return 0;

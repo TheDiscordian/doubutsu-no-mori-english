@@ -341,6 +341,28 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
                     # Keep retained owners in one chain before the separately
                     # reported catalogue allowance, so it is counted once.
                     retained_pool.append(dict(address=address,before=before-old_slack,after=after-old_slack))
+            if address==0x800C4B10:
+                # Later controls, carried menus, and the code editor share the
+                # same arena. Validate their full current owners before keeping
+                # their actual increments in the rebuilt catalogue receipt.
+                from v3_furniture_capacity import checked as checked_capacity
+                checked_capacity(base,prior)
+                controls=equipment.get('holiday_items',{}).get('controls',{})
+                late=controls.get('metadata',[])+equipment.get('carried_items',{}).get('menu_allocations',[])
+                patches=[r['pool_patch'] for r in late]
+                editor=prior.get('password_editor')
+                if editor:
+                    patches.append(dict(address=address,
+                        before=0x25CE0000|(editor['previous_pool_bound']&65535),
+                        after=0x25CE0000|(editor['pool_bound']&65535)))
+                for patch in patches:
+                    before,after=patch['before'],patch['after']
+                    if (patch['address']!=address or before!=word or after<before or
+                            (after-before)%64 or (before^after)&0xFFFF8000):
+                        raise ValueError('Changed retained later menu allocation')
+                    word=after
+                    if after!=before:
+                        retained_pool.append(dict(address=address,before=before-old_slack,after=after-old_slack))
             if word!=struct.unpack_from('>I',current_code,at)[0]:
                 raise ValueError(f'Catalogue allocation mismatch at {address:08X}')
     if pool_slack!=old_slack:

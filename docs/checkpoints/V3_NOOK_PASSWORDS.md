@@ -2,17 +2,20 @@
 
 ## Current cartridge
 
-The connected category task is Nook's code-entry/result/animated gift path,
-followed by ordinary admission of supported password-only furniture and surfaces.
+The connected category task installs Nook's code-entry/result/animated gift path
+and ordinary admission of supported password-only furniture and surfaces.
 The installed bindings do not establish ordinary gameplay or hardware acceptance.
 
-- Lock: `build/v3-nook-password-installed-10/build-lock.json`, ABI 375.
-- ROM: `build/v3-nook-password-installed-10/animal-forest-v3-asset-loader.z64`.
-- ROM SHA-256: `124c70e0e0d88e51a9ae4a51afd6213ce35d94c6f019e460f63ab9810aa96797`.
-- UPS SHA-256: `313985c032ad3af0854dea8fa601373d914beb2f8888ea35199e8358ed757517`.
-- Complete preparation: `build/v3-nook-password-prepared-12/prepared.json`.
-- Exact predecessor: `build/v3-nook-password-runtime-02/build-lock.json`, ABI 374.
-- Saved format 20 / card wire 7; Nook does not change either format or profile.
+- Lock: `build/v3-password-only-imports-01/password-destinations/build-lock.json`, ABI 378.
+- ROM: `build/v3-password-only-imports-01/password-destinations/animal-forest-v3-asset-loader.z64`.
+- ROM SHA-256: `0156ade100afcc966e492f9fb4cf88a6858c63e2c11e58b6d72918aaac7e2954`.
+- UPS SHA-256: `827ca21eed83ae1c5dae89cd8ef6658466f980237c7a5c8a332a75be3639ec95`.
+- Complete frontend preparation: `build/v3-nook-password-prepared-13/prepared.json`.
+- Safe frontend base: `build/v3-nook-password-installed-11/build-lock.json`, ABI 375.
+- Exact predecessor: `build/v3-password-only-imports-01/surfaces-02/build-lock.json`, ABI 377.
+- Saved format 20 / card wire 7 remain unchanged. Admission adds sixteen furniture
+  profile bits and two existing surface-profile bits; unchanged formats do not
+  establish compatibility with a smaller selected profile.
   Formats 19 and earlier cannot read format-20 saves. Imported identities and
   stationery mode still require a compatible selected profile. Preserve separate
   copied/disposable saves; ordinary persistence is not established by unchanged
@@ -43,10 +46,10 @@ All 256 donor name glyphs and existing native/English glyph readers are retained
 The checked 32-KiB password packet owns `804C0000..804C7FFF`, including its bounded
 conversation context. The complete font owner uses the existing guarded
 `80450000..80457FFF` reservation, not a new ordinary heap allocation. Pixels own
-`804DA000..804E911F`; the full native title replay owns `804EA000..804EE82F`.
-These buffers follow the complete room-rig packet at `804D0000..804D8FFF`, retain
-reaction/colour state at `804CD000..804CD4FF`, and precede furniture banks at
-`80500000`. The installer rejects overlapping live owners.
+`807D9000..807E811F`; the full native title replay owns `807E9000..807ED82F`.
+Both fit eight-MiB RAM after the existing upper resident owners. The installer
+checks all retained RAM reservations, including carrying, console state/storage,
+room rigs, and furniture banks, rather than checking only nearby room owners.
 
 The native title allocation fails on the checked ABI-374 predecessor as well as
 the first connected prototype: its `4830`-byte allocation returns null, followed
@@ -54,17 +57,43 @@ by `DMA ERROR` in `m_titledemo.c`. The complete checked allocation function,
 resource, and sole patched call are retained in the font receipt. Its separate
 Expansion Pak buffer preserves the whole replay and native playback without
 consuming the already constrained ordinary arena. Early buffer placements in
-prototype 09 overlap live room code/state and are not a usable deliverable;
-prototype 10 moves both buffers and adds live-owner rejection checks.
+prototype 09 overlap live room code/state. Prototype 10 overlaps carrying and
+console-storage packets despite clearing the room-rig packet. Neither is a
+usable deliverable. Frontend 11 moves both complete buffers into verified free
+upper RAM and rejects overlap with any retained owner.
+
+The ordinary shared importer admits all sixteen source password-only furniture
+records: five HomePage Famicom rewards and all eleven Nintendo-code birth-34
+records. It reuses their complete staged artwork and behaviours without adding
+shop stock or catalogue orderability. The same category admits block flooring
+and mushroom mural through their actual HomePage lists, retaining complete art,
+ordinary surface stock, and catalogue allocation. The live destination map now
+contains 215 imports and 1,425 native correspondences in 316 AFPM-v2 ranges.
+There are 235 experimental development choices. Harvest surfaces remain pending.
 
 ## Verification and remaining consumers
 
 `python3 -m unittest discover -s tests -p test_v3_nook_install.py -v` passes five
-current checks: complete four-owner relocation/allocation preservation, complete
+frontend-11 checks: complete four-owner relocation/allocation preservation, complete
 font/packet bounds and checksums, whole audio and keyboard relocation, official
 text and retained physical/save resources, and real private browser/offline
 reconstruction. Profiles are empty/default, independent net-only, and all 217
-choices. Empty/default matches stable V2-14 exactly; all choices match this ROM.
+choices. Empty/default matches stable V2-14 exactly; all choices match frontend 11.
+
+`python3 -m unittest discover -s tests -p test_v3_password_acquisition.py -v`
+passes ten checks on the safe frontend and assembled ABI 378: complete source
+category admission, retained native owner hooks and menu/editor allocations,
+negative checksum/overlap checks, unchanged art/stock/save-codec fields, live
+selected destinations, and browser/offline reconstruction. Empty/default,
+Starman-only, Clu Clu Land D-only, block-flooring-only, and all 235 profiles agree;
+empty/default reproduces V2-14 and all choices reproduce the current ROM.
+
+Silent native results at `build/v3-password-only-imports-01/native-memory/results.json`
+pass eight memory assertions across twelve recorded steps. The complete 6,384-byte
+carrying packet, 19,968-byte console-storage packet, and 18,480-byte title resource
+match their expected contents after startup. The new font header, resident guard,
+and initial/final CPU-fault fields also pass. This verifies the memory-corruption
+fix in the current cartridge, not ordinary input, delivery, or physical save I/O.
 
 Retain the golden-tool native/save evidence in
 [its checkpoint](V3_GOLDEN_TOOLS.md); unchanged reward assets and saved providers
@@ -94,9 +123,10 @@ checks and continue the other required acquisition implementation. Do not infer
 working controller entry, native animated delivery, ordinary save/restart, or
 hardware from source bindings, host mocks, or pure engine calls.
 
-The next required consumers are focused ordinary code-entry/gift delivery and
-shared metadata admission of every supported staged password-only record,
-refreshing the selected destination map through the ordinary runtime builder.
-Unavailable rewards must stay explicit, never substitute shop stock. Other
+Ordinary code-entry/gift delivery remains unverified with its harness allowance
+spent. Shared admission and the live destination-map refresh are installed and
+checked. Continue the remaining source reward categories, beginning with the
+complete Harvest participant/cutlery/reward path and both surfaces. Unavailable
+rewards must stay explicit, never substitute shop stock. Other
 remaining category-wide acquisition routes and the assembled gameplay/save
 check still precede the final private hardware-targeted handoff.
