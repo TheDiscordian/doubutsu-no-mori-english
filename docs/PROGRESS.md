@@ -138,7 +138,7 @@ The connected source-mail category has checked account/reward preparation at
 `build/v3-post-office-category-prepared-04/`, based on the current ABI 386.
 The complete sixteen-function donor frontend, source formatter/drawing/art, and
 checked native menu/wallet/pocket adapters compile at
-`build/v3-post-office-bank-frontend-prepared-14/`. Fifteen complete Pelly
+`build/v3-post-office-bank-frontend-prepared-18/`. Sixteen complete Pelly
 conversation functions, actual resident/home/loan/renovation admission, and
 additive native bank-action dispatch also compile. The complete 24,224-byte art
 packet and receipts are reused. The guarded transaction uses a separately owned
@@ -167,9 +167,16 @@ open flag. An owned rejected construction installs closing-only callbacks until
 destruction, never numerical repayment callbacks. The category entry planner
 connects all six Pelly/menu lifecycle consumers through local relocated shims,
 retaining original function bodies, BSS, and the full submenu allocation chain.
-Seven focused frontend/dialogue/entry checks pass; native services remain doubles,
+Nine focused frontend/dialogue/entry checks pass; host native services remain doubles,
 and entry-plan checks use fixture destinations, not linked cartridge code.
-The actual MIPS frontend compiles with reused artwork. Complete packet linking,
+The combined MIPS object binds 34 checked native APIs/globals and 23 retained
+saved-owner services. It includes the complete loan formatter with its full
+seven-byte buffer and the complete format-21 saved-town owner, resolving account
+access to the same compiled transaction implementation. The sixteen-byte field
+setter is checked through its entire startup-installed text owner and CRC;
+message selection preserves the complete installed shared announcement owner.
+Artwork is reused. Account-mode configuration and the source April dialogue
+clip remain unbound, alongside final art addresses. Complete packet linking,
 resource relocation, text-bank and saved-owner installation are next;
 selection/admission bindings, official templates,
 real delivery/scheduling, and independent account/reward choices remain connected

@@ -36,7 +36,7 @@ HEADER_REFERENCES={
 }
 NUMERIC=('mBN_now_bell_2_bell','mBN_cursol_2_keta','mBN_total_item_bell',
     'mBN_bank_ok','mBN_move_Play','mBN_bank_ovl_init')
-PELLY=('aPG_Set_continue_msg_num','aPG_ChangeMsgData','aPG_set_post_status',
+PELLY=('aPG_Set_continue_msg_num','aPG_ChangeMsgData','aPG_set_loan_balance','aPG_set_post_status',
     'aPG_ask_for_business','aPG_msg_win_open_wait','aPG_msg_win_close_wait',
     'aPG_deposit_before','aPG_deposit_menu_close_wait','aPG_deposit_after',
     'aPG_msg_win_open_wait_init','aPG_msg_win_close_wait_init','aPG_repay_after_init',
@@ -48,6 +48,7 @@ PELLY_HEADERS={
     'm_choice.h':'bb8fc5347821769955e9f11d52ba8f6b464fa6e7056e8673cac14fcfe30c0a57',
     'm_demo.h':'ee115d213a0331b4fa588fa8fb6adfb4481105108ac2e39d42ef41ad7eb75786',
     'm_post_office.h':'5f51bcf1b629469982d3fd9949be3e2fe05438740c3554f1db1a9d0c5715ac42',
+    'm_font.h':'7a6354cc7d29d0d8fef7579d26fe40e58a19b0bbde40ca8c20f604f1b4134ded',
 }
 SOURCES=('tools/v3_post_office.py','overlays/v3/bank_account.h','overlays/v3/bank_account.c',
     'overlays/v3/bank_source_adapter.h','overlays/v3/bank_source_adapter.c')
@@ -142,10 +143,15 @@ def pelly(source):
     # formatter result rather than reproducing that unsafe source declaration.
     if body.count('u8 str[8];')!=1:raise ValueError('Changed complete Pelly balance formatter contract')
     body=body.replace('u8 str[8];','u8 str[11];')
-    if body.count('Now_Private')!=2:raise ValueError('Changed Pelly borrowed account/loan consumers')
+    # The complete loan formatter writes the declared seven-character field,
+    # despite the matching decompilation's two-byte local array. Preserve every
+    # source operation and both message fields with a full-sized local buffer.
+    if body.count('u8 str[2];')!=1:raise ValueError('Changed complete Pelly loan formatter contract')
+    body=body.replace('u8 str[2];','u8 str[aPG_LOAN_STR_LEN];')
+    if body.count('Now_Private')!=4:raise ValueError('Changed Pelly borrowed account/loan consumers')
     body=body.replace('Now_Private','af_pg_private')
     macros=constants(body,report['references'],headers=('types.h','ac_npc_post_girl.h',
-        'm_msg.h','m_msg_enum.h','m_choice.h','m_demo.h','m_submenu.h','m_post_office.h'))
+        'm_msg.h','m_msg_enum.h','m_choice.h','m_demo.h','m_submenu.h','m_post_office.h','m_font.h'))
     for name,digest in PELLY_HEADERS.items():
         if report['references']['include/'+name]['sha256']!=digest:raise ValueError('Changed complete Pelly constants: '+name)
     rows=[row for row in report['functions']['src/actor/npc/ac_npc_post_girl.c_inc'] if row['symbol'] in PELLY]
@@ -154,7 +160,7 @@ def pelly(source):
     generated=prelude+body+'\n'+(ROOT/'overlays/v3/bank_pelly_source.c').read_text()
     return {'pelly_source.c':generated,'pelly_constants.h':macros},dict(
         functions=rows,references=report['references'],source_action_count=30,
-        full_balance_field_bytes=11,native_actor_bytes=0x958,borrowed_fields=True,
+        full_balance_field_bytes=11,full_loan_field_bytes=7,native_actor_bytes=0x958,borrowed_fields=True,
         installed=False,native_menu_and_message_io_bound=False)
 
 

@@ -50,10 +50,10 @@ an explicit choice for the absent GameCube island system, not a substitute route
 The category's checked preparation is
 `build/v3-post-office-category-prepared-04/prepared.json`, with the complete
 frontend/native adapters at
-`build/v3-post-office-bank-frontend-prepared-14/prepared.json`, based on ABI 386.
+`build/v3-post-office-bank-frontend-prepared-18/prepared.json`, based on ABI 386.
 All sixteen donor bank functions, complete source drawing/formatting/art,
 transactional controls, checked native menu/wallet/pocket adapters, the separately
-owned 48-byte account record, whole-table milestone receipts, fifteen complete
+owned 48-byte account record, whole-table milestone receipts, sixteen complete
 Pelly conversation functions, checked resident/home/loan/renovation admission,
 and additive native bank-action dispatch compile. Four
 focused frontend checks pass with native I/O doubled; the original numerical and
@@ -75,12 +75,19 @@ closing-only callbacks until destruction, without repayment fallback.
 `tools/v3_post_office_install.py` prepares all six native Pelly/menu consumers
 using local relocated shims and preserves complete original bodies/BSS.
 The complete retained submenu chain grows by 64 bytes for the menu shims.
-Seven focused frontend/dialogue/entry checks pass, including both load addresses;
-native I/O is doubled, and the entry checks use fixture destinations.
-Actual selected-mode/home/current-player bindings,
+Nine focused frontend/dialogue/entry checks pass, including both load addresses;
+host native I/O is doubled, and the entry checks use fixture destinations.
+The combined MIPS object binds 34 checked native APIs/globals and 23 retained
+saved services. Complete loan formatting uses a safe seven-byte source buffer;
+the full saved-town owner resolves account access to the same compiled bank
+implementation. The complete extended text owner/startup CRC and shared
+announcement dispatcher are checked, not replaced by obsolete native bodies.
+Account-mode configuration, source April dialogue support, and final art addresses
+remain unbound. Complete packet linking,
 text-bank/menu/lifecycle installation, cartridge saved ownership, official template creation,
 real mail I/O, scheduling, and ordinary gameplay remain unbound. The current ROM
-and selections do not change. The exact next connection is complete packet linking
+and selections do not change. Resolve the source April dialogue provider and
+account-mode configuration without an empty provider, then complete packet linking
 and resource relocation, followed by text-bank and full saved-owner installation,
 using the prepared entry planner, checked dialogue, and reservations, while
 preserving repayment. Link the

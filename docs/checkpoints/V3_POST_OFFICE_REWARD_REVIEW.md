@@ -102,7 +102,7 @@ physical persistence, or hardware result is claimed.
 
 `tools/v3_bank_frontend.py` prepares all sixteen complete bank functions and the
 three complete source integer-formatting functions at
-`build/v3-post-office-bank-frontend-prepared-14/prepared.json`. It retains the
+`build/v3-post-office-bank-frontend-prepared-18/prepared.json`. It retains the
 genuine title, OK label, complete frame, cash/Bell/balance labels, and complete
 128-by-32 deposit/withdrawal textures. The shared UI converter preserves both
 source CI palette slots and checked tile-one replacement without overwriting
@@ -141,7 +141,7 @@ loan or renovation. This platform adaptation must be stated in the eventual
 N64/GameCube bank choice; N64 mode keeps banking disabled. No upper-floor building
 or guessed house field is introduced.
 
-`tools/v3_post_office.py` also compiles fifteen complete Pelly conversation
+`tools/v3_post_office.py` also compiles sixteen complete Pelly conversation
 functions, including greeting, business selection, status, deposit, menu waiting,
 closing balance display, and recovery/continuation. The source declaration's
 eight-byte balance buffer is corrected to the formatter's actual eleven-byte
@@ -254,7 +254,7 @@ submenu bytes, retaining the current complete arena contribution rather than
 replacing earlier growth. Whole owner/relocation guards and comparisons at two
 load addresses preserve every unrelated loaded byte, including the common menu.
 
-Seven current frontend/dialogue/entry checks pass, with sanitized native-I/O
+Nine current frontend/dialogue/entry checks pass, with sanitized native-I/O
 doubles and exact original-function/entry-address checks at both load bases.
 Entry-plan tests use distinct fixture destinations; no linked bank or installed
 cartridge is implied. The compiled frontend reuses the complete art packet.
@@ -262,6 +262,50 @@ The unchanged saved-town and numerical evidence remains retained. Native
 banking, physical save I/O, ordinary gameplay, and hardware are unverified.
 The enlarged owners still require ordinary VROM/physical resource relocation,
 Pelly's complete allocation descriptor, and actual linked service/code ownership.
+
+### Checked services and shared saved-object bindings
+
+The complete prepared MIPS object is
+`build/v3-post-office-bank-frontend-prepared-18/post-office.o`, SHA-256
+`42ef261e2fe35a0b24ba2e0f51369958b418bd484854002486e4c23ad2d78cfe`.
+It contains 35,185 text/constant bytes, 30 data bytes, and 1,060 BSS bytes before
+final layout. These object dimensions do not prove a final memory allocation.
+The 24,224-byte artwork packet is reused without conversion. The object binds
+34 real native APIs/globals and 23 retained saved-owner services; linker bindings
+only resolve genuine undefined references and never override compiled definitions.
+Every fixed native service has a complete body guard. The actual message-number
+getter is `8009DBB0`, not the continuation-terminal check at `8009DD8C`.
+
+The setter entry `8009D6D0` contains a one-shot loader in the cartridge. Its
+entire loader, actual owner CRC, complete 4,032-byte extended-text owner, and
+retained sixteen-byte setter initialization are checked before binding it.
+The 11-character balance therefore uses the installed extended field provider,
+not the original ten-character setter. Native message selection at `8007B5C0`
+has a complete 52-byte guard and retains its real redirect to the installed
+6,096-byte shared announcement owner. The actual resident owner and destination
+are checked in their current physical packet; an obsolete native body is not
+restored or substituted.
+
+All sixteen selected Pelly functions compile, including the complete donor loan
+formatter and complete source message-length helper. Its two-byte decompiler
+local is corrected to the declared seven-byte loan field without changing source
+operations or either message field. Sanitized source checks cover both split
+fields at 100, 999,999, 1,000,000, and 999,999,999 Bells. No external loan stub
+is needed.
+
+The same object includes the full town/console/diary/card/golden saved owner and
+format-21 codec, preserving every current storage compiler define and the checked
+separate account/scratch reservations. Its account provider and save operations
+resolve to this object's single account/transaction implementation. No second
+account busy flag or synthetic account-function addresses are linked. This is
+combined MIPS compilation and partial linking, not final placement, cartridge
+save installation, or fresh native persistence evidence.
+
+Only account-mode configuration, the source April dialogue clip, and the four
+final art-model addresses remain undefined in the combined object. The April
+provider requires real source/calendar/state bindings; an empty clip is not a
+faithful completed donor branch. Failed preparation `16` remains preserved with
+its missing font-constant diagnostic; `18` is the current complete preparation.
 
 ## Remaining connected consumers
 
@@ -278,8 +322,9 @@ queue retry, and one-time persistence. The existing catalogue-order/ticket
 wrapper in `POST_OFFICE_LETTERS.md` is not this savings-reward mechanism.
 
 Install the prepared complete bank/Pelly route, preserving repayment and the
-reviewed resident/loan/house/renovation admission. The exact next connection is
-complete packet linking and native resource relocation, then text-bank and full
+reviewed resident/loan/house/renovation admission. Bind the source April dialogue
+provider and actual account-mode configuration, then complete packet linking
+and native resource relocation, followed by text-bank and full
 saved-owner installation, using the prepared native entry planner,
 official dialogue and account provider above. Bind the
 compiled selection/admission adapters and checked wallet/pocket services only

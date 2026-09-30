@@ -23,6 +23,7 @@ from v3_ui_art import Packet
 
 FONT_SOURCE='89f63d09c6c6b5c71b9ec2b51ffe3cba9ef89ea89714cec9ad8bef015c2316de'
 FONT_HEADER='7a6354cc7d29d0d8fef7579d26fe40e58a19b0bbde40ca8c20f604f1b4134ded'
+MESSAGE_SOURCE='bef7085161b41930f24d8649f26e49948c0ca673e425fdb7413e230e5fff5d0d'
 SOURCES=('tools/v3_bank_frontend.py','tools/v3_post_office.py','tools/v3_ui_art.py',
     'tools/v3_furniture_art.py','overlays/v3/bank_account.c','overlays/v3/bank_account.h',
     'overlays/v3/bank_source_adapter.c','overlays/v3/bank_source_adapter.h',
@@ -32,9 +33,12 @@ SOURCES=('tools/v3_bank_frontend.py','tools/v3_post_office.py','tools/v3_ui_art.
     'overlays/v3/bank_pelly.h','overlays/v3/bank_pelly_source.h',
     'overlays/v3/bank_pelly_source.c','overlays/v3/bank_pelly_native.c','overlays/v3/bank_admission.c')
 SOURCES+=('tools/v3_bank_dialogue.py','overlays/v3/bank_dialogue.h',
+    'tools/v3_post_office_install.py',
     'overlays/v3/bank_entries.c','overlays/v3/bank_entries.h',
     'tools/v3_bank_storage.py','overlays/v3/console_storage.c','overlays/v3/console_storage.h',
-    'overlays/v3/save_compressed.c','overlays/v3/save_compressed.h','overlays/v3/save_runtime.c')
+    'overlays/v3/save_compressed.c','overlays/v3/save_compressed.h','overlays/v3/save_runtime.c',
+    'overlays/v3/holiday_cards.c','overlays/v3/holiday_cards.h',
+    'overlays/v3/carried_collection.c')
 ROOTS=('tyo_win_mode','tyo_win_model','tyo_win_moji2T_model','tyo_win_moji3T_model')
 NATIVE_SERVICES={
     'af_bank_native_translate':(0x800E0314,264,'767212be165dde7a9be2467ffb03b98a80af114e9ad9d352e21998c6f9981ca2'),
@@ -186,6 +190,14 @@ def generate(source):
         offsets=[at for at,entries in source.functions.items() if any(n==name for n,_ in entries)]
         if len(offsets)!=1:raise ValueError('Ambiguous source font function')
         font_rows.append(source.function(offsets[0])[1])
+    message=read('src/game/m_msg_main.c_inc',report['references'])
+    if report['references']['src/game/m_msg_main.c_inc']['sha256']!=MESSAGE_SOURCE:
+        raise ValueError('Changed complete donor message length helper')
+    name='mMsg_Get_Length_String'
+    offsets=[at for at,entries in source.functions.items() if any(n==name for n,_ in entries)]
+    if len(offsets)!=1:raise ValueError('Ambiguous complete donor message length helper')
+    message_row=source.function(offsets[0])[1]
+    font_body+='\n'+clean(function(message,name))+'\n'
     macros=constants(body+font_body,report['references'],headers=('types.h','audio_defs.h',
         'm_name_table.h','m_private.h','m_bank_ovl.h','m_submenu.h','m_lib.h','m_font.h'))
     for path,digest in dict(HEADER_REFERENCES,**{'include/m_font.h':FONT_HEADER}).items():
@@ -203,7 +215,7 @@ def generate(source):
         (ROOT/'overlays/v3/bank_source_adapter.c').read_text()+'\n'+\
         (ROOT/'overlays/v3/bank_frontend_source.c').read_text()
     report.update(format='AFV3-BANK-FRONTEND-PREPARED-1',compiled_frontend=True,
-        bank_functions=names,font_functions=font_rows,native_frontend_installed=False,
+        bank_functions=names,font_functions=font_rows,message_functions=[message_row],native_frontend_installed=False,
         frontend_transaction_adapter='full donor Play through guarded snapshot/conservation/commit',
         title=dict(symbol='kingaku_str$598',sha256=sha256(title),text=title.decode()),
         ok=dict(symbol='end_str$599',sha256=sha256(ok),text=ok.decode()))
@@ -263,12 +275,50 @@ def prepare(output,lock,*,reuse_art=None,dialogue=None):
     run('gcc',*flags,'/source/overlays/v3/bank_pelly_native.c','-o','pelly-native.o')
     run('gcc',*flags,'/source/overlays/v3/bank_admission.c','-o','bank-admission.o')
     run('gcc',*flags,'/source/overlays/v3/bank_entries.c','-o','bank-entries.o')
+    # Compile the full saved-town owner into this same object. Its bank calls
+    # resolve to this object's one account/transaction implementation, not a
+    # second busy flag or synthetic function addresses in a separate save owner.
+    from v3_bank_storage import layout
+    memory=layout(prior);retained=prior['save_codec']['active_storage_code']
+    storage_flags=retained['flags']+['-DAF_V3_BANK_STORAGE=1',
+        f'-DAF_BANK_STATE_RAM=0x{memory["account"]["ram"]:08X}u']
+    saved_objects=[]
+    for stem,path in (('bank-storage','console_storage'),('bank-codec','save_compressed'),
+            ('bank-cards','holiday_cards'),('bank-collection','carried_collection')):
+        obj=stem+'.o';run('gcc',*storage_flags,'/source/overlays/v3/'+path+'.c','-o',obj)
+        saved_objects.append(obj)
     additional=[]
     if dialogue is not None:
         write_new(output/'bank-dialogue.c',(dialogue/'bank-dialogue.c').read_bytes())
         run('gcc',*flags,'bank-dialogue.c','-o','bank-dialogue.o');additional.append('bank-dialogue.o')
-    run('ld','-EB','-r','bank-source.o','bank-account.o','bank-native.o',
-        'pelly-source.o','pelly-native.o','bank-admission.o','bank-entries.o',*additional,'-o','post-office.o')
+    objects=['bank-source.o','bank-account.o','bank-native.o','pelly-source.o',
+        'pelly-native.o','bank-admission.o','bank-entries.o',*saved_objects,*additional]
+    from v3_post_office_install import native_bindings
+    candidates,binding_report=native_bindings(base,prior)
+    undefined=set();defined=set()
+    for obj in objects:
+        undefined.update(line.split()[-1] for line in run('nm','--undefined-only',obj).splitlines())
+        defined.update(line.split()[-1] for line in run('nm','--defined-only','--extern-only',obj).splitlines())
+    # Resolve genuine external native APIs only; --defsym must never replace
+    # a newly compiled implementation or saved-state provider.
+    bound={name:candidates[name] for name in sorted(undefined-defined) if name in candidates}
+    saved_bound={name:retained['link_symbols'][name] for name in sorted(undefined-defined-bound.keys())
+        if name in retained['link_symbols']}
+    if 'AF_HI_STORAGE_RAM' in saved_bound:raise ValueError('Partial saved owner unexpectedly depends on a code origin')
+    all_bound=dict(bound,**saved_bound)
+    run('ld','-EB','-r',*(f'--defsym={n}=0x{a:X}' for n,a in all_bound.items()),
+        *objects,'-o','post-office.o')
+    definitions={name:(int(address,16),kind) for address,kind,name in
+        (line.split() for line in run('nm','--defined-only','--extern-only','post-office.o').splitlines())}
+    if any(definitions.get(name)!=(address,'A') for name,address in all_bound.items()):
+        raise ValueError('Checked native bank symbol was not bound to its real API')
+    if definitions.get('af_bank_pelly_loan_balance',(0,''))[1]!='T':
+        raise ValueError('Full source Pelly loan formatter is not compiled')
+    for name in ('af_bank_native_account','af_v3_bank_data','af_v3_save_pack',
+            'af_v3_save_check','af_v3_console_storage_commit','af_v3_console_player_clear',
+            'af_v3_save_compress_bank','af_v3_save_expand_bank','af_v3_save_measure_bank'):
+        if definitions.get(name,(0,''))[1]!='T':
+            raise ValueError('Full saved-bank owner is not compiled: '+name)
     unbound=run('nm','--undefined-only','post-office.o').strip().splitlines()
     if {line.split()[-1] for line in unbound}-{'memcpy','memset',*ROOTS,
             'af_bank_native_translate','af_bank_native_scale','af_bank_native_matrix',
@@ -279,12 +329,18 @@ def prepare(output,lock,*,reuse_art=None,dialogue=None):
             'af_bank_pelly_unlock','af_bank_pelly_force','af_bank_pelly_free_string',
             'af_bank_pelly_appear','af_bank_pelly_disappear','af_bank_pelly_order','af_bank_pelly_set_order',
             'af_bank_pelly_choice_window','af_bank_pelly_choice','af_bank_pelly_mail_count',
-            'af_bank_pelly_first_job','af_bank_pelly_foreigner','af_bank_pelly_loan_balance',
+            'af_bank_pelly_first_job','af_bank_pelly_foreigner',
             'af_bank_pelly_native_open_menu','af_bank_pelly_message_map','af_bank_pelly_message_unmap',
             'af_bank_pelly_native_number','af_bank_pelly_native_continue','af_bank_pelly_native_change',
             'af_bank_pelly_april_clip','af_bank_pelly_native_message'}:
         raise ValueError('Unexpected frontend dependencies: '+str(unbound))
+    if {line.split()[-1] for line in unbound}&all_bound.keys():
+        raise ValueError('Checked native bank API remains unresolved')
     report.update(base_sha256=sha256(base),base_abi=prior['runtime_abi'],native_adapter=native,
+        native_bindings=binding_report,
+        saved_owner=dict(compiled=True,installed=False,flags=storage_flags,memory=memory,
+            retained_storage_sha256=retained['sha256'],bound_services=saved_bound,
+            shared_account_implementation=True,save_format=21,card_wire=7),
         artwork_reused_from=str(Path(reuse_art).resolve().relative_to(ROOT)) if reuse_art else None,
         generated_sha256={n:sha256((output/n).read_bytes()) for n in generated},
         sources={n:sha256((ROOT/n).read_bytes()) for n in SOURCES},
@@ -292,6 +348,7 @@ def prepare(output,lock,*,reuse_art=None,dialogue=None):
             resources=prepared[2],compiled_models=models,models=prepared[4],
             palette_slots=[14,15],shared_converter=True),
         object=dict(sha256=sha256((output/'post-office.o').read_bytes()),compiler=IMAGE,flags=flags,
+            bound_native_services=bound,
             size=run('size','post-office.o'),linked=False,unbound_services=unbound))
     write_new(output/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
     return report

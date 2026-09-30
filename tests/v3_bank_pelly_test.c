@@ -8,6 +8,7 @@ static int window,number,continuing=1,disappeared,appeared,chosen=1,order_value=
 static int keep_mail,first_job,forced,unlocked,opened,showed,loan_calls,native_action_value;
 static int original_business_calls,original_talk_calls,original_destruct_calls,status_calls;
 static char free_str[12];
+static char loan_str[2][8];
 static union {unsigned int align;unsigned char b[0x958];} actor;
 static union {unsigned int align;unsigned char b[0x1DAC];} game;
 static union {unsigned int align;unsigned char b[0x40];} private;
@@ -28,7 +29,13 @@ void af_bank_pelly_native_continue(void *w,int n) {assert(w==&window);number=n;}
 void af_bank_pelly_native_change(void *w,int n) {assert(w==&window);number=n;}
 void af_bank_pelly_native_message(int n) {number=n;}
 void af_bank_pelly_free_string(void *w,int index,const unsigned char *text,int n) {
-    assert(w==&window && index==3 && n==11);memcpy(free_str,text,11);free_str[11]=0;
+    assert(w==&window);
+    if(index==3) {assert(n==11);memcpy(free_str,text,11);free_str[11]=0;}
+    else {
+        assert((index==1 || index==2) && n>=0 && n<=7);
+        memset(loan_str[index-1],0,8);memcpy(loan_str[index-1],text,(unsigned int)n);
+        if(index==2) {assert(n==7);loan_calls++;}
+    }
 }
 void af_bank_pelly_appear(void *w,int n) {assert(w==&window && n==1);showed++;}
 void af_bank_pelly_disappear(void *w) {assert(w==&window);disappeared=1;}
@@ -39,7 +46,6 @@ int af_bank_pelly_choice(void *w) {assert(w==&window);return chosen;}
 int af_bank_pelly_mail_count(void) {return keep_mail;}
 int af_bank_pelly_first_job(void) {return first_job;}
 int af_bank_pelly_foreigner(void) {return af_bank_player>=4;}
-void af_bank_pelly_loan_balance(void) {loan_calls++;}
 AFBankPellyApril *af_bank_pelly_april_clip(void) {return 0;}
 void af_bank_pelly_native_open_menu(void *s,int n,int a,int b) {
     assert(s==game.b+0x1CBC && n==7 && !a && !b);opened++;
@@ -141,6 +147,14 @@ void af_bank_pelly_test(void) {
     /* The original source status function retains loan and mail-queue rules. */
     AFBankPelly s={0,0,0,0,0,100,0,0,1};keep_mail=5;first_job=0;
     assert(af_bank_pelly_step(&s,AF_BANK_PELLY_STATUS) && s.status==3 && loan_calls==1);
+    assert(!strcmp(loan_str[1],"100    ") && !strcmp(loan_str[0],""));
+    s.loan=999999;assert(af_bank_pelly_step(&s,AF_BANK_PELLY_STATUS));
+    assert(!strcmp(loan_str[1],"999,999") && !strcmp(loan_str[0],""));
+    s.loan=1000000;assert(af_bank_pelly_step(&s,AF_BANK_PELLY_STATUS));
+    assert(!strcmp(loan_str[1],"0      ") && !strcmp(loan_str[0],"1"));
+    s.loan=999999999;assert(af_bank_pelly_step(&s,AF_BANK_PELLY_STATUS));
+    assert(!strcmp(loan_str[1],"999,999") && !strcmp(loan_str[0],"999"));
+    assert(loan_calls==4);
     s.loan=0;assert(af_bank_pelly_step(&s,AF_BANK_PELLY_STATUS) && s.status==5);
     s.has_bank_account=0;assert(af_bank_pelly_step(&s,AF_BANK_PELLY_STATUS) && s.status==1);
     s.action=30;assert(!af_bank_pelly_step(&s,AF_BANK_PELLY_MOVE));

@@ -11,7 +11,7 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,u32
 from catalogue_names import Image
 from npc_mail_show import relocate_verified_data
 from v3_furniture_install import inputs
-from v3_post_office_install import ENTRIES,native_entries
+from v3_post_office_install import ENTRIES,native_entries,native_bindings,native_binding_contract,PELLY_SERVICES
 
 
 class PostOfficeEntriesTests(unittest.TestCase):
@@ -73,6 +73,49 @@ class PostOfficeEntriesTests(unittest.TestCase):
             else:exports[ENTRIES[0]]=0x80000000
             with self.assertRaisesRegex(ValueError,'complete linked entry set'):
                 native_entries(self.base,exports,code_bounds=(0x807D9000,0x807DA000))
+
+    def test_checked_native_apis_and_extended_field_provider(self):
+        bindings,report=native_bindings(self.base,self.prior)
+        self.assertEqual(bindings['af_bank_pelly_native_number'],0x8009DBB0)
+        self.assertNotIn(0x8009DD8C,bindings.values())
+        self.assertEqual(bindings['af_bank_pelly_native_message'],0x8007B5C0)
+        self.assertEqual(report['services']['af_bank_pelly_native_message']['bytes'],52)
+        self.assertTrue(report['message_dispatch']['retained_shared_owner'])
+        self.assertEqual(report['message_dispatch']['entry'],0x806FEB98)
+        self.assertEqual(bindings['af_bank_pelly_free_string'],0x8009D6D0)
+        self.assertEqual(report['free_string']['field_bytes'],16)
+        self.assertTrue(report['free_string']['startup_installed'])
+        self.assertFalse(report['installed']);self.assertFalse(report['native_execution_verified'])
+        self.assertEqual(bindings['af_bank_now_private'],0x80136FD8)
+        self.assertEqual(bindings['af_bank_player'],0x80136EA3)
+        self.assertEqual(set(report['unresolved_providers']),{
+            'af_bank_native_account','af_bank_account_mode','af_bank_pelly_april_clip'})
+        self.assertFalse(set(report['unresolved_providers'])&bindings.keys())
+        self.assertNotIn('af_bank_open_queue',bindings)
+        for changed in ('body','target'):
+            prior=copy.deepcopy(self.prior)
+            code=prior['equipment_resources']['npc_extra']['events']['demo']['code']
+            if changed=='body':code['sha256']='0'*64
+            else:code['symbols']['af_holiday_demo_message']+=4
+            with self.subTest(dispatcher=changed),self.assertRaisesRegex(ValueError,'installed post-office message dispatcher'):
+                native_bindings(self.base,prior)
+
+    def test_native_binding_guards_fail_closed(self):
+        files=by_vrom(self.base)
+        owners=[files[v].extract(self.base) for v in (CODE_VROM,0x1060,0x8A6C10,0x03A00000)]
+        for name,(address,size,_) in PELLY_SERVICES.items():
+            current=list(owners);current[0]=bytearray(current[0]);current[0][address-CODE_RAM+size-1]^=1
+            with self.subTest(service=name),self.assertRaisesRegex(ValueError,'complete native post-office service'):
+                native_binding_contract(*current)
+        for index,at,reason in ((0,0x8009D758-CODE_RAM,'startup loader'),
+                (1,0x8003B9B0-0x80025C60,'native post-office service'),
+                (2,0x809C3650-0x809C3420,'current-private reader'),
+                (3,2132+31,'extended post-office text owner'),
+                (3,3808+20,'extended post-office text owner'),
+                (3,3476,'extended post-office text owner')):
+            current=list(owners);current[index]=bytearray(current[index]);current[index][at]^=1
+            with self.subTest(owner=index,offset=at),self.assertRaisesRegex(ValueError,reason):
+                native_binding_contract(*current)
 
 
 if __name__=='__main__':unittest.main()

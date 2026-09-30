@@ -47,6 +47,7 @@ extern void af_bank_pelly_loan_balance(void);
 extern void af_bank_pelly_open_menu(AFBankPellySubmenu *,int,int,int);
 /* Use the complete compiled donor formatter, not the distinct N64 ABI. */
 extern int mFont_UnintToString(u8 *,int,u32,int,int,int,int);
+extern int mMsg_Get_Length_String(u8 *,int);
 #define mMsg_Get_base_window_p af_bank_pelly_window
 #define mMsg_Get_msg_num af_bank_pelly_message_number
 #define mMsg_Check_MainNormalContinue af_bank_pelly_continue

@@ -14,7 +14,7 @@ from v3_furniture_pipeline import Source
 from v3_bank_frontend import generate,artwork,native_contract,admission_contract,reuse_artwork,ROOTS
 from v3_post_office import pelly
 
-PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-14')
+PREPARED=ROOT/os.environ.get('V3_BANK_FRONTEND_PREPARED','build/v3-post-office-bank-frontend-prepared-18')
 
 
 class BankFrontendTests(unittest.TestCase):
@@ -27,7 +27,10 @@ class BankFrontendTests(unittest.TestCase):
         generated,report=generate(self.source);prepared=json.loads((PREPARED/'prepared.json').read_bytes())
         pg,pg_report=pelly(self.source);generated.update(pg)
         self.assertEqual(json.loads(json.dumps(pg_report)),prepared['pelly'])
-        self.assertEqual(len(pg_report['functions']),15)
+        self.assertEqual(len(pg_report['functions']),16)
+        self.assertEqual(pg_report['full_loan_field_bytes'],7)
+        self.assertIn('u8 str[aPG_LOAN_STR_LEN];',pg['pelly_source.c'])
+        self.assertNotIn('u8 str[2];',pg['pelly_source.c'])
         self.assertIn('u8 str[11];',pg['pelly_source.c']);self.assertNotIn('u8 str[8];',pg['pelly_source.c'])
         self.assertEqual(len(report['bank_functions']),16)
         self.assertTrue(prepared['compiled_frontend']);self.assertFalse(prepared['native_frontend_installed'])
@@ -36,6 +39,22 @@ class BankFrontendTests(unittest.TestCase):
             self.assertEqual(text.encode(),(PREPARED/name).read_bytes())
             self.assertEqual(sha256(text.encode()),prepared['generated_sha256'][name])
         self.assertEqual(sha256((PREPARED/'post-office.o').read_bytes()),prepared['object']['sha256'])
+        from v3_post_office_install import native_bindings
+        from v3_furniture_install import inputs
+        image,prior=inputs(ROOT/'build/v3-holiday-card-prize-imports-01/password-destinations/build-lock.json')
+        bound,receipt=native_bindings(image,prior)
+        self.assertEqual(receipt,prepared['native_bindings'])
+        self.assertEqual(bound,prepared['object']['bound_native_services'])
+        unresolved={line.split()[-1] for line in prepared['object']['unbound_services']}
+        self.assertFalse(unresolved&bound.keys())
+        self.assertNotIn('af_bank_pelly_loan_balance',unresolved)
+        self.assertNotIn('af_bank_native_account',unresolved)
+        self.assertTrue(prepared['saved_owner']['shared_account_implementation'])
+        self.assertTrue(prepared['saved_owner']['compiled'])
+        self.assertFalse(prepared['saved_owner']['installed'])
+        self.assertEqual(prepared['saved_owner']['save_format'],21)
+        self.assertEqual(prepared['saved_owner']['card_wire'],7)
+        self.assertEqual(prepared['saved_owner']['flags'][:-2],prior['save_codec']['active_storage_code']['flags'])
         if 'dialogue' in prepared:
             from v3_bank_storage import layout
             from v3_holiday_dialogue import check_provenance
