@@ -736,7 +736,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     room_rigs_art=None, room_rigs_code=False, room_goods=None, room_carry=None, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
-                    password_runtime=None,password_editor=False,password_nook=None,harvest_connected=None,bank_connected=None,private_save_bank=False,room_effects=None,furniture_capacity=False,console_storage=False,
+                    password_runtime=None,password_editor=False,password_nook=None,harvest_connected=None,bank_connected=None,private_save_bank=False,scene_arena=False,room_effects=None,furniture_capacity=False,console_storage=False,
                     console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None,carried_items=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
@@ -772,6 +772,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if private_save_bank:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
+    if scene_arena:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if creature_items is not None:
@@ -816,7 +819,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if private_save_bank:
+    if scene_arena:
+        import v3_scene_arena as equipment
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+            base,prior,blob,core,module,output)
+        display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
+    elif private_save_bank:
         import v3_private_save_bank as equipment
         equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
             base,prior,blob,core,module,output)
@@ -1647,6 +1655,14 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             additional_scene_bytes=0,resource_allocations_changed=True)
         report['sources'].update(workspace['sources'])
         report['native_test']='pending changed save/load callers and ordinary save/reload; creature failures and ordinary scene headroom remain unresolved'
+    if scene_arena:
+        workspace=equipment_report['scene_arena']
+        report['shared_runtime_refresh'].update(adapters=['scene_arena'],
+            additional_resident_bytes=workspace['code']['bytes'],
+            additional_scene_bytes=workspace['workspace']['free_payload_bytes'],
+            resource_allocations_changed=True)
+        report['sources'].update(workspace['sources'])
+        report['native_test']='pending native scene ownership, actor loading, cleanup, and ordinary save/restart'
     if console_storage:
         storage=equipment_report['console_storage']
         report['shared_runtime_refresh'].update(adapters=['console_storage'],saved_format_changed=True,
@@ -1987,6 +2003,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install linked bank/April resources, text, and saved ownership without enabling selection')
     parser.add_argument('--private-save-bank',action='store_true',
         help='With --refresh-runtime, bind complete save/load workspace independently of the scene heap')
+    parser.add_argument('--scene-arena',action='store_true',
+        help='With --refresh-runtime, borrow exclusive title RAM for complete native gameplay allocations')
     parser.add_argument('--room-effects',type=Path,
         help='With --refresh-runtime, install prepared shared effects through the native controller')
     parser.add_argument('--furniture-capacity',action='store_true',
@@ -2049,6 +2067,7 @@ if __name__=='__main__':
     if args.harvest_connected and not args.refresh_runtime:parser.error('--harvest-connected requires --refresh-runtime')
     if args.bank_connected and not args.refresh_runtime:parser.error('--bank-connected requires --refresh-runtime')
     if args.private_save_bank and not args.refresh_runtime:parser.error('--private-save-bank requires --refresh-runtime')
+    if args.scene_arena and not args.refresh_runtime:parser.error('--scene-arena requires --refresh-runtime')
     if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
     if args.furniture_capacity and not args.refresh_runtime:parser.error('--furniture-capacity requires --refresh-runtime')
     if args.console_storage and not args.refresh_runtime:parser.error('--console-storage requires --refresh-runtime')
@@ -2073,7 +2092,7 @@ if __name__=='__main__':
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
                             furniture_scoring=args.furniture_scoring,password_runtime=args.password_runtime,
                             password_editor=args.password_editor,password_nook=args.password_nook,harvest_connected=args.harvest_connected,
-                            bank_connected=args.bank_connected,private_save_bank=args.private_save_bank,room_effects=args.room_effects,
+                            bank_connected=args.bank_connected,private_save_bank=args.private_save_bank,scene_arena=args.scene_arena,room_effects=args.room_effects,
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,

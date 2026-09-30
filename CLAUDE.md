@@ -14,17 +14,20 @@ extraction/conversion, stable additive identities, bulk asset/data installation,
 item/villager runtime behaviour and persistence, English text, and independent
 browser/offline selections. Regular items are importable and obtainable through
 the regular item pool. Read `specs/V3_OPTIONAL_IMPORTS.md` and the active V3 queue.
-Special items requiring GameCube acquisition features should not be importable
-until those features exist in V4. Their conversion/resources can be
-prepared in V3; prepared or installed resources do not make them importable.
-Do not add substitute regular stock or gifts for special items.
-Post-office banking/mail rewards, holiday/Harvest and golden-tool reward systems,
-Museum/island reward policies, Able Sisters/custom designs, the Museum building,
-island facilities, and other new GameCube features belong to V4. Do not finish
-these systems or demand policy choices for them as V3 prerequisites. Preserve
-existing experimental code/resources without expanding them. Design-dependent
-sign boards remain deferred. Ordinary item behaviours, including fish/insects/
-fossils, remain V3 import work. This boundary governs subordinate specifications,
+Rewards that fit existing systems are in scope for V3 item acquisition. A reward
+or special-item label does not itself make an item V4 work. Defer acquisition
+only when it requires an entirely new feature or building, rather than extending
+an existing system. Items depending on those deferred features should not be
+importable before they are obtainable. Their conversion/resources can be prepared
+in V3; prepared or installed resources do not make them importable. Do not invent
+substitute regular stock or unrelated gifts for special items.
+New buildings and entirely new features, including Able Sisters/custom designs,
+the Museum building, island facilities, and savings accounts, belong to V4.
+Preserve existing experimental code/resources; assess each acquisition path by
+its actual dependencies instead of excluding all mail, holiday, or golden-tool
+rewards. Do not demand policies for new V4 systems as V3 prerequisites.
+Design-dependent sign boards remain deferred. Ordinary item behaviours, including
+fish/insects/fossils, remain V3 import work. This boundary governs subordinate specifications,
 checkpoint continuations, and stored goal wording.
 There is one deployed patcher: the public website. Localhost is an ordinary
 website preview; running it as a service gives it no special status. Use "the
@@ -150,13 +153,13 @@ the experimental V3 publication hold does not apply to V2 fixes.
 - Importing includes extraction, conversion, bulk installation, and working
   item behaviours, including item-specific behaviours. Do not impose a rule
   postponing item-specific work until all shared categories are finished.
-  Regular items enter the regular item pool. Special acquisition, including
-  Nook's code UI, gift handover, holiday rewards, and golden-tool rewards, is V4
-  work, not a V3 follow-up task or completion requirement. Prepare supported
-  artwork and shared records without implementing new GameCube features.
-  Keep incomplete behaviour and special acquisition-dependent items out of
-  selectable imports. Report prepared pipeline coverage separately from
-  importability; preparation does not enable a special item. Extend a
+  Regular items enter the regular item pool. Rewards that fit existing systems
+  remain V3 acquisition work; do not blanket-defer gifts, mail, holiday rewards,
+  or golden-tool rewards by name. Acquisition requiring an entirely new feature
+  or building belongs to V4. Prepare supported artwork and shared records without
+  implementing those deferred features. Items with incomplete behaviour or
+  unavailable acquisition should not be selectable. Report prepared pipeline
+  coverage separately from importability; preparation does not enable an item. Extend a
   shared category once for all matching records. Reuse passing tests for
   unchanged components.
 - Substantial N64/GameCube behaviour differences are explicit WebUI choices,
@@ -166,9 +169,9 @@ the experimental V3 publication hold does not apply to V2 fixes.
   cosmetic toggle or treating an unfinished port as a completed alternative.
 - V3 completes the import pipeline for items and villagers. Once that pipeline
   is complete, verify and hand it over.
-  Do not continue into gold-tree reward events, special acquisition, or other
-  V4 systems. Preserve installed item behaviours and existing evidence without
-  expanding unrelated reward-system checks.
+  Do not continue into new buildings or entirely new V4 features. Existing-system
+  rewards are not automatically excluded from V3. Preserve installed item
+  behaviours and existing evidence without expanding unrelated feature checks.
 - Use existing focused checks once per meaningful change. Reuse passing native
   evidence for unchanged code/resources; do not add exhaustive per-record or
   all-combinations harnesses without a concrete uncovered risk. For a testing-

@@ -25,55 +25,72 @@ lock or publish experimental V3.
 ## Active development
 
 V3 is only the import pipeline for items and villagers. Regular items should be
-importable and obtainable through the regular item pool. Special items requiring
-GameCube acquisition features should not be importable through browser/offline
-selections until those features exist in V4; prepared resources do not make them importable. Their
-missing acquisition is not a V3 blocker. Banking, special mail/rewards, holiday/
-Harvest and golden-tool reward systems, Museum/island policies, and new GameCube
-facilities are outside active V3 work. Preserve their experiments without expanding
-them. See the [active pipeline queue](WORK_QUEUE.md#execution-order).
+importable and obtainable through the regular item pool. Rewards that fit existing
+systems are in scope for V3. Special items are not automatically deferred: assess
+their actual acquisition dependencies. Items requiring new buildings or entirely
+new features should not be importable until those features exist in V4; prepared
+resources do not make them importable. Savings accounts, new facilities, and
+comparable entirely new features are outside V3. Preserve experiments and evaluate
+existing-system reward routes individually. See the
+[active pipeline queue](WORK_QUEUE.md#execution-order).
 
-### Regular-pool selections
+### Current import selections and verification
 
 Browser and offline builds default to the V3 pipeline scope. Both offer all
-twenty villagers and 128 independent regular-pool item choices. Two exclusive
+twenty villagers and 135 independent item choices. Two exclusive
 starting-outfit resources follow their villagers as dependencies, not standalone
-item choices. Select all requests 148 choices and includes those two resources.
+item choices. Select all requests 155 choices and includes those two resources.
 Actual checked stock tables determine regular furniture, clothing, and surfaces;
 the remaining item categories use their installed native acquisition paths.
-Special items remain unavailable. Prepared resources and stable identities are
+Seven furniture choices use the existing native lottery, with checked donor
+membership and retained native selection code. They require no new event provider.
+The current filter leaves items outside its admitted regular categories
+unavailable; this is implemented selection behaviour, not proof that every
+excluded reward requires V4. Review those exclusions against existing-system
+acquisition. Prepared resources and stable identities are
 preserved; selection changes do not reconvert artwork or remove physical data.
-New event/reward providers stay disabled, and their V4 controls are hidden.
+Experimental event/reward providers stay disabled, and their controls are hidden;
+this does not classify every reward as V4.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-04/build.json`, pinned to the repaired ABI-388
-cartridge. Five current-cartridge scope/browser-equivalence tests pass. The
+`build/v3-import-pipeline-browser-05/build.json`, pinned to the repaired ABI-389
+cartridge. Six current-cartridge scope/browser-equivalence tests pass. The
 current headless Chromium worker check at
-`build/v3-import-pipeline-worker-02/results.json` reads actual game files and
+`build/v3-import-pipeline-worker-03/results.json` reads actual game files and
 matches offline hashes for empty, all-available, villager/regular-item, and
 equipment-subset selections, with cancellation and invalid-input rejection.
-The unchanged interface retains its passing evidence at
-`build/v3-import-pipeline-interface-03/results.json`, including independent
+The current interface check passes at
+`build/v3-import-pipeline-interface-05/results.json`, including independent
 selection/dependencies, keyboard controls, unavailable-review data, and download
-lifecycle checks; twelve unchanged JavaScript checks retain passing evidence.
+lifecycle checks. Twelve unchanged JavaScript checks retain passing evidence.
 Empty selection returns exact V2-14. No game files are uploaded; the temporary
 check servers are stopped. The export is unserved.
 
 The all-available offline profile is
-`build/v3-import-pipeline-profile-04/profile.json`; UPS reconstruction passes.
+`build/v3-import-pipeline-profile-06/profile.json`; UPS reconstruction passes.
 ROM SHA-256:
-`6e56a63e8e6b553f0a624a2a801bedd2fd94d1d615e88123e7eb01879e64eb7f`.
+`ccdf2274a65ec5005948dc6bcd807b4f6253305965de553e6fc279125386fabe`.
 UPS SHA-256:
-`4d5cb23d1dc7a200fbe7052cb2857bf8fffc4f1af9cd9b43d8048ef88ea88d5d`.
-It retains ABI 388, format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and older
-V3 readers cannot read these saves; preserve separate saves and backups. Browser
-composition does not prove ordinary gameplay, physical save/restart, or hardware.
-The current ROM's silent isolated boot check passes at
-`build/v3-import-pipeline-boot-04/results.json`: eight-MiB RAM, startup readiness,
-translation/resident/save guards, zero native fault state before and after Start,
-and graceful shutdown. No dialogue is loaded in the sampled frame; the Start
-keypress is not proof of ordinary progression. The emitted blank FlashRAM file
-is not a game-save/reload test. No old creature fixture is replayed.
+`a87f9a9edebeca2d372d360eb9baf6678ac95bf05e62925275d7047debcd0178`.
+It retains ABI 389, format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and
+format-20-or-earlier V3 readers cannot read these saves; preserve separate saves
+and backups. Supported older saves migrate forward. Browser composition does
+not establish hardware compatibility or comprehensive gameplay.
+
+The exact profile's silent ordinary controller-path checks pass at
+`build/v3-import-pipeline-ordinary-save-03/results.json` and
+`build/v3-import-pipeline-ordinary-reload-01/results.json`. A disposable older
+town loads normally, the gyroid offers Save & Quit, the native saving message
+appears, both complete FlashRAM banks are written, and the game returns to title.
+A fresh emulator process loads that saved town without an emulator checkpoint.
+Imported plum fan `2255`, pockets, and clothing survive. Save/workspace/resident
+guards, zero native fault state, and graceful shutdown pass in both runs.
+Independent full-chip validation checks both additive checksums, complete-bank
+CRC, decompression, all three saved-record CRCs, canonical selected profiles,
+zero unused padding, and the preserved imported fan. Five focused scene/save
+tests pass, including that actual written-chip check. This verifies this town's
+ordinary save/restart, not every item behaviour, synchronous writing,
+diary-preflight execution, or hardware. No old creature fixture is replayed.
 The retained creature constructor timeout and scheduler disconnection remain
 unclassified, not established harness faults or passed gameplay checks.
 
@@ -99,8 +116,8 @@ synchronous writer and direct loader at `80A9FFB0`/`80A9FFB8`. The separate save
 menu calls the synchronous writer after gameplay cleanup clears the scene heap;
 the original writer did not allocate there. That save-menu allocation dependency
 is a concrete implementation defect addressed by the private-bank repair below.
-Ordinary save/restart and broader scene headroom remain unverified, not proved
-safe by the boot result.
+The diagnostic allocation failure is separate from the passing ordinary
+controller-path save/reload checks; the exhausted fixture remains unverified.
 
 The complete private-bank repair is installed at
 `build/v3-private-save-bank-installed-06/build-lock.json`, ABI 388. Its 356-byte
@@ -125,11 +142,27 @@ Start/load path reads a complete bank, releases the workspace, and retains zero
 save error, all guards, and the relocated record. Its matching checkpoint
 contains the blank-chip bytes in the private bank and native replay bytes at the
 old conflicting address. This establishes the changed allocated-loader path,
-not ordinary write/restart compatibility. The exact same tested ROM is retained
-by the current profile; unchanged native evidence is reused without replay.
-Next verify the synchronous writing/diary consumers and ordinary save/restart,
-then finish the private handoff. Do not replace the failed check with smaller
-test buffers, replay exhausted fixtures, or silently omit a save consumer.
+not ordinary write/restart compatibility. Unchanged private-bank evidence is
+retained without replay. Its complete program and workspace remain intact in
+the current scene repair.
+
+The current connected repair is
+`build/v3-scene-arena-installed-03/build-lock.json`, ABI 389. Gameplay borrows
+the native title's exclusive `80400000..80450000` workspace only while no title
+owner is loaded. Guards and a native allocated sentinel protect the separate
+block; cleanup releases ownership before title loading. The main heap ceiling,
+native allocator, complete artwork, save format, and all existing actor code
+remain unchanged. Only two authenticated gameplay lifecycle calls change.
+Ordinary reload contains all four gyroids and 186,896 free scene bytes; the
+failed pre-repair ordinary save capture has 480 free bytes and no gyroids.
+That missing-actor defect is repaired, not dismissed as test navigation.
+
+Next review current selector exclusions against existing-system acquisition,
+verify the remaining synchronous writing/diary consumers, classify retained
+creature failures from evidence, and finish the private handoff. Do not replace
+failed checks with smaller buffers, replay exhausted fixtures, reset their
+debugging budgets, or silently omit a save consumer. New buildings and entirely
+new features remain outside V3.
 
 ## Preserved experimental artifact and subsystem evidence
 
@@ -159,8 +192,8 @@ empty/default selection, and the complete 235-choice cartridge. Font and title
 buffers use checked upper RAM, avoiding every retained owner; a silent native
 check verifies the complete carrying/storage/title contents and CPU fault fields.
 Controller-driven code entry, full gift handover, ordinary save/restart, and
-hardware remain unverified. Special acquisition continuations belong to V4,
-not the active V3 pipeline. See
+hardware remain unverified. Acquisition continuations require individual
+existing-system versus new-feature classification, not automatic V4 deferral. See
 [the Nook checkpoint](checkpoints/V3_NOOK_PASSWORDS.md).
 
 Harvest installs its complete owner, hiding/arrival/relocation adapters, five

@@ -47,8 +47,9 @@ synchronous writer/direct loader at `80A9FFB0`/`80A9FFB8`. The independent
 `SaveMenu` state calls the synchronous writer without initializing a scene arena,
 after `play_cleanup` clears that arena. The original synchronous writer used live
 data directly, with no heap allocation. The added scene-heap dependency therefore
-requires the independent workspace below. Blank-chip title loading has focused
-native evidence; ordinary saved-town restart remains unverified.
+requires the independent workspace below. Blank-chip title loading and ordinary
+saved-town restart have focused native evidence. Synchronous writing and
+diary-preflight execution remain unverified.
 
 `overlays/v3/private_save_bank.c` implements a shared temporary bank independent of
 that scene heap. It reserves 65,536 data bytes and 32 metadata/guard bytes, rejects
@@ -80,7 +81,9 @@ receipt's byte count describes a code function rather than its data buffer.
 
 `build/v3-private-save-bank-installed-06/build-lock.json` pins the installation,
 ABI 388. Six focused host and five installed-cartridge checks pass. The
-all-available profile is `build/v3-import-pipeline-profile-04/profile.json`.
+current all-available profile is `build/v3-import-pipeline-profile-06/profile.json`,
+with the ABI-389 scene repair at
+`build/v3-scene-arena-installed-03/build-lock.json`.
 `build/v3-import-pipeline-boot-04/results.json` verifies the exact same ROM's
 normal Start/allocated-loader path: a complete bank read, released workspace,
 zero save error, and intact state/guards. Its checkpoint confirms native replay
@@ -89,6 +92,35 @@ save/restart, synchronous writing, or diary-preflight execution. The exhausted
 native save-check fixture remains retained and unverified; installation does not
 restart its debugging budget. Other evidence below applies only to its recorded
 builds, not to all current consumers.
+
+The current exact profile passes ordinary controller-path Save & Quit at
+`build/v3-import-pipeline-ordinary-save-03/results.json` and fresh-process reload
+at `build/v3-import-pipeline-ordinary-reload-01/results.json`. Both complete
+format-21 banks validate independently, including all decompressed records,
+checksums, CRCs, selected profiles, and imported fan `2255`. Pockets and clothing
+survive reload. This is ordinary save/restart evidence, not physical synchronous
+writer, diary-preflight, every-item, or original-hardware coverage.
+
+## Gameplay scene headroom
+
+`overlays/v3/scene_arena.c` borrows the native title allocation
+`80400000..80450000` exclusively during real town/room gameplay. It requires
+eight-MiB RAM and an unloaded title owner. Title, resident-selection,
+introduction, and announcement scenes keep the original allocation path.
+The native main heap ceiling remains `80400000`. A native allocated sentinel
+separates the lower and upper blocks because native shrink-reallocation assumes
+a free successor is adjacent. Front/end guards and explicit ownership protect
+the borrowed workspace; cleanup clears ownership before the title loads again.
+The complete native allocator and title descriptor remain unchanged.
+
+The helper uses `804F3280..804F4900`, with ownership at `804F4900`, inside the
+same retired reservation as the private bank. Installation changes only two
+authenticated gameplay lifecycle calls and leaves the relocation table intact.
+Complete artwork and existing actor hooks are preserved. The ordinary saved-town
+reload contains all four gyroids and 186,896 free scene bytes, with intact
+guards. Five focused scene/save tests pass, covering sanitized ownership,
+sentinel/overlap checks, complete packet preservation, the two-call patch,
+exact UPS reconstruction, and the actual written-chip validation.
 
 ## Memory and startup
 

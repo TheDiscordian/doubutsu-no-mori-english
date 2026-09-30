@@ -15,17 +15,18 @@ persistence, official English text, and deterministic independent browser/offlin
 selections. V3 is complete when the import pipeline works for items and villagers.
 Regular items should be obtainable through the regular item pool.
 
-Special items requiring GameCube acquisition features should not be importable
-through browser or offline selections until their acquisition is implemented
-in V4. V3 may prepare their conversion/resources, but should not enable importing
-them or put them in substitute regular stock. Prepared integration and selectable
-imports are separate states; deferred special acquisition does not block V3.
+Rewards that fit existing systems are in scope for V3. Assess acquisition by the
+actual systems it requires, not by whether an item is special or awarded as a
+reward. Mail, holiday, gift, and golden-tool rewards are not automatically V4.
+Items requiring an entirely new acquisition feature or building should not be
+importable through browser or offline selections until that feature exists in V4.
+V3 may prepare their conversion/resources, but should not put them in substitute
+regular stock. Prepared integration and selectable imports are separate states.
 
-Savings accounts/postal rewards, Nook code handovers, holiday/Harvest events,
-golden-tool reward systems, and Museum/island acquisition policies are V4 work.
-Able Sisters/custom designs, the Museum building, island facilities, and other
-new GameCube features also belong to V4. Preserve existing experiments without
-expanding them; no V3 task requires completing them or choosing replacement routes.
+New buildings and entirely new features, including savings accounts, Able Sisters/
+custom designs, the Museum building, and island facilities, belong to V4.
+Preserve existing experiments and evaluate reward consumers individually; no V3
+task requires completing a new V4 system or choosing its replacement route.
 Design-dependent sign boards and saved-pattern representations remain deferred.
 Ordinary fish, insects, fossils, and other items retain their actual item
 behaviours within V3 without adding the Museum. This boundary governs subsystem
@@ -579,7 +580,8 @@ in both-mode saved-owner checks. These results do not prove ordinary gameplay,
 physical save/restart, or hardware behaviour.
 
 Genuine successful-mail acknowledgement and scheduling, and independent mechanic/
-reward controls remain V4 acquisition work. The source milestone does
+reward controls remain unfinished. Assess their existing-system dependencies
+separately from the new V4 savings-account feature. The source milestone does
 not become lifetime earnings or random post-office stock. Format-21
 saves migrate older supported records forward with empty accounts; format-20-or-
 earlier readers cannot load format 21, even when banking is disabled. Preserve

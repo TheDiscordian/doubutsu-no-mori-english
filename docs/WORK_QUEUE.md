@@ -12,11 +12,14 @@ fish/insect/fossil imports remain V3 work; the Museum building is not required.
 
 V3 completes the shared import pipeline for items and villagers, not GameCube feature ports.
 Regular items should be importable and obtainable through the regular item pool.
-Special items requiring GameCube acquisition features should not be importable
-through browser or offline selections until their acquisition exists in V4. Preparing
-their converted resources is allowed; enabling them or inventing ordinary stock
-is not. Banking, special mail/rewards, holiday/Harvest reward systems, Museum/
-island policies, and other new facilities are not V3 tasks or prerequisites.
+Rewards that fit existing systems are in scope for V3. A special item or reward
+is not automatically V4 work. Items whose acquisition requires an entirely new
+feature or building should not be importable until that feature exists in V4.
+Preparing their converted resources is allowed; inventing substitute ordinary
+stock or unrelated gifts is not. New buildings and entirely new features, such
+as savings accounts, Able Sisters/custom designs, and island facilities, are not
+V3 tasks or prerequisites. Assess mail, holiday, gift, and golden-tool acquisition
+by their actual dependencies rather than excluding entire reward categories.
 This boundary governs every continuation and subsystem note in this queue.
 
 ### Execution order
@@ -29,14 +32,17 @@ This boundary governs every continuation and subsystem note in this queue.
    Item-specific behaviours are part of this work, without a rule postponing
    them until all shared categories are finished.
 2. Complete browser/offline import selection and regular item-pool integration.
-   Keep special acquisition-dependent items disabled; do not port their V4 systems.
+   Include working rewards that fit existing systems. Keep items requiring
+   deferred new features unavailable; do not port their V4 systems.
 3. Run focused import-pipeline/runtime/save checks and deliver the private pipeline
    playtest build. Broad human testing follows the build, not the reverse.
 
-Special acquisition is V4 work. A missing gift route must not prevent asset/data
-conversion, block V3 completion, or redirect work from the pipeline. Those special
-items stay unavailable in the selector, even when resources are fully prepared.
-Regular items use the regular pool. Reuse unchanged passing tests throughout.
+Existing-system acquisition belongs to the item import pipeline. Review selector
+exclusions against actual existing reward routes; absence from ordinary shop stock
+does not establish a V4 dependency. Missing new V4 features do not block asset/data
+conversion or V3 completion. Items dependent on those features should remain
+unavailable in the selector, even when resources are prepared. Regular items use
+the regular pool. Reuse unchanged passing tests throughout.
 
 Carry substantial N64/GameCube behaviour differences through the shared import
 path as explicit WebUI choices, following the
@@ -45,58 +51,70 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: finish focused stability/save verification and the
-private import-pipeline handoff. Regular-pool browser/offline integration passes:
-`build/v3-import-pipeline-browser-04/build.json`,
-`build/v3-import-pipeline-interface-03/results.json`, and
-`build/v3-import-pipeline-worker-02/results.json`. The unchanged interface evidence
-is reused; the current repaired cartridge's worker hashes match offline builds.
-The all-available profile is
-`build/v3-import-pipeline-profile-04/profile.json` (148 independent choices,
-including all twenty villagers, plus two required outfit resources). Preserve
-these results and disabled special-item selections. Complete the exact current
-cartridge's bounded save check. Its boot/RAM/startup/guard/fault check passes at
-`build/v3-import-pipeline-boot-04/results.json`; the blank FlashRAM output does
-not establish save/reload or ordinary progression. The format-21 native save
-attempt at `build/v3-import-pipeline-save-write-01/results.json` stops before
-writes: its 16,640-byte transfer allocation cannot fit the captured native
-scene arena's 14,576 free bytes. The spring foreground owner now reserves
-149,024 bytes. The retail title actor calls the allocated loader immediately at
-`80AA01B0`, without checking its result. The separate save menu calls the
-synchronous writer after gameplay cleanup clears the scene arena; unlike the
-original writer, the installed writer requires an allocation from that arena.
-The guarded complete-bank workspace is installed through the existing checked
-startup at `build/v3-private-save-bank-installed-06/build-lock.json`, ABI 388.
-All 23 former scratch exports are authenticated as redirects to the active
-diary owner. Both synchronous writers, diary preflight, and native allocated
-loader/release use the complete 65,536-byte bank without the scene heap. The
-retained 64-byte save record resides at `806A9080`, outside the native title
-replay buffer; ten authenticated high-address bindings retain all entry addresses,
-other instructions, and saved data. Native buffer reservation scans include
-full RAM/end and pixel extents, not a neighbouring function's short byte count.
-Six focused host checks, five installed-cartridge checks, and five current-build
-browser/offline scope checks pass. The native Start/load path reads a complete
-bank and releases it with zero save error, intact guards, and intact relocated
-state at `build/v3-import-pipeline-boot-04/results.json`. The matching checkpoint
-contains the complete blank-chip read in the private bank and title replay data
-at the old conflicting address. This verifies loading, not a completed game save.
-Next verify the actual synchronous writing/diary consumers and ordinary
-save/restart, and finish the private handoff. Preserve complete data, native I/O,
-asynchronous framebuffer ownership, and save format 21. Ordinary scene headroom
-remains separate from this save workspace. Do not reduce the diagnostic buffer and call save coverage
-complete, skip the synchronous writer, replay exhausted fixtures, or reset this
-save-check harness's spent debugging budget. Retain its unverified adapter and
-exact failed output. Classify retained creature constructor/scheduler failures
-from evidence without replaying exhausted old fixtures.
-Fix demonstrated game faults and record remaining limits honestly. Do not treat
-missing special acquisition as a pipeline defect or resume source mail, banking,
-or other GameCube feature ports for V3.
+Current implementation task: finish existing-system acquisition selection,
+remaining focused save consumers, and the private import-pipeline handoff.
+The checked current build is
+`build/v3-scene-arena-installed-03/build-lock.json`, ABI 389. The all-available
+profile is `build/v3-import-pipeline-profile-06/profile.json`: twenty villagers
+and 135 independent item choices, plus two required starting-outfit resources.
+Seven included furniture rewards use the existing native lottery; no new event
+provider is enabled for those rewards. Ordinary regular-pool integration remains
+installed. Keep unsupported acquisition unavailable without calling every
+excluded reward V4.
 
-### V4 experiments: preserved resources, not active V3 tasks
+Current real-file browser worker and interface checks pass:
+`build/v3-import-pipeline-browser-05/build.json`,
+`build/v3-import-pipeline-worker-03/results.json`, and
+`build/v3-import-pipeline-interface-05/results.json`. Browser hashes match offline
+builds; empty selection returns V2-14. The private export is unserved.
+Six focused current-cartridge scope/browser-equivalence tests pass.
 
-The source mail/reward work below belongs to V4. Its linked preparation and
-installed experimental code remain preserved; no listed continuation, feature
-test, acquisition policy, or reward gate is a V3 completion requirement.
+Ordinary save and fresh-process reload of the exact current profile pass at
+`build/v3-import-pipeline-ordinary-save-03/results.json` and
+`build/v3-import-pipeline-ordinary-reload-01/results.json`. Normal controller
+input loads a disposable older town, selects gyroid Save & Quit, writes both
+complete format-21 FlashRAM banks, and returns to title. A fresh emulator
+process loads that save without a checkpoint. Imported fan `2255`, pockets,
+and clothing survive. Full-chip validation checks both bank checksums, CRCs,
+complete decompression, all saved records, selected profiles, and zero padding.
+Five focused scene/save tests pass. Hardware and broad gameplay are unclaimed.
+
+The complete private-bank workspace and relocated retained record remain intact.
+Gameplay borrows the native title's exclusive workspace only while the title
+owner is absent; guarded cleanup releases ownership before returning to title.
+The native allocator, main heap ceiling, complete artwork, save format, and
+existing actor hooks remain unchanged. Current ordinary reload has all four
+gyroids and 186,896 free scene bytes. The exhausted direct native save fixture
+remains retained and unverified; ordinary save/reload does not relabel that
+failure or restart its budget.
+
+Remaining connected work:
+
+1. Review existing-system reward exclusions individually. Installed golden-tool
+   routes report no preparation dependencies, but current selection rejects all
+   non-passive tools. Event-stock membership alone does not prove each gift route.
+   Separate dependencies on entirely new features from extensions to existing
+   systems; do not resume savings accounts or other unrelated feature ports.
+2. Verify the actual synchronous writer and diary-preflight consumers using
+   bounded existing paths. The ordinary Save & Quit result does not establish
+   those distinct entries. Preserve complete data, native I/O, asynchronous
+   framebuffer ownership, and save format 21. Do not shrink diagnostic buffers,
+   silently omit a consumer, replay exhausted fixtures, or reset their budgets.
+3. Classify retained creature constructor/scheduler failures from existing
+   evidence without replaying exhausted old fixtures; unexplained failures remain
+   unresolved, not declared harness faults or passing checks.
+4. Finish the private handoff with exact artifacts, hashes, compatibility
+   warnings, and known limits. Do not switch the deployed patcher or local preview.
+
+Fix demonstrated game faults and record remaining limits honestly. Missing
+new V4 features do not make every reward a V4 item.
+
+### Preserved acquisition experiments
+
+The linked preparation and installed experimental code below remain preserved.
+New buildings and entirely new features belong to V4; existing-system reward
+paths are evaluated for V3 individually. These subsystem notes do not authorise
+resuming all experimental features or blanket-excluding all rewards.
 
 The category's checked preparation is
 `build/v3-post-office-category-prepared-04/prepared.json`, with the complete
@@ -690,16 +708,17 @@ See [bulk profiles](checkpoints/V3_BUILTIN_PROFILES.md).
   identity/conversion path and must not restart as missing ordinary furniture.
 - Keep item-specific behaviours in scope alongside shared categories. Acquisition
   follows primary importing; pending rewards do not block complete asset staging.
-- Verify the regular import selections/item pool, keep special items disabled,
-  and provide a private pipeline playtest build with explicit save compatibility
-  warnings. Do not finish special acquisition or gold-tree reward systems for V3.
+- Verify regular import selections/item pools and rewards that fit existing
+  systems. Items requiring new V4 features should remain unavailable. Provide a
+  private pipeline playtest build with explicit save compatibility warnings.
 
 The existing metadata scan at `build/v3-furniture-post-plain-scan-01.json` has
 109 supported and 281 review records; it precedes the final 24 profile stages.
 These are metadata categories, not remaining-import counts. Review includes
 parent representations, absent/dummy resources, native counterparts, and rewards.
-Neither deployment switches to experimental V3 without user testing and approval.
-The main build lock is unchanged; both patchers serve stable V2-14 only.
+Neither the deployed patcher nor the ordinary local preview switches to
+experimental V3 without user testing and approval. The main build lock is
+unchanged; the public website and local preview serve stable V2-14 only.
 
 The shared save executor is prepared at `build/v3-console-games-prepared-06/`:
 3,988 MIPS bytes, all sixty recipes, and four independent player blocks.

@@ -1,7 +1,7 @@
-"""V3 selection eligibility from installed regular pools, not new reward systems.
+"""V3 eligibility from installed pools and verified existing-system acquisition.
 
 The full development catalogue remains available to resource verifiers. This
-policy limits user-facing V3 selections without deleting prepared V4 resources.
+policy limits user-facing selections without treating all rewards as V4.
 """
 
 DEVELOPMENT = 'development'
@@ -18,7 +18,10 @@ def check_scope(scope):
 
 def availability(catalog, report):
     """Use the checked cartridge's actual pool membership for every category."""
-    shops = {r['item_id'] for r in report['shops']['imports'] if r['group'] < 3}
+    # Group five is the existing native lottery, with checked donor lottery
+    # membership and retained native selection code. No new feature is needed.
+    # Event/train membership alone does not establish each item's specific route.
+    shops = {r['item_id'] for r in report['shops']['imports'] if r['group'] in (0, 1, 2, 5)}
     shirts = {item for group in report['clothing']['stock']['groups']
               for item in group['items']}
     surfaces = {r['id'] for group in report.get('room_surfaces', {}).get('stock', {}).get('resources', [])
@@ -55,12 +58,12 @@ def availability(catalog, report):
         result[key] = dict(selectable=ready, dependency_only=dependency_only,
             reason=('Included only as an authentic villager starting-outfit resource; not a standalone item choice.'
                     if dependency_only else '' if ready else
-                    'Special acquisition is deferred to V4; this item is not in the regular item pool.'))
+                    'Acquisition is not admitted by the current V3 selection policy; existing-system reward routes require individual review.'))
     for key, row in catalog.items():
         if result[key]['selectable']:
             for child in row['dependencies']:
                 if not (result[child]['selectable'] or result[child]['dependency_only']):
-                    raise ValueError('Regular import requires deferred acquisition: '+key+' -> '+child)
+                    raise ValueError('V3 import requires unavailable acquisition: '+key+' -> '+child)
     return result
 
 

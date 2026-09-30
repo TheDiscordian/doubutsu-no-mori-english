@@ -43,7 +43,7 @@ class ImportScopeTests(unittest.TestCase):
     def test_regular_choices_follow_actual_installed_pools_and_all_villagers_remain(self):
         offered = requested_options(self.catalog, self.report)
         self.assertEqual(sum(self.catalog[k]['kind'] == 'villager' for k in offered), 20)
-        pool = {r['item_id'] for r in self.report['shops']['imports'] if r['group'] < 3}
+        pool = {r['item_id'] for r in self.report['shops']['imports'] if r['group'] in (0, 1, 2, 5)}
         self.assertEqual({r['item_id'] for k,r in self.catalog.items()
                           if r['kind'] == 'furniture' and k in offered},
                          pool & {r['item_id'] for r in self.catalog.values() if r['kind'] == 'furniture'})
@@ -51,6 +51,17 @@ class ImportScopeTests(unittest.TestCase):
         self.assertTrue(all(g['forced_disabled'] for g in self.plan['runtime_groups']))
         self.assertEqual({r['id'] for r in self.plan['behaviours'] if r.get('v4_only')}, FEATURE_CHOICES)
         self.assertTrue(all(not r['selectable'] and r['reason'] for r in self.plan['pending_options']))
+
+    def test_existing_lottery_rewards_are_selectable_without_new_event_providers(self):
+        by_item = {row['item_id']:key for key,row in self.catalog.items() if row['kind']=='furniture'}
+        lottery = [by_item[row['item_id']] for row in self.report['shops']['imports'] if row['group']==5]
+        self.assertEqual(len(lottery),7)
+        self.assertIn('GAFE01-r0/item/1DDC',lottery)  # Excitebike's real lottery route.
+        self.assertTrue(all(self.states[key]['selectable'] for key in lottery))
+        selection=self.select(lottery)
+        self.assertEqual(set(selection['requested']),set(lottery))
+        self.assertTrue(all(group['forced_disabled'] for group in self.plan['runtime_groups']))
+        self.assertTrue(all('deferred to V4' not in state['reason'] for state in self.states.values()))
 
     def test_special_items_and_feature_settings_reject_before_composition(self):
         rejected = [k for k,s in self.states.items() if not s['selectable']]
