@@ -39,9 +39,9 @@ existing-system reward routes individually. See the
 ### Current import selections and verification
 
 Browser and offline builds default to the V3 pipeline scope. Both offer all
-twenty villagers and 231 independent item choices. Two exclusive
+twenty villagers and 249 independent item choices. Two exclusive
 starting-outfit resources follow their villagers as dependencies, not standalone
-item choices. Select all requests 251 choices and includes those two resources.
+item choices. Select all requests 269 choices and includes those two resources.
 Actual checked stock tables determine regular furniture, clothing, and surfaces;
 the remaining item categories use their installed native acquisition paths.
 Seven furniture choices use the existing native lottery, with checked donor
@@ -91,19 +91,19 @@ not enable the optional holiday, Wisp, birthday, or savings-account providers.
 Unavailable behaviour controls are hidden without a blanket V4 classification.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-10/build.json`, pinned to the ABI-390
-cartridge. Thirteen current-cartridge scope/browser-equivalence checks pass,
+`build/v3-import-pipeline-browser-11/build.json`, pinned to the ABI-391
+cartridge. Fourteen current-cartridge scope/browser-equivalence checks pass,
 covering complete Redd stock routing, selected-only furniture
 lists, four independent
 golden tools, reward-provider/resource rejection, and the existing Gulliver/igloo
-routes, and independent Mayor gifts/provider activation. Twenty-three actual
+routes, independent Mayor gifts/provider activation, and password-only selections. Twenty-six actual
 browser/offline profiles match. The current headless
 Chromium worker check at
-`build/v3-import-pipeline-worker-08/results.json` reads actual game files and
-matches the offline fixed, station-model, and flower-model gift selection. Retained unchanged worker
+`build/v3-import-pipeline-worker-09/results.json` reads actual game files and
+matches the offline Nintendo-code furniture, HomePage NES, and flooring selection. Retained unchanged worker
 checks cover cancellation and invalid-input rejection.
 The current interface check passes at
-`build/v3-import-pipeline-interface-10/results.json`, including independent
+`build/v3-import-pipeline-interface-12/results.json`, including independent
 selection/dependencies, keyboard controls, unavailable-review data, and download
 lifecycle checks, the actual GameCube stock setting, its downloaded hash and
 receipt, and invalidation when settings change. Five focused seasonal checks
@@ -132,15 +132,30 @@ Empty selection returns exact V2-14. No game files are uploaded; the temporary
 check servers are stopped. The export is unserved.
 
 The all-available offline profile is
-`build/v3-import-pipeline-profile-11/profile.json`; UPS reconstruction passes.
+`build/v3-import-pipeline-profile-12/profile.json`; UPS reconstruction passes.
 ROM SHA-256:
-`87fd2dd3fbd6b8dd9bbb2a0501b618c7c0b6bd4b959cd03913513a919d3e5777`.
+`8409eec4131de56d4786546e020c94139c210853469beec10a57ebaa405c9e95`.
 UPS SHA-256:
-`cc7fdf171a81ed2d5b568a143d71bcb89b2074c89fa40f2b7180321900438b82`.
-It uses ABI 390 and retains format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and
+`928d89e02244424dbb1e70a2b94e3bb8d59501abac9f70a5627f49b514012f20`.
+It uses ABI 391 and retains format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and
 format-20-or-earlier V3 readers cannot read these saves; preserve separate saves
 and backups. Supported older saves migrate forward. Browser composition does
 not establish hardware compatibility or comprehensive gameplay.
+
+Sixteen complete password-only furniture imports and two HomePage surfaces are
+admitted through the installed Nook code-entry and animated handover bindings.
+Actual source categories, permissions, whole frontend resources, non-orderable
+metadata, and the runtime map's live selection gates authenticate before
+composition. These items do not enter ordinary shop stock or activate unrelated
+event providers. The complete 256-glyph artwork uses three guarded resident pages
+instead of overwriting live save code. The complete original packet remains in
+ROM and has one source-ordered CRC across all pages. All native font prefix code,
+title replay, saved fields, existing account code, and scene allocations are
+retained. Eleven focused font/frontend checks pass. Silent normal boot and a
+menu transition pass 43 assertions at
+`build/v3-nook-font-repaired-native-01/results.json`, verifying every loaded glyph
+byte, all six page guards, and the full retained save program. Ordinary password
+entry/delivery, the larger profile's save/reload, and hardware remain unverified.
 
 The retained 155-choice profile at
 `build/v3-import-pipeline-profile-06/profile.json` has passing silent ordinary
@@ -157,17 +172,18 @@ CRC, decompression, all three saved-record CRCs, canonical selected profiles,
 zero unused padding, and the preserved imported fan. Five focused scene/save
 tests pass, including that actual written-chip check. This verifies this town's
 ordinary save/restart, not every item behaviour, synchronous writing,
-diary-preflight execution, or hardware. The current 251-choice profile extends
+diary-preflight execution, or hardware. The current 269-choice profile extends
 that selection with four golden tools, twelve native Redd items, and the seasonal
-candle/flag, the Gulliver and winter-igloo rewards, and fifty Mayor gifts. Its stock adapter occupies
+candle/flag, the Gulliver and winter-igloo rewards, fifty Mayor gifts, and eighteen
+password-only items. Its stock adapter occupies
 an existing preloaded gap, preserving complete artwork and save format;
 selected-only stock data stays connected.
 It has not repeated ordinary save/reload. Compatibility with ABI 389 is expected
 in both directions when import profiles and other behaviour settings match;
 cross-version save/restart is not verified.
 The added reward identities require a build selecting those same imports; a
-profile-11 save may be rejected by profile-10's narrower selection despite the
-unchanged ABI and saved layout. Preserve separate builds, saves, and backups.
+profile-12 save may be rejected by profile-11's narrower selection despite the
+unchanged saved layout. Preserve separate builds, saves, and backups.
 The native format-20 golden reward/state and shovel-rule evidence remains at
 `build/v3-golden-rewards-native-01/results.json` and
 `build/v3-golden-rewards-native-storage-01/results.json`; those results do not
@@ -248,8 +264,8 @@ new features remain outside V3.
 
 ## Preserved experimental artifact and subsystem evidence
 
-The current proposal is ABI 387 / format 21 at
-`build/v3-post-office-bank-installed-05/build-lock.json`.
+The current proposal is ABI 391 / format 21 at
+`build/v3-nook-font-repaired-02/build-lock.json`.
 The complete linked bank/April resources, official dialogue, and saved-account
 owner are installed with banking still disabled by default. Real source mail
 delivery/scheduling and independent account/reward controls remain unfinished.
@@ -257,9 +273,9 @@ Format-21 saves cannot be read by format-20-or-earlier V3 or V2, even with banki
 disabled. Supported older saves migrate forward with empty accounts; ordinary
 save/restart remains unverified. Keep separate builds, saves, and backups.
 The ROM SHA-256 is
-`e9380cd721bc45985e916f3cb6db81ae93249ca9c0bffac10fa70e0ffea32707`;
+`1e978bc58945b255f601ac0cb0a163e528e3e728c13b50ca065127eca4ce9a60`;
 the UPS SHA-256 is
-`fdb399431b9580e9ee78f92a4bc99085c978f975ef211f125ea8654d3d125606`.
+`7f0316603324ebf5d4c3aab29c18d5f78f63962a4c08255e314d0b113022f7c4`.
 Harvest's complete connected resources, native full-model reservations, and
 twelve independent reward choices are installed, alongside fifty independent
 source holiday furniture gifts. This is an internal development

@@ -68,9 +68,12 @@ class PasswordAcquisitionTests(unittest.TestCase):
         for owner in ('room_carry','console_storage'):
             r=copy.deepcopy(self.report)
             font=r['equipment_resources']['passwords']['nook']['font']
-            size=font['pixels_end']-font['pixels_ram']
-            font['pixels_ram']=r['equipment_resources'][owner]['packet']['ram']
-            font['pixels_end']=font['pixels_ram']+size
+            if font.get('pixel_pages'):
+                r['equipment_resources'][owner]['packet']['ram']=font['pixels_ram']
+            else:
+                size=font['pixels_end']-font['pixels_ram']
+                font['pixels_ram']=r['equipment_resources'][owner]['packet']['ram']
+                font['pixels_end']=font['pixels_ram']+size
             with self.assertRaisesRegex(ValueError,'overlaps a retained RAM owner'):
                 checked(self.source,self.image,r)
 

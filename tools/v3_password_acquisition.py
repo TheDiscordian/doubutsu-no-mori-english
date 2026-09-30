@@ -5,6 +5,7 @@ models, behaviour, saved identities, and selectable metadata use the ordinary
 importer; the shared password map is refreshed after that installation.
 """
 import json
+import struct
 import zlib
 
 from aflib import by_vrom,sha256
@@ -46,18 +47,8 @@ def checked(source,image,report):
     if set(nook['native']['owners'])!={'cranny','conv','super','depart'}:
         raise ValueError('Incomplete front-counter password category')
     font=nook['font']
-    from v3_console_disk_install import reservations
-    # Nook's title receipt also describes the patched allocator function with a
-    # `bytes` field; it is not a second retained owner of its own new buffer.
-    retained=dict(report)
-    equipment=dict(report['equipment_resources'])
-    passwords=dict(p);passwords.pop('nook')
-    equipment['passwords']=passwords;retained['equipment_resources']=equipment
-    for a,b in reservations(retained):
-        for first,last in ((font['pixels_ram'],font['pixels_end']),
-                (font['title_buffer']['ram'],font['title_buffer']['end'])):
-            if first<b and a<last:
-                raise ValueError('Password acquisition font/title overlaps a retained RAM owner')
+    from v3_nook_font import check_pixel_layout
+    check_pixel_layout(report,font)
     if sha256(files[font['vrom']].extract(image))!=font['blob_sha256']:
         raise ValueError('Changed complete Nook name font')
     for resource in nook['dialogue']['resources']:
@@ -112,3 +103,97 @@ def catalogue_source(source,item,index,row):
         acquisition.get('source_birth_category')==category['source_birth_category'] and
         acquisition.get('permission_mask',0)&category['required_mask'] and
         acquisition.get('native_delivery_installed') is True)
+
+
+def installed_items(report):
+    """Admit complete source password categories, never replacement shop stock."""
+    e=report.get('equipment_resources',{});p=e.get('passwords',{});n=p.get('nook',{})
+    if not (p.get('acquisition_installed') and p.get('keyboard_installed') and
+            p.get('name_conversion_installed') and n.get('installed') and
+            p.get('conversation',{}).get('native_bindings_installed')):
+        return set()
+    result=set()
+    for row in report.get('furniture',{}).get('imports',[]):
+        a=row.get('password_acquisition',{})
+        if (a.get('route') not in ('homepage-famicom','nintendo-code') or
+                not a.get('native_delivery_installed') or not row.get('runtime_installed') or
+                any(x not in ('representative native execution','ordinary gameplay and save/restart')
+                    for x in row.get('remaining',[]))):
+            continue
+        if row.get('stock_group')!=255 or row.get('reward_route')!=0 or row.get('ordinary_stock') or row.get('catalogue_orderable'):
+            raise ValueError('Password-only item acquires substitute stock or ordering')
+        result.add(row['id'])
+    surfaces=report.get('room_surfaces',{})
+    choices=surfaces.get('optional_selection',{}).get('identities',[])
+    for row in surfaces.get('stock',{}).get('passwords',[]):
+        a=row.get('password_acquisition',{})
+        if (row['id'] in choices and a.get('route')=='homepage-surface' and
+                a.get('native_delivery_installed') and not row.get('ordinary_stock') and
+                not row.get('catalogue_orderable')):
+            result.add(row['id'])
+    return result
+
+
+def verify_installed_items(image,report,catalog):
+    ids=installed_items(report)
+    if not ids:return set()
+    from v3_furniture_pipeline import Source
+    from v3_registry import furniture_source
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    binding=checked(source,image,report)
+    blob=by_vrom(image)[BLOB].extract(image)
+    p=report['equipment_resources']['passwords']
+    mapping=p['source']['destinations']['rows']
+    from v3_password_runtime import MAP
+    packet=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+    magic,version,count,stride,n,reserved,unused=struct.unpack_from('>4s6H',packet,MAP)
+    if (magic!=b'AFPM' or version!=2 or stride!=16 or n!=16+count*16 or
+            n>0x2800 or reserved or unused):
+        raise ValueError('Changed complete live password map header')
+    ranges=[struct.unpack_from('>3HBBIB3x',packet,MAP+16+i*16) for i in range(count)]
+    stock={r['item_id'] for r in report['shops']['imports']}
+    for row in report['furniture']['imports']:
+        if row['id'] not in ids:continue
+        donor,index=furniture_source(row)
+        a=row['password_acquisition']
+        lists=[('ftr_listHomePage','')] if a['route']=='homepage-famicom' else []
+        category=source_category(source,donor,index,lists)
+        if (category is None or category['route']!=a['route'] or
+                category['source_birth_category']!=a['source_birth_category'] or
+                not binding['matrix'][donor]&category['required_mask'] or
+                binding['matrix'][donor]!=a['permission_mask'] or row['item_id'] in stock or
+                row['donor_list']!=category['symbol'] or
+                row['donor_list_sha256']!=sha256(source.raw(category['symbol']))):
+            raise ValueError('Changed complete source password acquisition category')
+        if lists and struct.unpack('>'+str(len(source.raw('ftr_listHomePage'))//2)+'H',
+                source.raw('ftr_listHomePage')).count(donor)!=1:
+            raise ValueError('Password console lacks actual donor HomePage membership')
+        from v3_furniture_install import catalogue_record,order_mask
+        from v3_import_storage import ITEMS
+        at=ITEMS+(row['runtime_index']-1024)*32
+        if (struct.unpack_from('>2H',blob,at)!=(row['runtime_index'],int(row['item_id'],16)) or
+                blob[at+7]!=1 or blob[at+24]!=order_mask(catalogue_record(row)) or blob[at+27]):
+            raise ValueError('Changed installed password item metadata or ordering')
+    for row in report['room_surfaces']['stock']['passwords']:
+        if row['id'] not in ids:continue
+        raw=source.raw(row['source_symbol']);donor=int(row['source_item_id'],16)
+        if (sha256(raw)!=row['source_sha256'] or
+                struct.unpack('>'+str(len(raw)//2)+'H',raw).count(donor)!=1 or
+                binding['matrix'][donor]!=row['password_acquisition']['permission_mask']):
+            raise ValueError('Changed complete source HomePage surface category')
+    for key in ids:
+        choice=catalog[key];donor=int(key.rsplit('/',1)[1],16);item=int(choice['item_id'],16)
+        rows=[r for r in mapping if r['id']==key]
+        count=4 if choice['kind']=='furniture' else 1
+        if (len(rows)!=count or any(r['source_item']!=donor+i or r['item']!=item+i or
+                r['enable_ram']!=choice['enable_ram'] or r['enable_bytes']!=choice['enable_bytes'] or
+                r['enable_offset']!=choice['enable_offset'] for i,r in enumerate(rows)) or
+                int.from_bytes(blob[choice['enable_offset']:choice['enable_offset']+choice['enable_bytes']],'big')!=1):
+            raise ValueError('Password item lacks complete live selection/destination gates')
+        for i in range(count):
+            matches=[r for r in ranges if r[0]<=donor+i<=r[1]]
+            if (len(matches)!=1 or matches[0][2]+donor+i-matches[0][0]!=item+i or
+                    matches[0][3:5]!=(0,0) or matches[0][5:]!=(choice['enable_ram'],choice['enable_bytes'])):
+                raise ValueError('Password item differs from actual runtime destination map')
+    return ids

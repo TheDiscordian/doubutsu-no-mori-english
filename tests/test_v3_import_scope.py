@@ -18,7 +18,7 @@ from v3_creature_choices import options as behaviour_options
 from v3_holiday_selection import groups,active
 from v3_import_scope import PIPELINE, UNAVAILABLE_BEHAVIOURS, availability, requested_options
 
-LOCK = ROOT/os.environ.get('V3_IMPORT_SCOPE_LOCK', 'build/v3-seasonal-stock-installed-03/build-lock.json')
+LOCK = ROOT/os.environ.get('V3_IMPORT_SCOPE_LOCK', 'build/v3-nook-font-repaired-02/build-lock.json')
 
 
 class ImportScopeTests(unittest.TestCase):
@@ -51,6 +51,9 @@ class ImportScopeTests(unittest.TestCase):
         pool.update(existing_system_items(self.report))
         from v3_holiday_acquisition import installed_items
         pool.update(installed_items(self.report))
+        from v3_password_acquisition import installed_items as password_items
+        password_ids=password_items(self.report)
+        pool.update(r['item_id'] for r in self.catalog.values() if r['id'] in password_ids and r['kind']=='furniture')
         self.assertEqual({r['item_id'] for k,r in self.catalog.items()
                           if r['kind'] == 'furniture' and k in offered},
                          pool & {r['item_id'] for r in self.catalog.values() if r['kind'] == 'furniture'})
@@ -263,6 +266,39 @@ class ImportScopeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unknown import scope'):
             composer.resolve(self.catalog, [], scope='unrestricted-v3', report=self.report)
 
+    def test_password_only_choices_use_real_frontend_and_live_selection_gates(self):
+        from v3_password_acquisition import installed_items,verify_installed_items
+        from aflib import by_vrom
+        from v3_asset_loader import BLOB
+        from v3_import_storage import ITEMS
+        ids=installed_items(self.report)
+        self.assertEqual(len(ids),18)
+        self.assertEqual(verify_installed_items(self.image,self.report,self.catalog),ids)
+        self.assertTrue(all(self.states[k]['selectable'] for k in ids))
+        bad=copy.deepcopy(self.report)
+        bad['equipment_resources']['passwords']['conversation']['native_bindings_installed']=False
+        self.assertEqual(installed_items(bad),set())
+        bad=copy.deepcopy(self.report)
+        next(r for r in bad['furniture']['imports'] if r['id']=='GAFE01-r0/item/331C')['remaining']=['item behaviour']
+        self.assertNotIn('GAFE01-r0/item/331C',installed_items(bad))
+        for key in ('GAFE01-r0/item/331C','GAFE01-r0/item/1DCC','GAFE01-r0/item/2640'):
+            selected=self.select([key]);self.assertEqual(selected['enabled'],[key])
+            result,_,blob=composer.compose(self.image,self.report,self.catalog,selected)
+            for candidate in ids:
+                row=self.catalog[candidate];at=row['enable_offset'];width=row['enable_bytes']
+                self.assertEqual(int.from_bytes(blob[at:at+width],'big'),int(candidate==key))
+            self.assertFalse(any(active(g,selected['enabled'],selected['behaviours'],scope=PIPELINE,
+                report=self.report) for g in groups(self.image,self.report)))
+        bad=copy.deepcopy(self.report)
+        next(r for r in bad['equipment_resources']['passwords']['source']['destinations']['rows']
+            if r['id']=='GAFE01-r0/item/331C')['enable_ram']+=4
+        with self.assertRaisesRegex(ValueError,'live selection/destination'):
+            verify_installed_items(self.image,bad,self.catalog)
+        bad=bytearray(self.image);row=self.catalog['GAFE01-r0/item/331C']
+        bad[by_vrom(self.image)[BLOB].pstart+ITEMS+(row['runtime_index']-1024)*32+24]=8
+        with self.assertRaisesRegex(ValueError,'metadata or ordering'):
+            verify_installed_items(bad,self.report,self.catalog)
+
     def test_exclusive_outfits_are_only_resources_of_the_selected_villager(self):
         villagers = [k for k,r in self.catalog.items() if r['kind'] == 'villager']
         selected = self.select(villagers)
@@ -321,6 +357,8 @@ class ImportScopeTests(unittest.TestCase):
         for key in ('GAFE01-r0/item/1FC0','GAFE01-r0/item/30A8','GAFE01-r0/item/3378'):
             profiles.append(('mayor-'+key.rsplit('/',1)[-1],[key]))
         profiles.append(('mayor-calendar-gc',['GAFE01-r0/item/1FC0'],{'holiday-calendar':'GameCube'}))
+        for key in ('GAFE01-r0/item/331C','GAFE01-r0/item/1DCC','GAFE01-r0/item/2640'):
+            profiles.append(('password-'+key.rsplit('/',1)[-1],[key]))
         cases = []
         seasonal = self.report['equipment_resources'].get('seasonal_stock')
         if seasonal:

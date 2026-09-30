@@ -1,5 +1,90 @@
 # Automatic furniture pipeline checkpoint
 
+## Complete font/save collision repair and password-only selection
+
+The installed Nook name-glyph buffer at `807D9000..807E811F` overlaps live
+format-21 save/account code at `807D8040..807E15FF`. This is an actual DMA
+overwrite, not a stale acquisition receipt or a reason to remove the already-built
+feature. The private ABI-391 repair at
+`build/v3-nook-font-repaired-02/build-lock.json` retains the complete installed
+font prefix, every source glyph, the original physical-ROM packet, full title
+replay, all existing save code/artwork, saved fields, and scene allocations.
+Only the complete font extension is rebuilt, with source-ordered guarded pages:
+
+| Source data | RAM data range | Bytes |
+| --- | --- | ---: |
+| Header, widths, complete atlas | `80458010..8045E12F` | 24,864 |
+| First 192 complete padded glyphs | `806A90D0..806AFCCF` | 27,648 |
+| Final 64 complete padded glyphs | `807ED840..807EFC3F` | 9,216 |
+
+Each page has sixteen-byte guards before and after its data. One complete CRC
+authenticates all 61,728 bytes before installation. The polygon renderer chooses
+the actual padded-glyph page; ordinary width/atlas readers retain their complete
+first-page layout. The font program still owns `80450000..80457FFF`, and the
+title/gameplay arena remains below it. The initializer rejects absent Expansion
+Pak memory before page writes. The checked native DMA/CRC, font state, relocation,
+cache operations, native title allocation, and original letter/name readers remain.
+The complete font image is 30,768 bytes plus 1,040 relocation bytes, within its
+32-KiB guarded reservation. No ordinary heap or save-format growth occurs.
+The acquisition verifier authenticates the retained title-buffer receipt alias
+before excluding that duplicate reservation; real account and packet owners
+remain checked. Fixed native/static reservations supplement the report inventory.
+
+The native result at `build/v3-nook-font-repaired-native-01/results.json` passes
+43 assertions across normal boot/title and the following menu transition. Every
+loaded source glyph byte, all six page guards, the full retained 38,336-byte save
+program, existing state/workspace guards, zero native fault state, and graceful
+shutdown pass. No debug-loaded replacement font, skipped artwork, or disabled
+account code supplies this result. Result SHA-256:
+`1e5394bf5f0d16ad6f8f17014c616a8947664531c73f269684b99893f1c15119`.
+Four current complete-font/relocation/mutation checks and seven installed
+frontend/source/category checks pass. Original native shop appends and their
+relocations remain unchanged. Only the font, its DMA directory row, and shared
+ABI/checksum boot resources differ from the predecessor.
+
+V3 admission adds sixteen complete password-only furniture imports and two
+HomePage surfaces through the already-installed Nook frontend. The verifier
+checks whole frontend/font/editor/result resources, complete donor permission
+rules, HomePage membership or source birth category, non-orderable metadata,
+actual runtime map rows, all furniture rotations, and live independent selection
+gates. No replacement shop stock, unrelated gift, new feature, or saved field is
+introduced. Ordinary password conversation and animated delivery are not newly
+claimed; existing bindings and retained component evidence remain distinct.
+
+Fourteen current scope checks pass, including twenty-six actual browser/offline
+profiles and independent Mario/NES/floor choices. Fourteen JavaScript checks pass.
+The private unserved browser export is `build/v3-import-pipeline-browser-11/build.json`.
+The real-file worker at `build/v3-import-pipeline-worker-09/results.json` matches
+the three-category password selection with ROM SHA-256
+`d36666c5d17be4e67c91398dd8cd4a1d0fba7112d75139076b01b344f3a2f0ba`;
+result SHA-256 is `46fae05f9aeaafa55a2f9063847fdd408de221974c41e6e9db65e81a11ce14fb`.
+The interface/download check at
+`build/v3-import-pipeline-interface-12/results.json` passes with result SHA-256
+`588e3252f54e4add1fe20b214fd6aced464318aca278e000268738dcb7bad631`.
+Both temporary servers stop, with body-free local GETs and no uploads/browser
+errors. The initial interface invocation incorrectly combines its full-interface
+mode with focused worker-only selections; the single corrected invocation removes
+that conflicting flag. No native setup failure or retry occurs.
+
+Current all-available profile: `build/v3-import-pipeline-profile-12/profile.json`,
+twenty villagers, 249 independent items, and two required starting outfits.
+ROM SHA-256: `8409eec4131de56d4786546e020c94139c210853469beec10a57ebaa405c9e95`.
+UPS SHA-256: `928d89e02244424dbb1e70a2b94e3bb8d59501abac9f70a5627f49b514012f20`.
+UPS reconstruction passes. Raw repair ROM SHA-256:
+`1e978bc58945b255f601ac0cb0a163e528e3e728c13b50ca065127eca4ce9a60`;
+raw report SHA-256: `17690ef29d24c57f6fbec39f66d8911d093c91723bcec9ba508ecf2210bbd88c`.
+ABI 391 retains format 21/wire 7, eight-MiB RAM, and FlashRAM. Profile-12 saves
+may be rejected by narrower profile-11 builds; V2 and format-20-or-earlier readers
+cannot load format 21. Keep matching selections, separate builds/saves, and backups.
+Ordinary profile-12 save/reload and hardware remain unverified. No served recipe,
+main import lock, deployed patcher, or local-preview service changes.
+
+Next connected consumers remain exercise-card/radio, actual extended Harvest
+manager/cleanup bindings, Wisp, and other retained acquisition dependencies;
+then distinct save entries, retained creature-failure classification, and the
+private import-pipeline handoff. Do not replay exhausted fixtures, reset their
+budgets, or start unrelated feature development.
+
 ## Retained Mayor gift provider and independent V3 selection
 
 V3 admits fifty installed Mayor holiday gifts from the complete donor selector

@@ -30,6 +30,12 @@ def reservations(value):
             if (type(value.get(first)) is int and type(value.get(last)) is int
                     and 0x80000000<=value[first]<value[last]<=0x80800000):
                 yield value[first],value[last]
+        # Source-ordered font pages own both four-word guards as well as data.
+        # Keep these spans visible to every later shared reservation check.
+        if (type(value.get('source_offset')) is int and type(value.get('guard_value')) is int
+                and type(value.get('front_guard')) is int and type(value.get('end_guard')) is int
+                and 0x80400000<=value['front_guard']<value['end_guard']<=0x807FFFF0):
+            yield value['front_guard'],value['end_guard']+16
         for v in value.values():yield from reservations(v)
     elif isinstance(value,list):
         for v in value:yield from reservations(v)

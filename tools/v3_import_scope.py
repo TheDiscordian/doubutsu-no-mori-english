@@ -31,6 +31,8 @@ def availability(catalog, report):
     shops.update(existing_system_items(report))
     from v3_holiday_acquisition import installed_items
     shops.update(installed_items(report))
+    from v3_password_acquisition import installed_items as password_items
+    password_ids=password_items(report)
     summer_rewards = {r['item_id'] for r in report.get('furniture_rewards', {}).get('imports', [])
                       if r['route'] == 23}
     shirts = {item for group in report['clothing']['stock']['groups']
@@ -59,14 +61,14 @@ def availability(catalog, report):
         kind = row['kind']
         dependency_only = False
         if kind == 'furniture':
-            ready = row['item_id'] in shops
+            ready = row['item_id'] in shops or key in password_ids
         elif kind == 'clothing':
             ready = int(row['item_id'], 16) in shirts
             # A villager's authentic starting outfit is part of that villager's
             # resources, not a separately offered exclusive-item import.
             dependency_only = not ready and key in outfits
         elif kind in ('floor', 'wall'):
-            ready = key in surfaces
+            ready = key in surfaces or key in password_ids
         elif kind == 'equipment':
             ready = key in equipment
         elif kind == 'carried':

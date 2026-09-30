@@ -247,6 +247,8 @@ def catalogue(image, report):
     verify_existing_system_items(image, report)
     from v3_holiday_acquisition import verify_installed_items
     verify_installed_items(image, report)
+    from v3_password_acquisition import verify_installed_items as verify_password_items
+    verify_password_items(image,report,result)
     return dict(sorted(result.items()))
 
 

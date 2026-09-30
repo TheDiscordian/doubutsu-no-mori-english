@@ -234,8 +234,13 @@ RNG, preserved saved fields, guards, and cleanup. Four front counters have insta
 input, official dialogue, and native animated handover bindings. Ordinary code
 entry/delivery and persistence remain required before claiming usable password
 rewards. Shared admission installs all sixteen password-only furniture records
-and both HomePage surfaces without substituting shop stock. Five current
-browser/offline profiles agree for 235 experimental choices. See
+and both HomePage surfaces without substituting shop stock. The V3 pipeline
+admits these eighteen choices only with the complete frontend and actual runtime
+map's selected destination gates. Its complete source font uses guarded pages
+that remain separate from the font program, title replay, and save code. Silent
+normal boot/menu checks verify every glyph byte, six page guards, and the complete
+retained save program. Twenty-six current browser/offline profiles agree across
+the 269-choice V3 selection. Ordinary code entry/delivery is not claimed. See
 [the connected checkpoint](../docs/checkpoints/V3_NOOK_PASSWORDS.md) for the
 incomplete enclosing scenario and retained setup allowance.
 

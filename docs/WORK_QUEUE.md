@@ -58,9 +58,9 @@ runtime alternatives; other substantial differences still need real bindings.
 Current implementation task: finish existing-system acquisition selection,
 remaining focused save consumers, and the private import-pipeline handoff.
 The checked current build is
-`build/v3-seasonal-stock-installed-03/build-lock.json`, ABI 390. The all-available
-profile is `build/v3-import-pipeline-profile-11/profile.json`: twenty villagers
-and 231 independent item choices, plus two required starting-outfit resources.
+`build/v3-nook-font-repaired-02/build-lock.json`, ABI 391. The all-available
+profile is `build/v3-import-pipeline-profile-12/profile.json`: twenty villagers
+and 249 independent item choices, plus two required starting-outfit resources.
 Seven included furniture rewards use the existing native lottery; no new event
 provider is enabled for those rewards. Ordinary regular-pool integration remains
 installed. Keep unsupported acquisition unavailable without calling every
@@ -99,15 +99,23 @@ admission adds no runtime code, artwork, allocation, or save field. Unrelated
 selections leave this provider off; Wisp and the savings account remain independent.
 
 Current real-file browser worker and interface checks pass:
-`build/v3-import-pipeline-browser-10/build.json`,
-`build/v3-import-pipeline-worker-08/results.json`, and
-`build/v3-import-pipeline-interface-10/results.json`. Browser hashes match offline
+`build/v3-import-pipeline-browser-11/build.json`,
+`build/v3-import-pipeline-worker-09/results.json`, and
+`build/v3-import-pipeline-interface-12/results.json`. Browser hashes match offline
 builds; empty selection returns V2-14. The private export is unserved.
-Thirteen focused current-cartridge scope/browser-equivalence checks pass,
-including twenty-three actual profile hashes, both seasonal modes
+Fourteen focused current-cartridge scope/browser-equivalence checks pass,
+including twenty-six actual profile hashes, both seasonal modes
 with each item selected alone,
 complete native Redd routing, stock selection, four standalone golden tools,
 complete/sparse Gulliver and igloo rewards, and independent Mayor gifts.
+Sixteen password-only furniture imports and two HomePage surfaces use the
+complete installed Nook frontend and live destination/selection gates, without
+substitute shop stock or catalogue ordering. The complete name font uses three
+guarded pages, retaining every source glyph and avoiding the actual save-code
+collision. Eleven focused frontend/font checks and 43 silent normal-boot/menu
+assertions pass. All glyph bytes, six guards, and the complete installed save
+program authenticate in the native result. Ordinary password conversation and
+delivery remain unverified; installed acquisition is not a hardware claim.
 Two shared reward/trade C sanitizer checks retain passing results; the actual
 connected world/reward C also passes on current installed data with inventory
 I/O doubled. Ordinary Mayor conversations remain unverified; no exhausted holiday
@@ -148,7 +156,8 @@ Remaining connected work:
 1. Review remaining existing-system reward exclusions individually. Golden-tool,
    Redd, fixed-ID seasonal stock, Gulliver, and winter-igloo admission are connected.
    The fifty installed Mayor gifts and their existing calendar choice are admitted.
-   Review the remaining exercise-card/radio, Harvest, Wisp, password, postal,
+   Password acquisition admission and its font/save-code collision repair are connected.
+   Review the remaining exercise-card/radio, Harvest, Wisp, postal,
    and retained summer-camping acquisition routes against their actual
    acquisition dependencies, retaining already-built features. The current
    Harvest resource check rejects its historical manager receipt after later

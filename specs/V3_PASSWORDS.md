@@ -213,9 +213,17 @@ Four complete message/choice banks carry 22 provenance entries for official
 English pages and necessary platform adaptations. Full donor/native name
 conversion retains eight-byte comparison fields and every source character.
 The installed font retains its old glyphs and adds all 256 complete donor glyphs.
-Its image fits the existing checked `80450010` font reservation. Pixels own
-`807D9000..807E811F`; native title replay owns `807E9000..807ED82F`. Both fit
-eight-MiB RAM after the upper resident packets. The installer rejects overlap
+Its image fits the existing checked `80450010` font reservation, including its
+complete relocation file and both loader guards. Complete source pixels use
+three persistent pages: header/widths/atlas at `80458010..8045E12F`, the first
+192 padded glyphs at `806A90D0..806AFCCF`, and the final 64 padded glyphs at
+`807ED840..807EFC3F`. Each page has sixteen-byte guards before and after its
+data. Real physical-ROM DMA loads every byte in source order, and one complete
+CRC authenticates all pages before installation. Width/atlas readers and the
+polygon renderer use those actual page addresses; no glyph is omitted or rebuilt.
+Native title replay owns `807E9000..807ED82F`. The font program, account record,
+complete save code/artwork, title playback, and scene arenas remain separate.
+The installer rejects overlap
 with every retained reservation, including carrying and console storage, rather
 than checking only the room-rig packet. The title's checked allocation call uses its separate
 Expansion Pak buffer while preserving the complete `BC8000` replay data and
@@ -257,5 +265,5 @@ are not claims of controller-driven conversation or complete native handover.
 
 The linked decoder and encoder are not evidence for ordinary gameplay,
 save/restart, or hardware. Keep the current
-experimental build and both deployments of the one stable patcher unchanged
-until their respective integration and user-approval requirements are met.
+experimental build private; keep the deployed patcher and local preview on V2
+until the user tests V3 and explicitly approves the switch.

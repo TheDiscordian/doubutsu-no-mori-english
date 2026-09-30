@@ -13,7 +13,43 @@ extern u32 active_glyph;
 #include "/source/runtime/crc32.h"
 #include "/source/runtime/crc32.c"
 static const u8 *af_np_pixels __attribute__((section(".data")))=0;
+#ifdef AF_NP_SPLIT_PIXELS
+static const u32 af_np_pages[3][2]={
+    {AF_NP_PAGE_0_RAM,AF_NP_PAGE_0_BYTES},
+    {AF_NP_PAGE_1_RAM,AF_NP_PAGE_1_BYTES},
+    {AF_NP_PAGE_2_RAM,AF_NP_PAGE_2_BYTES}};
+static int af_np_pixel_guards(void) {
+    u32 i,j;
+    for(i=0;i<3;i++)for(j=0;j<4;j++)
+        if(((volatile const u32 *)(af_np_pages[i][0]-16))[j]!=0xAF4E4647u ||
+           ((volatile const u32 *)(af_np_pages[i][0]+af_np_pages[i][1]))[j]!=0xAF4E4647u)return 0;
+    return 1;
+}
+#endif
 static int af_np_load_pixels(void) {
+#ifdef AF_NP_SPLIT_PIXELS
+    u32 i,j,bit,offset=0,crc=0xFFFFFFFFu;
+    if(af_np_pixels)return af_np_pixel_guards();
+    if(*(volatile const u32 *)0x80000318u!=0x800000u)return 0;
+    for(i=0;i<3;i++) {
+        u32 a=af_np_pages[i][0],n=af_np_pages[i][1];
+        if((a&15u) || (n&15u) || a<0x80458010u || a>0x80800000u-16 || n>0x80800000u-16-a)return 0;
+        for(j=0;j<4;j++) {
+            ((volatile u32 *)(a-16))[j]=0xAF4E4647u;
+            ((volatile u32 *)(a+n))[j]=0xAF4E4647u;
+        }
+        if(af_v3_resource_read((void *)a,AF_NP_PIXELS_ROM+offset,n,
+                (int (*)(void *,unsigned int,unsigned int))0x80026B44u))return 0;
+        for(j=0;j<n;j++) {
+            crc^=((const u8 *)a)[j];
+            for(bit=0;bit<8;bit++)crc=(crc>>1)^((0u-(crc&1u))&0xEDB88320u);
+        }
+        ((void (*)(void *,u32))0x8002FE00u)((void *)a,n);
+        offset+=n;
+    }
+    if(offset!=AF_NP_PIXELS_BYTES || (crc^0xFFFFFFFFu)!=AF_NP_PIXELS_CRC || !af_np_pixel_guards())return 0;
+    af_np_pixels=(const u8 *)AF_NP_PAGE_0_RAM;return 1;
+#else
     u32 a=AF_NP_PIXELS_RAM;
     if(af_np_pixels)return 1;
     if(a<0x807D9000u || (a&15u) || a>0x80800000u || AF_NP_PIXELS_BYTES>0x80800000u-a)return 0;
@@ -22,6 +58,7 @@ static int af_np_load_pixels(void) {
             af_crc32((const unsigned char *)a,AF_NP_PIXELS_BYTES)!=AF_NP_PIXELS_CRC)return 0;
     ((void (*)(void *,u32))0x8002FE00u)((void *)a,AF_NP_PIXELS_BYTES);
     af_np_pixels=(const u8 *)a;return 1;
+#endif
 }
 
 int af_np_glyph_index(const u8 *text,u32 bytes) {
@@ -117,7 +154,13 @@ void af_np_glyph_poly(void *graph,Gfx **gpp,int code,Point *tl,Point *br,int s,i
         v[i].v.tc[0]=i>=2?(s+2)*64:0;v[i].v.tc[1]=(i==1 || i==2)?18*64:0;
         v[i].v.cn[0]=v[i].v.cn[1]=v[i].v.cn[2]=v[i].v.cn[3]=0;
     }
-    gDPLoadTextureBlock_4b(g++,af_np_pixels+24864+slot*144,G_IM_FMT_I,16,18,0,
+#ifdef AF_NP_SPLIT_PIXELS
+    const u8 *padded=slot<192?(const u8 *)AF_NP_PAGE_1_RAM+slot*144:
+        (const u8 *)AF_NP_PAGE_2_RAM+(slot-192)*144;
+#else
+    const u8 *padded=af_np_pixels+24864+slot*144;
+#endif
+    gDPLoadTextureBlock_4b(g++,padded,G_IM_FMT_I,16,18,0,
         G_TX_CLAMP,G_TX_CLAMP,0,0,0,0);
     gSPVertex(g++,v,4,0);gSP2Triangles(g++,0,1,2,0,0,2,3,0);*gpp=g;
 }
