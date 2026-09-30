@@ -47,6 +47,21 @@ reader. Map the remaining complete source mail/special-present consumers once
 before changing shared delivery. Island acquisition remains separate and needs
 an explicit choice for the absent GameCube island system, not a substitute route.
 
+The category's checked preparation is
+`build/v3-post-office-category-prepared-04/prepared.json`, based on ABI 386.
+Actual donor numerical controls/transfer functions, a separately owned 48-byte
+account record, transactional wallet/pocket validation, and whole-table milestone
+receipts compile; two focused source/sanitized host checks pass. Native frontend,
+Pelly actions, saved-town ownership, official template creation, real inventory
+and mail I/O, scheduling, and ordinary gameplay remain unbound. The current ROM
+and selections do not change. The exact next consumer is the complete bank
+frontend/Pelly business path, preserving original repayment, followed by the
+connected saved-town and real mail owners. The
+[category source map and remaining connections](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md#remaining-connected-consumers)
+cover all 23 staged records; do not rescan their unchanged artwork or turn each
+connection into a new category task. Bank preparation does not restart the spent
+holiday, Harvest, or Nook native-harness budgets.
+
 Fifty ordinary holiday gifts and the summer-exercise radio have ordinary category
 admission. The radio uses the full installed source card controller, prize map,
 official dialogue, stored stamps, and actual card dependency; its artwork is not

@@ -134,6 +134,23 @@ the UPS SHA-256 is
 The current lock above owns their exact paths and reconstruction checks. These
 are development artifacts, not the requested private assembled playtest handoff.
 
+The connected source-mail category has checked account/reward preparation at
+`build/v3-post-office-category-prepared-04/`, based on the current ABI 386.
+The actual donor numerical controls and complete money-bag transfer functions run
+through a scoped view with a separately owned 48-byte account record. Preview and
+cancel do not write balances/pockets; confirmation checks the same resident and
+complete money snapshot before conserving and publishing Bells. Whole-source
+milestone rows retain ordering and successful-submission-only receipts. Two
+focused source/sanitized host checks pass; native money and mail I/O remain
+unbound. Current Pelly status is checked and still lacks the donor banking branch.
+The full frontend, Pelly deposit actions, saved-town ownership/migration, official
+templates, real delivery/scheduling, and independent account/reward choices
+remain connected implementation work. No current ROM, saved format, selectable
+count, or deployment changes. The
+[source checkpoint](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md) records the single
+remaining acquisition map and exact next consumer. No ordinary native bank/save
+or hardware claim is made.
+
 The current native password helper passes 45 assertions and twelve selected-item
 cases, including complete DMA/CRC/cache loading, native RNG, saved-state
 preservation, guards, and cleanup. Checkpoint restoration and the following CPU
