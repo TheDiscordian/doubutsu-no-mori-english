@@ -39,6 +39,7 @@ LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
 SOURCES = capacity.SOURCES + physical.SOURCES + ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/v3_password_acquisition.py', 'tools/v3_harvest_acquisition.py', 'tools/map_artwork.py', 'tools/v3_room_aliases.py',
+    'tools/v3_bank_install.py','tools/v3_bank_resources.py',
     'tools/v3_holiday_acquisition.py',
     'tools/v3_furniture_rigs.py', 'tools/v3_furniture_materials.py', 'tools/v3_furniture_scroll.py', 'tools/v3_keyframes.py',
     'tools/v3_furniture_art.py', 'tools/v3_furniture_composite.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
@@ -735,7 +736,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     room_rigs_art=None, room_rigs_code=False, room_goods=None, room_carry=None, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
-                    password_runtime=None,password_editor=False,password_nook=None,harvest_connected=None,room_effects=None,furniture_capacity=False,console_storage=False,
+                    password_runtime=None,password_editor=False,password_nook=None,harvest_connected=None,bank_connected=None,room_effects=None,furniture_capacity=False,console_storage=False,
                     console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None,carried_items=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
@@ -765,6 +766,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if harvest_connected is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
+    if bank_connected is not None:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if creature_items is not None:
@@ -809,7 +813,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if harvest_connected is not None:
+    if bank_connected is not None:
+        import v3_bank_install as equipment
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+            base,prior,blob,core,module,output,bank_connected)
+        display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
+    elif harvest_connected is not None:
         import v3_harvest_install as equipment
         equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
             base,prior,blob,core,module,output,harvest_connected)
@@ -1392,6 +1401,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         result=equipment.finish(result,base,output,equipment_report,report_updates['physical_resources'])
     if harvest_connected is not None:
         result=equipment.finish(result,base,output,equipment_report,report_updates['physical_resources'])
+    if bank_connected is not None:
+        result=equipment.finish(result,base,output,equipment_report,report_updates['physical_resources'])
     physical.verify(result,report_updates.get('physical_resources',prior.get('physical_resources',[])))
     fix_checksum(result);result=bytes(result)
     patch=make_ups(original,result)
@@ -1854,6 +1865,14 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             additional_resident_bytes=harvest['packet']['bytes'],resource_allocations_changed=True)
         report['sources'].update(harvest['sources'])
         report['native_test']='pending selected Harvest admission, ordinary hiding/conversation/delivery, and save/restart'
+    if bank_connected is not None:
+        bank=equipment_report['bank']
+        report['shared_runtime_refresh'].update(adapters=['post_office_bank'],
+            additional_resident_bytes=bank['additional_resident_bytes'],
+            additional_menu_bytes=bank['additional_menu_bytes'],
+            saved_format_changed=True,resource_allocations_changed=True)
+        report['sources'].update(bank['sources'])
+        report['native_test']='pending native banking/April/save execution; real source mail and independent selections remain unfinished'
     if report.get('resource_capacity'):
         report['resource_capacity']['resources']=capacity.text_records(result,report)
         capacity.checked_limit(result,report)
@@ -1949,6 +1968,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, connect prepared Nook code-entry, official results, and animated gift delivery')
     parser.add_argument('--harvest-connected',type=Path,
         help='With --refresh-runtime, install the complete linked Harvest actor, hiding, manager, and dialogue resources')
+    parser.add_argument('--bank-connected',type=Path,
+        help='With --refresh-runtime, install linked bank/April resources, text, and saved ownership without enabling selection')
     parser.add_argument('--room-effects',type=Path,
         help='With --refresh-runtime, install prepared shared effects through the native controller')
     parser.add_argument('--furniture-capacity',action='store_true',
@@ -2009,6 +2030,7 @@ if __name__=='__main__':
     if args.password_editor and not args.refresh_runtime:parser.error('--password-editor requires --refresh-runtime')
     if args.password_nook and not args.refresh_runtime:parser.error('--password-nook requires --refresh-runtime')
     if args.harvest_connected and not args.refresh_runtime:parser.error('--harvest-connected requires --refresh-runtime')
+    if args.bank_connected and not args.refresh_runtime:parser.error('--bank-connected requires --refresh-runtime')
     if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
     if args.furniture_capacity and not args.refresh_runtime:parser.error('--furniture-capacity requires --refresh-runtime')
     if args.console_storage and not args.refresh_runtime:parser.error('--console-storage requires --refresh-runtime')
@@ -2032,7 +2054,8 @@ if __name__=='__main__':
                             furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art,
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
                             furniture_scoring=args.furniture_scoring,password_runtime=args.password_runtime,
-                            password_editor=args.password_editor,password_nook=args.password_nook,harvest_connected=args.harvest_connected,room_effects=args.room_effects,
+                            password_editor=args.password_editor,password_nook=args.password_nook,harvest_connected=args.harvest_connected,
+                            bank_connected=args.bank_connected,room_effects=args.room_effects,
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,

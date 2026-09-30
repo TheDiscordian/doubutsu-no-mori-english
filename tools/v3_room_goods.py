@@ -458,6 +458,7 @@ def publish_bootstrap(equipment,blob,surface,output):
                 raise ValueError('Changed complete carried NPC startup extension')
             expected=npc['end']-p['ram']
         rewards=quest.get('rewards') if quest else None
+        bank=equipment.get('bank')
         if rewards:
             from v3_reward_bindings import LAYOUT
             reward_end=LAYOUT['pools']['ram']+LAYOUT['pools']['bytes']
@@ -466,9 +467,25 @@ def publish_bootstrap(equipment,blob,surface,output):
                     rewards['save_format']!=20 or rewards['wire_version']!=7 or
                     rewards['storage']['symbols']['af_v3_card_state']!=LAYOUT['state']['ram'] or
                     rewards['storage']['symbols']['AF_HI_STORAGE_RAM']!=LAYOUT['storage']['ram'] or
-                    equipment['diaries']['memory']['scratch']['bytes']!=120368):
+                    equipment['diaries']['memory']['scratch']['bytes']!=(120416 if bank else 120368)):
                 raise ValueError('Changed complete golden reward startup extension')
             expected=reward_end-p['ram']
+        if bank:
+            from v3_bank_link import RAM as BANK_RAM,END as BANK_END
+            from v3_bank_storage import STATE_RAM,STATE_BYTES,SCRATCH_RAM,SCRATCH_PRIOR,SCRATCH_BYTES
+            if (not rewards or reward_end!=BANK_RAM or not bank['installed'] or bank['packet']!=p or
+                    bank['ram']!=BANK_RAM or bank['end']!=BANK_END or
+                    bank['packet_offset']!=expected or
+                    bank['loaded_packet']['ram']!=BANK_RAM or bank['loaded_packet']['bytes']!=BANK_END-BANK_RAM or
+                    bank['save_format']!=21 or bank['wire_version']!=7 or
+                    bank['memory']!=dict(account=dict(ram=STATE_RAM,record_bytes=48,guard_bytes=16,bytes=STATE_BYTES),
+                        scratch=dict(ram=SCRATCH_RAM,retained_bytes=SCRATCH_PRIOR,bytes=SCRATCH_BYTES),
+                        save_format=21,card_wire=7,installed=True) or
+                    equipment['diaries']['memory']['scratch']!=dict(ram=SCRATCH_RAM,bytes=SCRATCH_BYTES) or
+                    f'-DAF_BANK_STATE_RAM=0x{STATE_RAM:X}u' not in bank['code']['flags'] or
+                    bank['code']['symbols'].get('af_v3_card_state')!=rewards['storage']['symbols']['af_v3_card_state']):
+                raise ValueError('Changed complete bank extension of the shared startup packet')
+            expected+=BANK_END-BANK_RAM
         if (not carried_quest['installed'] or p['ram']!=0x807AC000 or p['bytes']!=expected or
                 p['physical']&15 or p['storage']!='physical-ROM' or
                 not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
@@ -518,3 +535,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     if npc_extra:npc_extra['startup']=copy.deepcopy(goods['startup'])
     if holiday_state:holiday_state['startup']=copy.deepcopy(goods['startup'])
     if fishing:fishing['startup']=copy.deepcopy(goods['startup'])
+    if equipment.get('bank'):equipment['bank']['startup']=copy.deepcopy(goods['startup'])

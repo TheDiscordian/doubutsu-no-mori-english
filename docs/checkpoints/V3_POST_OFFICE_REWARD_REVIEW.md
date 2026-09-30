@@ -1,5 +1,13 @@
 # Post-office reward: source review
 
+The current cartridge is ABI 387 / format 21 at
+`build/v3-post-office-bank-installed-05/build-lock.json`. Startup, complete
+repayment/Pelly resources and allocation, April native hooks, official dialogue,
+and the full saved-account owner are installed. Banking remains disabled by
+default. Real mail delivery/scheduling and independent mechanic/reward controls
+remain unfinished; the 23 staged acquisition gates stay closed. See
+[the installed ownership evidence](#installed-cartridge-ownership).
+
 ## Verified donor
 
 The complete pinned REL and symbols pass `verify_sources`. The actual
@@ -35,7 +43,7 @@ The original Pelly owner at VROM `008A6C10`, RAM `809C3420`, matches the
 7,680-byte cached disassembly input. Its 104-byte status function at
 `809C3708..809C376F` has SHA-256
 `69f4cd5494efd6f494ee3b322f24db809e8ef33e7c858dbc2727ddb0a3ebfd1c`.
-The current ABI-386 cartridge retains these instructions unchanged, checked from
+The retained ABI-386 input retains these instructions unchanged, checked from
 its actual owner. Its complete disassembly is
 `build/v3-post-office-category-prepared-03/native-pelly/code.asm`. The function
 sets the mail-queue bit and, when the first-job check permits it, tests the loan
@@ -68,7 +76,7 @@ a sixteen-byte header and four eight-byte rows. Each row has a big-endian balanc
 the source receipt bits `04/08/10/20`, and three zero reserved bytes. Header byte
 eight records required account support. Player clearing affects only its row and
 does not remove that support requirement. The full saved-town owner below owns
-this record in source; installation in the current cartridge remains pending.
+this record in source; the enclosing ABI-387 cartridge installs that owner.
 
 The account transaction runs the complete donor controls and transfer algorithm,
 including all four money-bag denominations, condition-aware pockets, withdrawal
@@ -170,8 +178,8 @@ The current combined MIPS preparation and complete packet are described below.
 Native services, shared saved ownership, source April callbacks, art roots, and
 configuration storage have real linked addresses. Calendar/actor registration
 and cartridge menu/save ownership remain unfinished. No native bank harness
-starts and no existing harness budget resets. The current ABI-386 ROM, format
-20/wire 7, selections, and both patcher deployments are unchanged.
+starts and no existing harness budget resets. The retained ABI-386 ROM and
+existing saves remain untouched; selections and both patcher deployments are unchanged.
 
 ### Official dialogue and saved account owner
 
@@ -187,7 +195,7 @@ Controller Pak letter-save interaction instead of the GameCube Memory Card menu.
 The single provenance catalogue contains exact official-source credits for all
 eighteen additions. The generated bidirectional map is compiled into preparation
 23; its complete source Pelly host check uses that map, not arithmetic message
-IDs. Actual text-bank installation/bounds and native services remain pending.
+IDs. The enclosing cartridge installation supplies the actual text banks and bounds.
 
 `AF_V3_BANK_STORAGE` connects `AFBA` to `console_storage.c` and
 `save_compressed.c`, including ordinary pack/check/adoption, diary capacity
@@ -203,12 +211,12 @@ save before caller state, live accounts, or device writes change.
 `tools/v3_bank_storage.py` checks a separate 64-byte account/guard reservation at
 `807E9080..807E90BF` against all retained owners. Save scratch at `80682000`
 requires 120,416 bytes including its existing sixteen-byte guard, an increase
-of exactly 48 bytes. These reservations are checked preparation, not installed
-memory. MIPS compilation requires an explicit account reservation; the existing
+of exactly 48 bytes. The enclosing cartridge installs these reservations.
+MIPS compilation requires an explicit account reservation; the existing
 event-storage linker still forbids unowned data/BSS growth.
 
 Nine focused bank/frontend/dialogue/account/storage checks pass. Actual MIPS
-storage compilation retains every current format-20 compiler define. Sanitized
+storage compilation retains every input format-20 compiler define. Sanitized
 full-town host checks cover both banking modes, both physical-bank reads with
 device I/O doubled, all four residents, maximum balances/receipts, probe-only
 reads, adoption, deletion, new towns, formats 14–20, older compressed/canonical
@@ -216,12 +224,12 @@ migration, required-mode rejection, guard corruption, and capacity preflight.
 The unchanged format-20 golden/card transaction also passes in both paper modes.
 No emulator bank/save or original-hardware verification is claimed.
 
-**Compatibility warning for the prospective installation:** supported older
+**Compatibility warning:** supported older
 saves migrate forward with empty bank accounts. Format-21 saves cannot be loaded
 by format-20-or-earlier V3 or V2 readers, even when banking is disabled. A save
 requiring banking also needs banking enabled in its current profile. Preserve
 separate saves and builds; ordinary forward/backward compatibility is unverified.
-The current format-20 cartridge and existing saves are not modified.
+The retained format-20 cartridge and existing saves are not modified.
 
 ### Queued opening and native lifecycle entry plan
 
@@ -337,8 +345,8 @@ addresses. No resident reservation or manager actor allocation grows.
 Descriptor lookup delegates through the authenticated existing registry chain,
 without changing the prior public entry or recursing into the new wrapper.
 The core edits merge with the bank menu plan only when their exact old bytes
-are unchanged; overlapping changes reject. Calendar/actor/text/save installation
-remains pending in the enclosing cartridge builder.
+are unchanged; overlapping changes reject. The enclosing ABI-387 cartridge
+installs these calendar/actor/text/save consumers together.
 
 Sanitized tests cover all eleven identities/messages for all four
 residents, visitor suppression, repeat talk, allocation failure, reconstruction,
@@ -372,45 +380,107 @@ changing resource contents. Linked art SHA-256 is
 All six native Pelly/menu entry shims use actual linked functions. Two packet
 checks verify full resources, pointer bounds, collision rejection, initialized
 state/guards, original-object matching, and the complete native entry plan.
-These are not native rendering or gameplay/save evidence. Startup transfer and
-enlarged resource relocation, text/full saved-owner redirects, April native
-lifecycle installation, real mail scheduling, and profile controls remain required.
+These are not native rendering or gameplay/save evidence. The enclosing cartridge
+installs startup, resource relocation, text/full saved-owner redirects, and April
+native hooks. Real mail scheduling and profile controls remain required.
 Preparation `23` and linked packet `04` are current. Preparation `21` retains its
 missing-source-status-constants diagnostic; `22`/`03` retain intermediate compiled
 resources. All unchanged bank artwork is reused. Eleven focused frontend/dialogue/
 entry/packet checks and both-mode saved-owner checks pass for the connected batch.
 
+## Installed cartridge ownership
+
+`tools/v3_bank_install.py` connects the complete linked packet through
+`tools/v3_furniture_install.py --refresh-runtime --bank-connected`. The checked
+current build is `build/v3-post-office-bank-installed-05/`, ABI 387, format 21,
+card wire seven. ROM SHA-256:
+`e9380cd721bc45985e916f3cb6db81ae93249ca9c0bffac10fa70e0ffea32707`.
+UPS SHA-256:
+`fdb399431b9580e9ee78f92a4bc99085c978f975ef211f125ea8654d3d125606`.
+The ordinary shared writer checks full resources, DMA changes, physical ownership,
+ROM checksums, and patch reconstruction. This is an internal checkpoint, not the
+assembled private playtest handoff.
+
+The retained quest owner ends at `807D8040`, exactly where the linked bank begins.
+A complete 245,824-byte replacement therefore loads `807AC000..807E8040` through
+the existing descriptor and editable CRC. It retains every old quest/card/golden
+byte except the 46 explicit public saved-entry redirects. Bank code, BSS, mode,
+all 24,224 art bytes, and both bank guards match the linked packet. The old
+physical packet remains untouched and owned. Startup stays 676 bytes inside its
+688-byte reservation with all 23 descriptors, transfers, CRCs, and cache calls;
+no new loader, weakened check, or overwritten equipment guard is needed.
+
+`tools/v3_bank_resources.py` moves the complete repayment code/relocation pair
+to VROM `04700000/04701000` and Pelly to `04710000/04712000`. Their native DMA
+indices remain `60/61` and `234/235`. The actual native loader reads the following
+DMA directory entry for relocation bounds; physical or virtual adjacency is not
+substituted for that contract. Complete original relocated code/data/BSS remains
+in the appended shim resources. Repayment's final descriptor preserves its three
+local lifecycle entries. Pelly's complete descriptor retains profile `809C5000`,
+normal allocation type, and unloaded state, while growing loaded storage from
+7,680 to 7,744 bytes. The retained submenu chain gains 64 aligned bytes after the
+code-editor contribution. Its complete current capacity and a follow-on ordinary
+category check pass without recompiling artwork. Original physical copies remain.
+
+The April manager appends control 76/type 117 without changing the 75 retained
+rows; its complete owner and relocation table use the shared physical allocator.
+The compiled calendar, exclusive cleanup bound 118, and guarded `F6` descriptor
+are installed. Personal deletion reaches the same complete source April owner.
+The full saved-town owner receives all 46 public redirects, preserving the old
+entry locations and retained canonical services, with no recursive target.
+AFBA owns 48 record bytes and a separate sixteen-byte guard at `807E9080`; scratch
+at `80682000` gains exactly 48 bytes. Canonical live-state size is unchanged.
+The account and transaction implementation is shared, not duplicated.
+
+All fourteen official messages and four choices are installed at `33B2..33BF`
+and `0220..0223`, with complete old message/choice prefixes preserved. Both message
+bounds and the actual native choice bound are raised. Whole-bank Nook/Harvest
+and shared choice-capacity receipts match the current resources. The five focused
+installed checks and three planning checks pass, including complete resource and
+allocation guards, mutation rejection, preserved old bytes, and five browser/
+offline profiles. Empty selection reproduces stable V2-14; all-selected reproduces
+the 298-choice ABI-387 cartridge. All 23 staged gates remain closed. Both-mode
+sanitized saved-owner checks pass with native I/O doubled; ordinary native banking,
+physical save/restart, and original hardware remain unverified. No native bank
+harness starts; spent holiday/Harvest/Nook harness budgets remain unchanged.
+
+Bank mode retains its owned zero/N64 default. No bank/reward choice is published
+before actual mail submission and acknowledgement are connected. Format-21 saves
+cannot be loaded by format-20-or-earlier V3 or V2, even with banking disabled.
+Supported older towns migrate forward with empty accounts; required-account saves
+reject a banking-disabled profile before mutation or device writes. Keep separate
+builds, saves, and backups. Both patcher deployments remain stable V2-14.
+<!-- Installation work record: 01 rejects an over-strict import-blob minimum;
+02 reaches text-capacity validation without the choice-bound connection;
+03 has the final ROM bytes but lacks the complete retained-menu allocation receipt;
+04 stops on a planner-list variable shadow. 05 supplies the complete checked
+allocation chain and current receipts. Earlier artifacts remain ignored and are
+not current proposals. No artwork is rebuilt. -->
+
 ## Remaining connected consumers
 
-Implement a real deposit/withdrawal route and reviewed per-player saved balance
-and reward acknowledgement before enabling the savings milestone. Preserve
-the loan-payment route and the donor's account eligibility. Bind actual native
-money transfers, save ownership, and ordinary mail scheduling before changing
-them. Unknown saved fields are not available storage without review.
+The complete deposit/withdrawal route and reviewed per-player saved owner are
+installed with banking disabled by default. Connect reward acknowledgement and
+ordinary scheduling before enabling savings milestones. Preserve original
+repayment and the donor's reviewed account eligibility. Unknown saved fields
+are not available storage without review.
 
-Extract and integrate the complete English `0248` reward template, preserving
-town/player fields, its genuine sender, paper mapping, and attached `3294` ID.
+Extract and integrate all four complete official templates `0246..0249`, preserving
+town/player fields, genuine senders, paper mappings, and every attached source gift.
+Template `0248` attaches the existing mailbox `3294`.
 Keep selected-profile gating, successful-delivery-only acknowledgement, full
 queue retry, and one-time persistence. The existing catalogue-order/ticket
 wrapper in `POST_OFFICE_LETTERS.md` is not this savings-reward mechanism.
 
-Install the prepared complete bank/Pelly route, preserving repayment and the
-reviewed resident/loan/house/renovation admission. Bind source April event 17 as
-additive native type 117/profile `F6` without shifting retained identities, using
-the prepared complete April calendar/manager/descriptor resources and guarded
-actor lifecycle wrappers. Personal deletion and complete official Pelly/Phyllis
-messages are connected in the prepared owners. Attach the linked packet's startup transfer and native resource relocation,
-followed by text-bank and full
-saved-owner installation, using the prepared native entry planner,
-official dialogue and account provider above. Bind the
-compiled selection/admission adapters and checked wallet/pocket services only
-through reviewed owners. Retain the checked complete packet and guards. Attach
-the format-21 saved owner and its checked account/scratch reservations to all
-current save entry points, retaining forward migration, complete existing
-card/golden/console/town data, and older-reader rejection. Do not discard balances
-or remove the required banking profile when installing the compiled providers.
-Publish real mechanic controls and independent milestone selections only after
-these native owners and the actual mail delivery/acknowledgement path are installed.
+The next consumer is genuine native player/mail creation and submission, followed
+by ordinary scheduling of the complete four-row milestone driver. Retain selected
+gift filtering, one attempt per non-null resident, exact-success-only receipts,
+full-queue retry, and re-entrancy protection. Connect the other complete source
+mail owners in the same category without rebuilding installed artwork. Publish
+real mechanic controls and independent milestone selections only after the mail
+delivery/acknowledgement path is installed. Retain the source April lifecycle,
+full town/card/golden/console data, migration, and older-reader rejection. Do not
+discard balances or remove required banking support when binding profiles.
 
 All four gift models/behaviours are already complete. The three staged savings
 items reuse their installed banks; the existing mailbox retains its complete

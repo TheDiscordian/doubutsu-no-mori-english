@@ -532,7 +532,12 @@ Actual linked menu/Pelly entries preserve original repayment and use the genuine
 native wallet, pocket, text, and drawing APIs. The complete bank artwork uses
 physical packet pointers without taking the native submenu's segment six.
 Bank configuration has owned initialized storage, but no installed profile
-control. This packet is not installed in the current cartridge.
+control. ABI 387 installs this packet with banking disabled by default. Its
+complete 245,824-byte shared startup transfer retains the existing 23-descriptor
+loader, original reservation, guards, and every old physical copy. Repayment/Pelly
+code and relocation pairs retain native directory order at explicit additive VROM
+identities; both complete allocation readers and the retained menu chain grow
+by their checked 64-byte allowances. The shared next-category reader retains them.
 
 The April controller retains its eleven source NPC/message rows and all four
 players' event-cache talk fields. Construction preflights native event allocation;
@@ -541,14 +546,19 @@ April calendar/manager/actor consumers compile and have a complete native resour
 plan for additive event 117/profile `F6`. Wisp 115 and Franklin 116 retain their
 identities. Native cleanup includes 117, and all 75 existing manager rows and
 relocations remain intact. Guarded lifecycle wrappers, saved-owner personal
-deletion, and complete official postal dialogue are connected in preparation;
-cartridge installation is required before that branch is playable. Phyllis retains source
+deletion, and complete official postal dialogue are installed. Phyllis retains source
 identity `D012`, independently of the postal draw-type field.
 
-Complete resource relocation and startup transfer, text/save entry installation,
-genuine successful-mail acknowledgement and scheduling, and independent mechanic/
+All 46 public saved-owner entries use the same linked format-21/account owner.
+Fourteen official messages and four choices preserve all existing text and the
+whole current Nook/Harvest/choice-reader receipts. Focused cartridge/resource
+checks and five browser/offline profiles pass; native services remain doubled
+in both-mode saved-owner checks. These results do not prove ordinary gameplay,
+physical save/restart, or hardware behaviour.
+
+Genuine successful-mail acknowledgement and scheduling, and independent mechanic/
 reward controls remain connected acquisition work. The source milestone does
-not become lifetime earnings or random post-office stock. Prospective format-21
+not become lifetime earnings or random post-office stock. Format-21
 saves migrate older supported records forward with empty accounts; format-20-or-
 earlier readers cannot load format 21, even when banking is disabled. Preserve
 separate builds/saves. See the [current source-mail checkpoint](../docs/checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md).

@@ -82,8 +82,9 @@ the experimental V3 publication hold does not apply to V2 fixes.
   fish/insect artwork. Leave those assets unchanged unless actual lettering or
   a concrete translation defect is identified. Hypothetical untranslated art
   is not a reason to delay `V1 Final` or build more inspection tooling.
-- Keep progress updates in chat and describe concrete completed work. Do not
-  open repeated status renders or repeat an unchanged completion percentage.
+- Keep progress updates in chat and describe concrete completed work. Never
+  open render-md windows or wait for the user to read one. Do not repeat an
+  unchanged completion percentage.
 - When asked for total translation progress, run `python3 tools/translation_progress.py`
   and report its single fresh combined approximation. Names and letters belong
   in the same total as dialogue. Do not reuse the bank-only diagnostic or mix

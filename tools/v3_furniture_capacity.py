@@ -146,6 +146,13 @@ def checked(base, report):
             late_chain.append(dict(address=POOL_WORD,
                 before=(0x25CE0000|((editor['previous_pool_bound']+late_delta)&65535))-extra,
                 after=tail_word-extra))
+        if equipment.get('bank'):
+            from v3_bank_resources import menu_allocation
+            bank=menu_allocation(base,report);patch=bank['pool_patch']
+            if patch['before']+late_delta!=tail_word:
+                raise ValueError('Broken retained bank submenu allocation chain')
+            actual_bound+=bank['additional_pool_bytes'];tail_word=patch['after']+late_delta
+            late_chain.append(dict(address=POOL_WORD,before=patch['before']-origin,after=patch['after']-origin))
         expected_word=int(patches[POOL_WORD]['after' if in_chain else 'before'],16)+delta
         if in_chain:
             observed=chain[chain.index(retained)+1:]

@@ -65,7 +65,7 @@ Fourteen complete official bank/April messages and four choices have additive ma
 preserving every existing native mail/Pak destination. The map compiles into the
 frontend and passes its complete source Pelly sequence with native I/O doubled.
 The full-town saved owner now connects the independent AFBA record, deletion,
-reset/adoption, preflight, and migrations in source. Its prospective format 21
+reset/adoption, preflight, and migrations in source. Its installed format 21
 retains card wire 7; old readers reject it, and removing required banking rejects
 before publication/writes. Separate account/guard and 48-byte scratch growth
 reservations are checked; actual MIPS storage compilation and both-mode sanitized
@@ -91,23 +91,28 @@ actor lifecycle wrappers compile for additive event 117/profile `F6`, preserving
 Wisp 115 and Franklin 116. The saved owner connects personal event deletion, and
 official postal April messages have IDs `33BE..33BF`. The complete native resource
 plan adds row 76 without changing the 75 existing rows, preserves both relocated
-load images, and grows cleanup's exclusive bound to 118. These consumers remain
-uninstalled. The fully linked 64-KiB packet at
+load images, and grows cleanup's exclusive bound to 118. The enclosing cartridge
+now installs these consumers. The fully linked 64-KiB packet at
 `807D8040..807E8040` is `build/v3-post-office-bank-linked-04/linked.json`, with
 39,488 code/state bytes, separate code/art guards, and all 24,224 reused art bytes.
 Its 51 resource pointers use physical addresses without taking native segment
 six. Native API addresses bind once from authenticated original objects, not
 again to a partially bound preview. Owned account-mode storage initially retains
-N64 mode; profile control remains uninstalled. Startup/resource relocation,
-text-bank/menu/lifecycle installation, cartridge saved ownership, official template creation,
-real mail I/O, scheduling, and ordinary gameplay remain unbound. The current ROM
-and selections do not change. Install the prepared native April resource plan
-and guarded wrappers; never register the source-numbered profile directly or
-bypass allocation preflight. Attach the linked packet's startup transfer and complete native overlay
-resource relocation, followed by text-bank and full saved-owner installation,
-using the prepared entry planner, checked dialogue, and reservations, while
-preserving repayment. Install the
-prepared complete route and bind the connected real mail owners. The
+N64 mode; profile control remains uninstalled. The checked combined quest/bank
+startup transfer, complete repayment/Pelly resource relocation and allocation,
+April calendar/manager/actor hooks, fourteen official messages/four choices, and
+all 46 saved-owner redirects are installed in ABI 387. Startup retains all 23
+descriptors inside its original reservation; every old physical copy remains.
+The complete menu chain and subsequent ordinary-category retention pass, alongside
+five browser/offline profiles and both-mode saved-owner checks with native I/O
+doubled. Banking stays disabled by default; the 298 choices and 23 staged gates
+remain unchanged. Native gameplay and physical save/restart remain unverified.
+Connect the four complete official milestone templates, native player/mail
+creation/submission and ordinary scheduling, retaining success-only acknowledgement,
+retry, null-player/visitor handling, and all donor thresholds. Then bind the
+independent bank mechanic/reward choices and the other complete mail owners in
+the same source category. Preserve repayment and every installed model; do not
+rebuild unchanged art or reset an existing harness budget. The
 [category source map and remaining connections](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md#remaining-connected-consumers)
 cover all 23 staged records; do not rescan their unchanged artwork or turn each
 connection into a new category task. Bank preparation does not restart the spent
@@ -121,8 +126,11 @@ rules remain. Ordinary holiday/exercise conversation, delivery, and save
 verification remain pending alongside Harvest/Nook. Preserve their spent native
 harness budgets; admission is not ordinary gameplay acceptance.
 
-The current proposal is ABI 386 / format 20 at
-`build/v3-holiday-card-prize-imports-01/password-destinations/build-lock.json`.
+The current proposal is ABI 387 / format 21 at
+`build/v3-post-office-bank-installed-05/build-lock.json`.
+Format-21 saves cannot be read by format-20-or-earlier V3 or V2, even with banking
+disabled. Supported older saves migrate forward with empty accounts; ordinary
+save/restart remains unverified. Preserve separate builds, saves, and backups.
 Its 298 development choices include all fifty source holiday furniture rewards,
 with independent selection and shared provider activation without diary imports.
 Initial gifts never become shop stock. Twelve complete source reorderable-list
@@ -142,8 +150,9 @@ furniture profiles retain their acquisition gates. Ordinary
 event gameplay, menu ordering, physical save/restart, scene headroom, and hardware
 remain unverified. Keep separate saves/profiles; ABI 382 ordinary forward/backward
 compatibility is not established, nor ordinary compatibility with ABI 384.
-Format 20/wire 7 are unchanged; older format
-readers cannot load format-20 saves. Both patcher deployments remain stable V2-14.
+The retained holiday/card baseline uses format 20/wire 7; the current bank owner
+adds format 21 without changing wire 7. Older readers cannot load the current
+format-21 saves. Both patcher deployments remain stable V2-14.
 <!-- Holiday work record: category-imports-01 stops on the catalogue allocation
 guard before producing a cartridge. Category-imports-02 is invalid: ordinary
 installation discards the new endpoint. Category-imports-03 retains that core

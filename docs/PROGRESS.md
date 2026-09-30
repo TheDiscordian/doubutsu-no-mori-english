@@ -23,8 +23,18 @@ lock or publish experimental V3.
 
 ## Active development
 
-The current proposal is ABI 386 / format 20 at
-`build/v3-holiday-card-prize-imports-01/password-destinations/build-lock.json`.
+The current proposal is ABI 387 / format 21 at
+`build/v3-post-office-bank-installed-05/build-lock.json`.
+The complete linked bank/April resources, official dialogue, and saved-account
+owner are installed with banking still disabled by default. Real source mail
+delivery/scheduling and independent account/reward controls remain unfinished.
+Format-21 saves cannot be read by format-20-or-earlier V3 or V2, even with banking
+disabled. Supported older saves migrate forward with empty accounts; ordinary
+save/restart remains unverified. Keep separate builds, saves, and backups.
+The ROM SHA-256 is
+`e9380cd721bc45985e916f3cb6db81ae93249ca9c0bffac10fa70e0ffea32707`;
+the UPS SHA-256 is
+`fdb399431b9580e9ee78f92a4bc99085c978f975ef211f125ea8654d3d125606`.
 Harvest's complete connected resources, native full-model reservations, and
 twelve independent reward choices are installed, alongside fifty independent
 source holiday furniture gifts. This is an internal development
@@ -131,11 +141,11 @@ The internal ABI-386 ROM SHA-256 is
 `5f7e2f7f8d9bfc55e0b78eeab6789b06388ad79a17359516fd88f714a5a8904c`;
 the UPS SHA-256 is
 `5b8bd899a8c83dba53e1b9ed422e1b77cf0be1dfdf2ff6d9ae1b3540622e6db6`.
-The current lock above owns their exact paths and reconstruction checks. These
+The retained ABI-386 lock owns their exact paths and reconstruction checks. These
 are development artifacts, not the requested private assembled playtest handoff.
 
 The connected source-mail category has checked account/reward preparation at
-`build/v3-post-office-category-prepared-04/`, based on the current ABI 386.
+`build/v3-post-office-category-prepared-04/`, based on retained ABI 386.
 The complete sixteen-function donor frontend, source formatter/drawing/art, and
 checked native menu/wallet/pocket adapters compile at
 `build/v3-post-office-bank-frontend-prepared-23/`. Sixteen complete Pelly
@@ -153,15 +163,15 @@ variants, largest balance, house/identity/renovation rejection, stale residents,
 and original-action restoration. Forced cancellation preserves bank-menu
 ownership until the ordinary native destructor; cancelled pending construction
 rejects instead of falling into repayment. Native field and whole-service guards are checked, and
-unrequested banking preserves original repayment. The frontend is fully linked,
-but not installed. Current cartridge Pelly status still lacks the donor banking branch.
+unrequested banking preserves original repayment. The frontend is fully linked
+and installed, with the banking branch held at its N64-disabled default.
 All fourteen official bank/April messages and four choices have compiled additive maps
 and exact provenance, preserving existing native mail/Pak destinations. The
 full-town saved owner connects a separate AFBA record in source, with both-mode
 sanitized adoption/deletion/reset/preflight/profile rejection and older-format
 migration checks passing. Native storage compilation and distinct account/guard
-and scratch-growth reservation checks pass. Prospective format 21 keeps card
-wire 7; it is not installed, and older readers reject its saves. The adapter
+and scratch-growth reservation checks pass. Installed format 21 keeps card
+wire 7; older readers reject its saves. The adapter
 honours queued native linking rather than requiring an immediate
 open flag. An owned rejected construction installs closing-only callbacks until
 destruction, never numerical repayment callbacks. The category entry planner
@@ -186,8 +196,8 @@ wrappers own the real actor descriptor and retire inactive controllers; personal
 deletion is connected in the complete saved owner. The native resource plan
 preserves all 75 existing manager rows and adds row 76, retains relocations at
 both load bases, and extends ordinary cleanup to include 117. Official Pelly/
-Phyllis messages have additive IDs `33BE..33BF`. These connections are prepared,
-not installed in the cartridge. Eleven focused frontend/dialogue/entry/packet
+Phyllis messages have additive IDs `33BE..33BF`. These connections are installed
+in the cartridge. Eleven focused frontend/dialogue/entry/packet
 checks pass; both-mode saved-owner checks pass with native event/storage I/O doubled.
 `build/v3-post-office-bank-linked-04/linked.json` owns the fully linked 64-KiB
 packet at `807D8040..807E8040`, with 39,488 code/state bytes, initialized BSS,
@@ -198,12 +208,27 @@ to N64 mode, but no installed profile control. Native services are bound once
 from authenticated original objects, avoiding absolute-call relocation overflow
 from re-linking the partially bound preview. Packet SHA-256 is
 `b8bafbf61da1aa36de1c9c642a539e39b992a24ef28365b1593aa13895572faa`.
-Install the prepared April/bank native owners with startup transfer and
-resource relocation, text-bank, and saved-owner redirects next;
-selection/admission bindings, official templates,
-real delivery/scheduling, and independent account/reward choices remain connected
-implementation work. No current ROM, saved format, selectable
-count, or deployment changes. The
+`tools/v3_bank_install.py` installs the complete bank/April owners through the
+shared cartridge writer. The existing quest packet ends exactly at the bank's
+start; its checked 245,824-byte replacement loads both complete owners through
+the existing startup descriptor. Startup remains 676 bytes with all 23 transfers,
+CRCs, caches, and guards. The old physical packet and native resource copies
+remain intact. Repayment/Pelly resource pairs retain their DMA directory indices
+and ordinary next-entry relocation lookup, with explicit additive VROM identities.
+Pelly's complete allocation grows by 64 bytes, and the complete retained submenu
+chain also grows by 64 bytes. The next ordinary category retains that allowance.
+All 46 public saved-owner entries redirect to the same linked account/format-21
+implementation; the separate 48-byte account, guard, and 48-byte scratch growth
+are installed. Fourteen official messages and four choices preserve every old
+message/choice; current Nook/Harvest and shared choice-reader receipts match.
+Five installed-cartridge checks and three resource-planning checks pass, including
+five browser/offline profiles, exact V2-14 empty output, 298-choice all-selected
+output, complete menu capacity, retained resource bytes, and mutation rejection.
+Both-mode sanitized saved-owner checks pass with native I/O doubled. No native
+bank gameplay, physical save/restart, or original-hardware result is claimed.
+Official templates, real delivery/acknowledgement/scheduling, and independent
+account/reward choices remain the connected category's next consumers. The 23
+staged gates and both stable V2-14 deployments remain unchanged. The
 [source checkpoint](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md) records the single
 remaining acquisition map and exact next consumer. No ordinary native bank/save
 or hardware claim is made.

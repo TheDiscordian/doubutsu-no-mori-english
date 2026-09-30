@@ -358,6 +358,9 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
                     patches.append(dict(address=address,
                         before=0x25CE0000|(editor['previous_pool_bound']&65535),
                         after=0x25CE0000|(editor['pool_bound']&65535)))
+                if equipment.get('bank'):
+                    from v3_bank_resources import menu_allocation
+                    patches.append(menu_allocation(base,prior)['pool_patch'])
                 for patch in patches:
                     before,after=patch['before'],patch['after']
                     before+=old_slack-menu_origin;after+=old_slack-menu_origin
