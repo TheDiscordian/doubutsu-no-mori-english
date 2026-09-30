@@ -86,7 +86,7 @@ complete passing result; the whole scenario is not. No further setup retry is
 available in this batch, and this does not establish ordinary UI or delivery.
 
 Native harness construction begins at `2026-09-30 00:44:27 UTC`; its 30-minute
-allowance ends at `01:14:27 UTC`. The initial engine scenario's timeout uses the
+allowance ends at `01:14:27 UTC` and is exhausted. The initial engine scenario's timeout uses the
 one setup correction; do not reset either allowance on continuation. Actual
 title-allocation and live-memory-overlap fixes are game defect work, not new
 harness construction. At the allowance limit, retain unresolved UI/delivery

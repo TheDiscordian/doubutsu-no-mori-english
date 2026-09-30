@@ -786,28 +786,25 @@ and both patcher deployments target it. See the
 hold does not apply to stable V2 fixes. Current imported V3 already includes both
 fixes; align its pinned empty-selection V2-12 baseline with V2-13 before handoff.
 
-The unfinished code-entry keyboard is parked source work, not the next task.
-Its first build stops at the V2 reconstruction helper's unrelated-resource
-guard for `02800000`, before producing a cartridge. Preserve that work for
-phase 2; do not debug its frontend or replay password fixtures during phase 1.
-
-The linked password engine is ABI 197 at
-`build/v3-password-runtime-05/build-lock.json`. Its 32-KiB packet, native RNG,
-live selected-import reader, and checked lazy loader are installed. Phase 2 must
-complete the actual Nook input/dialogue and gift flow beyond this callable engine.
+The connected password engine and Nook frontend are ABI 375 at
+`build/v3-nook-password-installed-10/build-lock.json`. Its 32-KiB packet, native
+RNG, selected-import reader, lazy loader, keyboard, official result pages, complete
+name glyphs, and four native front-counter handover bindings are installed.
+Complete ordinary input/delivery verification and shared metadata admission.
 The loader entry is `804B4D00`; code input is 28 ASCII bytes and both names are
 eight-byte donor-font fields. Convert native saved/keyboard bytes explicitly.
-Complete existing-native/display correspondence and keep destination packets
+Preserve the checked existing-native/display correspondence and keep destination packets
 updated when the ordinary bulk importer adds more supported identities.
 
-Four focused host checks cover installed bindings, preserved resources,
-sanitized loader failure/cache ordering, and browser/offline none/all/individual
-composition. Native attempts stop before decoder execution: first on an invalid
-whole-equipment immutable comparison, then on a debugger proof that includes a
-non-word-aligned string suffix. The proof now includes checked zero alignment;
-do not spend further fixture retries in this batch. Include the pending native
-engine check in the next meaningful frontend/integration run. Retain all passed
-unchanged codec/policy evidence and keep this partial native result explicit.
+Five current installation checks and three browser/offline profiles pass.
+The complete native engine helper passes 45 assertions across twelve cases,
+including saved-field preservation and allocator cleanup. Its enclosing scenario
+retains an obsolete save-extension guard expectation and is not a full pass.
+The native setup retry and thirty-minute construction allowance are spent;
+retain pending UI/delivery checks and continue other required acquisition
+implementation rather than creating another fixture. Actual game-defect fixes
+are not limited by this harness allowance. See
+[the Nook checkpoint](checkpoints/V3_NOOK_PASSWORDS.md).
 
 The common password transform and policy retain their verified preparations at
 `build/v3-password-prepared-03/` and `build/v3-password-policy-prepared-03/`.

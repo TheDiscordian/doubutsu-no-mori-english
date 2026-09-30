@@ -205,11 +205,15 @@ remain required before these become optional playable imports.
 
 The [shared password modules](V3_PASSWORDS.md) link the complete donor code
 transform, eligibility rules, Nook results, and selected destination mapping for
-128 implemented imports. Bounded MIPS code and sanitized donor comparisons are
-verified. A checked lazy-loaded packet supplies the native selection reader and
-RNG binding; complete native execution remains unverified. Existing
-native-item/display correspondence, Nook's input/dialogue, and
-animated handover remain required before password rewards become usable imports.
+197 implemented imports and 1,425 checked native correspondences. Bounded MIPS
+code and sanitized donor comparisons are verified. The native engine passes 45
+assertions across twelve cases for selected destinations, real DMA/CRC/cache,
+RNG, preserved saved fields, guards, and cleanup. Four front counters have installed
+input, official dialogue, and native animated handover bindings. Ordinary code
+entry/delivery, shared admission of pending password-only records, and persistence
+remain required before claiming usable password rewards. See
+[the connected checkpoint](../docs/checkpoints/V3_NOOK_PASSWORDS.md) for the
+incomplete enclosing scenario and retained setup allowance.
 
 The [expanded import storage](V3_IMPORT_STORAGE.md) supports further batches
 without adding to the full DMA directory. English choice data retains its
