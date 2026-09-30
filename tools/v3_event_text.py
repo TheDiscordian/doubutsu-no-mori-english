@@ -152,6 +152,19 @@ def split_placements(image,files,loaded,physical_resources,reserved_end):
         if runs and lo<runs[-1][1]:raise ValueError('Overlapping original text banks')
         if runs and lo==runs[-1][1]:runs[-1]=(runs[-1][0],hi)
         else:runs.append((lo,hi))
+    # A checked packet move can expose a small zero-filled append margin.
+    # Keep the complete native bank in place when its extension crosses no
+    # current DMA owner or physical packet. Never treat retired nonzero bytes
+    # or padding inside another live resource as free space.
+    current=by_vrom(image)
+    for index,(lo,hi) in enumerate(runs):
+        need=max((files[v].pstart+len(data) for v,data in loaded.items()
+            if lo<=files[v].pstart<hi),default=hi)
+        if (need>hi and need<=len(image) and not any(image[hi:need]) and
+                not any(e.pstart<need and hi<(e.pend or e.pstart+e.size)
+                    for v,e in current.items() if v not in loaded and e.pstart!=0xFFFFFFFF) and
+                not any(r['physical']<need and hi<r['physical']+r['bytes'] for r in physical_resources)):
+            runs[index]=(lo,need)
     scratch=bytearray(image);placements=[];reservations=list(physical_resources)
     for v,data in sorted(loaded.items(),key=lambda pair:len(pair[1]),reverse=True):
         # Preserve the original position when possible; a grown message bank

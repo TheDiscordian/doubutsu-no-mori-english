@@ -30,7 +30,8 @@ def text_records(image,report):
     """
     records=copy.deepcopy(report.get('resource_capacity',{}).get('resources',[]))
     equipment=report.get('equipment_resources',{})
-    text=(equipment.get('carried_items',{}).get('quest',{}).get('npc',{}).get('text') or
+    text=(equipment.get('passwords',{}).get('nook',{}).get('dialogue') or
+          equipment.get('carried_items',{}).get('quest',{}).get('npc',{}).get('text') or
           equipment.get('npc_extra',{}).get('events',{}).get('participants',{}).get('dialogue') or
           equipment.get('holiday_fishing',{}).get('live',{}).get('text') or
           equipment.get('npc_extra',{}).get('dialogue',{}).get('text'))

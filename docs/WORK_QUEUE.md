@@ -43,12 +43,21 @@ the prepared codec, eligibility matrix, staged artwork, stable identities,
 donor result classes, name rules, three-gift limit, and one-insertion handover.
 Keep real unavailable delivery routes explicit; do not substitute shop stock.
 
+All four front-counter code/result/handover bindings and complete shared
+keyboard/font/dialogue/audio resources are installed in ABI 375. Five current
+installation checks and three private browser/offline profiles pass. Ordinary
+controller-driven entry and complete animated delivery remain unverified;
+the native engine check does not establish those paths. The complete font/title
+buffers must remain outside the existing room-rig code and mutable state. Resume
+the same category task and native-harness allowance, not a fresh setup cycle.
+See [the Nook checkpoint](checkpoints/V3_NOOK_PASSWORDS.md).
+
 The four golden-tool behaviour/reward paths are connected through the shared
 equipment importer, including the golden-shovel tree route.
 The golden shovel's tree acquisition, rewards, selection, and catalogue are
-connected. Continue the shared collection-completion mayor gift director/NPC for
+connected. The shared collection-completion mayor gift director/NPC for
 net and rod (`ac_present_demo` / `ac_present_npc`), plus the Shrine/hem reward
-conversation for the axe. Preserve donor priority, handover, trophy, and
+conversation for the axe, are installed. Preserve donor priority, handover, trophy, and
 celebration timing; use the installed participant and reward services. Do not
 substitute shop stock or letters. The current inventory has no other unresolved
 V3 item identity; the sign board belongs to V4 Able Sisters. Retain installed
@@ -88,8 +97,8 @@ The policy and fixed pack identities are installed and selectable in development
 Do not mutate quantities during ordinary transfers or load. See the
 [stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
 
-The current proposal is ABI 372 / format 20 at
-`build/v3-golden-tools-selection-06/build-lock.json`, with 217 selectable development
+The current proposal is ABI 375 / format 20 at
+`build/v3-nook-password-installed-10/build-lock.json`, with 217 selectable development
 entries. All four golden tools are independently selectable. Shared held ordering
 keeps its 64-entry capacity, complete code, physical mapping, and other categories.
 Nine current browser/offline profiles agree, including each tool alone and

@@ -7,7 +7,9 @@ those items in unrelated shop stock. One codec and shared eligibility rules
 serve the category; item records supply identities and selected destinations.
 This does not imply that every decoded item is present in the native game.
 The codec, eligibility, and selected-import reader are linked in the experimental
-cartridge. No input UI or gift delivery is installed.
+cartridge. The four native front counters have code entry, official result
+dialogue, and animated gift-delivery bindings installed. Ordinary conversation,
+controller-driven entry, gift delivery, and save/restart still require verification.
 
 The algorithm reference is the pinned CC0 ACreTeam/ac-decomp
 `src/game/m_mail_password_check.c`; Nook's result and handover rules are in
@@ -94,15 +96,18 @@ empty `ftr_listMario`. Source acquisition must use those actual rules, not the
 name or emptiness of one list. The ordinary metadata importer still needs the
 linked password-acquisition adapter before enabling these records.
 
-The separate `AFPM` version-1 packet binds implemented imports from the checked
-current composition catalogue. Its 16-byte header is magic plus six unsigned
-16-bit fields: version, count, stride 12, total bytes, zero, zero. Twelve-byte
-rows contain source/native unsigned 16-bit IDs, live enable-field RAM address,
-field width (one or four), and three zero bytes. Furniture keeps all four
-rotations. The live reader must return exactly one; disabled, malformed, or
-missing records resolve to zero. The map is build-specific, not a stable saved
-format. No native correspondence is inferred from equal IDs. Existing native
-items and display-parent aliases still need their separately reviewed mappings.
+The separate `AFPM` version-2 packet binds implemented imports and checked native
+correspondences from the current composition catalogue. Its 16-byte header
+contains magic and six unsigned 16-bit fields: version, range count, stride 16,
+total bytes, zero, zero. Rows contain inclusive source first/last IDs, native
+first ID, field width, zero, live enable-field RAM address, and enable mask.
+Furniture retains all four affine rotations. Unconditional checked native
+correspondences have width zero; selected byte/word fields require exactly one
+when the mask is zero, or an enabled masked bit otherwise. Disabled, malformed,
+or missing records resolve to zero. The reader retains version-1 exact-row
+support. The map is build-specific, not a stable saved format; equal IDs alone
+never establish correspondence. The checked map contains 197 import identities
+and 1,425 native correspondences in 298 ranges; pending imports remain absent.
 
 `overlays/v3/password_policy.c` validates both packets, resolves selected
 destinations through a supplied read-only accessor, and implements Nook's
@@ -113,8 +118,11 @@ zero/hundred-percent rates; invalid/NaN/out-of-range rolls reject. The explicit
 `result_gives_item` helper excludes invalid, wrong-name, card-e, losing-magazine,
 and cancellation results. None of these functions awards an item or writes
 saved state. Prepared callback tests do not establish engine execution. The
-installed native accessor and RNG binding below still need complete native
-execution; input, dialogue, and handover remain absent.
+installed native accessor and RNG binding pass 45 focused native assertions
+across twelve selection cases, including complete DMA/CRC/cache loading, genuine
+RNG, preserved save state, guards, and allocator cleanup. The enclosing scenario
+retains an obsolete trailing save-guard expectation and is not a complete pass.
+Input, dialogue, and handover bindings do not establish ordinary gameplay.
 
 ## Linked engine and memory ownership
 
@@ -179,7 +187,36 @@ locks message continuation, and sets the head lock. The following frames create
 the handover actor and transfer ownership. Inventory insertion by itself is not
 the complete delivery, and it must not be repeated in the frame-update action.
 
-## Required integration
+## Installed frontend and remaining integration
+
+`tools/v3_nook_install.py` connects cranny, convenience store, supermarket, and
+department-store front counters without extending their `96C` actor allocation.
+Each complete owner retains its original action dispatcher and follows the
+native following-DMA-entry relocation rule. Upstairs Timmy/Tommy keep their
+native route. The shared transient context owns `804C7800..804C7FEF`; the
+three-gift counter is not a new daily saved field. Retry retains all 28 code
+characters. Foreign-player, full-pocket, and gift-limit gates precede input.
+Decode runs once per submitted attempt. Real native animation, gift actor birth,
+ownership transfer, message continuation, head lock, and teardown are bound;
+missing clips never count as completed handover. Insertion happens once, and a
+refused insertion neither counts a gift nor begins transfer.
+
+The complete diary keyboard gains mode 5 with two fourteen-character rows,
+case-sensitive code input, and `#`; other modes retain their original owner.
+Four complete message/choice banks carry 22 provenance entries for official
+English pages and necessary platform adaptations. Full donor/native name
+conversion retains eight-byte comparison fields and every source character.
+The installed font retains its old glyphs and adds all 256 complete donor glyphs.
+Its image fits the existing checked `80450010` font reservation. Pixels own
+`804DA000..804E911F`; native title replay owns `804EA000..804EE82F`. Both lie
+after the complete room-rig packet at `804D0000..804D8FFF`, outside live reaction
+and colour state, and before furniture banks at `80500000`. The installer rejects
+overlapping buffers. The title's checked allocation call uses its separate
+Expansion Pak buffer while preserving the complete `BC8000` replay data and
+ordinary native playback. No font pixel allocation consumes the ordinary heap.
+
+The following requirements remain the acceptance contract; installed bindings
+are not claims of controller-driven conversation or complete native handover.
 
 1. Retain the installed source eligibility from `mMpswd_check_present`: Famicom uses
    its whitelist, user-trade codes use actual tradable stock/price rules, and
@@ -212,7 +249,7 @@ the complete delivery, and it must not be repeated in the frame-update action.
    saves. Enable item choices only after graphics, behaviour, real delivery,
    and persistence requirements are met. Preserve translation-only output.
 
-The linked decoder and encoder are not evidence for installed UI, native
-execution, ordinary gameplay, save/restart, or hardware. Keep the current
+The linked decoder and encoder are not evidence for ordinary gameplay,
+save/restart, or hardware. Keep the current
 experimental build and both deployments of the one stable patcher unchanged
 until their respective integration and user-approval requirements are met.

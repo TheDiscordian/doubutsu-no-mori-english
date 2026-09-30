@@ -1305,6 +1305,18 @@ def install_audio_resources(image,prior,blob,code,new_sequence,resources,audio):
         owner=scenery.get(category)
         if owner:
             relocatable.update({owner['vrom']:owner['sha256'],owner['reloc']:owner['reloc_sha256']})
+    # Installed menu owners can occupy the wave append margin too. The
+    # overlay loader resolves both complete files through the DMA directory;
+    # moving checked bytes does not alter their virtual identities or hooks.
+    menus=prior['equipment_resources'].get('diaries',{}).get('hooks',{}).get('menus',{})
+    for owner in menus.values():
+        if not owner.get('installed'):continue
+        for identity,digest in (
+                (owner.get('target_vrom',owner['vrom']),owner['overlay_sha256']),
+                (owner.get('target_reloc',owner['reloc']),owner['relocation_sha256'])):
+            if identity not in files or sha256(files[identity].extract(image))!=digest:
+                raise ValueError('Changed complete installed menu audio-growth blocker')
+            relocatable[identity]=digest
     if new_waves==old_waves:changes,growth={},None
     else:
         target=wave_owner.vstart

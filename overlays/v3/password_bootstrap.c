@@ -15,18 +15,22 @@ extern int af_pw_execute(const af_pw_u8 *, const af_pw_u8 *, const af_pw_u8 *, s
 #define packet af_pw_packet
 #define execute af_pw_execute
 #endif
-int af_v3_password_boot_check(const af_pw_u8 *code, const af_pw_u8 *player,
-                              const af_pw_u8 *town, struct AfPasswordOffer *offer) {
+int af_v3_password_boot_ready(void) {
     /* Startup loads a zero cache word for every new cartridge session. */
     if (cache != AF_PW_PACKET_CRC) {
         if (af_pw_dma(packet, AF_PW_PACKET_VROM, 0x8000) ||
                 af_pw_crc(packet, 0x8000) != AF_PW_PACKET_CRC) {
             af_pw_fault("V3 item codes", "Invalid password module");
-            return AF_PW_INVALID;
+            return 0;
         }
         af_pw_writeback(packet, 0x8000);
         af_pw_invalidate(packet, 0x8000);
         cache = AF_PW_PACKET_CRC;
     }
+    return 1;
+}
+int af_v3_password_boot_check(const af_pw_u8 *code, const af_pw_u8 *player,
+                              const af_pw_u8 *town, struct AfPasswordOffer *offer) {
+    if(!af_v3_password_boot_ready())return AF_PW_INVALID;
     return execute(code, player, town, offer);
 }

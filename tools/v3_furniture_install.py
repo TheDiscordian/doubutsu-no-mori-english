@@ -708,7 +708,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     room_rigs_art=None, room_rigs_code=False, room_goods=None, room_carry=None, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
-                    password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
+                    password_runtime=None,password_editor=False,password_nook=None,room_effects=None,furniture_capacity=False,console_storage=False,
                     console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None,carried_items=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
@@ -730,9 +730,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     moved=[];tail_writes={};tail_padding=None;equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[];physical_writes=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
-    resource_mode=equipment_mode or room_rigs_code or room_goods is not None or room_carry is not None or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring or password_runtime is not None or password_editor or room_effects is not None or furniture_capacity or console_storage or console_images is not None or console_emulator
+    resource_mode=equipment_mode or room_rigs_code or room_goods is not None or room_carry is not None or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring or password_runtime is not None or password_editor or password_nook is not None or room_effects is not None or furniture_capacity or console_storage or console_images is not None or console_emulator
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,room_rigs_code,room_goods is not None,room_carry is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None,password_editor,room_effects is not None,furniture_capacity,console_storage,console_images is not None,console_emulator))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,room_rigs_code,room_goods is not None,room_carry is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None,password_editor,password_nook is not None,room_effects is not None,furniture_capacity,console_storage,console_images is not None,console_emulator))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if console_disk is not None:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
@@ -957,6 +957,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         equipment_report=copy.deepcopy(prior['equipment_resources'])
         equipment.refresh_code(equipment_report,blob,output,core=core)
+    elif password_nook is not None:
+        import v3_nook_install as equipment
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+            base,prior,blob,core,module,original,output,password_nook,lock)
     elif password_editor:
         import v3_password_editor as password_ui
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
@@ -965,6 +970,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_password_runtime as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         equipment_report=equipment.install(base,prior,blob,original,output,password_runtime,lock)
+        report_updates['physical_resources']=copy.deepcopy(prior.get('physical_resources',[]))
     elif furniture_scoring:
         import v3_furniture_scoring as scoring_categories
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
@@ -1129,8 +1135,17 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         growth=report_updates.get('resource_growth',[])
         growth_vroms={r['vrom'] for r in growth}
         forced_moves={v for r in growth for v in r['relocated_blockers']}
-        if len(growth_vroms)!=len(growth) or growth_vroms&forced_moves:
+        if len(growth_vroms)!=len(growth):
             raise ValueError('Conflicting in-place resource growth plans')
+        # A category may preallocate a complete unchanged blocker in a
+        # checked zero gap instead of the cartridge tail. Require its exact
+        # retained bytes; the common destination checks below still validate
+        # the new physical and virtual ranges against every other plan.
+        for vrom in growth_vroms&forced_moves:
+            row=next(r for r in growth if r['vrom']==vrom)
+            if not row.get('relocated') or owner_changes.get(vrom)!=files[vrom].extract(base):
+                raise ValueError('Conflicting in-place resource growth plans')
+            forced_moves.remove(vrom)
         menu_resizes={r['vrom']:r for r in report_updates.get('furniture_scoring',{}).get('owner_resizes',[])}
         if password_editor:
             menu_resizes={r['vrom']:r for r in report_updates['password_editor']['owner_resizes']}
@@ -1337,6 +1352,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             physical_resources=report_updates.get('physical_resources',prior.get('physical_resources',[])))
     if creature_insects is not None:
         result=equipment.finish(result,base,prior,output,equipment_report,report_updates['physical_resources'])
+    if password_nook is not None:
+        result=equipment.finish(result,base,output,equipment_report,report_updates['physical_resources'])
     physical.verify(result,report_updates.get('physical_resources',prior.get('physical_resources',[])))
     fix_checksum(result);result=bytes(result)
     patch=make_ups(original,result)
@@ -1785,6 +1802,14 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             resource_allocations_changed=True,changed_owner_moves=owner_moves)
         report['sources'].update(report['password_editor']['sources'])
         report['native_test']='pending two-row code-entry UI; Nook conversation and gift delivery remain incomplete'
+    if password_nook is not None:
+        nook=equipment_report['passwords']['nook']
+        report['shared_runtime_refresh'].update(adapters=['password_runtime','nook_code_entry'],
+            resource_allocations_changed=True,changed_owner_moves=owner_moves,
+            additional_shop_bytes=nook['additional_shop_bytes'],
+            additional_system_font_bytes=nook['additional_system_font_bytes'])
+        report['sources'].update(nook['source'])
+        report['native_test']='pending focused installed Nook input/result/gift, glyph, and actor teardown checks'
     if report.get('resource_capacity'):
         report['resource_capacity']['resources']=capacity.text_records(result,report)
         capacity.checked_limit(result,report)
@@ -1876,6 +1901,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, link prepared password rules and live engine bindings without enabling delivery')
     parser.add_argument('--password-editor',action='store_true',
         help='With --refresh-runtime, install two-row code entry without enabling Nook delivery')
+    parser.add_argument('--password-nook',type=Path,
+        help='With --refresh-runtime, connect prepared Nook code-entry, official results, and animated gift delivery')
     parser.add_argument('--room-effects',type=Path,
         help='With --refresh-runtime, install prepared shared effects through the native controller')
     parser.add_argument('--furniture-capacity',action='store_true',
@@ -1934,6 +1961,7 @@ if __name__=='__main__':
         parser.error('--holiday-participants requires --holiday-actor-services')
     if args.password_runtime and not args.refresh_runtime:parser.error('--password-runtime requires --refresh-runtime')
     if args.password_editor and not args.refresh_runtime:parser.error('--password-editor requires --refresh-runtime')
+    if args.password_nook and not args.refresh_runtime:parser.error('--password-nook requires --refresh-runtime')
     if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
     if args.furniture_capacity and not args.refresh_runtime:parser.error('--furniture-capacity requires --refresh-runtime')
     if args.console_storage and not args.refresh_runtime:parser.error('--console-storage requires --refresh-runtime')
@@ -1957,7 +1985,7 @@ if __name__=='__main__':
                             furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art,
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
                             furniture_scoring=args.furniture_scoring,password_runtime=args.password_runtime,
-                            password_editor=args.password_editor,room_effects=args.room_effects,
+                            password_editor=args.password_editor,password_nook=args.password_nook,room_effects=args.room_effects,
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,

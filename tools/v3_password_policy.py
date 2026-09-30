@@ -200,7 +200,7 @@ def compact(masks,report):
     return header+bytes(report['magazine_rates'])+bytes(11)+b''.join(struct.pack('>HHBB',*r) for r in rows),rows
 
 
-def destination_map(lock):
+def destination_map(lock,*,rows_only=False):
     """Bind implemented imports to their actual live selection fields.
 
     Existing native-item correspondence and display-parent aliases remain
@@ -215,10 +215,34 @@ def destination_map(lock):
     for key,row in catalog.items():
         if row['kind']=='villager':continue
         donor=int(key.rsplit('/',1)[1],16);native=int(row['item_id'],16)
+        if 'enable_offset' not in row:
+            if row['kind']!='carried' or not rows_only:
+                raise ValueError('Bit-selected imports require the connected version-two password map')
+            from v3_carried_selection import masks
+            from v3_carried_runtime import TABLE
+            field=next(r for r in masks(image,report) if any(m['id']==key for m in r['members']))
+            mask=row['carried_mask'];ram=TABLE+20
+            if not int.from_bytes(image[field['offset']:field['offset']+4],'big')&mask:
+                raise ValueError('Disabled imported password parent')
+            for state in report['equipment_resources']['carried_items']['rows']:
+                if state['id']!=key:continue
+                rows.append(dict(source_item=int(state['donor_item_id'],16),item=int(state['native_item_id'],16),
+                    enable_ram=ram,enable_bytes=4,enable_physical=field['offset'],
+                    enable_mask=mask,id=key,kind=row['kind']))
+            continue
         at=row['enable_offset'];width=row['enable_bytes'];ram=row.get('enable_ram')
         if ram is None:
-            if row['kind']!='clothing' or not 0<=at<0xC000:raise ValueError('Unbound import selection address')
-            ram=0x80460000+at
+            if row['kind'] in ('fish','insect'):
+                from v3_import_storage import ROWS,ROWS_RAM,slot
+                parent_slot=slot(int(row['display_item_id'],16))
+                if at!=ROWS+parent_slot*80+4:raise ValueError('Changed creature display selection')
+                ram=ROWS_RAM+parent_slot*80+4
+            else:
+                if row['kind']!='clothing':raise ValueError('Unbound import selection address')
+                from v3_clothing_install import metadata_offset
+                if at!=metadata_offset(blob,report,row['source_record'])+10:
+                    raise ValueError('Changed complete garment selection binding')
+                ram=int(row['source_record']['metadata_ram'],16)+10
         if (width not in (1,4) or len(blob[at:at+width])!=width
                 or int.from_bytes(blob[at:at+width],'big')!=1
                 or not 0x80400000<=ram<=0x80800000-width or width==4 and ram%4):
@@ -230,6 +254,10 @@ def destination_map(lock):
                 enable_bytes=width,enable_offset=at,id=key,kind=row['kind']))
     rows.sort(key=lambda r:r['source_item'])
     if len({r['source_item'] for r in rows})!=len(rows):raise ValueError('Ambiguous password import destination')
+    if rows_only:
+        return None,dict(rows=rows,imports=len({r['id'] for r in rows}),
+            base_rom_sha256=sha256(image),base_report_sha256=sha256((optional.BASE/'build.json').read_bytes()),
+            runtime_abi=report['runtime_abi'],saved_format=report['save_codec']['format_version'])
     size=16+len(rows)*12
     if size>65535:raise ValueError('Password destination map exceeds bounded format')
     data=struct.pack('>4s6H',b'AFPM',1,len(rows),12,size,0,0)+b''.join(
@@ -238,6 +266,72 @@ def destination_map(lock):
         base_rom_sha256=sha256(image),base_report_sha256=sha256((optional.BASE/'build.json').read_bytes()),
         runtime_abi=report['runtime_abi'],saved_format=report['save_codec']['format_version'],
         native_correspondence_complete=False,display_aliases_complete=False,runtime_installed=False)
+
+
+def connected_destination_map(lock):
+    """Compact reviewed native correspondences and current selected imports.
+
+    Version two merges only affine identity runs with identical live gates.
+    Disabled imports never fall back to an unrelated native appearance. Paper
+    stack quantities remain a creation-policy consumer, not invented native IDs.
+    """
+    from v3_furniture_install import inputs
+    from item_identity_sheet import SHEET_SHA,sheet_rows
+    from v3_item_destinations import destinations
+    _,imports=destination_map(lock,rows_only=True)
+    image,report=inputs(lock)
+    worksheet=ROOT/'build/item-identity-megasheet.xlsx'
+    if sha256(worksheet.read_bytes())!=SHEET_SHA:raise ValueError('Changed password identity worksheet')
+    matrix=(ROOT/'build/v3-password-policy-prepared-03/donor-permissions.bin').read_bytes()
+    if sha256(matrix)!='22a5c233464f1779aa1d80944166b4ba4657b25392ff563cba7e9b02a04a2cc9':
+        raise ValueError('Changed prepared complete password permissions')
+    rows={r['source_item']:dict(r) for r in imports['rows']}
+    staged={int(r['id'].rsplit('/',1)[1],16) for r in report.get('staged_furniture',{}).get('rows',[])}
+    native=[];pending=[]
+    for number,cells in sheet_rows(worksheet,'Items'):
+        donor=cells.get('E','');counterpart=cells.get('C','')
+        if not re.fullmatch('[0-9A-F]{4}',donor):continue
+        donor=int(donor,16)
+        if donor in rows or donor in staged or not matrix[donor]:continue
+        if (not re.fullmatch('[12][0-9A-F]{3}',counterpart) or cells.get('HE')!='1'):
+            pending.append(dict(source_item=donor,worksheet_row=number,reason='no obtainable native counterpart'))
+            continue
+        # Full donor stacks need the connected quantity provider; a name alone
+        # cannot authorise silently collapsing them into single native sheets.
+        if donor>>8==0x20 and donor&0xC0:
+            pending.append(dict(source_item=donor,worksheet_row=number,reason='paper quantity provider required'))
+            continue
+        native.append(donor)
+    bindings=destinations(image,report,native,lock=lock)
+    for binding in bindings:
+        donor,item=binding['source_item'],binding['item']
+        if binding['evidence']!='pinned native counterpart' or binding['quantity']!=1:
+            raise ValueError('Native password map requires a direct reviewed counterpart')
+        rotations=4 if donor>>12 in (1,3) else 1
+        if rotations==4 and (donor&3 or item&3):raise ValueError('Unaligned native furniture correspondence')
+        for rotation in range(rotations):
+            source_id=donor+rotation
+            if source_id in rows:raise ValueError('Ambiguous native/import password correspondence')
+            rows[source_id]=dict(binding,source_item=source_id,item=item+rotation,
+                enable_ram=0,enable_bytes=0,kind='native',id=f'GAFE01-r0/item/{donor:04X}')
+    ordered=[rows[k] for k in sorted(rows)]
+    ranges=[]
+    for row in ordered:
+        if ranges and (row['source_item']==ranges[-1]['last']+1 and
+                row['item']==ranges[-1]['item']+row['source_item']-ranges[-1]['first'] and
+                row['enable_ram']==ranges[-1]['enable_ram'] and row['enable_bytes']==ranges[-1]['enable_bytes'] and
+                row.get('enable_mask',0)==ranges[-1]['enable_mask']):
+            ranges[-1]['last']=row['source_item']
+        else:ranges.append(dict(first=row['source_item'],last=row['source_item'],
+            item=row['item'],enable_ram=row['enable_ram'],enable_bytes=row['enable_bytes'],enable_mask=row.get('enable_mask',0)))
+    size=16+16*len(ranges)
+    if size>0x2800:raise ValueError('Complete connected map exceeds bounded shared password reservation')
+    data=struct.pack('>4s6H',b'AFPM',2,len(ranges),16,size,0,0)+b''.join(
+        struct.pack('>3HBBIB3x',r['first'],r['last'],r['item'],r['enable_mask'],0,r['enable_ram'],r['enable_bytes']) for r in ranges)
+    return data,dict(imports,version=2,bytes=len(data),sha256=sha256(data),rows=ordered,ranges=ranges,
+        native_correspondences=bindings,pending_correspondences=pending,
+        worksheet_sha256=SHEET_SHA,native_correspondence_complete=not pending,
+        display_aliases_complete=False,runtime_installed=False)
 
 
 def prepare(source,output,*,lock):

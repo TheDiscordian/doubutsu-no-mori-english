@@ -7,6 +7,9 @@
  * Cancel/invalid leave offer untouched. No result writes inventory or a save. */
 int af_v3_password_boot_check(const af_pw_u8 *, const af_pw_u8 *,
     const af_pw_u8 *, struct AfPasswordOffer *);
+/* Load once without consuming a code attempt or RNG. Export address comes
+ * from the current checked bootstrap receipt, not an assumed fixed offset. */
+int af_v3_password_boot_ready(void);
 int af_v3_password_check(const af_pw_u8 *, const af_pw_u8 *,
     const af_pw_u8 *, struct AfPasswordOffer *);
 #endif

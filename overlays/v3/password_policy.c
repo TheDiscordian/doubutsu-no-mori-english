@@ -6,28 +6,43 @@ typedef af_pw_u32 u32;
 static u32 half(const u8 *p) { return (u32)p[0]*256+p[1]; }
 static u32 word(const u8 *p) { return (half(p)<<16)|half(p+2); }
 int af_v3_password_map_valid(const u8 *p,u32 n) {
-    u32 i,count,last=0;
+    u32 i,count,last=0,version,stride;
     if(!p||n<16||n>65535||p[0]!='A'||p[1]!='F'||p[2]!='P'||p[3]!='M'
-        ||half(p+4)!=1||half(p+8)!=12||half(p+10)!=n||word(p+12)) return 0;
-    count=half(p+6);if(n!=16+count*12) return 0;
+        ||half(p+10)!=n||word(p+12)) return 0;
+    version=half(p+4);stride=half(p+8);
+    if(!((version==1&&stride==12)||(version==2&&stride==16)))return 0;
+    count=half(p+6);if(n!=16+count*stride) return 0;
     for(i=0;i<count;i++) {
-        const u8 *r=p+16+i*12;u32 source=half(r),item=half(r+2),ram=word(r+4),width=r[8];
-        if(!source||source==65535||!item||item==65535||(i&&source<=last)
-            ||(width!=1&&width!=4)||ram<0x80400000u||ram>0x80800000u-width
-            ||(width==4&&(ram&3))||r[9]||r[10]||r[11])return 0;
-        last=source;
+        const u8 *r=p+16+i*stride;
+        u32 source=half(r),end=version==1?source:half(r+2),item=half(r+(version==1?2:4));
+        u32 ram=word(r+(version==1?4:8)),width=r[version==1?8:12];
+        if(!source||end==65535||source>end||!item||item+end-source>=65535||(i&&source<=last))return 0;
+        if(version==2 && (r[7]||r[13]||r[14]||r[15] ||
+            (r[6] && ((width!=1&&width!=4) || (r[6]&(r[6]-1))))))return 0;
+        if(version==2 && !width) {if(ram||r[6])return 0;}
+        else if((width!=1&&width!=4)||ram<0x80400000u||ram>0x80800000u-width
+            ||(width==4&&(ram&3)))return 0;
+        if(version==1 && (r[9]||r[10]||r[11]))return 0;
+        last=end;
     }
     return 1;
 }
 u32 af_v3_password_resolve(const u8 *p,u32 n,u32 item,u32 (*read)(void *,u32,u32),void *context) {
-    u32 lo=0,hi,mid;
+    u32 lo=0,hi,mid,version,stride;
     if(item>65535||!read||!af_v3_password_map_valid(p,n))return 0;
-    hi=half(p+6);
+    hi=half(p+6);version=half(p+4);stride=half(p+8);
     while(lo<hi) {
-        const u8 *r;mid=lo+(hi-lo)/2;r=p+16+mid*12;
-        if(item<half(r))hi=mid;
-        else if(item>half(r))lo=mid+1;
-        else return read(context,word(r+4),r[8])==1?half(r+2):0;
+        const u8 *r;u32 source,end,native,ram,width;
+        mid=lo+(hi-lo)/2;r=p+16+mid*stride;
+        source=half(r);end=version==1?source:half(r+2);
+        native=half(r+(version==1?2:4));ram=word(r+(version==1?4:8));width=r[version==1?8:12];
+        if(item<source)hi=mid;
+        else if(item>end)lo=mid+1;
+        else {
+            u32 value=width?read(context,ram,width):1;
+            int enabled=version==2&&r[6]?(value&r[6])!=0:value==1;
+            return enabled?native+item-source:0;
+        }
     }
     return 0;
 }

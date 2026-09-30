@@ -13,14 +13,16 @@ import v3_password_policy as policy
 
 RAM, SIZE, BOOT, CACHE = 0x804C0000, 0x8000, 0x804B4D00, 0x804B4EF0
 TABLES, POLICY, MAP = 0x2800, 0x3000, 0x5000
+CONVERSATION = 0x7800
 MATRIX_SHA = '22a5c233464f1779aa1d80944166b4ba4657b25392ff563cba7e9b02a04a2cc9'
 SOURCES = ('tools/v3_password_runtime.py', 'tools/v3_asset_loader.py',
     'tools/v3_furniture_install.py', 'overlays/v3/password_runtime.c', 'overlays/v3/password_runtime.h',
     'overlays/v3/password_runtime.ld', 'overlays/v3/password_bootstrap.c',
-    'overlays/v3/password_bootstrap.ld', 'translations/provenance.json') + codec.SOURCES + policy.SOURCES
+    'overlays/v3/password_bootstrap.ld', 'overlays/v3/nook_password.c',
+    'overlays/v3/nook_password.h', 'translations/provenance.json') + codec.SOURCES + policy.SOURCES
 
 
-def prepared(source, directory, lock):
+def prepared(source, directory, lock, *, connected=False):
     """Rebind existing verified results, without recompiling the donor oracle."""
     raw = (directory/'password-policy.json').read_bytes()
     receipt = json.loads(raw)
@@ -36,8 +38,8 @@ def prepared(source, directory, lock):
             or receipt['sha256'] != sha256(permissions)
             or permissions != (directory/'password-policy.bin').read_bytes()):
         raise ValueError('Changed complete prepared permission packet')
-    destinations, mapping = policy.destination_map(lock)
-    if (mapping != receipt['destinations']
+    destinations, mapping = (policy.connected_destination_map(lock) if connected else policy.destination_map(lock))
+    if not connected and (mapping != receipt['destinations']
             or destinations != (directory/'password-destinations.bin').read_bytes()):
         raise ValueError('Prepared password destinations do not match the current build')
     tables, codec_contract = codec.discover(source)
@@ -49,7 +51,7 @@ def prepared(source, directory, lock):
 def install(image, prior, blob, original, output, directory, lock):
     old = prior['equipment_resources']
     if old.get('passwords'):
-        raise ValueError('Password engine already installed')
+        return refresh(image,prior,blob,original,output,directory,lock)
     ep = bytearray(blob[old['blob_offset']:old['blob_offset']+old['bytes']])
     if (old['ram'] != EQUIPMENT_RAM or old['bytes'] != 0x12000
             or old['vrom'] != BLOB+old['blob_offset'] or sha256(ep) != old['sha256']
@@ -114,4 +116,52 @@ def install(image, prior, blob, original, output, directory, lock):
         ordinary_gameplay_tested=False, native_execution_tested=False,
         additional_resident_bytes=SIZE, saved_format_changed=False, saved_profile_changed=False,
         sources={p: sha256((ROOT/p).read_bytes()) for p in SOURCES})
+    return result
+
+
+def refresh(image,prior,blob,original,output,directory,lock):
+    """Rebind current identities and the shared Nook stages in existing space."""
+    result=copy.deepcopy(prior['equipment_resources']);p=result['passwords']
+    at=p['blob_offset'];old_packet=bytes(blob[at:at+p['bytes']])
+    ep=bytearray(blob[result['blob_offset']:result['blob_offset']+result['bytes']])
+    if (p['ram']!=RAM or p['bytes']!=SIZE or sha256(old_packet)!=p['sha256'] or
+            zlib.crc32(old_packet)!=p['crc32'] or sha256(ep)!=result['sha256'] or
+            zlib.crc32(ep)!=result['crc32'] or p['vrom']!=BLOB+at or
+            old_packet[-16:]!=struct.pack('>4I',*([0xAF5057DE]*4))):
+        raise ValueError('Changed complete installed password resources')
+    for part in p['parts']:
+        if sha256(old_packet[part['offset']:part['offset']+part['bytes']])!=part['sha256']:
+            raise ValueError('Changed installed password component')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    tables,permissions,destinations,source_report=prepared(source,directory,lock,connected=True)
+    defines=(f'AF_PW_TABLE_BYTES={len(tables)}',f'AF_PW_POLICY_BYTES={len(permissions)}',
+        f'AF_PW_MAP_BYTES={len(destinations)}')
+    code,compiled=compile_part('password_runtime',output/'password_runtime',
+        extra_sources=('overlays/v3/password.c','overlays/v3/password_policy.c','overlays/v3/nook_password.c'),defines=defines)
+    packet=bytearray(SIZE)
+    parts=((0,TABLES,code),(TABLES,POLICY,tables),(POLICY,MAP,permissions),(MAP,CONVERSATION,destinations))
+    for start,end,data in parts:
+        if not data or start+len(data)>end:raise ValueError('Connected password component exceeds reservation')
+        packet[start:start+len(data)]=data
+    packet[-16:]=old_packet[-16:];crc=zlib.crc32(packet)
+    if not crc:raise ValueError('Connected password CRC collides with cold cache')
+    boot=p['bootstrap']['code'];start=BOOT-result['ram']
+    if (sha256(ep[start:start+boot['bytes']])!=boot['sha256'] or
+            any(ep[CACHE-result['ram']:CACHE+4-result['ram']])):
+        raise ValueError('Changed complete password bootstrap or cold cache')
+    loader,bootstrap=compile_part('password_bootstrap',output/'password_bootstrap',
+        defines=(f'AF_PW_PACKET_VROM=0x{BLOB+at:X}u',f'AF_PW_PACKET_CRC=0x{crc:X}u'))
+    if not loader or len(loader)>CACHE-BOOT:raise ValueError('Connected loader exceeds equipment padding')
+    ep[start:start+CACHE-BOOT]=loader.ljust(CACHE-BOOT,b'\0')
+    blob[at:at+SIZE]=packet
+    blob[result['blob_offset']:result['blob_offset']+len(ep)]=ep
+    p.update(code=compiled,crc32=crc,sha256=sha256(packet),source=source_report,
+        bootstrap=dict(ram=BOOT,cache=CACHE,code=bootstrap),
+        parts=[dict(offset=a,bytes=len(d),sha256=sha256(d)) for a,_,d in parts],
+        conversation=dict(ram=RAM+CONVERSATION,bytes=SIZE-16-CONVERSATION,
+            shared_session_gift_count=True,saved=False,native_bindings_installed=False),
+        native_execution_tested=False,ordinary_gameplay_tested=False,
+        sources={path:sha256((ROOT/path).read_bytes()) for path in SOURCES})
+    result.update(sha256=sha256(ep),crc32=zlib.crc32(ep),additional_resident_bytes=0)
     return result

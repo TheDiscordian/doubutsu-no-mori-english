@@ -8,15 +8,16 @@ from v3_asset_loader import ROOT
 from v3_furniture_pipeline import Source
 from letter_ui_fix import compile_part
 from editor_pixel_fix import flat_rows, jump
-from title_start_fix import reconstruct
 from npc_mail_show import relocate_verified_data
 from catalogue_names import Image
 import keyboard_v2 as v2
 import keyboard_v2_layout as layout
 
-VROM, RELOC, OWNER, RAM = v2.VROM, v2.RELOC, v2.OWNER, v2.RAM
-BASE_SHA='8927f2a00a2636816bfbb7f24b6f876f0ad080febf493c7f8cccbb6e5dbde944'
-REL_SHA='4bf303b9cfd014e1cd9cf8187fb1735fad6bb950985081beeab9af9d2058981e'
+from v3_diary_install import MENU_VROM
+VROM,RELOC=MENU_VROM['keyboard']
+OWNER,RAM=v2.OWNER,v2.RAM
+BASE_SHA='f08345f502023e14b1a445469e2ec2459d13888b4214afe9cc642841764efad3'
+REL_SHA='344c2495962d438c141a65c21b922a8ff15d3c433e69f4858a6dc01a55215096'
 REFERENCES={
     'src/game/m_passwordChk_ovl.c': 'f9f4035216bacc64a89d7a35345b1e175997f65ee19e678f7957396850122a19',
     'src/game/m_editor_ovl.c': 'e3d15e50af75a51fc7d7aec816c955204456c1a2436164774d7f74fbae2e1ae4',
@@ -81,33 +82,34 @@ def install(image, prior, core, original, output):
     if not prior['equipment_resources'].get('passwords'):raise ValueError('Missing shared password engine')
     files=by_vrom(image);old=files[VROM].extract(image);rel=files[RELOC].extract(image)
     if sha256(old)!=BASE_SHA or sha256(rel)!=REL_SHA:raise ValueError('Changed accepted keyboard owner')
-    # Replace only the prior presentation suffix; preserve its entire native,
-    # English editing, controls, and runtime context prefix.
-    prefix=bytearray(old[:v2.PREFIX]);struct.pack_into('>I',prefix,v2.CALL,jump(RAM+25748,True))
-    rows=[r for r in flat_rows(rel,len(old)) if r&0xFFFFFF<v2.PREFIX]
-    n=(24+len(rows)*4+15)&~15
-    previous_rel=struct.pack('>5I',len(prefix),0,0,0,len(rows))+struct.pack('>'+str(len(rows))+'I',*rows)+bytes(n-24-len(rows)*4)+struct.pack('>I',n)
-    if sha256(prefix)!=v2.SPEC['sha'] or sha256(previous_rel)!=v2.SPEC['reloc_sha']:
-        raise ValueError('Changed retained keyboard editor/input prefix')
+    # Append to the complete current keyboard, including its diary callbacks.
+    # The accepted input context and every preceding relocation remain owned
+    # by that prefix; a presentation rebuild must not retire the diary hooks.
+    diary=prior['equipment_resources']['diaries']['hooks']['menus']['keyboard']
+    if (not diary['installed'] or diary['target_vrom']!=VROM or diary['target_reloc']!=RELOC or
+            diary['overlay_sha256']!=BASE_SHA or diary['relocation_sha256']!=REL_SHA or
+            diary['owner_after'][:4]!=[VROM,VROM+len(old),RAM,RAM+len(old)]):
+        raise ValueError('Changed installed complete diary keyboard binding')
     symbols=struct.unpack_from('>40H',old,27776+320)
     cell=next(i for i,c in enumerate(symbols) if c==0xFFFF)
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     generated_files,reference=generated(source,image)
-    spec=copy.deepcopy(v2.SPEC)
-    spec['imports'].update(af_pw_previous_init=0x8088B2AC,af_pw_previous_update=0x80886724,
+    spec=dict(copy.deepcopy(v2.SPEC),vrom=VROM,reloc=RELOC,sha=BASE_SHA,reloc_sha=REL_SHA)
+    previous_init=RAM+diary['symbols']['af_diary_editor_init']
+    previous_update=RAM+diary['symbols']['af_diary_editor_update']
+    spec['imports'].update(af_pw_previous_init=previous_init,af_pw_previous_update=previous_update,
         af_pw_previous_input=0x8088C62C,af_pw_done=0x808860A0,af_pw_feedback=0x8088596C,
         af_pw_sound=0x800D1A9C,af_grid_editor_prepare=0x8088B278)
-    spec['calls']={0x80888484:('af_pw_editor_init',0x8088B2AC),
-        RAM+v2.CALL:('af_pw_editor_draw',RAM+25748),
+    spec['calls']={0x80888484:('af_pw_editor_init',previous_init),
+        RAM+v2.CALL:('af_pw_editor_draw',RAM+30644),
         0x8088B0CC:('af_pw_editor_key',0x8088AC9C)}
-    recovered=reconstruct(original,image,{VROM:bytes(prefix),RELOC:previous_rel},resized=(VROM,RELOC))
-    data,new_rel,compiled=compile_part('password_editor',recovered,output/'password_editor',
+    data,new_rel,compiled=compile_part('password_editor',image,output/'password_editor',
         spec=spec,source='/out/helper.c',generated=generated_files,
         flags=('-D_LANGUAGE_C','-DF3DEX_GBI_2','-I/source/upstream/af/lib/ultralib/include',
             '-I/source/overlays/keyboard_grid','-I/out',f'-DAF_PW_HASH_COLUMN={cell%10}',f'-DAF_PW_HASH_ROW={cell//10}'))
     data=bytearray(data);dispatch=0x8088883C-RAM
-    if (struct.unpack_from('>I',data,dispatch)[0]!=0x80886724 or
+    if (struct.unpack_from('>I',data,dispatch)[0]!=previous_update or
             (0x42000000|dispatch) not in flat_rows(new_rel,len(data))):
         raise ValueError('Changed native per-frame editor dispatch')
     struct.pack_into('>I',data,dispatch,RAM+compiled['symbols']['af_pw_editor_update'])
@@ -115,7 +117,7 @@ def install(image, prior, core, original, output):
     for base in (0x80200010,0x80370010):
         a=relocate_verified_data(Image(RAM,len(old),struct.unpack_from('>5I',rel)),old,rel,base)
         b=relocate_verified_data(Image(RAM,len(data),struct.unpack_from('>5I',new_rel)),data,new_rel,base)
-        if any(a[i]!=b[i] for i in range(v2.PREFIX) if i not in allowed):
+        if any(a[i]!=b[i] for i in range(len(a)) if i not in allowed):
             raise ValueError('Code-entry changes unrelated existing editor behaviour')
     data=bytes(data);compiled.update(overlay_sha256=sha256(data),touched_offsets=sorted(allowed))
     owner=bytearray(files[OWNER].extract(image));at=spec['owner_at']
@@ -125,17 +127,40 @@ def install(image, prior, core, original, output):
     # This HI/LO pair is the shared arena's editor term, including previously
     # reserved growth for other menus. Add only this editor's aligned increase.
     high,low=0x800C4AFC-CODE_RAM,0x800C4B10-CODE_RAM
-    if (struct.unpack_from('>I',core,high)[0],struct.unpack_from('>I',core,low)[0])!=(0x3C0E808A,0x25CE8FE0):
+    if (struct.unpack_from('>I',core,high)[0],struct.unpack_from('>I',core,low)[0])!=(0x3C0E808A,0x25CEBBE0):
         raise ValueError('Changed shared menu allocation term')
     growth=((len(data)+63)&~63)-((len(old)+63)&~63)
     if not 0<growth<=0x4000 or len(data)>RELOC-VROM:raise ValueError('Code-entry exceeds bounded owner growth')
-    bound=0x80898FE0+growth
+    bound=0x8089BBE0+growth
     struct.pack_into('>I',core,high,0x3C0E0000|((bound+0x8000)>>16))
     struct.pack_into('>I',core,low,0x25CE0000|(bound&0xFFFF))
     changes={VROM:data,RELOC:new_rel,OWNER:bytes(owner)}
+    # Current cartridge-tail storage is occupied. Reserve complete changed
+    # owners through the shared zero-gap allocator, retaining their old copies
+    # and excluding every live packet and each pending allocation.
+    from v3_furniture_install import relocate_resource_plan
+    growth_plans=[]
+    for vrom,content in changes.items():
+        if vrom not in (VROM,RELOC) and not files[vrom].pend:
+            continue
+        _,plan=relocate_resource_plan(image,files,vrom,content,
+            minimum_physical=0x100000,reservations=prior.get('physical_resources',()),
+            append_only=False,allow_compressed=True,
+            excluded_spans=tuple((r['physical'],r['physical']+r['bytes']) for r in growth_plans))
+        growth_plans.append(plan)
+    equipment=copy.deepcopy(prior['equipment_resources'])
+    keyboard=equipment['diaries']['hooks']['menus']['keyboard']
+    keyboard.update(bytes=len(data),overlay_sha256=sha256(data),
+        relocation_sha256=sha256(new_rel),
+        owner_after=[VROM,VROM+len(data),RAM,RAM+len(data),*diary['owner_after'][4:]],
+        password_extension=dict(symbols=compiled['symbols'],
+            retained_diary_init=previous_init,retained_diary_update=previous_update))
+    equipment['passwords']['keyboard_installed']=True
     receipt=dict(format='AFV3-PASSWORD-EDITOR-1',vrom=VROM,reloc=RELOC,ram=RAM,
         compiled=compiled,source=reference,hash_cell=cell,mode=5,caller_bytes=28,
-        additional_menu_pool_bytes=growth,previous_pool_bound=0x80898FE0,pool_bound=bound,
+        additional_menu_pool_bytes=growth,previous_pool_bound=0x8089BBE0,pool_bound=bound,
+        retained_diary_init=previous_init,retained_diary_update=previous_update,
+        complete_previous_bytes=len(old),complete_prefix_preserved=True,
         owner_resizes=[dict(vrom=v,previous_bytes=files[v].size,previous_sha256=sha256(files[v].extract(image)),
             bytes=len(d),sha256=sha256(d)) for v,d in changes.items() if v in (VROM,RELOC)],
         installed=True,shop_route_installed=False,ordinary_gameplay_tested=False,native_execution_tested=False,
@@ -143,4 +168,5 @@ def install(image, prior, core, original, output):
     # Preserve final installed bytes, not only the pre-dispatch compiler output.
     (output/'password_editor/installed.bin').write_bytes(data)
     (output/'password_editor/installed.json').write_text(json.dumps(receipt,indent=2)+'\n')
-    return changes,{'password_editor':receipt}
+    return changes,{'password_editor':receipt,'resource_growth':growth_plans,
+        'equipment_resources':equipment}

@@ -23,8 +23,28 @@ lock or publish experimental V3.
 
 ## Active development
 
-The current development proposal is ABI 372 / format 20 at
-`build/v3-golden-tools-selection-06/build-lock.json`. All four golden tools are
+The current development proposal is ABI 375 / format 20 at
+`build/v3-nook-password-installed-10/build-lock.json`. Nook's four front counters
+have installed code-entry, official result dialogue, and native animated handover
+bindings. The complete keyboard, full donor-name font, original shop actions,
+and saved formats are retained. Five current installation checks and three
+private browser/offline profiles pass, including exact V2-14 for empty/default
+selection and the complete 217-choice cartridge. Font and title buffers occupy
+checked space after the live room-rig packet; they do not overwrite room code or
+reaction/colour state. Controller-driven code entry, full gift handover, ordinary
+save/restart, and hardware remain unverified. Continue this connected category
+task and shared admission of its staged password-only records. See
+[the Nook checkpoint](checkpoints/V3_NOOK_PASSWORDS.md).
+
+The current native password helper passes 45 assertions and twelve selected-item
+cases, including complete DMA/CRC/cache loading, native RNG, saved-state
+preservation, guards, and cleanup. Checkpoint restoration and the following CPU
+fault/module-guard checks pass. The enclosing scenario stops at an obsolete
+save-extension guard expectation; it is not a complete scenario pass. Its setup
+retry is spent. Keep UI/delivery/save verification explicit and preserve the
+existing native-harness budget instead of starting a new setup cycle.
+
+All four golden tools are
 independently selectable: shovel through shining-hole planting and golden-tree
 growth/drop, net/rod through the collection-completion mayor presentation, and
 axe through the Shrine's perfect-town assessment and Farley handover.

@@ -121,8 +121,11 @@ SECTIONS {{
     relocation = (struct.pack('>5I', len(data), 0, 0, 0, len(rows))+
                   struct.pack('>'+str(len(rows))+'I', *rows)+bytes(size-24-len(rows)*4)+struct.pack('>I', size))
     for base_at in (0x80200010, 0x80370010):
-        before = relocate_verified_data(Image(ram, len(prefix), sections), old, old_rel, base_at)
-        after = relocate_verified_data(Image(ram, len(data), struct.unpack_from('>5I', relocation)), data, relocation, base_at)
+        constants=spec.get('address_constants',())
+        before = relocate_verified_data(Image(ram, len(prefix), sections), old, old_rel, base_at,
+                                       address_constants=constants)
+        after = relocate_verified_data(Image(ram, len(data), struct.unpack_from('>5I', relocation)), data, relocation, base_at,
+                                      address_constants=constants)
         if any(a != b and at not in touched for at, (a, b) in enumerate(zip(before, after))):
             raise ValueError('Letter UI changes retained code/data at a runtime load address')
     report = {'previous_bytes': len(old), 'previous_resident_bytes': len(prefix), 'bytes': len(data),
