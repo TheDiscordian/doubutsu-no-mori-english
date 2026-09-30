@@ -1317,7 +1317,12 @@ no replacement prose is introduced. The source importer's single
 The destination table is a counted, sorted set of checked source/native/profile
 records. Its 66 entries include the summer aerobics prize `1FCC` → `3C48`,
 which is not a member of the ordinary 28-event reward table. The complete source
-card controller and a compiled assertion establish that prize identity.
+card controller and a compiled assertion establish that prize identity. Ordinary
+category admission reads both prize branches and the first card from the complete
+checked donor controller, verifies all seventeen installed source card functions,
+and binds only the actual exercise-card dependency. The radio remains outside
+shop stock and non-orderable; card-only selection does not enable it. Its complete
+model/room lifecycle and indoor exercise code are reused, not reconstructed.
 Header length, ordering, kind, inverse diary parent, profile enable word, and
 metadata enable byte are checked before resolution. The table fits its original
 NPC packet reservation, so no actor layout or saved format changes.

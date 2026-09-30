@@ -3,6 +3,7 @@
 Initial acquisition stays with Tortimer. The source reorderable list remains
 orderable after collection, without inserting rewards into ordinary shop stock.
 """
+import json
 import struct
 
 from aflib import by_vrom,sha256
@@ -18,6 +19,31 @@ def contract(source):
     if not hasattr(source,'holiday_reward_contract'):
         source.holiday_reward_contract=discover(source)
     return source.holiday_reward_contract
+
+
+def exercise_contract(source):
+    """Read the prize and required card from the complete donor controller."""
+    if not hasattr(source,'holiday_exercise_contract'):
+        raw,receipt=source.function(0x7C8BC)
+        if (receipt['symbol']!='mSC_Radio_Set_Talk_Proc' or len(raw)!=1600 or
+                sha256(raw)!='8b8f9951b01fa0318bdfdc36fc29bf041cce0ee8b262f6f056431656e2ad5dfc'):
+            raise ValueError('Changed complete summer-exercise source controller')
+        # Both finish branches load the same prize; new-card creation loads the
+        # actual first state. These are checked PPC instructions, not item lists.
+        prize=struct.unpack_from('>I',raw,0x3B8)[0]
+        second=struct.unpack_from('>I',raw,0x480)[0]
+        card=struct.unpack_from('>I',raw,0x268)[0]
+        if prize!=second or prize>>16!=0x3800 or card>>16!=0x3800:
+            raise ValueError('Changed complete exercise prize/card creation')
+        source.holiday_exercise_contract=dict(item=prize&65535,card=card&65535,
+            symbol=receipt['symbol'],sha256=receipt['sha256'],receipt=receipt)
+    return source.holiday_exercise_contract
+
+
+def acquisition_bytes(source,symbol):
+    exercise=exercise_contract(source)
+    if symbol==exercise['symbol']:return source.function(exercise['receipt']['offset'])[0]
+    return source.raw(symbol)
 
 
 def checked(source,image,report):
@@ -73,7 +99,23 @@ def checked(source,image,report):
     destinations={r['donor_item']:r for r in rows if r['donor_item'] in candidates}
     if len(candidates)!=65 or destinations.keys()!=candidates:
         raise ValueError('Incomplete whole-source holiday destination set')
+    exercise=exercise_contract(source)
+    owner=events['exercise'];prepared=ROOT/owner['prepared']
+    if sha256((prepared/'prepared.json').read_bytes())!=owner['prepared_sha256']:
+        raise ValueError('Changed complete exercise acquisition preparation')
+    description_card=json.loads((prepared/'prepared.json').read_bytes())
+    functions=description_card['card_functions']
+    if len(functions)!=17:raise ValueError('Incomplete exercise card function family')
+    for expected_function in functions:
+        _,actual=source.function(expected_function['offset'])
+        if json.loads(json.dumps(actual))!=expected_function:
+            raise ValueError('Installed exercise functions differ from complete donor')
+    if not any(r['symbol']==exercise['symbol'] for r in functions):
+        raise ValueError('Missing exercise source prize controller')
+    prizes={r['donor_item']:r for r in rows if r['donor_item']==exercise['item']}
+    if len(prizes)!=1:raise ValueError('Missing installed exercise prize destination')
     return dict(destinations=destinations,events=description['rows'],
+        exercise_destinations=prizes,exercise=exercise,
         source_table_sha256=description['event_table_sha256'],
         native_delivery_installed=True,ordinary_gameplay_tested=False)
 
@@ -81,20 +123,22 @@ def checked(source,image,report):
 def furniture(source,item,index,lists):
     del index
     events=[r for r in contract(source)['rows'] if f'{item:04X}' in r['source_items']]
-    if not events or item>>8==0x2B:return None
-    if lists and (len(lists)!=1 or lists[0][0]!='ftr_listEventPresentChumon'):
+    exercise=exercise_contract(source);card_prize=item==exercise['item']
+    if (not events and not card_prize) or item>>8==0x2B:return None
+    if (card_prize and lists) or (lists and (len(lists)!=1 or lists[0][0]!='ftr_listEventPresentChumon')):
         raise ValueError('Holiday reward has an unsupported additional acquisition list')
     binding=getattr(source,'holiday_acquisition',None)
     if binding is None:
         from v3_furniture_pipeline import ReviewRequired
         raise ReviewRequired('acquisition needs an adapter: complete native holiday delivery')
-    destination=binding['destinations'][item]
-    symbol=lists[0][0] if lists else 'event_table'
+    destination=binding['exercise_destinations' if card_prize else 'destinations'][item]
+    symbol=exercise['symbol'] if card_prize else (lists[0][0] if lists else 'event_table')
     orderable=bool(lists)
-    return dict(donor_list=symbol,donor_list_sha256=sha256(source.raw(symbol)),
+    return dict(donor_list=symbol,donor_list_sha256=sha256(acquisition_bytes(source,symbol)),
         stock_group=255,reward_route=0,ordinary_stock=False,catalogue_orderable=orderable,
-        holiday_acquisition=dict(route='holiday',destination_item=f'{destination["item"]:04X}',
-            events=[r['event'] for r in events],dependencies=[],
+        holiday_acquisition=dict(route='exercise-card' if card_prize else 'holiday',destination_item=f'{destination["item"]:04X}',
+            events=[r['event'] for r in events],
+            dependencies=[f'GAFE01-r0/item/{exercise["card"]:04X}'] if card_prize else [],
             native_delivery_installed=True,ordinary_gameplay_tested=False))
 
 
@@ -102,6 +146,12 @@ def catalogue_source(source,item,index,row):
     expected=[r['event'] for r in contract(source)['rows'] if f'{item:04X}' in r['source_items']]
     acquisition=row.get('holiday_acquisition',{})
     symbol=row.get('donor_acquisition_list')
+    exercise=exercise_contract(source)
+    if item==exercise['item']:
+        return (index>=0 and symbol==exercise['symbol'] and row.get('catalogue_orderable') is False and
+            acquisition==dict(route='exercise-card',destination_item=row['item_id'],events=[],
+                dependencies=[f'GAFE01-r0/item/{exercise["card"]:04X}'],
+                native_delivery_installed=True,ordinary_gameplay_tested=False))
     listed=struct.unpack('>'+str(len(source.raw('ftr_listEventPresentChumon'))//2)+'H',
         source.raw('ftr_listEventPresentChumon'))
     orderable=item in listed

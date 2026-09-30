@@ -478,7 +478,7 @@ and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
 integration remain required. The web patcher does not upload or edit saves.
 
 The [optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
-selections for twenty installed villagers and 277 installed logical items,
+selections for twenty installed villagers and 278 installed logical items,
 including required outfits, house furnishings, and twenty-eight equipment parents.
 Mannequin and equipment catalogue representations are dependencies, not separate
 choices.
@@ -505,8 +505,12 @@ selectors, guarded native handovers, inventory/collection, and saved trophy
 records remain the initial acquisition path. Twelve source reorderable-list
 members retain catalogue ordering after collection; no gift enters shop stock.
 Ordinary conversation, acquisition/ordering, and physical save/restart remain
-unverified. The source summer-exercise radio prize still needs ordinary admission
-with its actual card dependency; retain its complete installed controller.
+unverified. The source summer-exercise radio prize has ordinary admission with
+its actual exercise-card dependency, retaining the complete installed controller,
+room lifecycle, music, and indoor exercise. Card-only selection does not select
+the radio. Initial acquisition remains the full source stamp/reward route,
+without shop stock or catalogue ordering; ordinary gameplay/save verification
+remains pending.
 The shared draw-only scrolling category supplies backyard pool through its
 verified donor event-item route, with complete layered graphics and the same
 optional catalogue/save consumers. Well model remains inactive pending its

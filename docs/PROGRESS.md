@@ -23,8 +23,8 @@ lock or publish experimental V3.
 
 ## Active development
 
-The current proposal is ABI 384 / format 20 at
-`build/v3-holiday-gift-category-imports-03/password-destinations/build-lock.json`.
+The current proposal is ABI 386 / format 20 at
+`build/v3-holiday-card-prize-imports-01/password-destinations/build-lock.json`.
 Harvest's complete connected resources, native full-model reservations, and
 twelve independent reward choices are installed, alongside fifty independent
 source holiday furniture gifts. This is an internal development
@@ -98,14 +98,41 @@ including diary, event/carried menus, and the password editor. Four focused
 checks pass, including seven browser/offline profiles and the existing sanitized
 world fixture's 128 handovers with inventory I/O doubled. Empty selection returns
 exact V2-14; all 297 choices reproduce the current cartridge. Twenty-four complete
-furniture profiles retain separate acquisition gates. The source summer-exercise
-radio prize is the next connected consumer, reusing the installed card owner.
+furniture profiles retain separate acquisition gates in the fifty-gift checkpoint.
 Ordinary event conversations, gift pickup/ordering, physical save/restart,
 scene heap headroom, and hardware remain unverified. Format 20/wire 7 do not
 change; preserve separate test saves and profiles. Do not load saves requiring
 new gift choices in a build lacking those selections. Forward/backward ordinary
 save compatibility with ABI 382 is not established. Both deployed patchers stay
 on stable V2-14.
+
+The summer-exercise radio is independently selectable through the same category
+adapter. Both prize branches and the required card identity come from the complete
+pinned donor controller; all seventeen card functions match the installed
+preparation. The shared catalogue reads the actual controller as acquisition
+evidence, rather than treating its instructions as a stock list. Selecting the
+radio requires only its exercise card; selecting the card does not select the
+radio. The full card/stamp/reward conversation remains installed, without shop
+stock or catalogue ordering. Its complete model, room music, and indoor exercise
+behaviour are reused, with zero artwork compilation and no provider, saved-codec,
+or menu-arena changes. Three focused checks pass, including six browser/offline
+profiles, source mutation rejection, actual profile/ordering fields, complete
+physical-resource preservation, and exact empty/all-selected outputs. There are
+298 development choices and 23 complete furniture profiles with pending
+acquisition. The live password destination refresh follows ordinary admission.
+Ordinary exercise/event interaction, full handover, physical save/restart, scene
+headroom, and hardware remain unverified. Format 20/wire 7 are unchanged; separate
+test saves remain required. Ordinary forward/backward save compatibility with
+ABI 384 is not established. Keep the spent native-harness budgets and both stable
+V2-14 patcher deployments unchanged. The next implementation is the complete
+source mail/reward category, including a real account route for savings gifts.
+
+The internal ABI-386 ROM SHA-256 is
+`5f7e2f7f8d9bfc55e0b78eeab6789b06388ad79a17359516fd88f714a5a8904c`;
+the UPS SHA-256 is
+`5b8bd899a8c83dba53e1b9ed422e1b77cf0be1dfdf2ff6d9ae1b3540622e6db6`.
+The current lock above owns their exact paths and reconstruction checks. These
+are development artifacts, not the requested private assembled playtest handoff.
 
 The current native password helper passes 45 assertions and twelve selected-item
 cases, including complete DMA/CRC/cache loading, native RNG, saved-state

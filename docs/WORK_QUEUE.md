@@ -36,20 +36,28 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: complete the connected source holiday acquisition
-category, including the summer-exercise radio prize and ordinary shared
-conversation/delivery/save verification. Fifty ordinary holiday furniture gifts
-are admitted through the installed Tortimer selector and receipt owner. The
-radio's complete room lifecycle, source card controller, prize mapping, official
-dialogue, and stored stamps are installed; connect ordinary category admission
-and the actual exercise-card dependency without another artwork conversion.
-Retain the source event, gender, random-variant, visitor, and no-loss handover
-rules. Keep pending Harvest/Nook gameplay checks and their spent harness budgets
-explicit; those budgets are not restarted by this category work.
+Current implementation task: complete the connected source mail/reward
+acquisition category. Begin with the actual native post-office account route and
+per-player saved balance/reward acknowledgement from the
+[source review](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md). Preserve repayment
+and donor account eligibility; implement genuine deposit/withdrawal and
+successful-mail-only milestone acknowledgement, not lifetime earnings or a
+random postal gift. Reuse every installed model/behaviour and shared selection
+reader. Map the remaining complete source mail/special-present consumers once
+before changing shared delivery. Island acquisition remains separate and needs
+an explicit choice for the absent GameCube island system, not a substitute route.
 
-The current proposal is ABI 384 / format 20 at
-`build/v3-holiday-gift-category-imports-03/password-destinations/build-lock.json`.
-Its 297 development choices include all fifty source holiday furniture rewards,
+Fifty ordinary holiday gifts and the summer-exercise radio have ordinary category
+admission. The radio uses the full installed source card controller, prize map,
+official dialogue, stored stamps, and actual card dependency; its artwork is not
+reconverted. Source event, gender, random-variant, visitor, and no-loss handover
+rules remain. Ordinary holiday/exercise conversation, delivery, and save
+verification remain pending alongside Harvest/Nook. Preserve their spent native
+harness budgets; admission is not ordinary gameplay acceptance.
+
+The current proposal is ABI 386 / format 20 at
+`build/v3-holiday-card-prize-imports-01/password-destinations/build-lock.json`.
+Its 298 development choices include all fifty source holiday furniture rewards,
 with independent selection and shared provider activation without diary imports.
 Initial gifts never become shop stock. Twelve complete source reorderable-list
 members remain orderable after collection; the other 38 do not. All fifty models
@@ -58,10 +66,17 @@ from complete aligned resources, retaining every existing arena contribution.
 Four focused checks pass, including seven browser/offline profiles and the
 existing sanitized world fixture's 128 handovers with native inventory doubled.
 Actual allocation words, complete capacity chains, and mutation rejection pass.
-Twenty-four complete furniture profiles retain their acquisition gates. Ordinary
+The radio's only required import is the exercise card; card-only selection does
+not enable the radio. It remains non-orderable and outside shop stock. Three
+focused checks pass, including six browser/offline profiles, both source prize
+branches, all seventeen installed source card functions, actual enabled fields,
+unchanged physical owners/save codec/menu capacity, and mutation rejection.
+All radio artwork is reused, with zero compiler containers. Twenty-three complete
+furniture profiles retain their acquisition gates. Ordinary
 event gameplay, menu ordering, physical save/restart, scene headroom, and hardware
 remain unverified. Keep separate saves/profiles; ABI 382 ordinary forward/backward
-compatibility is not established. Format 20/wire 7 are unchanged; older format
+compatibility is not established, nor ordinary compatibility with ABI 384.
+Format 20/wire 7 are unchanged; older format
 readers cannot load format-20 saves. Both patcher deployments remain stable V2-14.
 <!-- Holiday work record: category-imports-01 stops on the catalogue allocation
 guard before producing a cartridge. Category-imports-02 is invalid: ordinary

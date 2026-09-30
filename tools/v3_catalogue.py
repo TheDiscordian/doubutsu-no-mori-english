@@ -141,15 +141,17 @@ def table_from_records(base, rel, symbols, furniture, records):
         donor_item,donor_index = furniture_source(row)
         found = [(n,m) for n,(i,m) in enumerate(donor) if i == donor_index]
         group = row.get('donor_acquisition_list') or row['ordinary_shop_list']
-        goods = symbol_data(rel, symbols.decode(), group)
         if row.get('holiday_acquisition') and holiday_source is not None:
-            from v3_holiday_acquisition import catalogue_source
+            from v3_holiday_acquisition import catalogue_source,acquisition_bytes
+            goods=acquisition_bytes(holiday_source,group)
             member=catalogue_source(holiday_source,donor_item,donor_index,row)
         elif group=='mRmTp_birth_type':
+            goods=symbol_data(rel,symbols.decode(),group)
             from v3_furniture_pipeline import Source
             from v3_password_acquisition import catalogue_source
             member=catalogue_source(Source(rel,symbols),donor_item,donor_index,row)
         else:
+            goods=symbol_data(rel,symbols.decode(),group)
             ids = list(struct.unpack('>'+str(len(goods)//2)+'H', goods))
             member=not ids[-1] and 0 not in ids[:-1] and ids.count(donor_item)==1
         if (index != 1024+(item-0x3000)//4 or row['runtime_index'] != index

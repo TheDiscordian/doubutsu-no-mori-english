@@ -69,8 +69,16 @@ handover remains the source route. The twelve members of the complete
 `ftr_listEventPresentChumon` list retain catalogue reordering; their native
 eligibility uses the existing event-order mask without adding them to event
 stock. Other holiday gifts use checked source `event_table` membership and stay
-non-orderable. Summer-exercise prize admission remains separate from the
-ordinary 28-event selector, using the existing source card owner.
+non-orderable. Summer-exercise prize admission shares this adapter but uses the
+complete source card controller rather than the ordinary 28-event selector.
+The complete checked PPC controller supplies both prize branches and the actual
+card parent; all seventeen source card functions match installed preparation.
+The controller's function bytes provide catalogue acquisition provenance, not a
+16-bit stock list. The radio requires only the exercise card, activates the same
+shared holiday providers, and remains non-orderable and outside shop stock.
+Ordinary installation reuses its complete model/room lifecycle/player exercise
+path, then refreshes live password destinations. Selection/resource checks do
+not establish ordinary summer-event gameplay or physical save/restart.
 
 ### Built-in native profile staging
 

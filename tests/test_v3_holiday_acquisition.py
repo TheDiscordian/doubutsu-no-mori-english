@@ -159,4 +159,109 @@ class HolidayAcquisitionTests(unittest.TestCase):
             self.assertEqual(run.returncode,0,run.stdout+run.stderr);print(run.stdout.strip())
 
 
+class ExerciseAcquisitionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.directory=ROOT/os.environ.get('V3_EXERCISE_CATEGORY_CURRENT',
+            'build/v3-holiday-card-prize-imports-01/password-destinations')
+        cls.base,cls.prior=inputs(ROOT/'build/v3-holiday-gift-category-imports-03/password-destinations/build-lock.json')
+        cls.image,cls.report=inputs(cls.directory/'build-lock.json')
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.binding=checked(cls.source,cls.image,cls.report)
+
+    def test_complete_card_source_and_prize_admission(self):
+        from v3_holiday_acquisition import exercise_contract
+        self.source.holiday_acquisition=self.binding
+        row=next(r for r in self.report['furniture']['imports'] if r['id']=='GAFE01-r0/item/1FCC')
+        metadata=furniture(self.source,0x1FCC,1011,[])
+        self.assertEqual(metadata['holiday_acquisition'],row['holiday_acquisition'])
+        self.assertEqual(metadata['holiday_acquisition']['dependencies'],['GAFE01-r0/item/2523'])
+        self.assertEqual(metadata['holiday_acquisition']['route'],'exercise-card')
+        self.assertFalse(metadata['catalogue_orderable']);self.assertFalse(metadata['ordinary_stock'])
+        self.assertTrue(catalogue_source(self.source,0x1FCC,1011,catalogue_record(row)))
+        self.assertEqual(order_mask(catalogue_record(row)),0)
+        invalid=catalogue_record(row);invalid['holiday_acquisition']=copy.deepcopy(invalid['holiday_acquisition'])
+        invalid['holiday_acquisition']['dependencies']=[]
+        self.assertFalse(catalogue_source(self.source,0x1FCC,1011,invalid))
+        self.source.holiday_acquisition=None
+        with self.assertRaisesRegex(ReviewRequired,'native holiday delivery'):
+            furniture(self.source,0x1FCC,1011,[])
+        source=copy.copy(self.source)
+        del source.holiday_exercise_contract
+        raw=bytearray(source.rel);raw[source.sections[1][0]+0x7C8BC+0x3BB]^=4;source.rel=bytes(raw)
+        with self.assertRaisesRegex(ValueError,'complete summer-exercise'):exercise_contract(source)
+        source=copy.copy(self.source)
+        raw=bytearray(source.rel);raw[source.sections[1][0]+509384]^=1;source.rel=bytes(raw)
+        with self.assertRaisesRegex(ValueError,'exercise functions differ'):checked(source,self.image,self.report)
+
+    def test_real_profile_and_unchanged_owners(self):
+        from v3_import_storage import ROWS,ITEMS,slot
+        from v3_furniture_capacity import checked as checked_capacity
+        from v3_holiday_selection import groups
+        row=next(r for r in self.report['furniture']['imports'] if r['id']=='GAFE01-r0/item/1FCC')
+        old=next(r for r in self.prior['staged_furniture']['rows'] if r['id']==row['id'])
+        self.assertEqual(int(row['object_vrom'],16),old['object_vrom'])
+        self.assertEqual(row['object_sha256'],old['object_sha256'])
+        self.assertEqual(row['room_runtime'],old['room_runtime'])
+        self.assertEqual(row['room_lifecycle'],old['room_lifecycle'])
+        automatic=self.report['automatic_furniture'];art=ROOT/automatic['art_directory']/'art.json'
+        self.assertEqual(sha256(art.read_bytes()),automatic['art_report_sha256'])
+        self.assertEqual(json.loads(art.read_bytes())['batch'],
+            dict(objects=1,compiled=0,reused=1,compiler_containers=0))
+        blob=by_vrom(self.image)[BLOB].extract(self.image);at=slot(0x3C48)
+        self.assertEqual(struct.unpack_from('>I',blob,ROWS+at*80+4)[0],1)
+        self.assertEqual(blob[ITEMS+at*32+7],1);self.assertEqual(blob[ITEMS+at*32+24],0)
+        self.assertNotIn(row['item_id'],{r['item_id'] for r in self.report['shops']['imports']})
+        self.assertEqual(self.report['room_surfaces'],self.prior['room_surfaces'])
+        self.assertEqual(self.report['physical_resources'],self.prior['physical_resources'])
+        for p in self.report['physical_resources']:
+            at=p['physical'];self.assertEqual(self.image[at:at+p['bytes']],self.base[at:at+p['bytes']])
+        self.assertEqual(self.report['save_codec'],self.prior['save_codec'])
+        self.assertEqual(checked_capacity(self.image,self.report),checked_capacity(self.base,self.prior))
+        group=next(g for g in groups(self.image,self.report) if g['id']=='diary-holidays')
+        self.assertIn(row['id'],group['any_imports'])
+
+    def test_radio_requires_only_card_browser_and_offline(self):
+        import v3_optional_composition as composition
+        import v3_browser_composition as browser
+        from v3_creature_choices import options
+        from v3_holiday_selection import groups,active
+        composition.use_build_lock(self.directory/'build-lock.json')
+        catalog=composition.catalogue(self.image,self.report);self.assertEqual(len(catalog),298)
+        radio='GAFE01-r0/item/1FCC';card='GAFE01-r0/item/2523'
+        self.assertEqual(catalog[radio]['dependencies'],[card])
+        choices=options(self.image,self.report);plan=browser.rules(self.image,self.report)
+        requests=(('empty',[],{}),('radio-only',[radio],{}),('card-only',[card],{}),
+            ('radio-gc',[radio],{'holiday-calendar':'GameCube'}),
+            ('unrelated',['GAFE01-r0/item/2320'],{}),('all',list(catalog),{}))
+        cases=[]
+        for name,requested,behaviours in requests:
+            selection=composition.resolve(catalog,requested,behaviour_options=choices,behaviours=behaviours)
+            result,_,_=composition.compose(self.image,self.report,catalog,selection)
+            if name=='empty':self.assertEqual(sha256(result),composition.stable_reference(self.report)[1])
+            else:
+                if name=='all':self.assertEqual(result,self.image)
+                if name.startswith('radio'):
+                    self.assertEqual(set(selection['enabled']),{card,radio});self.assertEqual(selection['required'],[card])
+                if name=='card-only':
+                    self.assertEqual(selection['enabled'],[card]);self.assertEqual(selection['required'],[])
+                group=next(g for g in groups(self.image,self.report) if g['id']=='diary-holidays')
+                on=active(group,selection['enabled'],selection['behaviours'])
+                self.assertEqual(on,name!='unrelated')
+                for field in group['fields']:
+                    self.assertEqual(struct.unpack_from('>I',result,field['offset'])[0],
+                        field['enabled'] if on else field['disabled'])
+            cases.append(dict(name=name,requested=requested,behaviours=behaviours,
+                selection=selection,sha256=sha256(result)))
+        with tempfile.TemporaryDirectory(prefix='v3-exercise-prize-composition-') as temp:
+            path=Path(temp)/'fixture.json'
+            write_new(path,json.dumps(dict(plan=plan,cases=cases,
+                base=str(self.directory/'animal-forest-v3-asset-loader.z64'),
+                stable=str(composition.stable_reference(self.report)[0]))).encode())
+            run=subprocess.run(['node','--experimental-global-webcrypto','tests/v3_browser_equivalence.mjs',str(path)],
+                cwd=ROOT,capture_output=True,text=True,timeout=180)
+            self.assertEqual(run.returncode,0,run.stdout+run.stderr);print(run.stdout.strip())
+
+
 if __name__=='__main__':unittest.main()
