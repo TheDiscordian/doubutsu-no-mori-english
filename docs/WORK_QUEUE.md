@@ -1,6 +1,6 @@
 # Completion queue
 
-## Active: V3 optional GameCube imports
+## Active: V3 import pipeline only
 
 V3 imports items and villagers with working behaviours. Able Sisters (including
 its custom-design system), the Museum building, and comparable large features belong to V4. The
@@ -9,6 +9,15 @@ at `baded8ca`, with its checkpoint in `docs/checkpoints/V4_CUSTOM_DESIGNS.md`
 on that branch. It is not installed in V3. Design-dependent sign boards and
 saved-pattern forms remain deferred, not completed or selectable. Ordinary
 fish/insect/fossil imports remain V3 work; the Museum building is not required.
+
+V3 completes the shared import pipeline for items and villagers, not GameCube feature ports.
+Regular items should be importable and obtainable through the regular item pool.
+Special items requiring GameCube acquisition features should not be importable
+through browser or offline selections until their acquisition exists in V4. Preparing
+their converted resources is allowed; enabling them or inventing ordinary stock
+is not. Banking, special mail/rewards, holiday/Harvest reward systems, Museum/
+island policies, and other new facilities are not V3 tasks or prerequisites.
+This boundary governs every continuation and subsystem note in this queue.
 
 ### Execution order
 
@@ -19,15 +28,15 @@ fish/insect/fossil imports remain V3 work; the Museum building is not required.
    batch. Preserve all source resources and reuse already converted assets.
    Item-specific behaviours are part of this work, without a rule postponing
    them until all shared categories are finished.
-2. Complete acquisition systems and the requested gold-tree work, including
-   Nook's codes, special rewards, gold-tree effects, and golden-tool acquisition.
-3. Run focused combined gameplay/save checks and deliver a private hardware
+2. Complete browser/offline import selection and regular item-pool integration.
+   Keep special acquisition-dependent items disabled; do not port their V4 systems.
+3. Run focused import-pipeline/runtime/save checks and deliver the private pipeline
    playtest build. Broad human testing follows the build, not the reverse.
 
-Acquisition is not importing pipeline work. A missing gift route must not
-prevent asset/data conversion or redirect work from an unfinished shared format.
-Incomplete gameplay stays unavailable in the selector; installing assets does
-not claim that an item is playable. Reuse unchanged passing tests throughout.
+Special acquisition is V4 work. A missing gift route must not prevent asset/data
+conversion, block V3 completion, or redirect work from the pipeline. Those special
+items stay unavailable in the selector, even when resources are fully prepared.
+Regular items use the regular pool. Reuse unchanged passing tests throughout.
 
 Carry substantial N64/GameCube behaviour differences through the shared import
 path as explicit WebUI choices, following the
@@ -36,16 +45,27 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: complete the connected source mail/reward
-acquisition category. Begin with the actual native post-office account route and
-per-player saved balance/reward acknowledgement from the
-[source review](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md). Preserve repayment
-and donor account eligibility; implement genuine deposit/withdrawal and
-successful-mail-only milestone acknowledgement, not lifetime earnings or a
-random postal gift. Reuse every installed model/behaviour and shared selection
-reader. Map the remaining complete source mail/special-present consumers once
-before changing shared delivery. Island acquisition remains separate and needs
-an explicit choice for the absent GameCube island system, not a substitute route.
+Current implementation task: finish focused stability/save verification and the
+private import-pipeline handoff. Regular-pool browser/offline integration passes:
+`build/v3-import-pipeline-browser-03/build.json`,
+`build/v3-import-pipeline-interface-03/results.json`, and
+`build/v3-import-pipeline-worker-01/results.json`. The all-available profile is
+`build/v3-import-pipeline-profile-01/profile.json` (148 independent choices,
+including all twenty villagers, plus two required outfit resources). Preserve
+these results and disabled special-item selections. Complete the exact current
+cartridge's bounded save check. Its boot/RAM/startup/guard/fault check passes at
+`build/v3-import-pipeline-boot-01/results.json`; the blank FlashRAM output does
+not establish save/reload or ordinary progression. Classify retained creature constructor/
+scheduler failures from evidence without replaying exhausted old fixtures.
+Fix demonstrated game faults and record remaining limits honestly. Do not treat
+missing special acquisition as a pipeline defect or resume source mail, banking,
+or other GameCube feature ports for V3.
+
+### V4 experiments: preserved resources, not active V3 tasks
+
+The source mail/reward work below belongs to V4. Its linked preparation and
+installed experimental code remain preserved; no listed continuation, feature
+test, acquisition policy, or reward gate is a V3 completion requirement.
 
 The category's checked preparation is
 `build/v3-post-office-category-prepared-04/prepared.json`, with the complete
@@ -107,7 +127,7 @@ The complete menu chain and subsequent ordinary-category retention pass, alongsi
 five browser/offline profiles and both-mode saved-owner checks with native I/O
 doubled. Banking stays disabled by default; the 298 choices and 23 staged gates
 remain unchanged. Native gameplay and physical save/restart remain unverified.
-Connect the four complete official milestone templates, native player/mail
+V4 continuation only: connect the four complete official milestone templates, native player/mail
 creation/submission and ordinary scheduling, retaining success-only acknowledgement,
 retry, null-player/visitor handling, and all donor thresholds. Then bind the
 independent bank mechanic/reward choices and the other complete mail owners in
@@ -212,7 +232,7 @@ The current build is an internal resource checkpoint, not a Franklin playtest
 handoff. Focused checks prove the four installed capacity instructions against
 complete retail caller/helper/reservation spans and unchanged relocations; they
 do not establish scene headroom, ordinary rendering, or gameplay.
-Next connected consumers are ordinary conversation, hiding/arrival, reward
+V4 continuation only: ordinary conversation, hiding/arrival, reward
 delivery, and save/restart verification. Experimental selection does not claim
 playable-import acceptance. The Harvest new-harness allowance
 and setup retry are exhausted; do not reset them or replay unchanged checks.
@@ -621,7 +641,7 @@ compiler job. There are 176 selectable development choices and 100 inactive
 furniture profiles. No new resident allocation or saved format is added.
 See [bulk profiles](checkpoints/V3_BUILTIN_PROFILES.md).
 
-Next importing work:
+### Import-pipeline verification and handoff
 
 - Finish the creature category's ordinary native gameplay and save verification,
   including scene-bank allocation and actual catch/place/release paths. Complete
@@ -639,9 +659,9 @@ Next importing work:
   identity/conversion path and must not restart as missing ordinary furniture.
 - Keep item-specific behaviours in scope alongside shared categories. Acquisition
   follows primary importing; pending rewards do not block complete asset staging.
-- Finish source acquisition and gold-tree effects/acquisition, then run bounded
-  combined checks and provide a private
-  hardware-test build with explicit save incompatibility warnings.
+- Verify the regular import selections/item pool, keep special items disabled,
+  and provide a private pipeline playtest build with explicit save compatibility
+  warnings. Do not finish special acquisition or gold-tree reward systems for V3.
 
 The existing metadata scan at `build/v3-furniture-post-plain-scan-01.json` has
 109 supported and 281 review records; it precedes the final 24 profile stages.

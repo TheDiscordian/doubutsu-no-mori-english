@@ -4,7 +4,8 @@
 
 V2-14 at `build/v2-dresser-14/Animal Forest English V2.z64` fixes B-button
 cancellation at dressers and retains the official `Animal Crossing` credits
-title and English `Museum` letter headers. Both patchers target this build. The
+title and English `Museum` letter headers. The deployed patcher and local preview
+target this build. The
 publication hold applies only to experimental V3, not stable V2 fixes.
 
 Three dresser checks, eight cartridge/packaging checks, and 29 silent native
@@ -22,6 +23,56 @@ Its empty-selection baseline returns V2-14. This does not change the main V3
 lock or publish experimental V3.
 
 ## Active development
+
+V3 is only the import pipeline for items and villagers. Regular items should be
+importable and obtainable through the regular item pool. Special items requiring
+GameCube acquisition features should not be importable through browser/offline
+selections until those features exist in V4; prepared resources do not make them importable. Their
+missing acquisition is not a V3 blocker. Banking, special mail/rewards, holiday/
+Harvest and golden-tool reward systems, Museum/island policies, and new GameCube
+facilities are outside active V3 work. Preserve their experiments without expanding
+them. See the [active pipeline queue](WORK_QUEUE.md#execution-order).
+
+### Regular-pool selections
+
+Browser and offline builds default to the V3 pipeline scope. Both offer all
+twenty villagers and 128 independent regular-pool item choices. Two exclusive
+starting-outfit resources follow their villagers as dependencies, not standalone
+item choices. Select all requests 148 choices and includes those two resources.
+Actual checked stock tables determine regular furniture, clothing, and surfaces;
+the remaining item categories use their installed native acquisition paths.
+Special items remain unavailable. Prepared resources and stable identities are
+preserved; selection changes do not reconvert artwork or remove physical data.
+New event/reward providers stay disabled, and their V4 controls are hidden.
+
+The checked private browser export is
+`build/v3-import-pipeline-browser-03/build.json`. Five current-cartridge scope
+tests and twelve JavaScript checks pass. Headless Chromium interface and worker
+checks pass at `build/v3-import-pipeline-interface-03/results.json` and
+`build/v3-import-pipeline-worker-01/results.json`: actual file inputs, independent
+selection/dependencies, cancellation, download hashes, unavailable-review data,
+and browser/offline agreement. Empty selection returns exact V2-14. No game files
+are uploaded; the temporary check servers are stopped. The export is unserved.
+
+The all-available offline profile is
+`build/v3-import-pipeline-profile-01/profile.json`; UPS reconstruction passes.
+ROM SHA-256:
+`5159042cb4fa71b5d63523d6dd3c0e93ffffa542dcfdf66c5496798d48205a77`.
+UPS SHA-256:
+`8fe8177422d7c50bd1a1c57758b9fa6ea0df81858600511ce28cd48587a0b3ba`.
+It retains ABI 387, format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and older
+V3 readers cannot read these saves; preserve separate saves and backups. Browser
+composition does not prove ordinary gameplay, physical save/restart, or hardware.
+The current ROM's silent isolated boot check passes at
+`build/v3-import-pipeline-boot-01/results.json`: eight-MiB RAM, startup readiness,
+translation/resident/save guards, zero native fault state before and after Start,
+and graceful shutdown. No dialogue is loaded in the sampled frame; the Start
+keypress is not proof of ordinary progression. The emitted blank FlashRAM file
+is not a game-save/reload test. No old creature fixture is replayed.
+The retained creature constructor timeout and scheduler disconnection remain
+unclassified, not established harness faults or passed gameplay checks.
+
+## Preserved experimental artifact and subsystem evidence
 
 The current proposal is ABI 387 / format 21 at
 `build/v3-post-office-bank-installed-05/build-lock.json`.
@@ -49,8 +100,8 @@ empty/default selection, and the complete 235-choice cartridge. Font and title
 buffers use checked upper RAM, avoiding every retained owner; a silent native
 check verifies the complete carrying/storage/title contents and CPU fault fields.
 Controller-driven code entry, full gift handover, ordinary save/restart, and
-hardware remain unverified. Continue the other source acquisition categories,
-beginning with the complete Harvest reward path. See
+hardware remain unverified. Special acquisition continuations belong to V4,
+not the active V3 pipeline. See
 [the Nook checkpoint](checkpoints/V3_NOOK_PASSWORDS.md).
 
 Harvest installs its complete owner, hiding/arrival/relocation adapters, five

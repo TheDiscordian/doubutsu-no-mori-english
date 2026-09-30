@@ -1,5 +1,13 @@
 # Post-office reward: source review
 
+This is a preserved V4 feature experiment, not an active V3 task. Do not resume
+banking, mail scheduling, milestone rewards, or Museum/island acquisition policies
+to complete V3. V3 completes the import pipeline for items and villagers, with
+regular item-pool integration. Special items should not be importable until their
+acquisition exists in V4.
+The resources and continuations below remain available for V4 without requiring
+further feature work, policy choices, or native feature tests during V3.
+
 The current cartridge is ABI 387 / format 21 at
 `build/v3-post-office-bank-installed-05/build-lock.json`. Startup, complete
 repayment/Pelly resources and allocation, April native hooks, official dialogue,

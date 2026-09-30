@@ -246,12 +246,19 @@ def catalogue(image, report):
     return dict(sorted(result.items()))
 
 
-def resolve(catalog, selected, *, behaviours=None, behaviour_options=None):
+def resolve(catalog, selected, *, behaviours=None, behaviour_options=None,
+            scope='development', report=None):
+    from v3_import_scope import PIPELINE, check_scope, check_requests
+    check_scope(scope)
     if not isinstance(selected, (list, tuple)) or any(type(key) is not str for key in selected):
         raise ValueError('Selections must be a list of fixed source identities')
     requested = sorted(set(selected))
     if set(requested)-catalog.keys():
         raise ValueError('Unknown or unimplemented import: '+', '.join(sorted(set(requested)-catalog.keys())))
+    if scope == PIPELINE:
+        if report is None:
+            raise ValueError('V3 pipeline selection requires the checked installed report')
+        check_requests(catalog, report, requested, behaviours)
     enabled, reasons = set(requested), {}
     pending = list(requested)
     while pending:
@@ -279,6 +286,8 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None):
             (catalog[key] for key in sorted(enabled))],
         'profile_hex':profile.hex(), 'profile_sha256':sha256(profile),
         'experimental':True, 'web_patcher_enabled':False, 'playable_handoff':False}
+    if scope == PIPELINE:
+        result['scope'] = scope
     if any(r['kind'] in ('floor','wall') for r in catalog.values()):
         from v3_surface_selection import profile as surface_profile
         bits=surface_profile([catalog[k] for k in enabled if catalog[k]['kind'] in ('floor','wall')])
@@ -376,8 +385,15 @@ def compose(image, report, catalog, selection):
     from v3_creature_choices import options as behaviour_options,resolve as resolve_behaviours,checksum_fields as behaviour_checksums
     choices=behaviour_options(image,report)
     values=resolve_behaviours(choices,selection.get('behaviours'))
-    expected=resolve(catalog,selection['requested'],behaviours=selection.get('behaviours'),
-        behaviour_options=choices if 'behaviours' in selection else None)
+    scope = selection.get('scope', 'development')
+    supplied_behaviours = selection.get('behaviours')
+    if scope == 'v3-pipeline' and supplied_behaviours:
+        from v3_import_scope import FEATURE_CHOICES
+        if any(supplied_behaviours.get(key, 'N64') != 'N64' for key in FEATURE_CHOICES):
+            raise ValueError('V4 feature setting in V3 selection')
+        supplied_behaviours = {k:v for k,v in supplied_behaviours.items() if k not in FEATURE_CHOICES}
+    expected=resolve(catalog,selection['requested'],behaviours=supplied_behaviours,
+        behaviour_options=choices if 'behaviours' in selection else None, scope=scope, report=report)
     if selection != expected:
         raise ValueError('Selection receipt does not match its dependency resolution')
     if not selection['enabled'] and not selection.get('behaviours_changed',False):
@@ -415,7 +431,7 @@ def compose(image, report, catalog, selection):
     enabled = set(selection['enabled'])
     from v3_holiday_selection import groups as event_groups, active as event_active, checksum_fields as event_checksums
     for group in event_groups(image, report):
-        on = event_active(group, enabled, values)
+        on = event_active(group, enabled, values, scope=scope)
         for field in group['fields']:
             change(field['offset'], struct.pack('>I', field['enabled'] if on else field['disabled']), group['id'])
     from v3_carried_selection import masks as carried_masks, checksum_fields as carried_checksums
@@ -494,7 +510,7 @@ def scoring_selection(image, report, catalog, enabled):
     return writes, rows
 
 
-def build(output, selected=(), *, select_all=False, behaviours=None):
+def build(output, selected=(), *, select_all=False, behaviours=None, scope='v3-pipeline'):
     if not output.resolve().is_relative_to(ROOT/'build') or output.exists():
         raise ValueError('A fresh ignored build/ output directory is required')
     if select_all and selected:
@@ -503,8 +519,12 @@ def build(output, selected=(), *, select_all=False, behaviours=None):
     catalog = catalogue(image, report)
     from v3_creature_choices import options as behaviour_options,save_note
     choices=behaviour_options(image,report)
-    selection = resolve(catalog, list(catalog) if select_all else list(selected),
-        behaviours=behaviours,behaviour_options=choices if choices or behaviours else None)
+    from v3_import_scope import PIPELINE, requested_options, check_scope
+    check_scope(scope)
+    all_options = requested_options(catalog, report) if scope == PIPELINE else list(catalog)
+    selection = resolve(catalog, all_options if select_all else list(selected),
+        behaviours=behaviours,behaviour_options=choices if choices or behaviours else None,
+        scope=scope, report=report)
     result, writes, blob = compose(image, report, catalog, selection)
     native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
     patch = make_ups(native, result)
@@ -635,7 +655,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Fixed GAFE01-r0 identity; repeat as needed')
-    parser.add_argument('--all', action='store_true', help='All installed experimental entries, not the whole donor disc')
+    parser.add_argument('--all', action='store_true', help='All available choices in the selected scope')
+    parser.add_argument('--scope', choices=('v3-pipeline','development'), default='v3-pipeline',
+        help='V3 regular pools by default; development retains preserved feature experiments')
     parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock; leave the main development lock unchanged')
     parser.add_argument('--behaviour',action='append',default=[],metavar='SETTING=N64|GameCube',
         help='Shared installed behaviour setting; repeat for distinct mechanics')
@@ -646,5 +668,5 @@ if __name__ == '__main__':
         key,separator,value=argument.partition('=')
         if not separator or not key or key in behaviours:parser.error('Use distinct SETTING=VALUE behaviour choices')
         behaviours[key]=value
-    result = build(args.output, args.select, select_all=args.all,behaviours=behaviours)
+    result = build(args.output, args.select, select_all=args.all,behaviours=behaviours,scope=args.scope)
     print(json.dumps({key:result[key] for key in ('requested','required','output_sha256','save_compatibility')}, indent=2))

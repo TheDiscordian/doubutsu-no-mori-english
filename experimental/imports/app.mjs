@@ -45,9 +45,10 @@ function matches(row) {
 }
 function filter() {
   let visible = 0, pending = 0;
-  for (const { row, card } of cards.values()) { card.hidden = !matches(row); if (!card.hidden) visible++; }
+  for (const { row, card } of cards.values()) { card.hidden = Boolean(row.dependency_only) || !matches(row); if (!card.hidden) visible++; }
   for (const { row, card } of reviews) { card.hidden = !matches(row); if (!card.hidden) pending++; }
-  $('visible-count').textContent = `${visible} of ${cards.size} installed development choices shown`;
+  const offered = [...cards.values()].filter(({ row }) => !row.dependency_only).length;
+  $('visible-count').textContent = `${visible} of ${offered} installed development choices shown`;
   $('review-count').textContent = `(${pending} shown)`;
   $('no-results').hidden = Boolean(visible); $('no-review-results').hidden = Boolean(pending);
   $('select-visible').disabled = !visible; $('clear-visible').disabled = !visible;
@@ -57,7 +58,7 @@ function renderSelection() {
   const custom = Boolean(selection.enabled.length || selection.behaviours_changed);
   const enabled = new Set(selection.enabled), required = new Set(selection.required);
   for (const [id, { checkbox, card, note }] of cards) {
-    checkbox.checked = enabled.has(id); checkbox.disabled = required.has(id);
+    checkbox.checked = enabled.has(id); checkbox.disabled = required.has(id) || cards.get(id).row.dependency_only === true;
     card.dataset.selected = String(enabled.has(id)); card.dataset.required = String(required.has(id));
     const parents = selection.dependency_reasons[id] || [];
     note.textContent = parents.length ? `Required by ${parents.map(key => cards.get(key).row.name).join(', ')}` : '';
@@ -87,6 +88,7 @@ function changeSelection(change) {
 function addChoices(plan, review) {
   if (plan.save_compatibility) $('save-detail').textContent = plan.save_compatibility;
   for (const row of plan.behaviours || []) {
+    if (row.v4_only) continue;
     const label = document.createElement('label'), select = document.createElement('select');
     const caption = document.createElement('strong'), description = document.createElement('p');
     caption.textContent = row.name; description.textContent = row.description;
@@ -115,6 +117,11 @@ function addChoices(plan, review) {
     if (row.native_artwork_variant) detail.textContent += ' · GameCube appearance; N64 version retained';
     text.append(name, detail, note); card.append(checkbox, text); $('options').append(card);
     cards.set(row.id, { row, card, checkbox, note });
+    if (row.dependency_only) {
+      card.hidden = true;
+      checkbox.disabled = true;
+      continue;
+    }
     checkbox.addEventListener('change', () => changeSelection(() => {
       if (checkbox.checked) requested.add(row.id); else requested.delete(row.id);
     }));
@@ -135,7 +142,7 @@ $('search').addEventListener('input', filter); $('kind').addEventListener('chang
 for (const [button, include, visible] of [['select-visible', true, true], ['clear-visible', false, true],
   ['select-all', true, false], ['clear-all', false, false]]) {
   $(button).addEventListener('click', () => changeSelection(() => {
-    for (const [id, { row }] of cards) if (!visible || matches(row)) {
+    for (const [id, { row }] of cards) if (!row.dependency_only && (!visible || matches(row))) {
       if (include) requested.add(id); else requested.delete(id);
     }
   }));
@@ -145,6 +152,9 @@ $('build').addEventListener('click', () => {
   ready(); if ($('build').disabled) return;
   clearDownloads(); $('error').hidden = true;
   const job = ++generation, chosen = [...selection.requested], chosenBehaviours = { ...selection.behaviours };
+  // Resolved receipts include frozen V4 defaults, but those are not user
+  // settings. Send only the visible controls and compare the full receipt below.
+  const chosenSettings = { ...behaviours };
   const custom = Boolean(selection.enabled.length || selection.behaviours_changed);
   try { worker = new Worker(new URL('./worker.mjs', import.meta.url), { type: 'module' }); }
   catch { error('This browser could not start the patcher. Use a current browser over localhost or HTTPS.'); return; }
@@ -175,7 +185,7 @@ $('build').addEventListener('click', () => {
     }
   };
   worker.onerror = () => { if (job === generation) error('The patcher stopped unexpectedly. No input files were changed.'); };
-  worker.postMessage({ requested: chosen, behaviours: chosenBehaviours, plan_sha256: loaded.bundle.plan.sha256, n64: inputs[0].files[0], gamecube: inputs[1].files[0] });
+  worker.postMessage({ requested: chosen, behaviours: chosenSettings, plan_sha256: loaded.bundle.plan.sha256, n64: inputs[0].files[0], gamecube: inputs[1].files[0] });
 });
 window.addEventListener('pagehide', () => { stop(); clearDownloads(); });
 

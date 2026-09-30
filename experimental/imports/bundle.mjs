@@ -53,12 +53,19 @@ export async function loadReview(bundle, plan) {
   if (review.format !== 'AFV3-BROWSER-REVIEW-1' || review.base_sha256 !== plan.base_sha256 ||
       !Array.isArray(review.unavailable) || review.unavailable.length > 4096) throw new Error('Invalid review catalogue.');
   const seen = new Set(plan.options.map(row => row.id));
+  const pending = new Map((plan.pending_options || []).map(row => [row.id, row]));
   for (const row of review.unavailable) {
+    const prepared = pending.get(row.id);
+    const checkedPending = prepared && ['id', 'name', 'kind', 'selectable', 'reason']
+      .every(key => prepared[key] === row[key]);
     if (typeof row.id !== 'string' || !/^GAFE01-r0\/item\/[0-9A-F]{4}$/.test(row.id) || seen.has(row.id) ||
-        !['furniture', 'floor', 'wall'].includes(row.kind) || row.selectable !== false || typeof row.name !== 'string' ||
+        (!['furniture', 'floor', 'wall'].includes(row.kind) && !checkedPending) ||
+        (prepared && !checkedPending) || row.selectable !== false || typeof row.name !== 'string' ||
         !row.name.length || row.name.length > 128 || typeof row.reason !== 'string' ||
         !row.reason.length || row.reason.length > 2048) throw new Error('Invalid unavailable import record.');
     seen.add(row.id);
   }
+  if (plan.scope === 'v3-pipeline' && [...pending.keys()].some(id => !seen.has(id)))
+    throw new Error('Deferred imports are missing from the review catalogue.');
   return review;
 }

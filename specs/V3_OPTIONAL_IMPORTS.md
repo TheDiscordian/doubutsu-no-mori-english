@@ -9,22 +9,38 @@ are off by default. Existing N64 villagers, items, locations, and the translatio
 remain available; importing means adding content, not silently replacing an
 existing villager or painting a new name onto an unrelated item.
 
-Able Sisters (including its custom-design system), the Museum building, and comparable large new
-features are V4 work. V3 remains an item/villager import release with working
-item behaviours. Design-dependent sign boards and saved-pattern representations
-are explicitly deferred to V4, not counted as completed V3 imports. Importing
-ordinary fish, insects, fossils, and other items does not require adding the
-Museum building. Preserve their actual item behaviours within V3.
+V3 is only the import pipeline: extraction/conversion, additive stable identities,
+bulk asset/data installation, working item/villager runtime behaviour and
+persistence, official English text, and deterministic independent browser/offline
+selections. V3 is complete when the import pipeline works for items and villagers.
+Regular items should be obtainable through the regular item pool.
 
-Both deployed patchers serve stable V2-14, SHA-256
+Special items requiring GameCube acquisition features should not be importable
+through browser or offline selections until their acquisition is implemented
+in V4. V3 may prepare their conversion/resources, but should not enable importing
+them or put them in substitute regular stock. Prepared integration and selectable
+imports are separate states; deferred special acquisition does not block V3.
+
+Savings accounts/postal rewards, Nook code handovers, holiday/Harvest events,
+golden-tool reward systems, and Museum/island acquisition policies are V4 work.
+Able Sisters/custom designs, the Museum building, island facilities, and other
+new GameCube features also belong to V4. Preserve existing experiments without
+expanding them; no V3 task requires completing them or choosing replacement routes.
+Design-dependent sign boards and saved-pattern representations remain deferred.
+Ordinary fish, insects, fossils, and other items retain their actual item
+behaviours within V3 without adding the Museum. This boundary governs subsystem
+notes below and acquisition continuations in their linked checkpoints.
+
+The deployed patcher and ordinary local preview serve stable V2-14, SHA-256
 `0e81d5c62548c3a759cc89d63eba0975b1c336a3a941211a3000e317b9243bf2`.
 The current experimental proposal pins this same V2-14 for empty selection.
 The import-free path must reproduce
 its build's pinned translation baseline exactly. V3 development uses
-`v3/optional-imports`; it must not replace the stable V2 deployments or edit the
-published trailer. Stable V2 corrections are published to both patchers.
+`v3/optional-imports`; it must not change the deployed patcher or local preview
+to V3 or edit the published trailer. Stable V2 corrections update the public
+patcher and local copy.
 V3 source and development work may be version-tracked on GitHub. Updating the
-local or public web patcher to V3 requires the user's testing and subsequent
+deployed patcher or local preview to V3 requires the user's testing and subsequent
 explicit approval. GitHub source publication does not authorise either update.
 Provide private playtest builds first; completed implementation or developer
 verification alone does not authorise the web-patcher switch.
@@ -37,7 +53,8 @@ An e/e+ input requirement must not stop unrelated English-donor work.
 
 ## N64 and GameCube behaviour choices
 
-When a substantial player-facing difference would otherwise require choosing
+For runtime behaviour within an imported item/villager, when a substantial
+player-facing difference would otherwise require choosing
 N64 behaviour over GameCube behaviour, expose an explicit **N64 / GameCube**
 choice in the V3 WebUI. Describe the actual difference in outcomes, interactions,
 or timing. Do not silently replace donor behaviour with native behaviour and
@@ -523,7 +540,12 @@ the shared native start-disabled placement rule with source C-stock acquisition
 and catalogue reordering. These category implementations do not establish
 ordinary gameplay or original-hardware acceptance.
 
-### Post-office account and source mail acquisition
+### V4: preserved post-office account and source mail experiment
+
+This system is outside V3. Do not continue its mail, account, reward, or profile
+controls to complete the import pipeline. Special items remain unavailable for
+import until their acquisition is implemented in V4. The following describes
+preserved experimental resources, not V3 requirements.
 
 The complete donor banking/Pelly frontend, source April talk controller, and
 format-21 saved-town owner have a bounded combined native link. The separate
@@ -557,7 +579,7 @@ in both-mode saved-owner checks. These results do not prove ordinary gameplay,
 physical save/restart, or hardware behaviour.
 
 Genuine successful-mail acknowledgement and scheduling, and independent mechanic/
-reward controls remain connected acquisition work. The source milestone does
+reward controls remain V4 acquisition work. The source milestone does
 not become lifetime earnings or random post-office stock. Format-21
 saves migrate older supported records forward with empty accounts; format-20-or-
 earlier readers cannot load format 21, even when banking is disabled. Preserve

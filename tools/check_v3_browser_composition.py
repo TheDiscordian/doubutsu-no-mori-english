@@ -15,7 +15,7 @@ ROOT = composer.ROOT
 PROBE = b'<!doctype html><meta charset="utf-8"><title>Private worker check</title><input id="n64" type="file"><input id="disc" type="file">'
 
 
-def check_interface(page, origin, out, expected, catalog, review):
+def check_interface(page, origin, out, expected, catalog, review, *, scope='development', extra_item=None):
     """Exercise the actual UI; keep native gameplay checks out of this batch."""
     results = {}
     page.add_init_script('''(() => {
@@ -30,7 +30,8 @@ def check_interface(page, origin, out, expected, catalog, review):
       };
     })()''')
     page.goto(origin+'/preview/')
-    page.wait_for_function("() => !document.querySelector('#selection-controls').disabled")
+    page.wait_for_function("() => !document.querySelector('#selection-controls').disabled || !document.querySelector('#error').hidden")
+    assert page.locator('#error').is_hidden(), page.locator('#error').inner_text()
     assert page.locator('.option').count() == len(catalog)
     assert page.locator('.option input:checked').count() == 0
     assert page.locator('#build').is_disabled()
@@ -43,7 +44,8 @@ def check_interface(page, origin, out, expected, catalog, review):
     page.locator('#clear-all').click()
     page.locator('#kind').select_option('clothing')
     page.locator('#select-visible').click()
-    assert page.locator('.option input:checked').count() == 3
+    assert page.locator('.option input:checked').count() == sum(
+        r['kind'] == 'clothing' and not r.get('dependency_only') for r in catalog.values())
     page.locator('#clear-visible').click()
     assert page.locator('.option input:checked').count() == 0
     equipment=[key for key,row in catalog.items() if row['kind']=='equipment']
@@ -76,8 +78,9 @@ def check_interface(page, origin, out, expected, catalog, review):
     punchy.uncheck()
     assert page.locator('.option input:checked').count() == 0
     punchy.check()
-    page.locator('#search').fill('31D4')
-    page.locator('[data-id="GAFE01-r0/item/31D4"] input').check()
+    extra_item = extra_item or 'GAFE01-r0/item/31D4'
+    page.locator('#search').fill(extra_item)
+    page.locator(f'[data-id="{extra_item}"] input').check()
     assert page.locator('.option input:checked').count() == 4
     results['keyboard_selection_dependencies_and_removal'] = True
 
@@ -89,7 +92,8 @@ def check_interface(page, origin, out, expected, catalog, review):
     page.locator('#save-ack').check()
     assert page.locator('#build').is_enabled()
     page.locator('#build').click()
-    page.wait_for_function("() => document.querySelector('#progress').value >= 4")
+    page.wait_for_function("() => document.querySelector('#progress').value >= 4 || !document.querySelector('#error').hidden")
+    assert page.locator('#error').is_hidden(), page.locator('#error').inner_text()
     page.locator('#cancel').click()
     assert page.locator('#working').is_hidden() and page.locator('#success').is_hidden()
     assert 'Cancelled' in page.locator('#status').inner_text()
@@ -117,7 +121,7 @@ def check_interface(page, origin, out, expected, catalog, review):
                           'enabled': selection['enabled']}
         print(json.dumps({'interface_case': label, 'sha256': expected[label], 'downloads_verified': True}), flush=True)
 
-    build_and_download('villager-and-seasonal-subset')
+    build_and_download('villager-and-regular-subset' if scope == 'v3-pipeline' else 'villager-and-seasonal-subset')
     old_urls = page.evaluate('window.__lifecycle.created.slice()')
     page.locator('#clear-all').click()
     assert page.locator('#success').is_hidden() and not page.locator('#download').get_attribute('href')
@@ -147,7 +151,8 @@ def check_interface(page, origin, out, expected, catalog, review):
 
     page.locator('#search').fill('')
     page.locator('#build').click()
-    page.wait_for_function("() => document.querySelector('#progress').value >= 4")
+    page.wait_for_function("() => document.querySelector('#progress').value >= 4 || !document.querySelector('#error').hidden")
+    assert page.locator('#error').is_hidden(), page.locator('#error').inner_text()
     page.locator('#select-all').click()
     assert page.locator('#working').is_hidden() and page.locator('#success').is_hidden()
     assert page.locator('#build').is_disabled() and not page.locator('#save-ack').is_checked()
@@ -237,18 +242,28 @@ def check(export, output, *, interface=False, selected=None):
 
     base, report = composer.inputs()
     catalog = composer.catalogue(base, report)
-    profiles = [('no-imports', []), ('all-installed', list(catalog)),
-                ('villager-and-seasonal-subset', ['GAFE01-r0/villager/00EB', 'GAFE01-r0/item/31D4'])]
-    equipment=[key for key,row in catalog.items() if row['kind']=='equipment']
+    plan = json.loads(resources['data/composition.json'])
+    scope = plan.get('scope', 'development')
+    menu = {r['id']:r for r in plan['options']}
+    available = [key for key,row in menu.items() if not row.get('dependency_only')]
+    extra_item = next(key for key in available if menu[key]['kind'] == 'furniture'
+                      and key not in catalog['GAFE01-r0/villager/00EB']['dependencies'])
+    subset_name = 'villager-and-regular-subset' if scope == 'v3-pipeline' else 'villager-and-seasonal-subset'
+    if scope != 'v3-pipeline':extra_item = 'GAFE01-r0/item/31D4'
+    def resolve(selected):
+        return composer.resolve(catalog, selected, scope=scope, report=report)
+    profiles = [('no-imports', []), ('all-installed', available),
+                (subset_name, ['GAFE01-r0/villager/00EB', extra_item])]
+    equipment=[key for key,row in menu.items() if row['kind']=='equipment']
     if equipment:profiles.append(('equipment-subset',[equipment[1],equipment[-1]]))
     if focused:
         if interface:raise ValueError('Choose a focused worker profile or the complete interface check')
-        composer.resolve(catalog,selected)
+        resolve(selected)
         profiles=[('focused-selection',selected)]
     expected = {}
     for name, selected in profiles:
         if interface and name == 'all-installed': continue
-        result, _, _ = composer.compose(base, report, catalog, composer.resolve(catalog, selected))
+        result, _, _ = composer.compose(base, report, catalog, resolve(selected))
         expected[name] = sha256(result)
     requests, errors, results = [], [], {}
     out.mkdir(parents=True)
@@ -290,8 +305,8 @@ def check(export, output, *, interface=False, selected=None):
                     })''', {'selected': selected, 'cancel': cancel, 'plan_sha256': manifest['plan']['sha256']})
 
                 if interface:
-                    results['interface'] = check_interface(page, origin, out, expected, catalog,
-                        json.loads(resources['data/review.json']))
+                    results['interface'] = check_interface(page, origin, out, expected, menu,
+                        json.loads(resources['data/review.json']), scope=scope, extra_item=extra_item)
                 else:
                     if not focused:
                         cancelled = worker(profiles[-1][1], cancel=True)
@@ -302,8 +317,8 @@ def check(export, output, *, interface=False, selected=None):
                         assert result['type'] == 'done', result
                         assert result['sha256'] == expected[name] == result['receipt']['output_sha256'], name
                         for key in ('enabled', 'required', 'profile_hex'):
-                            assert result['receipt'][key] == composer.resolve(catalog, selected)[key], (name, key)
-                        selection=composer.resolve(catalog,selected)
+                            assert result['receipt'][key] == resolve(selected)[key], (name, key)
+                        selection=resolve(selected)
                         if 'surface_profile_hex' in selection:
                             for key in ('surface_profile_hex','surface_profile_sha256'):
                                 assert result['receipt'][key]==selection[key],(name,key)
@@ -316,7 +331,7 @@ def check(export, output, *, interface=False, selected=None):
                         ui.wait_for_function("() => !document.querySelector('#selection-controls').disabled")
                         counts={}
                         for kind in sorted({catalog[k]['kind'] for k in profiles[0][1]}):
-                            count=sum(r['kind']==kind for r in catalog.values())
+                            count=sum(r['kind']==kind and not r.get('dependency_only') for r in menu.values())
                             ui.locator('#kind').select_option(kind)
                             assert ui.locator('.option:visible').count()==count
                             ui.locator('#select-visible').click()
@@ -340,7 +355,7 @@ def check(export, output, *, interface=False, selected=None):
             thread.join(timeout=3)
     results.update(base_sha256=composer.BASE_SHA, export_receipt_sha256=sha256((export/'build.json').read_bytes()),
                    requests=requests, browser_errors=errors, local_body_free_gets_only=True,
-                   server_stopped=True, served_patchers_changed=False)
+                   server_stopped=True, deployed_patcher_changed=False, local_preview_changed=False)
     (out/'results.json').write_bytes(composer.canonical(results))
     return {'checks': list(results)[:6], 'results_sha256': sha256((out/'results.json').read_bytes())}
 

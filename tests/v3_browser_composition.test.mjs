@@ -2,12 +2,35 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { sha256 } from '../web/core.mjs';
 import { validatePlan, resolveSelection, composeSelection, crc32, n64Checksum } from '../experimental/imports/composer.mjs';
+import { loadReview } from '../experimental/imports/bundle.mjs';
 
 const hex = data => Buffer.from(data).toString('hex');
 const id = (kind, number) => `GAFE01-r0/${kind}/${number}`;
 const A = id('item', '3100'), B = id('item', '3104'), C = id('villager', '00D8');
 const fromHex = s => Buffer.from(s, 'hex');
 const clone = structuredClone;
+
+test('deferred equipment and carried reviews match the checked plan exactly', async () => {
+  const pending = ['equipment', 'carried'].map((kind, i) => ({ id: id('item', `253${i}`),
+    name: `Deferred ${kind}`, kind, selectable: false, reason: 'Special acquisition is deferred to V4.' }));
+  const plan = { base_sha256: '0'.repeat(64), scope: 'v3-pipeline', options: [], pending_options: pending };
+  const originalFetch = globalThis.fetch;
+  async function review(rows) {
+    const raw = new TextEncoder().encode(JSON.stringify({ format: 'AFV3-BROWSER-REVIEW-1',
+      base_sha256: plan.base_sha256, unavailable: rows }));
+    globalThis.fetch = async () => new Response(raw);
+    return loadReview({ review: { file: 'review.json', size: raw.length, sha256: await sha256(raw) } }, plan);
+  }
+  try {
+    assert.deepEqual((await review(pending)).unavailable, pending);
+    await assert.rejects(review(pending.slice(1)), /missing from the review/);
+    for (const field of ['id', 'name', 'kind', 'selectable', 'reason']) {
+      const changed = clone(pending);
+      changed[0][field] = field === 'selectable' ? true : 'changed';
+      await assert.rejects(review(changed), /Invalid unavailable/);
+    }
+  } finally { globalThis.fetch = originalFetch; }
+});
 
 async function fixture() {
   const source = Uint8Array.from({ length: 0x104000 }, (_, i) => (i * 31 + (i >>> 5)) & 255);

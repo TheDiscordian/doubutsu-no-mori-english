@@ -1,7 +1,7 @@
 """Generate browser selection rules from the checked installed import records.
 
 Exports are unserved, ignored development artifacts. This does not update web/,
-the Pages recipe, or either running V2 patcher.
+the Pages recipe or the ordinary local preview.
 """
 import argparse
 import gzip
@@ -19,7 +19,7 @@ ROOT = composition.ROOT
 FILES = ('composer.mjs', 'worker.mjs', 'bundle.mjs', 'app.mjs', 'style.css')
 
 
-def rules(image, report):
+def rules(image, report, *, scope='development'):
     """Compile a small, data-only plan; there are no browser item allowlists."""
     pinned = (composition.BASE/'build.json').read_bytes()
     if (sha256(image) != composition.BASE_SHA or sha256(pinned) != composition.REPORT_SHA or
@@ -198,6 +198,29 @@ def rules(image, report):
         selected, _, _ = composition.compose(image, report, catalog, full)
         result.update(all_selected_sha256=sha256(selected))
         if pending:result['pending_options']=list(pending_entries.values())
+    from v3_import_scope import PIPELINE, check_scope, availability, requested_options, FEATURE_CHOICES
+    check_scope(scope)
+    if scope == PIPELINE:
+        states = availability(catalog, report)
+        offered, deferred = [], list(result.get('pending_options', []))
+        for row in result['options']:
+            state = states[row['id']]
+            if state['selectable'] or state['dependency_only']:
+                if state['dependency_only']:
+                    row.update(dependency_only=True, reason=state['reason'])
+                offered.append(row)
+            else:
+                deferred.append({**row, 'selectable':False, 'reason':state['reason']})
+        result.update(scope=scope, options=offered, pending_options=deferred)
+        for row in result.get('behaviours', []):
+            if row['id'] in FEATURE_CHOICES:
+                row['v4_only'] = True
+        for group in result.get('runtime_groups', []):
+            group['forced_disabled'] = True
+        full = composition.resolve(catalog, requested_options(catalog, report),
+            behaviour_options=behaviours or None, scope=scope, report=report)
+        selected, _, _ = composition.compose(image, report, catalog, full)
+        result['all_selected_sha256'] = sha256(selected)
     return result
 
 
@@ -220,7 +243,7 @@ def review_catalogue(plan, report):
         key = composition.item_key(int(row['item_id'], 16))
         parent = (row.get('parent_representation') or row.get('room_alias')
                   or row.get('profile',{}).get('creature_parent') or {})
-        if key in options or parent.get('parent_id') in options:
+        if key in options or key in pending or parent.get('parent_id') in options:
             continue
         if parent.get('parent_id') in pending:
             continue  # The carried diary owns this cover; it is not a second item.
@@ -247,12 +270,12 @@ def review_catalogue(plan, report):
             'worksheet_sha256': scan['worksheet_sha256'], 'unavailable': unavailable}
 
 
-def build(output, *, recipes=False, disc=None):
+def build(output, *, recipes=False, disc=None, scope='v3-pipeline'):
     out = output.resolve()
     if not out.is_relative_to(ROOT/'build') or out.exists():
         raise ValueError('Choose a fresh ignored build/ output; never a served site')
     image, report = composition.inputs()
-    plan = rules(image, report)
+    plan = rules(image, report, scope=scope)
     raw = composition.canonical(plan)
     review = composition.canonical(review_catalogue(plan, report))
     site = out/'site'
@@ -298,7 +321,8 @@ def build(output, *, recipes=False, disc=None):
     (data/'manifest.json').write_bytes(composition.canonical(manifest))
     receipt = {'format': 'AFV3-BROWSER-EXPORT-1', 'base_sha256': plan['base_sha256'],
                'base_report_sha256': composition.REPORT_SHA, 'runtime_abi': plan['runtime_abi'],
-               'options': len(plan['options']), 'recipes_included': recipes,
+               'options': sum(not r.get('dependency_only',False) for r in plan['options']),
+               'scope': scope, 'recipes_included': recipes,
                'experimental': True, 'served': False, 'web_patcher_enabled': False,
                'files': {str(p.relative_to(site)): sha256(p.read_bytes())
                          for p in sorted(site.rglob('*')) if p.is_file()}}
@@ -311,7 +335,8 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--recipes', action='store_true', help='Include two-game reconstruction recipes in the unserved export')
     parser.add_argument('--disc', type=Path)
-    parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock; never changes the served patchers')
+    parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock; never changes the deployed patcher or local preview')
+    parser.add_argument('--scope', choices=('v3-pipeline','development'), default='v3-pipeline')
     args = parser.parse_args()
     if args.base_lock:composition.use_build_lock(args.base_lock)
-    print(json.dumps(build(args.output, recipes=args.recipes, disc=args.disc), indent=2))
+    print(json.dumps(build(args.output, recipes=args.recipes, disc=args.disc, scope=args.scope), indent=2))

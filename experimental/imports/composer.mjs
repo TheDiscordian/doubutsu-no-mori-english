@@ -24,6 +24,8 @@ export function validatePlan(plan) {
   require(plan?.format === 'AFV3-BROWSER-COMPOSITION-1' && plan.donor === 'GAFE01-r0' &&
     plan.experimental === true && plan.web_patcher_enabled === false, 'Unsupported experimental import plan.');
   integer(plan.runtime_abi, 1, 65535);
+  const pipeline = plan.scope === 'v3-pipeline';
+  require(plan.scope === undefined || pipeline, 'Unsupported import scope.');
   integer(plan.base_size, 0x101000, MAX); integer(plan.stable_size, 0x101000, MAX);
   for (const key of ['base_sha256', 'stable_sha256', 'base_report_sha256']) hash(plan[key]);
   const surfaces = plan.surface_profile_hex !== undefined;
@@ -46,6 +48,9 @@ export function validatePlan(plan) {
       option.id.includes(option.kind === 'villager' ? '/villager/' : '/item/'), 'Invalid import kind.');
     require(typeof option.name === 'string' && option.name.length > 0 && option.name.length <= 128,
       'Invalid import name.');
+    if (option.dependency_only !== undefined) require(pipeline && option.dependency_only === true &&
+      option.kind === 'clothing' && typeof option.reason === 'string' && option.reason.length > 0,
+      'Invalid villager resource dependency.');
     array(option.dependencies, 0, 2048); array(option.disable, option.kind === 'carried' ? 0 : 1, 16);
     hexSize(option.profile_hex, 192, 192);
     if (surfaces) hexSize(option.surface_profile_hex, 64, 64);
@@ -71,19 +76,36 @@ export function validatePlan(plan) {
     options.set(option.id, option);
   }
   const pending = new Set();
+  const pendingRows = new Map();
   if (plan.pending_options !== undefined) {
     array(plan.pending_options, 1, 2048); hash(plan.all_selected_sha256);
     for (const row of plan.pending_options) {
       require(typeof row.id === 'string' && /^GAFE01-r0\/item\/[0-9A-F]{4}$/.test(row.id) &&
         !options.has(row.id) && !pending.has(row.id) && row.selectable === false &&
-        row.kind === 'diary' && typeof row.name === 'string' && row.name.length > 0 && row.name.length <= 128 &&
+        (pipeline ? ['furniture', 'clothing', 'equipment', 'floor', 'wall', 'diary', 'carried'].includes(row.kind) :
+          row.kind === 'diary') && typeof row.name === 'string' && row.name.length > 0 && row.name.length <= 128 &&
         typeof row.reason === 'string' && row.reason.length > 0 && row.reason.length <= 1024,
         'Invalid or selectable pending import.');
-      array(row.disable, 1, 16);
+      array(row.disable, pipeline && row.kind === 'carried' ? 0 : 1, 16);
+      if (row.profile_hex !== undefined) {
+        require(pipeline, 'Unexpected pending saved identity.');
+        hexSize(row.profile_hex, 192, 192);
+        if (surfaces) hexSize(row.surface_profile_hex, 64, 64);
+        if (creatures) {
+          hexSize(row.creature_profile_hex, 4, 4);
+          require(!bytes(row.creature_profile_hex).some(n => n), 'Deferred creature identity.');
+        }
+        if (row.kind === 'carried') {
+          integer(row.carried_mask, 1, 127);
+          require(!(row.carried_mask & (row.carried_mask - 1)) && !row.disable.length,
+            'Invalid deferred carried identity.');
+        }
+      }
       for (const patch of row.disable) {
         const size = field(patch, 1, 4); hexSize(patch.after, size, size);
       }
       pending.add(row.id);
+      pendingRows.set(row.id, row);
     }
   } else if (plan.all_selected_sha256 !== undefined) hash(plan.all_selected_sha256);
   // A cyclic dependency is a malformed catalogue, not an excuse to loop or to
@@ -101,7 +123,8 @@ export function validatePlan(plan) {
   for (const id of options.keys()) visit(id);
   field(plan.profile, 192, 192);
   const fullProfile = new Uint8Array(192);
-  for (const option of options.values()) {
+  const installed = [...options.values(), ...pendingRows.values()].filter(row => row.profile_hex !== undefined);
+  for (const option of installed) {
     bytes(option.profile_hex).forEach((n, i) => {
       require(!(fullProfile[i] & n), 'Two import options own the same saved identity.');
       fullProfile[i] |= n;
@@ -110,14 +133,14 @@ export function validatePlan(plan) {
   require(hex(fullProfile) === plan.profile.before, 'Incomplete installed save profile.');
   if (surfaces) {
     const fullSurface = new Uint8Array(64);
-    for (const option of options.values()) bytes(option.surface_profile_hex).forEach((n, i) => {
+    for (const option of installed) bytes(option.surface_profile_hex).forEach((n, i) => {
       require(!(fullSurface[i] & n), 'Two surface options own the same saved identity.'); fullSurface[i] |= n;
     });
     require(hex(fullSurface) === plan.surface_profile_hex, 'Incomplete installed surface profile.');
   }
   if (creatures) {
     const fullCreature = new Uint8Array(4);
-    for (const option of options.values()) bytes(option.creature_profile_hex).forEach((n, i) => {
+    for (const option of installed) bytes(option.creature_profile_hex).forEach((n, i) => {
       require(!(fullCreature[i] & n), 'Two creature options own the same saved identity.'); fullCreature[i] |= n;
     });
     require(hex(fullCreature) === plan.creature_profile_hex, 'Incomplete installed creature profile.');
@@ -145,6 +168,9 @@ export function validatePlan(plan) {
     require(typeof row.id === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(row.id) && !behaviourIds.has(row.id),
       'Invalid or repeated behaviour setting.');
     behaviourIds.add(row.id);
+    if (row.v4_only !== undefined) require(pipeline && row.v4_only === true &&
+      ['holiday-calendar', 'tournament-measurements', 'birthday-presentation'].includes(row.id),
+      'Invalid deferred feature setting.');
     for (const key of ['name', 'scope', 'description']) require(typeof row[key] === 'string' &&
       row[key].length > 0 && row[key].length < 1024, 'Invalid behaviour description.');
     require(row.values && Object.keys(row.values).length === 2 && row.values.N64 === 0 && row.values.GameCube === 1 &&
@@ -163,7 +189,7 @@ export function validatePlan(plan) {
     field(row, 4, 4); array(row.members, 1, 32);
     let full = 0; const members = new Set();
     for (const member of row.members) {
-      require(options.get(member.id)?.kind === 'carried' && !members.has(member.id),
+      require((options.get(member.id) || pendingRows.get(member.id))?.kind === 'carried' && !members.has(member.id),
         'Unknown or duplicate masked selection.');
       integer(member.mask, 1, 0x7fffffff);
       require(!(full & member.mask), 'Overlapping selection mask bits.');
@@ -171,16 +197,19 @@ export function validatePlan(plan) {
     }
     require(parseInt(row.before, 16) === full, 'Changed complete selection mask.');
   }
-  for (const option of options.values()) if (option.kind === 'carried')
+  for (const option of installed) if (option.kind === 'carried')
     require(maskOwners.has(option.id), 'Carried option has no installed selection field.');
   if (plan.runtime_groups !== undefined) array(plan.runtime_groups, 1, 32);
   for (const group of plan.runtime_groups || []) {
     require(typeof group.id === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(group.id) && !groupIds.has(group.id),
       'Invalid or repeated runtime group.');
     groupIds.add(group.id);
+    require(pipeline ? group.forced_disabled === true : group.forced_disabled === undefined,
+      'Invalid feature activation scope.');
     array(group.any_imports, 0, 2048); array(group.any_behaviours, 0, 32); array(group.fields, 1, 64);
     require(group.any_imports.length + group.any_behaviours.length > 0 &&
-      new Set(group.any_imports).size === group.any_imports.length && group.any_imports.every(id => options.has(id)),
+      new Set(group.any_imports).size === group.any_imports.length &&
+      group.any_imports.every(id => options.has(id) || pending.has(id)),
       'Unknown or repeated runtime dependency.');
     for (const condition of group.any_behaviours) {
       const setting = (plan.behaviours || []).find(row => row.id === condition.id);
@@ -213,7 +242,8 @@ export function validatePlan(plan) {
 export function resolveSelection(plan, requested, behaviours = {}) {
   const options = validatePlan(plan);
   array(requested, 0, 4096);
-  require(requested.every(id => typeof id === 'string' && options.has(id)), 'Unknown or unimplemented import.');
+  require(requested.every(id => typeof id === 'string' && options.has(id) && !options.get(id).dependency_only),
+    'Unknown or unimplemented standalone import.');
   const chosen = [...new Set(requested)].sort(), enabled = new Set(chosen), reasons = new Map(), pending = [...chosen];
   while (pending.length) {
     const id = pending.pop();
@@ -234,6 +264,7 @@ export function resolveSelection(plan, requested, behaviours = {}) {
   require(behaviours !== null && typeof behaviours === 'object' && !Array.isArray(behaviours), 'Invalid behaviour settings.');
   const definitions = new Map((plan.behaviours || []).map(row => [row.id, row]));
   require(Object.keys(behaviours).every(id => definitions.has(id)), 'Unknown or unavailable behaviour setting.');
+  require(Object.keys(behaviours).every(id => !definitions.get(id).v4_only), 'V4 feature setting is unavailable in V3.');
   const resolved = {}, rows = [...definitions.values()].sort((a, b) => a.id < b.id ? -1 : 1);
   for (const row of rows) {
     const value = Object.hasOwn(behaviours, row.id) ? behaviours[row.id] : row.default;
@@ -241,6 +272,7 @@ export function resolveSelection(plan, requested, behaviours = {}) {
     resolved[row.id] = value;
   }
   return { requested: chosen, enabled: [...enabled].sort(), required: [...enabled].filter(id => !chosen.includes(id)).sort(),
+    ...(plan.scope === undefined ? {} : { scope: plan.scope }),
     dependency_reasons: Object.fromEntries([...reasons].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
       .map(([key, parents]) => [key, [...parents].sort()])), profile_hex: hex(profile),
     ...(plan.surface_profile_hex === undefined ? {} : { surface_profile_hex: hex(surfaceProfile) }),
@@ -316,8 +348,8 @@ export async function composeSelection(source, plan, requested, behaviours = {})
       write(row, value);
     }
     for (const group of plan.runtime_groups || []) {
-      const active = group.any_imports.some(id => enabled.has(id)) ||
-        group.any_behaviours.some(row => selection.behaviours?.[row.id] === row.value);
+      const active = !group.forced_disabled && (group.any_imports.some(id => enabled.has(id)) ||
+        group.any_behaviours.some(row => selection.behaviours?.[row.id] === row.value));
       for (const row of group.fields) {
         const value = new Uint8Array(4); view(value).setUint32(0, active ? row.enabled : row.disabled);
         write(row, value);

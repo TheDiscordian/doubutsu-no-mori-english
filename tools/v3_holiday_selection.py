@@ -54,7 +54,9 @@ def groups(image, report):
     return result
 
 
-def active(group, enabled, behaviours):
+def active(group, enabled, behaviours, *, scope='development'):
+    if scope == 'v3-pipeline':
+        return False
     return bool(set(group['any_imports']) & set(enabled)) or any(
         behaviours.get(r['id']) == r['value'] for r in group['any_behaviours'])
 
@@ -123,7 +125,8 @@ def update_report(image, blob, report, selection):
     if not contract:
         return
     enabled = set(selection['enabled'])
-    states = {g['id']: active(g, enabled, selection.get('behaviours', {})) for g in contract['groups']}
+    states = {g['id']: active(g, enabled, selection.get('behaviours', {}),
+                             scope=selection.get('scope', 'development')) for g in contract['groups']}
     contract['resolved_groups'] = states
     on = states['diary-holidays']
     n['record']['selected'] = n['lifecycle']['active'] = on

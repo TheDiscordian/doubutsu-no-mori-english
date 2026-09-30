@@ -1,0 +1,14 @@
+[
+  {"wait":12},
+  {"read":["80000318",4],"expect":"00800000"},
+  {"read":["8019ACD0",4],"expect":"00000001"},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"read":["8019C8D0",16],"expect":"AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
+  {"read":["8046BFF0",16],"expect":"AF33C0DEAF33C0DEAF33C0DEAF33C0DE"},
+  {"read":["8046C4E0",16],"expect":"AF53C0DEAF53C0DEAF53C0DEAF53C0DE"},
+  {"key":"Return","duration":0.12},
+  {"wait":8},
+  {"snapshot_message":true},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"read":["8046C4E0",16],"expect":"AF53C0DEAF53C0DEAF53C0DEAF53C0DE"}
+]

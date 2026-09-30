@@ -9,22 +9,37 @@ An Expansion Pak requirement is acceptable if needed for the complete translatio
 Four-MiB compatibility is not a release requirement. Document and test the actual
 memory requirement; permission to use eight MiB does not itself change heap bounds.
 
-V3 adds optional GameCube villagers and items to the translated game. Read
-`specs/V3_OPTIONAL_IMPORTS.md` and the active V3 queue before import work.
-Able Sisters (including its custom-design system), the Museum building, and comparable large new
-features belong to V4, not V3. Keep design-dependent imports explicitly deferred;
-do not expand the item/villager import task into building those facilities.
-Ordinary item behaviours, including fish/insects/fossils, remain V3 import work.
+V3 is only the optional GameCube villager/item import pipeline. Finish shared
+extraction/conversion, stable additive identities, bulk asset/data installation,
+item/villager runtime behaviour and persistence, English text, and independent
+browser/offline selections. Regular items are importable and obtainable through
+the regular item pool. Read `specs/V3_OPTIONAL_IMPORTS.md` and the active V3 queue.
+Special items requiring GameCube acquisition features should not be importable
+until those features exist in V4. Their conversion/resources can be
+prepared in V3; prepared or installed resources do not make them importable.
+Do not add substitute regular stock or gifts for special items.
+Post-office banking/mail rewards, holiday/Harvest and golden-tool reward systems,
+Museum/island reward policies, Able Sisters/custom designs, the Museum building,
+island facilities, and other new GameCube features belong to V4. Do not finish
+these systems or demand policy choices for them as V3 prerequisites. Preserve
+existing experimental code/resources without expanding them. Design-dependent
+sign boards remain deferred. Ordinary item behaviours, including fish/insects/
+fossils, remain V3 import work. This boundary governs subordinate specifications,
+checkpoint continuations, and stored goal wording.
+There is one deployed patcher: the public website. Localhost is an ordinary
+website preview; running it as a service gives it no special status. Use "the
+deployed patcher" for the public website and "the local preview" for localhost.
+Never describe these as two patchers or two deployments.
 Use `v3/optional-imports` for experimental implementation, preserving the stable
-V2 cartridge and both deployments of the one web patcher. Imports need complete gameplay and
+V2 cartridge, deployed patcher, and local preview. Imports need complete gameplay and
 persistence support; an extracted name or disabled web option is not completion.
 Do not repurpose existing villagers/items or assign IDs by checkbox order.
 V3 development source may be pushed to GitHub on `v3/optional-imports`.
-Do not switch either the local or public deployment to V3 until the user has
+Do not switch the deployed patcher or local preview to V3 until the user has
 tested the build and explicitly approved the switch. GitHub source publication
-does not authorise updating either deployment's recipe, assets, or service.
+does not authorise updating the public or local copy's recipe, assets, or service.
 Developer verification and a private playtest handoff do not satisfy that approval.
-Keep both patcher deployments on the latest verified stable V2 corrections;
+Keep the deployed patcher and local preview on the latest verified stable V2 corrections;
 the experimental V3 publication hold does not apply to V2 fixes.
 
 ## Workflow
@@ -106,7 +121,7 @@ the experimental V3 publication hold does not apply to V2 fixes.
   around meaningful changes; record difficult edge cases for the later bug pass
   instead of repeatedly attempting them while bulk implementation waits.
 - New V3 furniture uses `tools/v3_furniture_pipeline.py` and the checked current
-  build lock. Extend shared format/behaviour/acquisition categories rather than
+  build lock. Extend shared format/behaviour categories rather than
   adding per-item Python definitions, family switches, installers, or native
   scenarios. Read `specs/V3_FURNITURE_PIPELINE.md`; keep unsupported dependencies
   explicit. Use the shared representative batch probe and retain passing
@@ -135,12 +150,13 @@ the experimental V3 publication hold does not apply to V2 fixes.
 - Importing includes extraction, conversion, bulk installation, and working
   item behaviours, including item-specific behaviours. Do not impose a rule
   postponing item-specific work until all shared categories are finished.
-  Acquisition means how players obtain an item; it is not importing pipeline
-  work and must not displace unfinished shared conversion categories. Nook's
-  code UI, gift handover, holiday rewards, and golden-tool acquisition belong
-  after the general importing pipelines. Prepare supported artwork and
-  shared records even when a separate behaviour is unfinished; retain explicit
-  readiness and keep incomplete gameplay out of selectable imports. Extend a
+  Regular items enter the regular item pool. Special acquisition, including
+  Nook's code UI, gift handover, holiday rewards, and golden-tool rewards, is V4
+  work, not a V3 follow-up task or completion requirement. Prepare supported
+  artwork and shared records without implementing new GameCube features.
+  Keep incomplete behaviour and special acquisition-dependent items out of
+  selectable imports. Report prepared pipeline coverage separately from
+  importability; preparation does not enable a special item. Extend a
   shared category once for all matching records. Reuse passing tests for
   unchanged components.
 - Substantial N64/GameCube behaviour differences are explicit WebUI choices,
@@ -148,10 +164,11 @@ the experimental V3 publication hold does not apply to V2 fixes.
   in `specs/V3_OPTIONAL_IMPORTS.md`; share a setting across the affected mechanic
   where appropriate, and implement both behaviours rather than offering a
   cosmetic toggle or treating an unfinished port as a completed alternative.
-- After general importing pipelines and bulk asset/data installation are complete,
-  finish gold-tree leaf/cut effects and
-  the full golden-shovel acquisition route. These remain required V3 work;
-  deferring them does not remove them from completion criteria.
+- V3 completes the import pipeline for items and villagers. Once that pipeline
+  is complete, verify and hand it over.
+  Do not continue into gold-tree reward events, special acquisition, or other
+  V4 systems. Preserve installed item behaviours and existing evidence without
+  expanding unrelated reward-system checks.
 - Use existing focused checks once per meaningful change. Reuse passing native
   evidence for unchanged code/resources; do not add exhaustive per-record or
   all-combinations harnesses without a concrete uncovered risk. For a testing-
