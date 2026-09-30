@@ -207,7 +207,7 @@ selection does not establish playable-import acceptance.
 
 The [shared password modules](V3_PASSWORDS.md) link the complete donor code
 transform, eligibility rules, Nook results, and selected destination mapping for
-227 implemented imports and 1,425 checked native correspondences. Bounded MIPS
+277 implemented imports and 1,425 checked native correspondences. Bounded MIPS
 code and sanitized donor comparisons are verified. The native engine passes 45
 assertions across twelve cases for selected destinations, real DMA/CRC/cache,
 RNG, preserved saved fields, guards, and cleanup. Four front counters have installed
@@ -478,8 +478,8 @@ and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
 integration remain required. The web patcher does not upload or edit saves.
 
 The [optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
-selections for twenty installed villagers and 127 installed logical items,
-including required outfits, house furnishings, and twenty-four equipment parents.
+selections for twenty installed villagers and 277 installed logical items,
+including required outfits, house furnishings, and twenty-eight equipment parents.
 Mannequin and equipment catalogue representations are dependencies, not separate
 choices.
 Six selectable surfaces have genuine A/C/event acquisition; two more use their
@@ -499,6 +499,14 @@ the pinned complete integration cartridge. The private browser interface uses
 generated records for the same choices, not a separate maintained item list.
 These are experimental development profiles,
 not complete donor coverage, playable-import certification, or served web options.
+Fifty complete source holiday furniture gifts use independent choices and the
+installed shared event providers without requiring diary imports. Source
+selectors, guarded native handovers, inventory/collection, and saved trophy
+records remain the initial acquisition path. Twelve source reorderable-list
+members retain catalogue ordering after collection; no gift enters shop stock.
+Ordinary conversation, acquisition/ordering, and physical save/restart remain
+unverified. The source summer-exercise radio prize still needs ordinary admission
+with its actual card dependency; retain its complete installed controller.
 The shared draw-only scrolling category supplies backyard pool through its
 verified donor event-item route, with complete layered graphics and the same
 optional catalogue/save consumers. Well model remains inactive pending its

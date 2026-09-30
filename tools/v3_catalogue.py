@@ -121,6 +121,10 @@ def table_from_records(base, rel, symbols, furniture, records):
         raise ValueError('Incomplete or duplicate catalogue records')
     result = []
     diary_rows = {}
+    holiday_source=None
+    if any(r.get('holiday_acquisition') for r in records):
+        from v3_furniture_pipeline import Source
+        holiday_source=Source(rel,symbols)
     if any(r.get('representation') == 'diary' for r in records):
         from v3_furniture_pipeline import Source
         from v3_diary_items import catalogue_rows
@@ -138,7 +142,10 @@ def table_from_records(base, rel, symbols, furniture, records):
         found = [(n,m) for n,(i,m) in enumerate(donor) if i == donor_index]
         group = row.get('donor_acquisition_list') or row['ordinary_shop_list']
         goods = symbol_data(rel, symbols.decode(), group)
-        if group=='mRmTp_birth_type':
+        if row.get('holiday_acquisition') and holiday_source is not None:
+            from v3_holiday_acquisition import catalogue_source
+            member=catalogue_source(holiday_source,donor_item,donor_index,row)
+        elif group=='mRmTp_birth_type':
             from v3_furniture_pipeline import Source
             from v3_password_acquisition import catalogue_source
             member=catalogue_source(Source(rel,symbols),donor_item,donor_index,row)
@@ -268,7 +275,7 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
 
 
 def install(base, parent, suffix, compiled, ordering, records, collection, runtime, room, *, clothing=None, expanded=False,
-            handheld=None,pool_slack=0):
+            handheld=None,pool_slack=0,grow_pool=False):
     if type(pool_slack) is not int or not 0<=pool_slack<=1024 or pool_slack%64:
         raise ValueError('Invalid shared catalogue code allowance')
     old, reloc, source_parent = sources(base)
@@ -415,6 +422,13 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
     align = lambda value: (value + 63) & ~63
     growth, relocation_growth = align(len(data)) - align(SIZE), align(len(new_rel)) - align(len(reloc))
     required, reserved = 253696 + 0x4400 + 64 + growth + relocation_growth, 257152 + 0x4400 + (POOL_EXTRA if expanded else 0)+pool_slack
+    if grow_pool:
+        if not expanded or type(pool_slack) is not int or pool_slack<0 or pool_slack%64:
+            raise ValueError('Invalid expandable catalogue pool allowance')
+        # Derive growth from both complete aligned resources, not a guessed
+        # per-item increment. The caller verifies and preserves the live chain.
+        delta=max(0,align(required-reserved))
+        pool_slack+=delta;reserved+=delta
     code = by_vrom(base)[CODE_VROM].extract(base)
     if (required > reserved or u32(code, 0x800C4AFC - CODE_RAM) != 0x3C0E8089
             or u32(code, 0x800C4B10 - CODE_RAM) != 0x25CE7620):

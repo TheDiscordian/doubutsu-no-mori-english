@@ -67,11 +67,15 @@ int main(int argc,char **argv) {
     load(argv[1],af_holiday_profiles,sizeof(af_holiday_profiles));
     load(argv[2],af_holiday_metadata,sizeof(af_holiday_metadata));
     reset(0);assert(bind()==0);
-    /* Installed candidates remain inactive; supplying a map does not select them. */
+    /* The current admission controls both complete records. Then disable the
+     * candidates for the existing no-gift fixture, without changing identities. */
     unsigned int candidate_count=half(af_holiday_destination_data+6);
     for(unsigned int i=0;i<candidate_count;++i) {
         const unsigned char *r=af_holiday_destination_data+16+i*8;
-        assert(af_holiday_world_resolve(&npc,half(r))==0);
+        unsigned int slot=half(r+4)-1024;
+        unsigned int selected=af_holiday_profiles[slot][7]==1 && af_holiday_metadata[slot][7]==1;
+        assert(af_holiday_world_resolve(&npc,half(r))==(selected?half(r+2):0));
+        af_holiday_profiles[slot][7]=af_holiday_metadata[slot][7]=0;
     }
     /* A diary-only profile can attend every event without importing its gift.
      * No item string, handover, fake receipt, or RNG call is needed. Visitors

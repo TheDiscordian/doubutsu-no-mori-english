@@ -1,0 +1,121 @@
+"""Admit complete source holiday gifts through the installed shared owner.
+
+Initial acquisition stays with Tortimer. The source reorderable list remains
+orderable after collection, without inserting rewards into ordinary shop stock.
+"""
+import struct
+
+from aflib import by_vrom,sha256
+from v3_asset_loader import ROOT
+
+SOURCES=('tools/v3_holiday_acquisition.py','tools/v3_holiday_rewards.py',
+    'tools/v3_holiday_world.py','tools/v3_holiday_selection.py',
+    'tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py','tools/v3_catalogue.py')
+
+
+def contract(source):
+    from v3_holiday_rewards import discover
+    if not hasattr(source,'holiday_reward_contract'):
+        source.holiday_reward_contract=discover(source)
+    return source.holiday_reward_contract
+
+
+def checked(source,image,report):
+    from v3_holiday_rewards import encode
+    from v3_holiday_selection import packets,location
+    from v3_event_text import MESSAGE,TABLE,CHOICE_TABLE
+    from textbanks import Bank
+    n=report.get('equipment_resources',{}).get('npc_extra',{})
+    if not n.get('world'):return None
+    events=n.get('events',{});selection=events.get('selection',{})
+    optional=n.get('optional_dialogue',{});world=n['world']
+    if (not n.get('installed') or not world.get('installed') or
+            not n.get('actor_callbacks_bound') or not n['lifecycle']['callbacks_installed'] or
+            not n['dialogue']['installed'] or not optional.get('installed') or
+            not selection.get('installed') or not events['calendar']['actor_admission_bound'] or
+            not events['dispatch']['complete_dependency_preflight'] or
+            not events['festivals']['native_services_bound'] or events['participants']['unbound_services']):
+        raise ValueError('Holiday gifts require the complete connected native providers')
+    e=report['equipment_resources']
+    for p in packets(e):
+        if sha256(image[p['physical']:p['physical']+p['bytes']])!=p['sha256']:
+            raise ValueError('Changed complete holiday acquisition packet')
+    def read(ram,size):
+        _,at=location(e,ram,size)
+        return image[at:at+size]
+    if sha256(read(optional['ram'],optional['bytes']))!=optional['sha256']:
+        raise ValueError('Changed complete shared holiday conversation and handover')
+    for row in optional['redirects']:
+        if read(row['address'],8)!=bytes.fromhex(row['after']):
+            raise ValueError('Changed actual holiday world/card redirect')
+    description=contract(source)
+    if world['reward_contract']['rows']!=description['rows']:
+        raise ValueError('Installed holidays differ from the complete source selectors')
+    rewards=world['rewards'];raw=read(rewards['ram'],rewards['bytes'])
+    if raw!=encode(description) or sha256(raw)!=rewards['sha256']:
+        raise ValueError('Changed complete source holiday reward table')
+    mapping=world['destinations'];data=read(mapping['ram'],mapping['bytes'])
+    rows=mapping['rows']
+    expected=struct.pack('>4s6H',b'AFHW',1,len(rows),8,16+8*len(rows),0,0)+b''.join(
+        struct.pack('>4H',r['donor_item'],r['item'],r['index'],int(r['diary'])) for r in rows)
+    if data!=expected or sha256(data)!=mapping['sha256'] or len(rows)!=66:
+        raise ValueError('Changed complete installed holiday destination map')
+    # Later categories append to these banks. Check the exact retained records,
+    # not obsolete hashes of the shorter historical complete bank.
+    files=by_vrom(image)
+    choices=n['dialogue']['text']['resources'][2]['vrom']
+    for kind,a,b,key in (('message',MESSAGE,TABLE,'rows'),('select',choices,CHOICE_TABLE,'choices')):
+        bank=Bank(kind,a,b,files[a].extract(image),files[b].extract(image)).entries()
+        for row in n['dialogue']['text'][key]:
+            if row['id']>=len(bank) or sha256(bank[row['id']])!=row['sha256']:
+                raise ValueError('Changed actual official holiday '+kind)
+    candidates={int(i,16) for r in description['rows'] for i in r['source_items']}
+    destinations={r['donor_item']:r for r in rows if r['donor_item'] in candidates}
+    if len(candidates)!=65 or destinations.keys()!=candidates:
+        raise ValueError('Incomplete whole-source holiday destination set')
+    return dict(destinations=destinations,events=description['rows'],
+        source_table_sha256=description['event_table_sha256'],
+        native_delivery_installed=True,ordinary_gameplay_tested=False)
+
+
+def furniture(source,item,index,lists):
+    del index
+    events=[r for r in contract(source)['rows'] if f'{item:04X}' in r['source_items']]
+    if not events or item>>8==0x2B:return None
+    if lists and (len(lists)!=1 or lists[0][0]!='ftr_listEventPresentChumon'):
+        raise ValueError('Holiday reward has an unsupported additional acquisition list')
+    binding=getattr(source,'holiday_acquisition',None)
+    if binding is None:
+        from v3_furniture_pipeline import ReviewRequired
+        raise ReviewRequired('acquisition needs an adapter: complete native holiday delivery')
+    destination=binding['destinations'][item]
+    symbol=lists[0][0] if lists else 'event_table'
+    orderable=bool(lists)
+    return dict(donor_list=symbol,donor_list_sha256=sha256(source.raw(symbol)),
+        stock_group=255,reward_route=0,ordinary_stock=False,catalogue_orderable=orderable,
+        holiday_acquisition=dict(route='holiday',destination_item=f'{destination["item"]:04X}',
+            events=[r['event'] for r in events],dependencies=[],
+            native_delivery_installed=True,ordinary_gameplay_tested=False))
+
+
+def catalogue_source(source,item,index,row):
+    expected=[r['event'] for r in contract(source)['rows'] if f'{item:04X}' in r['source_items']]
+    acquisition=row.get('holiday_acquisition',{})
+    symbol=row.get('donor_acquisition_list')
+    listed=struct.unpack('>'+str(len(source.raw('ftr_listEventPresentChumon'))//2)+'H',
+        source.raw('ftr_listEventPresentChumon'))
+    orderable=item in listed
+    return (bool(expected) and item>>8!=0x2B and index>=0 and
+        symbol==('ftr_listEventPresentChumon' if orderable else 'event_table') and
+        row.get('catalogue_orderable') is orderable and
+        acquisition.get('events')==expected and acquisition.get('destination_item')==row['item_id'] and
+        acquisition.get('native_delivery_installed') is True)
+
+
+def admit(report):
+    """The same provider group serves gifts, diaries, cards, and cutlery."""
+    rows=[r for r in report['furniture']['imports'] if r.get('holiday_acquisition')]
+    if not rows:return
+    group=next(g for g in report['equipment_resources']['npc_extra']['events']['selection']['groups']
+        if g['id']=='diary-holidays')
+    group['any_imports']=sorted(set(group['any_imports'])|{r['id'] for r in rows})

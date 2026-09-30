@@ -36,14 +36,40 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: complete the source Harvest acquisition category,
-connecting its existing calendar/participant/cutlery services, Franklin's actual
-conversation and reward handover, persistent reward state, and ordinary admission
-of the complete furniture and floor/wall family. Reuse installed artwork and
-behaviours; do not substitute shop stock or create per-item installers. Map the
-remaining connected consumers once before implementation.
+Current implementation task: complete the connected source holiday acquisition
+category, including the summer-exercise radio prize and ordinary shared
+conversation/delivery/save verification. Fifty ordinary holiday furniture gifts
+are admitted through the installed Tortimer selector and receipt owner. The
+radio's complete room lifecycle, source card controller, prize mapping, official
+dialogue, and stored stamps are installed; connect ordinary category admission
+and the actual exercise-card dependency without another artwork conversion.
+Retain the source event, gender, random-variant, visitor, and no-loss handover
+rules. Keep pending Harvest/Nook gameplay checks and their spent harness budgets
+explicit; those budgets are not restarted by this category work.
 
-Harvest's current connected cartridge is ABI 382 at
+The current proposal is ABI 384 / format 20 at
+`build/v3-holiday-gift-category-imports-03/password-destinations/build-lock.json`.
+Its 297 development choices include all fifty source holiday furniture rewards,
+with independent selection and shared provider activation without diary imports.
+Initial gifts never become shop stock. Twelve complete source reorderable-list
+members remain orderable after collection; the other 38 do not. All fifty models
+and physical providers are reused. Catalogue growth adds 64 menu bytes calculated
+from complete aligned resources, retaining every existing arena contribution.
+Four focused checks pass, including seven browser/offline profiles and the
+existing sanitized world fixture's 128 handovers with native inventory doubled.
+Actual allocation words, complete capacity chains, and mutation rejection pass.
+Twenty-four complete furniture profiles retain their acquisition gates. Ordinary
+event gameplay, menu ordering, physical save/restart, scene headroom, and hardware
+remain unverified. Keep separate saves/profiles; ABI 382 ordinary forward/backward
+compatibility is not established. Format 20/wire 7 are unchanged; older format
+readers cannot load format-20 saves. Both patcher deployments remain stable V2-14.
+<!-- Holiday work record: category-imports-01 stops on the catalogue allocation
+guard before producing a cartridge. Category-imports-02 is invalid: ordinary
+installation discards the new endpoint. Category-imports-03 retains that core
+instruction and validates shifted category allowances through the complete
+retained menu chain. All artwork is reused; no native harness is started. -->
+
+Harvest's retained connected category checkpoint is ABI 382 at
 `build/v3-harvest-category-imports-01/password-destinations/build-lock.json`, using
 `build/v3-harvest-connected-linked-18/connected.json` and unchanged actor
 preparation `build/v3-harvest-connected-prepared-09/`. It installs the full
@@ -1225,20 +1251,21 @@ stable mappings, and shared tests. The material and mapping checkpoints record
 exact hashes/limits. Continue broader callback/rig and acquisition categories;
 do not treat prepared reward artwork as a completed reward route.
 
-The complete holiday selector and no-loss transaction kernel are prepared at
-`build/v3-holiday-rewards-prepared-02/`: 28 events and 65 gift variants, driven by
-verified source code/tables. Three source/sanitizer checks pass; the N64 object
-has no unresolved external symbols, but remains unlinked and uninstalled.
-Connect the shared actor/calendar/dialogue and native operations, including
-the actual handover completion signal, selected identity resolver, ordinary
-inventory insertion/catalogue registration, and per-player format-3 trophy
-flag. No holiday item becomes selectable from preparation alone.
+The complete holiday selector and no-loss transaction kernel are installed:
+28 events and 65 source gift variants, driven by verified source code/tables.
+The actual actor/calendar/dialogue, handover completion signal, selected identity
+resolver, native insertion/collection, and persistent four-player trophy records
+share the installed owner. Fifty furniture choices and all diary styles are
+admitted through their ordinary categories. The summer-exercise radio uses its
+separate installed source card controller; its admission is the next connected
+consumer stated above. Retain source/host evidence without claiming ordinary
+native interaction or physical save/restart.
 
-Acquisition policy needs the user's choice for donor systems absent on N64:
-recreate those systems, or adapt rewards to suitable existing native routes.
-That question covers added holidays and GBA-island sources; it does not authorise
-a substitution yet. Continue unrelated conversion and behaviour work while the
-choice is pending. Keep prepared gift selectors reusable under the current plan.
+Retain the installed holiday/calendar alternatives and genuine source rewards.
+For remaining donor systems absent on N64, such as GBA-island acquisition,
+resolve the recreation/adaptation choice before implementing a substitute route.
+That requirement does not reopen the complete installed holiday selectors or
+authorise replacing them with arbitrary native rewards.
 
 Default discovery includes all 148 unresolved legacy `1xxx` worksheet records
 alongside the 242 `3xxx` records. These include ordinary furnishings, absent/dummy

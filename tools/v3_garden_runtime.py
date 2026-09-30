@@ -307,7 +307,10 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
     pool_slack=max(old_slack,128 if clothing is not None else 0,384 if diaries else 0)
     changes, report = catalogue.install(stable, parent, suffix, compiled, ordering, rows,
         prior['collection']['code'], prior['save_runtime']['code'], prior['furniture_room']['code'],
-        clothing=(cloth, clothes), expanded=True,handheld=handheld,pool_slack=pool_slack)
+        clothing=(cloth, clothes), expanded=True,handheld=handheld,pool_slack=pool_slack,grow_pool=True)
+    pool_slack=report['category_pool_bytes']
+    menu_origin=prior['catalogue'].get('menu_category_pool_origin',old_slack)
+    report['menu_category_pool_origin']=menu_origin
     rebuilt_code = changes.pop(CODE_VROM)
     current_code = files[CODE_VROM].extract(base)
     equipment=prior.get('equipment_resources',{})
@@ -357,6 +360,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
                         after=0x25CE0000|(editor['pool_bound']&65535)))
                 for patch in patches:
                     before,after=patch['before'],patch['after']
+                    before+=old_slack-menu_origin;after+=old_slack-menu_origin
                     if (patch['address']!=address or before!=word or after<before or
                             (after-before)%64 or (before^after)&0xFFFF8000):
                         raise ValueError('Changed retained later menu allocation')

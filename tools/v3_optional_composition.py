@@ -159,10 +159,10 @@ def catalogue(image, report):
         result[row['id']] = {'id':row['id'], 'name':row['name'], 'kind':'furniture',
             'item_id':row['item_id'], 'runtime_index':index, 'dependencies':[],
             'enable_offset':at+4, 'enable_bytes':4, 'enable_ram':row_ram+4}
-        if row.get('harvest_acquisition'):
-            acquisition=row['harvest_acquisition']
+        if row.get('harvest_acquisition') or row.get('holiday_acquisition'):
+            acquisition=row.get('harvest_acquisition') or row['holiday_acquisition']
             if not acquisition['native_delivery_installed'] or acquisition['destination_item']!=row['item_id']:
-                raise ValueError('Incomplete Harvest furniture acquisition binding')
+                raise ValueError('Incomplete source furniture acquisition binding')
             result[row['id']]['dependencies']=acquisition['dependencies']
         if row.get('native_artwork_variant'):
             result[row['id']]['native_artwork_variant']=row['native_artwork_variant']

@@ -2296,7 +2296,7 @@ retains collision-only coordinates without inventing actors for them. Both
 Tortimer appearances retain their native constructor-installed drawing callback.
 
 The generated `runtime_groups` plan activates the shared providers when any
-diary is selected or the user explicitly chooses a GameCube calendar/tournament
+diary or admitted holiday gift is selected, or the user explicitly chooses a GameCube calendar/tournament
 setting. Unrelated imports leave the original events active. Each group declares
 fixed imported identities, behaviour conditions, and checked on/off words; the
 browser has no separate item allowlist. Both composers update the NPC, event,
@@ -2304,6 +2304,16 @@ and equipment startup checksums in dependency order. Changing the N64/GameCube
 calendar changes actual dates, not just labels. Gifts remain independently
 selected: attendance never requires enabling every gift. Ordinary shop stock
 and full gameplay verification remain separate work.
+
+All fifty ordinary source holiday furniture rewards have independent
+experimental admission through the shared furniture pipeline. Initial delivery
+uses Tortimer, complete source selectors, actual handover completion, native
+insertion/collection, and the saved trophy owner. Twelve donor reorderable-list
+members preserve ordering after collection; other gifts stay non-orderable.
+Neither group enters ordinary/event stock. Selecting one gift does not require
+a diary or other gifts. The summer-aerobics radio is a separate source card prize,
+not an additional entry in the 28-event selector; its pending admission requires
+the actual card dependency and complete installed controller.
 
 The current lock is in `docs/PROGRESS.md`. Empty output is the pinned V2-14;
 all supported selections retain the complete current proposal. Neither deployed

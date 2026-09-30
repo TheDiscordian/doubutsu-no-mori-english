@@ -23,10 +23,11 @@ lock or publish experimental V3.
 
 ## Active development
 
-The current proposal is ABI 382 / format 20 at
-`build/v3-harvest-category-imports-01/password-destinations/build-lock.json`.
+The current proposal is ABI 384 / format 20 at
+`build/v3-holiday-gift-category-imports-03/password-destinations/build-lock.json`.
 Harvest's complete connected resources, native full-model reservations, and
-twelve independent reward choices are installed. This is an internal development
+twelve independent reward choices are installed, alongside fifty independent
+source holiday furniture gifts. This is an internal development
 checkpoint, not the private gameplay handoff. Nook's four front counters
 have installed code-entry, official result dialogue, and native animated handover
 bindings. The complete keyboard, full donor-name font, original shop actions,
@@ -78,6 +79,33 @@ unchanged; that does not prove compatibility or physical save/restart.
 Both deployed patchers remain stable V2-14. The Harvest
 harness allowance and corrected setup retry remain spent. See
 [the exact next consumers](WORK_QUEUE.md#execution-order).
+
+The ordinary importer admits the complete fifty-furniture holiday gift category
+through the installed Tortimer/calendar/conversation/receipt owner. All models,
+behaviours, physical provider packets, source selector variants, and official
+dialogue are retained. Selecting one gift activates the shared event providers
+without requiring a diary or selecting other gifts. Initial acquisition stays
+with the actual holiday handover; no gift is inserted into shop stock. Twelve
+source `ftr_listEventPresentChumon` rewards retain catalogue ordering after
+collection; the other 38 remain non-orderable. The shared live password map
+includes these actual selections without replacing their holiday route.
+
+The complete catalogue and relocation resource require 64 additional menu bytes.
+The shared builder derives that growth from aligned resource lengths, preserves
+all native allocations, and retains the actual endpoint instruction through
+ordinary installation. Current capacity checks verify the complete chain,
+including diary, event/carried menus, and the password editor. Four focused
+checks pass, including seven browser/offline profiles and the existing sanitized
+world fixture's 128 handovers with inventory I/O doubled. Empty selection returns
+exact V2-14; all 297 choices reproduce the current cartridge. Twenty-four complete
+furniture profiles retain separate acquisition gates. The source summer-exercise
+radio prize is the next connected consumer, reusing the installed card owner.
+Ordinary event conversations, gift pickup/ordering, physical save/restart,
+scene heap headroom, and hardware remain unverified. Format 20/wire 7 do not
+change; preserve separate test saves and profiles. Do not load saves requiring
+new gift choices in a build lacking those selections. Forward/backward ordinary
+save compatibility with ABI 382 is not established. Both deployed patchers stay
+on stable V2-14.
 
 The current native password helper passes 45 assertions and twelve selected-item
 cases, including complete DMA/CRC/cache loading, native RNG, saved-state
@@ -247,8 +275,8 @@ installation, and working item behaviours, including item-specific behaviours.
 There is no blanket postponement of item-specific work. Acquisition systems
 remain separate. The [execution order](WORK_QUEUE.md#execution-order) governs task
 selection; pending rewards must not displace unfinished conversion categories.
-The code-entry keyboard is parked, incomplete source work. Its attempted build
-stops on resource preservation before producing a ROM; it is not installed.
+The code-entry keyboard and Nook reward owner are installed as stated above;
+ordinary controller-driven entry and delivery remain unverified.
 
 Complete gold/palm/cedar banks are installed in all four seasonal renderers.
 The shared importer reuses every prepared model, palette, growth/death/stump

@@ -60,6 +60,18 @@ refreshes the shared live password destinations. Shop stock and catalogue
 ordering remain disabled. Resource/composition checks establish experimental
 selection, not ordinary gameplay or save/restart acceptance.
 
+The shared holiday acquisition adapter validates complete installed selector,
+destination, conversation/redirect, provider, and official text records. It
+admits all fifty furniture candidates from the source's 28-event selector through
+the ordinary importer. Gifts activate the same event providers as diaries,
+cards, and cutlery without requiring unrelated content selections. Initial
+handover remains the source route. The twelve members of the complete
+`ftr_listEventPresentChumon` list retain catalogue reordering; their native
+eligibility uses the existing event-order mask without adding them to event
+stock. Other holiday gifts use checked source `event_table` membership and stay
+non-orderable. Summer-exercise prize admission remains separate from the
+ordinary 28-event selector, using the existing source card owner.
+
 ### Built-in native profile staging
 
 The same dependency planner stages complete native drawing/contact profiles,
@@ -867,6 +879,13 @@ Rebuilding the catalogue retains the checked chain of existing submenu pool
 increases for inventory joints and the balloon menu. Every before/after word,
 positive aligned increment, and final live instruction must agree. The builder
 does not reduce those allocations or accept an unexplained larger pool.
+The shared catalogue builder derives any additional allowance from the complete
+aligned overlay and relocation sizes, in 64-byte steps. The checked predecessor
+category allowance identifies the original event/carried/editor receipts; later
+category growth shifts those bounds without changing their actual increments.
+The ordinary installer retains the complete changed core before writing goods
+or other shared descriptors. Actual instructions, receipt chains, source owner
+hashes, signed-immediate bounds, and native model capacities remain required.
 Bed validation checks all five complete affected native functions and their
 four expanded profile-table bindings; unrelated room-owner updates do not
 invalidate unchanged bed code. Changed function contents still reject.
