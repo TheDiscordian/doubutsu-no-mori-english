@@ -81,6 +81,21 @@ Both save RA/S0 at `+24`/`+20`. No actor layout grows.
 
 ## Reserved-bank streaming
 
+The complete shared NPC importer uses the owned 462-entry table at `807FD000`.
+`extend_model_reservations` verifies the complete retail model/texture caller,
+native reservation helper, and constructor reservation block in both owners.
+It enlarges ten model slots per owner to the aligned complete-model size and
+sets the same capacity in both streaming callers. Franklin requires `30C0`
+(12,480) bytes. The changed capacity words are `8097FEA4` / `80980DB0` and
+`809A042C` / `809A0BE0`; none is an overlay relocation target. Each owner uses
+22,400 additional scene bytes compared with `2800`-byte slots. The native scene
+allocator bounds and allocation failure handling, texture slots, status counts,
+pending DMA, transfer clamps, and release/reuse remain intact. Focused checks
+verify the current cartridge and reject altered consumers or unsupported sizes;
+ordinary scene headroom and full appearance remain unverified.
+
+The following details describe the original pilot implementation.
+
 Ordinary NPC construction has its own object-table lookup; it does not use
 the shared scene allocator at `800C5AA0`. The two streaming functions are
 `8097FDF0..8097FE7F` and `809A0378..809A0407`. Each finds a free preallocated

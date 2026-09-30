@@ -362,8 +362,10 @@ def install(base,prior,blob,core,module,output,directory):
                     target[i]=new_byte
         else:changes[vrom]=changed
     manager=copy.deepcopy(connected['manager'])
-    from v3_npc_draw import rebind_streaming_tables
+    from v3_npc_draw import rebind_streaming_tables,extend_model_reservations
     streaming=rebind_streaming_tables(base,changes,table_ram)
+    model_reservations=extend_model_reservations(base,changes,
+        json.loads((art/'art.json').read_bytes())['model_bytes'])
     changes[manager['vrom']]=checked('harvest-manager.bin',manager)
     changes[manager['reloc']]=checked('harvest-manager-reloc.bin',
         dict(sha256=manager['relocation_sha256'],bytes=manager['relocation_bytes']))
@@ -420,10 +422,9 @@ def install(base,prior,blob,core,module,output,directory):
         rewards=a['rewards'],sources=connected['sources'],saved_format_changed=False,
         object_table=dict(ram=table_ram,bytes=len(table),sha256=sha256(table),count=462,
             retained_count=460,retained_prefix_sha256=sha256(table[:460*8]),
-            native_streaming_rebindings=streaming),
+            native_streaming_rebindings=streaming,native_model_reservations=model_reservations),
         native_execution_verified=False,ordinary_gameplay_verified=False,selectable=False,
-        pending=['complete native model streaming allowance for the 12480-byte Franklin bank',
-            'independent Harvest furniture/surface admission with cutlery dependency',
+        pending=['independent Harvest furniture/surface admission with cutlery dependency',
             'ordinary conversation, hiding/arrival, reward delivery, and save/restart'])
     e['harvest']=report
     updates=dict(asset=asset,object_capacity=462,physical_resources=records,resource_growth=growth)

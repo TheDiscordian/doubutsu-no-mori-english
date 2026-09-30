@@ -44,8 +44,8 @@ behaviours; do not substitute shop stock or create per-item installers. Map the
 remaining connected consumers once before implementation.
 
 Harvest's current connected resource cartridge is ABI 379 at
-`build/v3-harvest-installed-07/build-lock.json`, using
-`build/v3-harvest-connected-linked-17/connected.json` and unchanged actor
+`build/v3-harvest-installed-08/build-lock.json`, using
+`build/v3-harvest-connected-linked-18/connected.json` and unchanged actor
 preparation `build/v3-harvest-connected-prepared-09/`. It installs the full
 39-function source owner, twelve mapped rewards, 36 official messages, complete
 125-frame motion, and 28-owner registry, retaining the 27 existing source owners
@@ -57,6 +57,10 @@ A checked 64-KiB startup packet owns `807F0000..80800000`; the pool begins at
 All 460 existing table entries and adjacent villager flags/growth data remain
 intact. Both native NPC streaming table readers and the common scene allocator
 use the complete new table. The startup remains inside its original reservation.
+Both NPC owners allocate ten complete 12,480-byte model slots and pass that same
+capacity to their native streaming routines. Each owner consumes 22,400 more
+scene bytes. Texture slots remain 5,664 bytes; scene bounds, allocation failure
+handling, transfer clamps, queued DMA, and native release/reuse remain intact.
 
 The complete source cover masks/classes, nearest-centre flat-unit search, actual
 ball/landmark exclusions, river/player fallbacks, and three relocation attempts
@@ -78,13 +82,17 @@ and unchanged physical resources outside the two declared shared packet edits.
 The extended object-status and mixed VROM/physical startup fixtures pass under
 sanitizers. No native gameplay, physical save I/O, or hardware result is claimed.
 
-Next connected consumer: enlarge the complete native model reservation and its
-streaming allowance. Both native streaming routines clamp the transfer to their
-caller-supplied size; Franklin's 12,480-byte model exceeds the ordinary 10,240-byte
-allowance. Resolve both actual callers/reservations without truncating the model
-or removing bounds. The current build is an internal resource checkpoint, not
-a Franklin playtest handoff. Then admit all twelve independent furniture/surface
-choices through the ordinary shared category with the actual cutlery dependency.
+Next connected consumers: admit all twelve independent furniture/surface choices
+through the ordinary shared category with the actual cutlery dependency. The
+source lists are `ftr_listHarvest`, `carpet_listHarvest`, and `wall_listHarvest`;
+reuse the ten installed staged profiles and both complete surfaces. Extend the
+ordinary source-acquisition metadata and surface admission, keeping shop stock
+and catalogue ordering disabled. Bind every reward selection to the existing
+`GAFE01-r0/item/2530` dependency in both browser and offline composition.
+The current build is an internal resource checkpoint, not a Franklin playtest
+handoff. Focused checks prove the four installed capacity instructions against
+complete retail caller/helper/reservation spans and unchanged relocations; they
+do not establish scene headroom, ordinary rendering, or gameplay.
 Keep the existing acquisition gate closed until that connected path is ready;
 gameplay/save verification remains pending. The Harvest new-harness allowance
 and setup retry are exhausted; do not reset them or replay unchanged checks.
@@ -94,6 +102,8 @@ Focused verification of actual game-defect repairs is not a new setup cycle. -->
 <!-- Harvest work record: installed-05 is invalid because resource-tail reuse
 discarded its object-table patch; installed-06 corrects the writer ordering;
 installed-07 additionally rebinds both complete native streaming table readers.
+Installed-08 retains those resources and enlarges both actual model allocations
+and caller limits without modifying their scene allocator or transfer clamp.
 The legacy asset-only startup fixture fails on its stale 03F00000 storage pin;
 the changed 462-bank object contract is verified separately without replaying
 that historical startup. No native-harness allowance is restarted. -->

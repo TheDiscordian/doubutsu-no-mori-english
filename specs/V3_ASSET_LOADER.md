@@ -7,9 +7,11 @@ The shared additional-NPC importer supports 462 banks. Its complete table at
 object allocator and both native reserved-bank streaming readers use that same
 table. The original resident table's 460-entry prefix, adjacent villager flags,
 and native growth permissions remain intact. Table relocation alone does not
-enlarge an NPC's caller-supplied model buffer. Franklin's complete 12,480-byte
-model requires a larger reservation/transfer allowance before acquisition is
-admitted. Resource installation is not complete native appearance or gameplay.
+enlarge an NPC's caller-supplied model buffer. Both native NPC owners reserve
+12,480 bytes for each of their ten model slots and use that same transfer limit,
+retaining the complete Franklin model. Texture slots, scene bounds, queued DMA,
+and allocation failure handling remain native. Source reward admission remains
+unfinished. Resource installation is not complete native appearance or gameplay.
 
 The current [complete-villager asset variant](V3_COMPLETE_VILLAGER_ASSETS.md)
 extends capacity to 448 banks, installs all twenty textures, two custom models,

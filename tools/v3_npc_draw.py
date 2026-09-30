@@ -20,6 +20,55 @@ STREAMING = {
     0x8798C0: (0x809A0378, 0x809A0408, 0x809A03AC,
                '47e0ce2bab773d78d8792c4216e5710751059e6bff2ea8411125c868188b44ed'),
 }
+# Complete native caller, reservation helper, and constructor reservation block.
+# These spans are identical in the verified retail and current translated owners.
+RESERVED_MODELS = {
+    0x8681F0: (0x8097FEA4, 0x80980DB0, (
+        (0x8097FE80, 0x8097FF14, '8da9c9eda44f34f2b1102a21b8821d87a651174fd696e4f2813fd77d04d7fa4f'),
+        (0x80980A78, 0x80980AE8, '26dd7720d4835b98b5d7d0a2225e4df65c0f0324ca8c515c3f6865c00d769f50'),
+        (0x80980D74, 0x80980DE4, '9f402f93c324d09d9fd7f65d1c75df89831ecfbc04baa23f4bbcae3d0b4680ce'))),
+    0x8798C0: (0x809A042C, 0x809A0BE0, (
+        (0x809A0408, 0x809A049C, '6d8739056b07a9c478e821bc505b7c5dd29213d4cc7a9b0031cb5f19a8f3bf14'),
+        (0x809A0B34, 0x809A0BA4, '26dd7720d4835b98b5d7d0a2225e4df65c0f0324ca8c515c3f6865c00d769f50'),
+        (0x809A0BA4, 0x809A0C14, '72f5b1eb8eb7f49ee62e8eeb1ddf1c76804f5d08ec239342e562647a9c0a7413'))),
+}
+
+
+def extend_model_reservations(base, changes, model_bytes):
+    """Enlarge both real slot allocations and their bounded streaming callers.
+
+    The native scene arena, ten-slot counts, allocation failure handling, queued
+    DMA, and reuse/release remain intact. No private substitute buffer is used.
+    """
+    if not isinstance(model_bytes, int) or not 0x2800 < model_bytes <= 0x7FF0:
+        raise ValueError('Unsupported complete NPC model reservation')
+    capacity = (model_bytes + 15) & ~15
+    files = by_vrom(base); rows = []; staged = {}
+    for vrom, reloc, ram, *_ in OWNERS:
+        data = bytearray(changes.get(vrom, files[vrom].extract(base)))
+        slots = relocation_offsets(files[reloc].extract(base), len(data))
+        caller, allocator, spans = RESERVED_MODELS[vrom]
+        for start, end, digest in spans:
+            if sha256(data[start-ram:end-ram]) != digest:
+                raise ValueError('Changed complete native NPC model reservation consumer')
+        patches = []
+        for address, instruction in ((caller, 0x24072800), (allocator, 0x24062800)):
+            at = address - ram
+            if u32(data, at) != instruction or at in slots:
+                raise ValueError('Changed or relocated native model capacity instruction')
+            after = (instruction & 0xFFFF0000) | capacity
+            struct.pack_into('>I', data, at, after)
+            patches.append(dict(address=address, before=f'{instruction:08x}', after=f'{after:08x}'))
+        staged[vrom] = bytes(data)
+        rows.append(dict(vrom=vrom, ram=ram, patches=patches,
+            verified_native_spans=[dict(start=start, end=end, sha256=digest) for start,end,digest in spans],
+            model_bytes=model_bytes, reserved_model_bytes=capacity, previous_model_bytes=0x2800,
+            reserved_texture_bytes=0x1620, slot_count=10,
+            additional_scene_bytes=10*(capacity-0x2800),
+            native_arena_bounds_unchanged=True, allocation_failure_handling_unchanged=True,
+            streaming_clamp_unchanged=True, relocations_unchanged=True))
+    changes.update(staged)
+    return rows
 
 
 def patch_streaming(data, reloc_data, vrom, ram):

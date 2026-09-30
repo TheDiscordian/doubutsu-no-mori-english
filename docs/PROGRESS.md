@@ -24,9 +24,9 @@ lock or publish experimental V3.
 ## Active development
 
 The current proposal is ABI 379 / format 20 at
-`build/v3-harvest-installed-07/build-lock.json`. Harvest's complete connected
-resources are installed, but native full-model loading and twelve-choice
-admission remain unfinished. This is an internal development checkpoint, not
+`build/v3-harvest-installed-08/build-lock.json`. Harvest's complete connected
+resources and native full-model reservations are installed, but twelve-choice
+admission remains unfinished. This is an internal development checkpoint, not
 the private gameplay handoff. Nook's four front counters
 have installed code-entry, official result dialogue, and native animated handover
 bindings. The complete keyboard, full donor-name font, original shop actions,
@@ -45,7 +45,7 @@ beginning with the complete Harvest reward path. See
 Harvest installs its complete owner, hiding/arrival/relocation adapters, five
 native manager slots, daily calendar entry/cleanup, official dialogue, NPC banks,
 guarded pool, and shared registry/motion redirects from
-`build/v3-harvest-connected-linked-17/connected.json`. The unchanged actor
+`build/v3-harvest-connected-linked-18/connected.json`. The unchanged actor
 preparation is `build/v3-harvest-connected-prepared-09/`. All 39 actor functions,
 twelve reward identities, 36 official messages, and the complete 125-frame motion
 are retained. Existing 27 source owners, eight native NPC identities, 74 manager
@@ -57,9 +57,14 @@ verify installed resources, hooks, guards, startup CRC/descriptor, and retained
 physical data. Source/host checks cover full hiding masks, ball exclusions,
 blocked arrival repair, relocation failure/success, reward filtering, saved-record
 history, dialogue/cutlery, and single insertion; native services remain doubles.
-Franklin's native model-loading allowance is still 10,240 bytes, below his full
-12,480-byte model. Enlarge both actual reservations/callers before admitting the
-twelve reward choices. No new choices or ordinary gameplay/save/hardware result
+Both native NPC owners allocate ten 12,480-byte model slots and pass that same
+allowance to their native streaming routines. Four checked instruction changes
+retain complete retail caller/helper/reservation spans, both relocation tables,
+texture allocations, scene bounds, and allocation/transfer failure handling.
+Each owner uses 22,400 additional scene bytes; ordinary scene headroom and full
+rendering remain unverified. The two focused reservation/cartridge checks pass.
+Next admit the twelve reward choices, retaining the actual cutlery dependency,
+source reward lists, and non-orderability. No new choices or ordinary gameplay/save/hardware result
 is claimed. Format 20/wire 7 remain unchanged; that does not prove compatibility
 or physical save/restart. Both deployed patchers remain stable V2-14. The Harvest
 harness allowance and corrected setup retry remain spent. See

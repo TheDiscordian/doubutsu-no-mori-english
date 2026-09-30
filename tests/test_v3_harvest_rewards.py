@@ -12,11 +12,41 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import sha256
 OUT=ROOT/os.environ.get('V3_HARVEST_PREPARED','build/v3-harvest-connected-prepared-09')
-LINKED=ROOT/os.environ.get('V3_HARVEST_LINKED','build/v3-harvest-connected-linked-17')
-INSTALLED=ROOT/os.environ.get('V3_HARVEST_INSTALLED','build/v3-harvest-installed-07')
+LINKED=ROOT/os.environ.get('V3_HARVEST_LINKED','build/v3-harvest-connected-linked-18')
+INSTALLED=ROOT/os.environ.get('V3_HARVEST_INSTALLED','build/v3-harvest-installed-08')
 
 
 class HarvestTests(unittest.TestCase):
+    def test_complete_native_model_reservations(self):
+        from aflib import by_vrom
+        from v3_furniture_install import inputs
+        from v3_npc_draw import extend_model_reservations,OWNERS
+        base,_=inputs(ROOT/'build/v3-password-only-imports-01/password-destinations/build-lock.json')
+        files=by_vrom(base);changes={};rows=extend_model_reservations(base,changes,12480)
+        self.assertEqual(len(rows),2)
+        for row in rows:
+            before=files[row['vrom']].extract(base);after=changes[row['vrom']]
+            expected=bytearray(before)
+            for patch in row['patches']:
+                at=patch['address']-row['ram']
+                self.assertEqual(before[at:at+4],bytes.fromhex(patch['before']))
+                expected[at:at+4]=bytes.fromhex(patch['after'])
+            self.assertEqual(after,expected)
+            self.assertEqual(row['reserved_model_bytes'],12480)
+            self.assertEqual(row['reserved_texture_bytes'],5664)
+            self.assertEqual(row['slot_count'],10)
+            self.assertEqual(row['additional_scene_bytes'],22400)
+            self.assertTrue(row['streaming_clamp_unchanged'])
+            self.assertTrue(row['allocation_failure_handling_unchanged'])
+        for size in (0,10240,32768,-1):
+            with self.assertRaises(ValueError):extend_model_reservations(base,{},size)
+        # Refuse a changed second owner's real reservation helper atomically.
+        vrom,_,ram,*_=OWNERS[1];changed=bytearray(files[vrom].extract(base))
+        changed[0x809A0B34-ram]^=1
+        rejected={vrom:bytes(changed)};previous=dict(rejected)
+        with self.assertRaises(ValueError):extend_model_reservations(base,rejected,12480)
+        self.assertEqual(rejected,previous)
+
     def test_complete_source_resources_and_native_contract(self):
         report=json.loads((OUT/'prepared.json').read_bytes())
         self.assertEqual(len(report['family'][0]['functions']),39)
@@ -113,6 +143,20 @@ class HarvestTests(unittest.TestCase):
             owner=files[row['vrom']].extract(image);at=row['address']-row['ram']
             self.assertEqual(owner[at:at+8],bytes.fromhex(row['after']))
             self.assertTrue(row['relocations_unchanged'])
+        self.assertEqual(len(t['native_model_reservations']),2)
+        for row in t['native_model_reservations']:
+            before=old_files[row['vrom']].extract(base);owner=files[row['vrom']].extract(image)
+            for span in row['verified_native_spans']:
+                first,last=span['start']-row['ram'],span['end']-row['ram']
+                self.assertEqual(sha256(before[first:last]),span['sha256'])
+                expected=bytearray(before[first:last])
+                for patch in row['patches']:
+                    at=patch['address']-row['ram']-first
+                    if 0<=at<len(expected):expected[at:at+4]=bytes.fromhex(patch['after'])
+                self.assertEqual(owner[first:last],expected)
+            self.assertEqual(row['model_bytes'],12480)
+            self.assertEqual(row['reserved_model_bytes'],12480)
+            self.assertEqual(row['additional_scene_bytes'],22400)
         for b in e['npc_extra']['banks'][-2:]:
             self.assertEqual(struct.unpack_from('>2I',table,b['bank']*8),(b['vrom'],b['vrom']+b['bytes']))
             self.assertEqual(sha256(image[b['physical']:b['physical']+b['bytes']]),b['sha256'])
