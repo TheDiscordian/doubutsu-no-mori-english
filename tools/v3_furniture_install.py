@@ -38,7 +38,7 @@ VERSION = 22
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-SOURCES = capacity.SOURCES + physical.SOURCES + ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/v3_password_acquisition.py', 'tools/map_artwork.py', 'tools/v3_room_aliases.py',
+SOURCES = capacity.SOURCES + physical.SOURCES + ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/v3_password_acquisition.py', 'tools/v3_harvest_acquisition.py', 'tools/map_artwork.py', 'tools/v3_room_aliases.py',
     'tools/v3_furniture_rigs.py', 'tools/v3_furniture_materials.py', 'tools/v3_furniture_scroll.py', 'tools/v3_keyframes.py',
     'tools/v3_furniture_art.py', 'tools/v3_furniture_composite.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
@@ -158,7 +158,8 @@ def catalogue_record(row):
         preview_override=row['preview_mode']!=0,preview_define='AF_V3_CATALOGUE_PREVIEW_RECORDS',
         ordinary_shop_list=row['donor_list'] if row['ordinary_stock'] else None,
         shop_list_sha256=row['donor_list_sha256'], catalogue_orderable=row['catalogue_orderable'],
-        **({'password_acquisition':row['password_acquisition']} if row.get('password_acquisition') else {}))
+        **({'password_acquisition':row['password_acquisition']} if row.get('password_acquisition') else {}),
+        **({'harvest_acquisition':row['harvest_acquisition']} if row.get('harvest_acquisition') else {}))
 
 
 def order_mask(row):
@@ -483,7 +484,7 @@ def build(output, art_path, lock=LOCK):
     stock_rows = prior['shops']['imports']+[dict(item_id=r['item_id'],group=r['stock_group'],
         **{k:r[k] for k in ('donor_item_id','donor_runtime_index') if k in r},
         donor_list=r['donor_list'],donor_list_sha256=r['donor_list_sha256']) for r in installed
-        if not r['reward_route'] and not r.get('password_acquisition')]
+        if not r['reward_route'] and not r.get('password_acquisition') and not r.get('harvest_acquisition')]
     stock_ids = {r['item_id'] for r in stock_rows}
     goods,table_at,stock_rows = shops.goods(stable,source.rel,source.symbols.encode(),
         [r for r in imports if r['item_id'] in stock_ids],reviewed_rows=stock_rows)

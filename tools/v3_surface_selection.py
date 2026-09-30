@@ -10,7 +10,7 @@ from v3_surface_items import RAM,BOOT,BOOT_END
 
 SOURCES=('tools/v3_surface_selection.py','tools/v3_surface_runtime.py',
     'tools/v3_optional_composition.py','tools/v3_browser_composition.py',
-    'tools/v3_furniture_install.py','tools/v3_password_acquisition.py',
+    'tools/v3_furniture_install.py','tools/v3_password_acquisition.py','tools/v3_harvest_acquisition.py',
     'overlays/v3/surface_bootstrap.c','overlays/v3/startup.c')
 
 
@@ -35,6 +35,13 @@ def ready(surface):
                 row.get('catalogue_orderable') is not False or
                 not row.get('password_acquisition',{}).get('native_delivery_installed')):
             raise ValueError('Incomplete password-only surface acquisition')
+        result.add(row['id'])
+    for row in stock.get('harvest',[]):
+        acquisition=row.get('harvest_acquisition',{})
+        if (row['id'] in result or row.get('group')!=20 or row.get('ordinary_stock') is not False or
+                row.get('catalogue_orderable') is not False or not acquisition.get('native_delivery_installed') or
+                acquisition.get('destination_item')!=row['item_id'] or not acquisition.get('dependencies')):
+            raise ValueError('Incomplete source Harvest surface acquisition')
         result.add(row['id'])
     pending={r['id']:r['dependency'] for r in stock['pending']}
     if (result&pending.keys() or result|pending.keys()!={r['id'] for r in surface['rows']} or
@@ -63,8 +70,10 @@ def options(blob,report):
                 record[8:]!=row['name'].encode('ascii').ljust(16,b' ')):
             raise ValueError('Changed complete surface selection binding')
         if active:
+            acquisition=next((r['harvest_acquisition'] for r in surface['stock'].get('harvest',[])
+                if r['id']==row['id']),None)
             result[row['id']]=dict(id=row['id'],name=row['name'],kind=origin['kind'],
-                item_id=row['item_id'],dependencies=[],enable_offset=start+at+4,
+                item_id=row['item_id'],dependencies=acquisition['dependencies'] if acquisition else [],enable_offset=start+at+4,
                 enable_bytes=4,enable_ram=RAM+at+4)
     if set(result)!=enabled or profile(result.values()).hex()!=selection['profile_hex']:
         raise ValueError('Incomplete surface selection profile')
@@ -139,7 +148,8 @@ def update_report(image,blob,report,selection,tables):
 
 def install(base,prior,blob,output):
     if prior['room_surfaces'].get('optional_selection'):
-        return promote_passwords(base,prior,blob,output)
+        route='harvest' if prior['room_surfaces']['stock'].get('passwords') else 'passwords'
+        return promote_acquisition(base,prior,blob,output,route=route)
     surface=copy.deepcopy(prior['room_surfaces']);enabled,pending=ready(surface)
     if surface.get('optional_selection'):raise ValueError('Surface optional selections already installed')
     files=by_vrom(base);items=surface['items'];start=items['blob_offset']
@@ -192,37 +202,55 @@ def install(base,prior,blob,output):
 
 def promote_passwords(base,prior,blob,output):
     """Admit every prepared HomePage surface without fabricating shop stock."""
+    return promote_acquisition(base,prior,blob,output,route='passwords')
+
+
+def promote_acquisition(base,prior,blob,output,*,route):
+    """Admit a complete source reward category using unchanged surface readers."""
     del output # Existing code and complete artwork are unchanged.
     from v3_furniture_pipeline import Source
-    from v3_password_acquisition import checked
     from v3_surface_stock import list_items
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if route=='passwords':
+        from v3_password_acquisition import checked
+        group=16
+    elif route=='harvest':
+        from v3_harvest_acquisition import checked
+        group=20
+    else:raise ValueError('Unsupported source surface admission category')
     binding=checked(source,base,prior)
-    if binding is None:raise ValueError('HomePage surfaces require complete installed Nook delivery')
+    if binding is None:raise ValueError('Surface admission requires complete installed '+route+' delivery')
     options(blob,prior)
     surface=copy.deepcopy(prior['room_surfaces']);stock=surface['stock']
-    if stock.get('passwords'):raise ValueError('Password-only surfaces are already admitted')
+    if stock.get(route):raise ValueError('Source surface category is already admitted')
     origins={r['id']:r for r in surface['rows']};admitted=[];pending=[]
     for row in stock['pending']:
-        if row['group']!=16:pending.append(row);continue
+        if row['group']!=group:pending.append(row);continue
         origin=origins[row['id']];donor=int(row['source_item_id'],16)
         data=source.raw(row['source_symbol']);ids=list_items(data,0)
         acquire=origin['acquisition']
-        if (len(acquire)!=1 or acquire[0]['table_index']!=16 or
+        if (len(acquire)!=1 or acquire[0]['table_index']!=group or
                 acquire[0]['symbol']!=row['source_symbol'] or len(data)%2 or
                 not data.endswith(bytes(2)) or len(set(ids))!=len(ids) or ids.count(donor)!=1 or
                 any(i>>8!=donor>>8 for i in ids) or sha256(data)!=row['source_sha256'] or
-                row['item_id']!=origin['destination_item_id'] or not binding['matrix'][donor]&4):
-            raise ValueError('Changed complete donor HomePage surface acquisition')
+                row['item_id']!=origin['destination_item_id']):
+            raise ValueError('Changed complete donor source surface acquisition')
         record=dict(row);record.pop('dependency')
-        record.update(ordinary_stock=False,catalogue_orderable=False,
-            password_acquisition=dict(route='homepage-surface',permission_mask=binding['matrix'][donor],
-                native_delivery_installed=True,ordinary_gameplay_tested=False))
+        record.update(ordinary_stock=False,catalogue_orderable=False)
+        if route=='passwords':
+            if not binding['matrix'][donor]&4:raise ValueError('Missing source HomePage password permission')
+            record['password_acquisition']=dict(route='homepage-surface',permission_mask=binding['matrix'][donor],
+                native_delivery_installed=True,ordinary_gameplay_tested=False)
+        else:
+            from v3_harvest_acquisition import acquisition
+            record['harvest_acquisition']=acquisition(binding,donor,row['source_symbol'])
+            if record['harvest_acquisition']['destination_item']!=row['item_id']:
+                raise ValueError('Source Harvest reward uses an unrelated surface identity')
         admitted.append(record)
     if len(admitted)!=2 or {r['kind'] for r in admitted}!={'floor','wall'}:
-        raise ValueError('Incomplete donor password-only surface category')
-    stock.update(passwords=admitted,pending=pending)
+        raise ValueError('Incomplete donor source surface category')
+    stock[route]=admitted;stock['pending']=pending
     enabled,remaining=ready(surface)
     files=by_vrom(base);items=surface['items'];start=items['blob_offset']
     packet=bytearray(blob[start:start+items['bytes']])
@@ -238,7 +266,7 @@ def promote_passwords(base,prior,blob,output):
             raise ValueError('Changed retained surface catalogue table/count')
         row['imports']=[r for r in row['available_imports'] if 'GAFE01-r0/item/'+r['source_item_id'] in enabled]
         values=list(range(64))+[r['index'] for r in row['imports']];row['rows']=len(values)
-        if len(values)>row['capacity']:raise ValueError('Password surfaces exceed their catalogue reservation')
+        if len(values)>row['capacity']:raise ValueError('Source surfaces exceed their catalogue reservation')
         table=struct.pack('>'+str(row['capacity'])+'H',*values,*([0]*(row['capacity']-len(values))))
         packet[at:at+len(table)]=table;row['sha256']=sha256(table)
         struct.pack_into('>I',data,pos+4,row['rows'])
@@ -255,10 +283,19 @@ def promote_passwords(base,prior,blob,output):
     items.update(sha256=sha256(packet),crc32=zlib.crc32(packet),enabled_items=len(enabled),
         table_sha256=sha256(packet[items['table_offset']:items['table_offset']+items['table_bytes']]))
     equipment.update(sha256=sha256(ep),crc32=zlib.crc32(ep),surface_bootstrap=copy.deepcopy(boot))
+    if route=='harvest':
+        h=equipment['harvest'];imports={r['id']:r for r in prior['furniture']['imports']}
+        expected={'GAFE01-r0/item/'+f'{item:04X}' for item in binding['lists']['ftr_listHarvest']['items']}
+        if not expected<=imports.keys() or any(not imports[key].get('harvest_acquisition') for key in expected):
+            raise ValueError('Source Harvest admission requires all ten ordinary furniture records')
+        h.update(reward_selection_installed=True,selectable=True,
+            reward_choices=sorted(expected|{r['id'] for r in admitted}),dependencies=binding['dependencies'],
+            pending=['ordinary conversation, hiding/arrival, reward delivery, and save/restart'])
     bits=profile([r for r in items['rows'] if r['enabled']])
     surface['optional_selection'].update(identities=sorted(enabled),pending=remaining,
         profile_hex=bits.hex(),profile_sha256=sha256(bits),
         ordinary_password_delivery_tested=False,ordinary_save_reload_tested=False)
+    surface['optional_selection']['ordinary_'+route+'_delivery_tested']=False
     surface['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
     updates=dict(room_surfaces=surface,catalogue=cat,equipment_resources=equipment,saved_format_changed=False)
     options(blob,dict(prior,**updates))

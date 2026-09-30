@@ -43,8 +43,8 @@ of the complete furniture and floor/wall family. Reuse installed artwork and
 behaviours; do not substitute shop stock or create per-item installers. Map the
 remaining connected consumers once before implementation.
 
-Harvest's current connected resource cartridge is ABI 379 at
-`build/v3-harvest-installed-08/build-lock.json`, using
+Harvest's current connected cartridge is ABI 382 at
+`build/v3-harvest-category-imports-01/password-destinations/build-lock.json`, using
 `build/v3-harvest-connected-linked-18/connected.json` and unchanged actor
 preparation `build/v3-harvest-connected-prepared-09/`. It installs the full
 39-function source owner, twelve mapped rewards, 36 official messages, complete
@@ -82,19 +82,23 @@ and unchanged physical resources outside the two declared shared packet edits.
 The extended object-status and mixed VROM/physical startup fixtures pass under
 sanitizers. No native gameplay, physical save I/O, or hardware result is claimed.
 
-Next connected consumers: admit all twelve independent furniture/surface choices
-through the ordinary shared category with the actual cutlery dependency. The
-source lists are `ftr_listHarvest`, `carpet_listHarvest`, and `wall_listHarvest`;
-reuse the ten installed staged profiles and both complete surfaces. Extend the
-ordinary source-acquisition metadata and surface admission, keeping shop stock
-and catalogue ordering disabled. Bind every reward selection to the existing
-`GAFE01-r0/item/2530` dependency in both browser and offline composition.
+All twelve independent furniture/surface choices are admitted through the
+ordinary shared category with the actual cutlery dependency. The source lists
+are `ftr_listHarvest`, `carpet_listHarvest`, and `wall_listHarvest`; the ten
+installed staged profiles and both complete surfaces are reused, without new
+artwork compilation. Shared source-acquisition metadata and surface admission
+keep actual shop stock and catalogue ordering disabled. Every reward selection
+binds to `GAFE01-r0/item/2530` in browser and offline composition. Four focused
+checks pass, including seven composition profiles and retained physical
+resources. The complete development cartridge has 247 choices; 74 complete
+furniture profiles retain their separate acquisition gates.
 The current build is an internal resource checkpoint, not a Franklin playtest
 handoff. Focused checks prove the four installed capacity instructions against
 complete retail caller/helper/reservation spans and unchanged relocations; they
 do not establish scene headroom, ordinary rendering, or gameplay.
-Keep the existing acquisition gate closed until that connected path is ready;
-gameplay/save verification remains pending. The Harvest new-harness allowance
+Next connected consumers are ordinary conversation, hiding/arrival, reward
+delivery, and save/restart verification. Experimental selection does not claim
+playable-import acceptance. The Harvest new-harness allowance
 and setup retry are exhausted; do not reset them or replay unchanged checks.
 <!-- Harvest work record: new-harness window 2026-09-30 03:10:10..03:40:10 UTC.
 The corrected initial setup passes; no native gameplay harness is completed.
@@ -166,9 +170,10 @@ The policy and fixed pack identities are installed and selectable in development
 Do not mutate quantities during ordinary transfers or load. See the
 [stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
 
-The current proposal is ABI 378 / format 20 at
+The retained golden-tool/password checkpoint is ABI 378 / format 20 at
 `build/v3-password-only-imports-01/password-destinations/build-lock.json`, with 235 selectable development
-entries. All four golden tools are independently selectable. Shared held ordering
+entries; the current proposal is stated above. All four golden tools are
+independently selectable. Shared held ordering
 keeps its 64-entry capacity, complete code, physical mapping, and other categories.
 Nine current browser/offline profiles agree, including each tool alone and
 GameCube birthday presentation without imports. N64 birthday mail is the default.

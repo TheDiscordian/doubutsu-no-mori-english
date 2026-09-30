@@ -200,13 +200,14 @@ inventory exchange are connected. Full-index base weights retain native values
 and add exact donor points; all five additive matching pairs and complete donor
 theme/base-point categories are connected. Full-index player/NPC footstep and drag readers preserve original
 mappings and bind complete donor programs/instruments with bounded audio storage.
-HomePage password admission supplies two additional experimental selections.
-Harvest acquisition and ordinary persistence remain required; experimental
+HomePage password admission and the connected Harvest owner supply the four
+remaining experimental selections. Each Harvest surface requires cutlery.
+Ordinary acquisition and persistence remain required; experimental
 selection does not establish playable-import acceptance.
 
 The [shared password modules](V3_PASSWORDS.md) link the complete donor code
 transform, eligibility rules, Nook results, and selected destination mapping for
-215 implemented imports and 1,425 checked native correspondences. Bounded MIPS
+227 implemented imports and 1,425 checked native correspondences. Bounded MIPS
 code and sanitized donor comparisons are verified. The native engine passes 45
 assertions across twelve cases for selected destinations, real DMA/CRC/cache,
 RNG, preserved saved fields, guards, and cleanup. Four front counters have installed
@@ -482,10 +483,11 @@ including required outfits, house furnishings, and twenty-four equipment parents
 Mannequin and equipment catalogue representations are dependencies, not separate
 choices.
 Six selectable surfaces have genuine A/C/event acquisition; two more use their
-actual HomePage password path. All eight have independent format-4 saved-profile
-bits. Floor/wall catalogue counts and selected-only stock follow the same private
-selection records. The Harvest pair remains unavailable until its real delivery
-is installed. Ordinary acquisition and save/restart remain unverified.
+actual HomePage password path. The Harvest pair binds to the complete installed
+Franklin owner and actual cutlery dependency. All ten have independent format-4
+saved-profile bits. Floor/wall catalogue counts and selected-only stock follow
+the same private selection records. Source reward surfaces remain non-orderable.
+Ordinary acquisition and save/restart remain unverified.
 Ten ordinary legacy furniture imports use explicit source-to-destination
 registry records; their browser identities retain the GameCube IDs while native
 records and saved bits use additive N64 destinations. The shared pipeline

@@ -16,10 +16,12 @@ Base surface scoring, all five additive matching themes, and full-index footstep
 are installed. Shared A/C/event stock supports six additions with selected-only
 membership and selection. The private composer exposes those six surfaces as
 individual or all-selected options, with real catalogue counts and independent
-saved profiles. HomePage/Harvest acquisition remains required; complete shared
-theme and furniture birth-point categories are installed. The four associated records stay disabled; installed
-artwork alone does not make them selectable. Ordinary gameplay and persistence
-are not established by category installation.
+saved profiles. Shared source acquisition admission adds both HomePage surfaces
+through the installed password owner and both Harvest surfaces through the
+installed Franklin owner. All ten surfaces have independent experimental
+choices; each Harvest surface requires the actual cutlery choice. Complete shared
+theme and furniture birth-point categories are installed. Ordinary gameplay and
+persistence are not established by category installation.
 
 Use the current explicit experimental lock; keep the main lock and both stable
 website deployments unchanged:

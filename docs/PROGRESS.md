@@ -23,11 +23,11 @@ lock or publish experimental V3.
 
 ## Active development
 
-The current proposal is ABI 379 / format 20 at
-`build/v3-harvest-installed-08/build-lock.json`. Harvest's complete connected
-resources and native full-model reservations are installed, but twelve-choice
-admission remains unfinished. This is an internal development checkpoint, not
-the private gameplay handoff. Nook's four front counters
+The current proposal is ABI 382 / format 20 at
+`build/v3-harvest-category-imports-01/password-destinations/build-lock.json`.
+Harvest's complete connected resources, native full-model reservations, and
+twelve independent reward choices are installed. This is an internal development
+checkpoint, not the private gameplay handoff. Nook's four front counters
 have installed code-entry, official result dialogue, and native animated handover
 bindings. The complete keyboard, full donor-name font, original shop actions,
 and saved formats are retained. Shared admission adds sixteen password-only
@@ -63,10 +63,19 @@ retain complete retail caller/helper/reservation spans, both relocation tables,
 texture allocations, scene bounds, and allocation/transfer failure handling.
 Each owner uses 22,400 additional scene bytes; ordinary scene headroom and full
 rendering remain unverified. The two focused reservation/cartridge checks pass.
-Next admit the twelve reward choices, retaining the actual cutlery dependency,
-source reward lists, and non-orderability. No new choices or ordinary gameplay/save/hardware result
-is claimed. Format 20/wire 7 remain unchanged; that does not prove compatibility
-or physical save/restart. Both deployed patchers remain stable V2-14. The Harvest
+The ordinary category importer admits all ten furniture records and both
+surfaces from their complete source reward lists, reusing installed artwork.
+Every reward requires the actual knife-and-fork choice; selecting one reward
+does not select the other eleven. Four focused acquisition checks pass, including
+seven browser/offline profiles, exact V2-14 for empty selection, and the complete
+247-choice cartridge. Actual furniture ordering masks and all eleven surface
+stock lists exclude these rewards. The checked live password map covers 227
+imports and retains 1,425 native correspondences. All physical resources,
+Harvest's complete packet, and native manager/model reservations remain unchanged.
+Ordinary conversation, hiding/arrival, delivery, and save/restart remain pending;
+no native gameplay or hardware result is claimed. Format 20/wire 7 remain
+unchanged; that does not prove compatibility or physical save/restart.
+Both deployed patchers remain stable V2-14. The Harvest
 harness allowance and corrected setup retry remain spent. See
 [the exact next consumers](WORK_QUEUE.md#execution-order).
 

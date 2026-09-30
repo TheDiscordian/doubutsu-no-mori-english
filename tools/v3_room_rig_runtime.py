@@ -437,6 +437,8 @@ def bind_profiles(source,base,report):
     source.runtime_profiles={}
     from v3_password_acquisition import checked as checked_password_acquisition
     source.password_acquisition=checked_password_acquisition(source,base,report)
+    from v3_harvest_acquisition import checked as checked_harvest_acquisition
+    source.harvest_acquisition=checked_harvest_acquisition(source,base,report)
     source.creature_runtime_bindings=None
     if report.get('equipment_resources',{}).get('creature_items'):
         from v3_creature_items import checked as checked_creatures

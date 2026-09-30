@@ -48,6 +48,18 @@ this after changing shared code when no new resource category needs installation
 profile-only staging retains existing code unless it installs a newly implemented
 material lifecycle; that stage rebuilds the shared packet and callback bindings.
 
+### Connected source acquisition admission
+
+Complete installed source acquisition owners can admit their matching category
+through the ordinary importer without substitute stock. Harvest admission checks
+the complete Franklin packet, manager/calendar hooks, full native model
+reservations, official dialogue, object banks, and all three source reward lists.
+The category batch reuses all ten installed furniture profiles and both surface
+banks, admits independent choices with the actual cutlery dependency, and then
+refreshes the shared live password destinations. Shop stock and catalogue
+ordering remain disabled. Resource/composition checks establish experimental
+selection, not ordinary gameplay or save/restart acceptance.
+
 ### Built-in native profile staging
 
 The same dependency planner stages complete native drawing/contact profiles,
