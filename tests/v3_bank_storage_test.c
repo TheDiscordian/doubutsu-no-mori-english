@@ -9,6 +9,7 @@ u8 af_bank_storage[AF_BANK_BYTES];
 u32 af_bank_storage_guard[4];
 static int selected=TEST_BANK_MODE;
 int af_bank_native_selected(void) {return selected;}
+int af_v3_travel_prepare(void) {return 1;}
 /* Native event I/O is doubled here; the complete April fixture separately
  * exercises the actual eight-byte event-cache deletion. */
 static u32 april_cleared;

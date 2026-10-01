@@ -293,6 +293,15 @@ def publish_bootstrap(equipment,blob,surface,output):
             prefix='AF_DIARY_'+name.upper()
             extra+=tuple(f'{prefix}_{label}=0x{p[key]:X}u' for label,key in
                 (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
+    travel=equipment.get('player_travel')
+    if travel:
+        p=travel['state_packet']
+        if (not travel['installed'] or p['ram']!=0x8062C020 or p['bytes']!=14240 or
+                p['physical']&15 or p['storage']!='physical-ROM' or
+                not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
+            raise ValueError('Changed travelling-player startup reservation')
+        extra+=tuple(f'AF_TRAVEL_RECORD_{label}=0x{p[key]:X}u' for label,key in
+            (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
     diary_items=equipment.get('diary_items')
     if diary_items:
         p=diary_items['packet']
@@ -523,12 +532,15 @@ def publish_bootstrap(equipment,blob,surface,output):
             raise ValueError('Changed complete Harvest startup packet')
         extra+=tuple(f'AF_HARVEST_{label}=0x{p[key]:X}u' for label,key in
             (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
+    startup_bindings={'af_surface_npc_init':npc_extra['code']['symbols']['af_v3_npc_dma_init']} if npc_extra else {}
+    if travel:
+        symbols=travel['compiled']['symbols']
+        startup_bindings.update({name:symbols[name] for name in ('af_travel_harvest_crc','af_travel_record_crc')})
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
         f'AF_ROOM_GOODS_VROM=0x{packet["vrom"]:X}u',f'AF_ROOM_GOODS_CRC=0x{packet["crc32"]:X}u',
-        f'AF_ROOM_GOODS_BYTES=0x{packet["bytes"]:X}u',*extra),link_symbols=(
-            {'af_surface_npc_init':npc_extra['code']['symbols']['af_v3_npc_dma_init']} if npc_extra else None))
+        f'AF_ROOM_GOODS_BYTES=0x{packet["bytes"]:X}u',*extra),link_symbols=startup_bindings or None)
     if len(boot)>BOOT_END-BOOT:raise ValueError('Combined surface/goods startup exceeds its reservation')
     compiled['packet_stride']=16
     compiled['packet_count']=2+sum(name.endswith('_BYTES') for name in

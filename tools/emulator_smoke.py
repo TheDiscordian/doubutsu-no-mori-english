@@ -1155,6 +1155,15 @@ def main():
                 request = action['test_native_flash_mail_save' if writing else 'test_native_flash_mail_read']
                 results.append(exercise(debug,request,record,
                     export_directory=out/'exported-save' if writing else None))
+            if 'test_v3_player_travel' in action:
+                from v3_player_travel_native import exercise
+                if (not args.expansion_pak or not (out/'test.bs1').is_file() or
+                        not args.allow_test_pak_write):
+                    raise ValueError('Installed travel check requires eight MiB, a checkpoint, and isolated Pak-write opt-in')
+                request=action['test_v3_player_travel']
+                if request['rom_sha256']!=rom_hash:raise ValueError('Player travel request does not match this ROM')
+                needs_checkpoint_restore=True
+                results.append(exercise(debug,request,record,out/'player-travel'))
             if 'test_native_pak_mail_save' in action or 'test_native_pak_mail_read' in action:
                 from pak_mail_smoke import exercise
                 writing = 'test_native_pak_mail_save' in action

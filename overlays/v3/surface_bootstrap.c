@@ -7,7 +7,7 @@ extern int af_surface_dma(void *,u32,u32);
 extern u32 af_surface_crc(const void *,u32);
 extern void af_surface_writeback(void *,u32),af_surface_invalidate(void *,u32);
 extern int af_surface_prior_init(void);
-#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL) || defined(AF_TREE_EFFECTS_PHYSICAL) || defined(AF_CARRIED_QUEST_PHYSICAL) || defined(AF_HARVEST_PHYSICAL) || defined(AF_CONSOLE_STORAGE_PHYSICAL)
+#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL) || defined(AF_TREE_EFFECTS_PHYSICAL) || defined(AF_CARRIED_QUEST_PHYSICAL) || defined(AF_HARVEST_PHYSICAL) || defined(AF_CONSOLE_STORAGE_PHYSICAL) || defined(AF_TRAVEL_RECORD_PHYSICAL)
 extern int af_surface_pi(u32,void *,u32);
 #endif
 
@@ -74,7 +74,16 @@ static const u32 tree_effects_crc=AF_TREE_EFFECTS_CRC;
 static const u32 carried_quest_crc=AF_CARRIED_QUEST_CRC;
 #endif
 #ifdef AF_HARVEST_PHYSICAL
+#ifdef AF_TRAVEL_RECORD_PHYSICAL
+extern const u32 af_travel_harvest_crc;
+#define harvest_crc af_travel_harvest_crc
+#else
 static const u32 harvest_crc=AF_HARVEST_CRC;
+#endif
+#endif
+#ifdef AF_TRAVEL_RECORD_PHYSICAL
+extern const u32 af_travel_record_crc;
+#define travel_record_crc af_travel_record_crc
 #endif
 
 #ifdef __mips__
@@ -96,6 +105,7 @@ extern unsigned char af_test_holiday_festivals[];
 extern unsigned char af_test_tree_effects[];
 extern unsigned char af_test_carried_quest[];
 extern unsigned char af_test_harvest[];
+extern unsigned char af_test_travel_record[];
 #define DEST(name,address) (af_test_##name)
 #define CLEAR(name,address) (&af_test_##name)
 #endif
@@ -183,11 +193,14 @@ static const struct StartupPacket packets[]={
 #ifdef AF_HARVEST_PHYSICAL
     {DEST(harvest,AF_HARVEST_RAM),AF_HARVEST_PHYSICAL|0x80000000u,AF_HARVEST_BYTES,&harvest_crc},
 #endif
+#ifdef AF_TRAVEL_RECORD_PHYSICAL
+    {DEST(travel_record,AF_TRAVEL_RECORD_RAM),AF_TRAVEL_RECORD_PHYSICAL|0x80000000u,AF_TRAVEL_RECORD_BYTES,&travel_record_crc},
+#endif
 };
 
 int af_v3_surface_init(void) {
     for (const struct StartupPacket *p=packets;p<packets+sizeof(packets)/sizeof(*packets);p++) {
-#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL) || defined(AF_TREE_EFFECTS_PHYSICAL) || defined(AF_CARRIED_QUEST_PHYSICAL) || defined(AF_HARVEST_PHYSICAL) || defined(AF_CONSOLE_STORAGE_PHYSICAL)
+#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL) || defined(AF_TREE_EFFECTS_PHYSICAL) || defined(AF_CARRIED_QUEST_PHYSICAL) || defined(AF_HARVEST_PHYSICAL) || defined(AF_CONSOLE_STORAGE_PHYSICAL) || defined(AF_TRAVEL_RECORD_PHYSICAL)
         int status=(p->source&0x80000000u)?
             af_surface_pi(physical_address(p->source),p->destination,p->bytes):
             af_surface_dma(p->destination,p->source,p->bytes);

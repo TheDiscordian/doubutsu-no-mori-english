@@ -25,8 +25,9 @@ lock or publish experimental V3.
 
 ## V3 development build: unfinished import integration
 
-V3 is not complete. Imported collection handlers can halt for visiting players;
-the existing passport adapter does not carry all added ownership records.
+V3 is not complete. Imported collection handlers still have resident-only
+restrictions. The installed development transport carries full added player
+records, but the remaining item/paper consumers are not connected to it.
 Imported diary opening and additional console play also reject visitors. The
 house/manor models have installed art/room behaviour but no connected HRA
 acquisition, scoring, or catalogue policy. Four added villager instruments retain
@@ -37,34 +38,38 @@ owns implementation and verification of these connected paths, plus any further
 in-scope omissions found while checking the remaining consumers. Passing narrow
 checks and resident-only behaviour do not establish completion.
 
-### Prepared player-record transport
+### Installed player-record transport
 
-The shared `pak_codec` and `travel_player` core implements lossless, page-aligned
-note framing and one complete identity-bound player's added records. It preserves
-full diary pages and console progress rather than shortening them to fit. Capacity
-failure leaves output untouched. Return merges ownership and restores editable
-progress only to the matched resident; other residents and shared town fields
-remain unchanged. Four focused transport checks pass, including address/undefined-behaviour
-sanitizers, independent wire decoding, corrupted/malformed note rejection, all four
-resident identities, acquisition in each ownership family, and a complete player
-record through note encoding/decoding and return. N64 compilation passes with
-only the four expected existing validation dependencies; the framing core has no
-unresolved library calls. Shared native read/write/status replacement code handles
-both note kinds with actual physical-size checks and commit-last generation slots.
-Device doubles check capacity/directory errors, interrupted writes and retries,
-original-note retention, and refusal to publish damaged or unsupported records.
-The save runtime has a checked scratch/hash loan; the current full-storage fixture
-checks re-entry rejection, guard checks, and the actual Pak workspace bridge.
-The preparation receipt, including all five N64-compiled components, is
-`build/v3-player-travel-prepared-06/prepared.json`.
+The checked cartridge is `build/v3-player-travel-installed-07/build-lock.json`,
+ABI 392, with full selection in `build/v3-player-travel-profile-03`.
+Native Pak read/write/status and departure/arrival/private-copy entries carry one
+complete identity-bound player's added records. Full diary pages, console progress,
+category ownership, and player rewards are retained; other residents and shared
+town fields remain separate. Status/nonce reads do not rewind live visitor records.
+Native passport/backup/private/animal sizes and town saved format 21 are unchanged.
+The new guarded visitor reservation is checked against the actual model pool and
+startup packets; code uses authenticated unused padding, preserving existing BSS,
+UI state, guards, and the startup loader's size limit.
 
-This is prepared code, not an installed cartridge or completed village visit.
-The new I/O code and workspace entries are not installed. Record lifecycle
-providers, a checked visitor reservation, all native hooks, live visitor
-collection, diary UI, and console sessions still require integration and
-current-game verification. Status/nonce reads must remain read-only for live
-visitor progress. The checked cartridge and running preview are unchanged.
-Resume the lifecycle/provider and installation consumer in the active queue.
+Five transport checks, current full-storage workspace checks, and four installed
+cartridge/patch checks pass. The silent
+`build/v3-player-travel-native-04/results.json` fixture executes installed native
+departure, arrival, return, and status with actual emulated Pak reads/writes and
+controlled resident identities. Imported acquisition and changed diary/console
+records survive return; other residents and guards remain intact. This is focused
+native execution, not a walked station visit, diary UI interaction, NES gameplay,
+physical Pak testing, or ordinary Save & Quit/restart.
+Converted legacy notes preserve unknown editable-record provenance, retaining
+home diary, console, card, and account data which the old note never carried.
+The connected host fixture covers conversion, departure, and return.
+
+The next connected consumers are the resident-only item/paper record and query
+handlers, visitor diary UI, and visitor console sessions. Creature acquisition
+already reaches the complete visitor record through both retained exports. Both
+native note kinds together and the actual station path still require connected
+verification. HRA model rewards, four instruments, current full-selection save/
+restart, and website repairs remain part of the same unfinished V3 task. The local
+preview and deployed public V2 patcher remain unchanged.
 
 V3 is only the import pipeline for items and villagers. Regular items should be
 importable and obtainable through the regular item pool. Rewards that fit existing

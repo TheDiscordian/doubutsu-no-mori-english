@@ -71,9 +71,23 @@ static struct View wire_view(const u8 *p) {
 }
 int af_v3_player_records_valid(const u8 *p,u32 bytes,const AFTravelSelection *current) {
     if(!p || bytes!=AF_TP_BYTES || !current)return AF_SAVE_ARGUMENT;
-    if(word(p)!=0x41465031u || word(p+4)!=1 || word(p+8)!=AF_TP_BYTES || word(p+12))return AF_SAVE_FORMAT;
+    if(word(p)!=0x41465031u || word(p+4)!=1 || word(p+8)!=AF_TP_BYTES ||
+       (word(p+12)&~AF_TP_UNKNOWN_EDITABLE))return AF_SAVE_FORMAT;
     for(u32 i=AF_TP_ACCOUNT+8;i<AF_TP_CONSOLE;i++)if(p[i])return AF_SAVE_FORMAT;
     struct View v=wire_view(p);return records_valid(&v,current->bytes);
+}
+int af_v3_player_blank(u8 *p,u32 bytes,const u8 identity[16],const AFTravelSelection *s) {
+    if(!p || bytes!=AF_TP_BYTES || !identity || !s || !selection_valid(s->bytes) ||
+       !separate(p,bytes,identity,16) || !separate(p,bytes,s,sizeof(*s)))return AF_SAVE_ARGUMENT;
+    for(u32 i=0;i<bytes;i++)p[i]=0;
+    put(p,0x41465031u);put(p+4,1);put(p+8,bytes);copy(p+16,identity,16);
+    for(u32 i=AF_TP_DIARY+AF_DIARY_CALENDAR;i<AF_TP_BYTES;i++)p[i]=32;
+    copy(p+AF_TP_HEADER,s->bytes,AF_TP_PROFILE);return AF_SAVE_OK;
+}
+int af_v3_player_rebind(u8 *p,u32 bytes,const AFTravelSelection *s) {
+    if(!s || !p || !separate(p,bytes,s,sizeof(*s)))return AF_SAVE_ARGUMENT;
+    int result=af_v3_player_records_valid(p,bytes,s);if(result<0)return result;
+    copy(p+AF_TP_HEADER,s->bytes,AF_TP_PROFILE);return AF_SAVE_OK;
 }
 static int town_valid(const AFTravelTown *t,const AFTravelSelection *s) {
     if(!t || !s || !t->players || !t->working || !t->console || !t->cards || !t->diary)return 0;
@@ -142,6 +156,10 @@ int af_v3_player_restore(AFTravelTown *t,u32 slot,const u8 *p,u32 bytes,const AF
     for(u32 i=0;i<4;i++)creature[i]|=v.creatures[i];
     for(u32 i=0;i<12;i++)reward[i]|=v.rewards[i];
     t->cards[9+slot]|=v.paper;
+    /* A converted catch-only passport can carry newly acquired ownership,
+     * but has no source value for these editable records. Preserve the home
+     * data rather than promoting an unknown empty row to a complete snapshot. */
+    if(word(p+12)&AF_TP_UNKNOWN_EDITABLE)return AF_SAVE_OK;
     u8 first=t->cards[21+slot*8]&128u;
     copy(t->cards+16+slot*8,v.card,8);t->cards[21+slot*8]|=first;
     if(t->accounts)copy(t->accounts+16+slot*8,v.account,8);

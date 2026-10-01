@@ -88,7 +88,7 @@ def prepare(lock,output):
         installed=False,new_entries=['af_v3_save_workspace_acquire','af_v3_save_workspace_release'])
     pending={'af_pi_record_export','af_pi_record_validate','af_pi_record_publish',
         'af_pi_legacy_validate','af_pi_legacy_publish','af_v3_save_workspace_acquire',
-        'af_v3_save_workspace_release'}
+        'af_v3_save_workspace_release','af_v3_console_storage_valid','af_v3_travel_prepare'}
     expected={'pak_codec':set(),'travel_player':{
         'af_bank_valid','af_diary_days','af_diary_valid','af_holiday_cards_valid'},
         'pak_native':set(native_providers)|{name for name in pending if name.startswith('af_pi_')}|
@@ -119,7 +119,7 @@ def prepare(lock,output):
         installed=False,native_execution_tested=False,ordinary_visiting_tested=False,
         pak_io=dict(shared_read_write_status_implemented=True,journal_commit_last=True,
             original_notes_retained=True,device_failures_tested_with_doubles=True,
-            scratch_bytes=105728,shared_save_workspace_loan_implemented=True,
+            scratch_bytes=119932,shared_save_workspace_loan_implemented=True,
             native_hooks=entries,native_hooks_installed=False,player_lifecycle_provider_installed=False),
         next_consumer='Connect record export/admission/publication and checked visitor reservation; rebuild and bind the loan-enabled storage and all three native Pak entries, then visitor item/diary/console consumers. Keep restrictions until connected.')
     write_new(output/'prepared.json',(json.dumps(receipt,indent=2,sort_keys=True)+'\n').encode())

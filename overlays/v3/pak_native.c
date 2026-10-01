@@ -32,7 +32,7 @@ static int external(const AFPIWorkspace *w,const void *p,u32 n) {
         separate(p,n,w->hash,AF_PAK_HASH_BYTES) && separate(p,n,w->binding,32);
 }
 static int workspace_valid(const AFPIWorkspace *w) {
-    return w->notes[0] && w->notes[1] && w->raw && w->hash && w->binding &&
+    return w->notes[0] && w->notes[1] && w->raw && w->staging && w->hash && w->binding &&
         !((address)w->hash&3) &&
         separate(w->notes[0],AF_PI_NOTE,w->notes[1],AF_PI_NOTE) &&
         separate(w->notes[0],AF_PI_NOTE,w->raw,AF_PI_RAW) &&
@@ -44,6 +44,7 @@ static int workspace_valid(const AFPIWorkspace *w) {
         separate(w->binding,32,w->notes[1],AF_PI_NOTE) &&
         separate(w->binding,32,w->raw,AF_PI_RAW) &&
         separate(w->binding,32,w->hash,AF_PAK_HASH_BYTES) &&
+        external(w,w->staging,AF_PI_STAGING) &&
         external(w,w,sizeof(*w));
 }
 static u32 header_crc(const u8 *p) {
@@ -153,7 +154,8 @@ static int write_locked(u8 *info,const u8 *native,unsigned kind,const AFPIWorksp
     int selected=scan(info,original,kind,w,slots);
     if(selected==-2 || (selected>=0 && !decode(kind,(unsigned)selected,w,slots+selected,&previous)))goto done;
     zero((u8 *)&input,sizeof(input));
-    if(af_pi_record_export(kind,native,&input)!=1 || input.kind!=kind ||
+    if(af_pi_record_export(kind,native,selected>=0?&previous:0,
+       w->staging,AF_PI_STAGING,&input)!=1 || input.kind!=kind ||
        input.native!=native || input.native_bytes!=native_bytes(kind) ||
        !equal(input.binding,w->binding,32) ||
        (input.record_bytes && !external(w,input.records,input.record_bytes)))goto done;

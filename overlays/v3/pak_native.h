@@ -9,10 +9,11 @@
 enum {
     AF_PI_PAGE=256, AF_PI_NOTE=AF_PAK_MAX_NOTE,
     AF_PI_RAW=AF_PAK_BACKUP_NOTE+AF_PAK_MAX_RECORDS,
-    AF_PI_SCRATCH=2*AF_PI_NOTE+AF_PI_RAW
+    AF_PI_STAGING=14204,
+    AF_PI_SCRATCH=2*AF_PI_NOTE+AF_PI_RAW+AF_PI_STAGING
 };
 typedef struct {
-    af_pak_u8 *notes[2],*raw;
+    af_pak_u8 *notes[2],*raw,*staging;
     af_pak_u32 *hash;
     const af_pak_u8 *binding;
 } AFPIWorkspace;
@@ -22,7 +23,9 @@ int af_v3_pak_native_status(int *status,int kind,void *info,void *backup);
 
 /* Integration providers. Acquire owns the existing save scratch/hash until
  * release; it checks guards and save state before setting their shared busy
- * flag. Records remain outside the borrowed buffers. Validate is read-only;
+ * flag. Export stages records beyond the bounded decode region, allowing a
+ * nonce rewrite to preserve the prior note without replacing live progress.
+ * Validate is read-only;
  * publish cannot fail and copies an already validated record before release.
  * Publication is enabled only by the arrival/return lifecycle wrapper; ordinary
  * status, identity, and nonce reads must not replace a visitor's newer progress
@@ -31,7 +34,8 @@ int af_v3_pak_native_status(int *status,int kind,void *info,void *backup);
  * the loan, not data getters which require the save workspace to be idle. */
 int af_pi_workspace_acquire(AFPIWorkspace *);
 int af_pi_workspace_release(void);
-int af_pi_record_export(unsigned kind,const af_pak_u8 *native,AFPakInput *);
+int af_pi_record_export(unsigned kind,const af_pak_u8 *native,const AFPakView *previous,
+    af_pak_u8 *staging,af_pak_u32 staging_bytes,AFPakInput *);
 int af_pi_record_validate(const AFPakView *);
 int af_pi_legacy_validate(unsigned kind,const af_pak_u8 *native);
 void af_pi_record_publish(const AFPakView *);

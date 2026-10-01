@@ -30,8 +30,15 @@ typedef struct {
 /* No live native copies or device I/O. Export and restore are transactional:
  * argument/profile/record failures leave output and town unchanged. Restore
  * requires the record's full identity to match the destination resident. */
+/* Older native/catch-only notes do not contain editable added records. This
+ * provenance bit survives conversion, preventing unknown blanks from replacing
+ * a home resident's diary, console, holiday-card, or retained account data. */
+enum { AF_TP_UNKNOWN_EDITABLE=1 };
 int af_v3_player_records_valid(const af_save_u8 *,af_save_u32,
     const AFTravelSelection *current);
+int af_v3_player_blank(af_save_u8 *,af_save_u32,const af_save_u8 identity[16],
+    const AFTravelSelection *);
+int af_v3_player_rebind(af_save_u8 *,af_save_u32,const AFTravelSelection *);
 int af_v3_player_export(af_save_u8 *,af_save_u32,const AFTravelTown *,
     af_save_u32 slot,const AFTravelSelection *);
 int af_v3_player_restore(AFTravelTown *,af_save_u32 slot,const af_save_u8 *,

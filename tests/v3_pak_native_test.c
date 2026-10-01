@@ -36,13 +36,20 @@ static void reset(unsigned kind) {
 }
 int af_pi_workspace_acquire(AFPIWorkspace *w) {
     if(acquire_fail || busy)return 0;
+#ifdef AF_TEST_REAL_TRAVEL
+    if(!af_v3_travel_prepare())return 0;
+#endif
     busy=1;w->notes[0]=scratch;w->notes[1]=scratch+AF_PI_NOTE;
-    w->raw=scratch+2*AF_PI_NOTE;w->hash=hash;w->binding=bound;return 1;
+    w->raw=scratch+2*AF_PI_NOTE;w->staging=w->raw+AF_PI_RAW;
+    w->hash=hash;w->binding=bound;return 1;
 }
 int af_pi_workspace_release(void) {assert(busy && !locked);busy=0;return !release_fail;}
-int af_pi_record_export(unsigned kind,const u8 *source,AFPakInput *p) {
+#ifndef AF_TEST_REAL_TRAVEL
+int af_pi_record_export(unsigned kind,const u8 *source,const AFPakView *prior,
+    u8 *staging,u32 capacity,AFPakInput *p) {
+    (void)prior;assert(capacity>=sizeof(records));memcpy(staging,records,sizeof(records));
     p->kind=kind;p->native=source;p->native_bytes=kind?AF_PAK_BACKUP_NOTE:AF_PAK_PRIVATE_NOTE;
-    p->records=records;p->record_bytes=sizeof(records);
+    p->records=staging;p->record_bytes=sizeof(records);
     memcpy(p->binding,bound,32);memcpy(p->identity,kind?records:source+8,16);return 1;
 }
 int af_pi_record_validate(const AFPakView *p) {
@@ -53,6 +60,7 @@ int af_pi_record_validate(const AFPakView *p) {
 int af_pi_legacy_validate(unsigned kind,const u8 *source) {(void)kind;(void)source;return !invalid_legacy;}
 void af_pi_record_publish(const AFPakView *p) {memcpy(published,p->records,sizeof(published));publish_count++;}
 void af_pi_legacy_publish(unsigned kind,const u8 *p) {(void)kind;(void)p;memset(published,0,sizeof(published));publish_count++;}
+#endif
 void *af_pi_lock(void) {assert(!locked && busy);locked=1;return info;}
 void af_pi_unlock(void *q) {assert(locked && q==info);locked=0;}
 int af_pi_open(void *opaque) {

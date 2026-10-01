@@ -30,73 +30,60 @@ complete the import pipeline. Keep this as one connected implementation task:
    on the experimental branch, refresh the local preview, and hand over the
    usable build with accurate compatibility and verification limits.
 
-The checked starting build is `build/v3-nook-font-repaired-02/build-lock.json`,
-ABI 391. Preserve the incomplete changes in `experimental/imports/index.html`;
+The checked transport build is `build/v3-player-travel-installed-07/build-lock.json`,
+ABI 392, with its full selection in `build/v3-player-travel-profile-03`.
+Preserve the incomplete changes in `experimental/imports/index.html`;
 do not serve them before the accompanying interface repairs pass. No incomplete
 visitor behaviour or unresolved possible game defect is waived by a private
 playtest label. Broad human gameplay and original-hardware testing remain
 separate from focused developer verification. The deployed public V2 patcher
 stays unchanged; new systems and e/e+ imports are outside this task.
 
-The shared storage/record core is prepared in `overlays/v3/pak_codec.c` and
-`overlays/v3/travel_player.c`, with the repeatable preparation command
-`python3 tools/v3_player_travel.py --output <new ignored build directory>`.
-`build/v3-player-travel-prepared-06/prepared.json` pins the current sources,
-base cartridge, four passing focused transport checks, current full-storage
-workspace checks, and N64 compiler results.
-Its 14,204-byte identity-bound record carries the full 12,008-byte diary, all
-1,632 console bytes, selection requirements, category ownership, reward flags,
-and retained player progress. Four-player export/acquisition/return tests verify
-that the other residents, native private bytes, shared holiday header, seasonal
-state, hunt state, and town-first reward flags remain unchanged. This core is
-not installed or native-execution-tested; the live preview retains the visitor
-restrictions. Do not confuse prepared serialization with finished visiting.
+The complete 14,204-byte travelling-player record and shared native Pak
+read/write/status replacements are installed through
+`tools/v3_player_travel_install.py`. The native passport remains `1200` bytes;
+the backup remains `6700`, and private/animal layouts remain `BD0`/`528`.
+Framing is separate and bounded, with actual allocation-size reads, capacity
+checks, two generation slots, and commit-last readback. Original/unrelated notes
+are retained. The adapter borrows 119,932 bytes and the existing hash under the
+shared save busy flag, including separate export staging. Checked references are
+resolved before the loan; record publication occurs only on explicit arrival.
+Status, identity, and nonce reads do not rewind live visitor progress.
 
-The shared read/write/status replacements are implemented in
-`overlays/v3/pak_native.c`, with the borrowed save-workspace bridge in
-`overlays/v3/pak_workspace.c`. Both physical note kinds use bounded lossless
-frames, actual allocation-size reads, free-space/directory checks, and two
-generation slots. Payload is written and read back before the commit header;
-the complete committed note is read back before success. Only an older owned
-slot or this attempt's uncommitted allocation is reclaimed. Original native and
-unrelated notes are retained. Device doubles check interrupted writes, initial
-write retry, capacity/directory errors, malformed/unsupported records, original
-note retention, status callers, and both kinds on one ordinary-sized Pak. This
-does not establish real controller/Pak execution or install the hooks.
-`console_storage` now exposes a guard-checked synchronous scratch/hash loan;
-save re-entry is rejected while held, and release checks the guards. The current
-full-storage fixture checks both existing profile modes and the actual bridge.
+The visitor reservation is `8062C020..8062F7C0`, checked against the actual model
+pool, startup descriptors, and mutable reservations. Code occupies authenticated
+unused diary/Harvest padding, not existing BSS or UI state. One startup descriptor
+loads the guarded visitor record. Two immutable checksum words live in the loaded
+I/O fragment, preserving the startup loader's `804A8FF0` guard boundary. Source
+checks cover the original code, BSS, state, guards, saved formats, native note-size
+table, physical resources, and patch reconstruction.
 
-The next implementation consumer is the player-record lifecycle/provider and
-checked cartridge installation, before changing collection restrictions.
-`upstream/af/src/code/m_cpak.c` owns more than the
-save/load entries already wrapped by `creature_travel.c`: note-status, player
-identity, nonce/writeback, and clearing paths also read/write the original
-passport. Its `1200`-byte buffer is immediately followed by the serial queue and
-other control fields. Do not grow the note-size constant while those callers
-still use that buffer. Bind all passport callers to a separately bounded extended
-buffer, preserve native `BD0` private/`528` animal layouts and the nonce protocol,
-and validate the imported record before copying or committing it. Transport
-the player's records rather than copying the host town's shared event state.
-An individual diary record is 12,008 bytes and console progress is 1,632 bytes;
-the existing 48-byte creature capsule cannot carry these. Preserve old notes and
-test device/capacity failures before enabling the extended route.
-The native backup note also consumes `6700` bytes on the same Pak in relevant
-travel flows. Integrate the lossless codec with both note kinds and actual free
-space checks, rather than assuming an expanded uncompressed passport fits beside
-that backup. The adapter borrows 105,728 scratch bytes and the existing hash under
-the shared busy flag. Rebuild/bind the loan-enabled storage as part of the same
-installation; no current cartridge contains the new entry points. Record
-providers must use references checked before the loan, not the existing getters
-which require idle save storage. Publish records only on explicit arrival/return;
-ordinary status, identity, and nonce reads must not replace the live visitor's
-new acquisitions with an older departure snapshot. Handle empty-note clearing
-and legacy creature capsules explicitly. The visitor record needs a checked
-separate reservation; do not treat gaps from the incomplete generic reservation
-scan as free RAM without checking startup/model-pool ownership. All existing
-passport status, identity, nonce, clear, and save/load callers need bounded
-framing/native views. Then connect the current visitor collection/reward/paper,
-diary, and console consumers, preserving resident behaviour and exact identities.
+Five transport checks and current full-storage workspace checks pass, including
+four identities, editable record preservation, failed departure, legacy return,
+and status/nonce isolation. Four installed-cartridge checks pass. The silent
+`build/v3-player-travel-native-04/results.json` check executes the installed native
+departure/arrival/copy entries with actual emulated Pak I/O, controlled resident
+identities, selected furniture/creature/paper acquisition, and diary/console record
+mutations. It checks return, other-resident preservation, storage guards, and
+checkpoint restoration. Diary UI, NES play, a walked station visit, physical Pak
+hardware, and ordinary Save & Quit/restart are not established by this fixture.
+The full selected profile has 20 villagers and 275 requested items, with the two
+existing outfit dependencies. The local preview remains unchanged.
+Converted legacy notes retain explicit unknown-editable-record provenance;
+ownership can return without overwriting diary, console, card, or account data
+which the legacy note never contained. The connected host fixture covers that
+conversion/departure/rearrival case, not only direct legacy readback.
+
+The next consumer is the current visitor collection/reward/paper handling in
+`collection.c`, `surface_save.c`, `held_collection.c`, `carried_collection.c`, and
+`diary_items.c`. Connect their shared record/query entries to the new visitor
+record, preserving selected canonical identities and resident behaviour. Creature
+acquisition already reaches the complete record through both retained exports.
+Then connect visitor diary UI and console sessions to the visitor's actual rows,
+not a fabricated fifth resident or another resident's storage. Verify both native
+note kinds together and the actual station path as part of the connected visiting
+batch. Continue HRA rewards, instruments, current save/restart, and website repairs
+under this same active task; the installed transport alone is not V3 completion.
 
 ### Completed preview repairs and verified behaviour
 
