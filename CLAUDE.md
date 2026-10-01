@@ -37,16 +37,16 @@ website preview; running it as a service gives it no special status. Use "the
 deployed patcher" for the public website and "the local preview" for localhost.
 Never describe these as two patchers or two deployments.
 Use `v3/optional-imports` for experimental implementation, preserving the stable
-V2 cartridge, deployed patcher, and local preview. Imports need complete gameplay and
+V2 cartridge and deployed patcher. Imports need complete gameplay and
 persistence support; an extracted name or disabled web option is not completion.
 Do not repurpose existing villagers/items or assign IDs by checkbox order.
 V3 development source may be pushed to GitHub on `v3/optional-imports`.
-Do not switch the deployed patcher or local preview to V3 until the user has
-tested the build and explicitly approved the switch. GitHub source publication
-does not authorise updating the public or local copy's recipe, assets, or service.
-Developer verification and a private playtest handoff do not satisfy that approval.
-Keep the deployed patcher and local preview on the latest verified stable V2 corrections;
-the experimental V3 publication hold does not apply to V2 fixes.
+The local preview serves V3 for the user's import-selector review and playtesting.
+Keep the deployed patcher on the latest verified stable V2 corrections until the
+user has tested V3 and explicitly approved public publication. GitHub source
+publication, developer verification, a private playtest handoff, and serving the
+local preview do not authorise updating the public recipe or assets. The V3
+public publication hold does not apply to V2 fixes. Preserve the stable V2 exports.
 
 ## Workflow
 

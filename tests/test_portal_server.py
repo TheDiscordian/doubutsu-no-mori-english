@@ -11,7 +11,54 @@ from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
-from serve_portal import StaticPortal
+from serve_portal import StaticPortal, validate_export
+
+
+class ExportValidationTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix='af-export-validation-')
+        self.addCleanup(self.temporary.cleanup)
+        self.site = Path(self.temporary.name)
+        (self.site/'index.html').write_text('<!doctype html><title>test</title>')
+
+    def manifest(self, path, contents):
+        target = self.site/path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(contents)
+
+    def test_stable_export(self):
+        self.manifest('release/manifest.json', '{}')
+        validate_export(self.site)
+
+    def test_v3_export(self):
+        self.manifest('data/manifest.json', '{"format":"AFV3-BROWSER-BUNDLE-1"}')
+        validate_export(self.site)
+
+    def test_missing_or_unrecognised_manifest(self):
+        with self.assertRaises(ValueError):
+            validate_export(self.site)
+        for contents in ('{}', '[]', '{"format":"unknown"}', '{'):
+            self.manifest('data/manifest.json', contents)
+            with self.assertRaises(ValueError):
+                validate_export(self.site)
+
+    def test_missing_index(self):
+        self.manifest('data/manifest.json', '{"format":"AFV3-BROWSER-BUNDLE-1"}')
+        (self.site/'index.html').unlink()
+        with self.assertRaises(ValueError):
+            validate_export(self.site)
+
+    def test_private_inputs_and_symlinks_rejected(self):
+        self.manifest('data/manifest.json', '{"format":"AFV3-BROWSER-BUNDLE-1"}')
+        for suffix in ('.z64', '.n64', '.v64', '.iso', '.gcm', '.ciso', '.fla', '.sra'):
+            target = self.site/('private'+suffix)
+            target.write_bytes(b'test')
+            with self.assertRaises(ValueError):
+                validate_export(self.site)
+            target.unlink()
+        (self.site/'link').symlink_to(self.site/'index.html')
+        with self.assertRaises(ValueError):
+            validate_export(self.site)
 
 
 class PortalServerTests(unittest.TestCase):

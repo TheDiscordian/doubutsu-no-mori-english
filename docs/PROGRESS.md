@@ -4,9 +4,10 @@
 
 V2-14 at `build/v2-dresser-14/Animal Forest English V2.z64` fixes B-button
 cancellation at dressers and retains the official `Animal Crossing` credits
-title and English `Museum` letter headers. The deployed patcher and local preview
-target this build. The
-publication hold applies only to experimental V3, not stable V2 fixes.
+title and English `Museum` letter headers. The deployed patcher targets this
+build. The local preview serves the V3 import selector at
+[http://127.0.0.1:8073/](http://127.0.0.1:8073/). The public publication hold
+applies only to experimental V3, not stable V2 fixes.
 
 Three dresser checks, eight cartridge/packaging checks, and 29 silent native
 assertions pass. A current Chromium download using the real CISO and N64 inputs
@@ -178,7 +179,8 @@ Fifteen focused JavaScript checks pass with Node's
 Web Crypto flag and fails before crypto-dependent assertions; the corrected
 invocation passes all twelve checks without changes to game code. -->
 Empty selection returns exact V2-14. No game files are uploaded; the temporary
-check servers are stopped. The export is unserved.
+check servers are stopped. The export is served only by the local preview;
+it is not publicly published.
 
 The all-available offline profile is
 `build/v3-import-pipeline-profile-17/profile.json`; UPS reconstruction passes.
@@ -369,9 +371,17 @@ handoff states the eight-MiB Expansion Pak and FlashRAM requirements, format-21
 incompatibility with V2/older V3 readers, exact profile requirements, and the
 controlled recompiler limitation. Broad human gameplay, original hardware,
 ordinary acquisition of every reward, and human acceptance are not claimed.
-The deployed patcher and local preview remain unchanged. New buildings and
+The deployed patcher remains unchanged; the local preview serves
+`build/v3-import-pipeline-browser-16/site` for the user's V3 review. New buildings and
 entirely new features remain outside V3; subsequent work follows reported
 playtest bugs or a separately requested importing expansion.
+
+The live loopback preview check at `build/v3-local-preview-check-01/results.json`
+loads all 295 selectable entries, filters to 20 villagers, and downloads the
+all-available ROM and profile using the supplied original games. The ROM matches
+profile 17 exactly; no page errors, uploads, or off-origin requests occur.
+All twelve export-file hashes and eight static-server tests pass. No cartridge
+code, import resources, public assets, or public deployment changes are involved.
 
 ## Preserved experimental artifact and subsystem evidence
 

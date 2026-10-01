@@ -113,7 +113,8 @@ Current real-file browser worker and retained interface checks pass:
 `build/v3-import-pipeline-browser-16/build.json`,
 `build/v3-import-pipeline-worker-14/results.json`, and
 `build/v3-import-pipeline-interface-13/results.json`. Browser hashes match offline
-builds; empty selection returns V2-14. The private export is unserved.
+builds; empty selection returns V2-14. The private export is served by the
+local preview at [http://127.0.0.1:8073/](http://127.0.0.1:8073/), not publicly.
 Retained focused current-cartridge scope/browser-equivalence checks pass,
 including both seasonal modes
 with each item selected alone,
@@ -228,9 +229,10 @@ This does not repeat ordinary Save & Quit on the larger profile.
 The private handoff is `build/v3-import-pipeline-profile-17/handoff.json`, with
 exact ROM/UPS/profile/report hashes, an eight-MiB Expansion Pak requirement,
 FlashRAM/save-format warnings, current native evidence, and explicit known limits.
-The build and patch remain private and unserved. Human acceptance, original
+The build and patch remain private. The V3 import selector is served locally
+for the user's review, without changing the deployed patcher. Human acceptance, original
 hardware, broad gameplay, and ordinary current-profile Save & Quit remain
-unclaimed. Do not switch the deployed patcher or local preview. Subsequent work
+unclaimed. Do not switch the deployed patcher without public publication approval. Subsequent work
 is reported playtest bugs or a separately requested importing expansion, not
 new V4 systems or repairs to historical emulator fixtures without a current need.
 
@@ -846,9 +848,9 @@ The existing metadata scan at `build/v3-furniture-post-plain-scan-01.json` has
 109 supported and 281 review records; it precedes the final 24 profile stages.
 These are metadata categories, not remaining-import counts. Review includes
 parent representations, absent/dummy resources, native counterparts, and rewards.
-Neither the deployed patcher nor the ordinary local preview switches to
-experimental V3 without user testing and approval. The main build lock is
-unchanged; the public website and local preview serve stable V2-14 only.
+The deployed patcher stays V2-14 until user testing and explicit public
+publication approval. The ordinary local preview serves V3 for that testing.
+The main build lock is unchanged; preserve the stable V2-14 exports.
 
 The shared save executor is prepared at `build/v3-console-games-prepared-06/`:
 3,988 MIPS bytes, all sixty recipes, and four independent player blocks.

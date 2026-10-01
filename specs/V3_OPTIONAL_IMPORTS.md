@@ -34,17 +34,19 @@ Ordinary fish, insects, fossils, and other items retain their actual item
 behaviours within V3 without adding the Museum. This boundary governs subsystem
 notes below and acquisition continuations in their linked checkpoints.
 
-The deployed patcher and ordinary local preview serve stable V2-14, SHA-256
+The deployed patcher serves stable V2-14, SHA-256
 `0e81d5c62548c3a759cc89d63eba0975b1c336a3a941211a3000e317b9243bf2`.
 The current experimental proposal pins this same V2-14 for empty selection.
 The import-free path must reproduce
 its build's pinned translation baseline exactly. V3 development uses
-`v3/optional-imports`; it must not change the deployed patcher or local preview
-to V3 or edit the published trailer. Stable V2 corrections update the public
-patcher and local copy.
+`v3/optional-imports`; it must not change the deployed patcher to V3 or edit
+the published trailer without approval. The ordinary local preview serves the
+private V3 import selector for the user's review and playtesting. Preserve
+stable V2 exports; empty selection still produces V2-14.
 V3 source and development work may be version-tracked on GitHub. Updating the
-deployed patcher or local preview to V3 requires the user's testing and subsequent
-explicit approval. GitHub source publication does not authorise either update.
+deployed patcher to V3 requires the user's testing and subsequent explicit
+public publication approval. GitHub source publication and the local preview
+do not authorise a public update.
 Provide private playtest builds first; completed implementation or developer
 verification alone does not authorise the web-patcher switch.
 
@@ -657,8 +659,9 @@ are disclosed, not silently enabled as unrelated additions.
 Changing a selection or input invalidates old results. Cancellation releases the
 worker and download URLs. Equivalent selection sets produce the same profile
 and cartridge regardless of click order. The source files remain untouched.
-Keep the deployed patcher and ordinary local preview on stable V2 until the user has tested V3 and
-explicitly approved the switch. A verified playtest handoff alone is not approval.
+Keep the deployed patcher on stable V2 until the user has tested V3 and explicitly
+approved public publication. Use the ordinary local preview for V3 testing;
+a verified playtest handoff or local preview alone is not public approval.
 
 ## Delivery order and acceptance
 

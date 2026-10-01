@@ -5,9 +5,16 @@ Its copy is written for the public audience, without private build history or
 local-preview explanations. Local-only hosting is an operational setting, not
 part of the site's visitor instructions.
 
-The portal is running at **http://127.0.0.1:8073/** through the enabled
+The V3 local preview is running at **http://127.0.0.1:8073/** through the enabled
 `animal-forest-portal.service` user service. It remains local-only. The service
-serves `build/web-portal-08/site`, not the repository or its game inputs.
+serves `build/v3-import-pipeline-browser-16/site`, not the repository or its game
+inputs. It offers 20 villagers and 275 item choices, independent selections,
+and behaviour settings. Select imports, choose both original games, acknowledge
+the separate-test-save warning, and download the ROM and selection profile.
+With no imports selected, it produces V2-14. V3 requires an Expansion Pak and
+FlashRAM; V2 and older V3 readers cannot read its format-21 saves. Keep the
+selection profile with the separate test save. Public V3 publication remains
+unapproved; the deployed patcher stays V2-14.
 
 The public address is
 **https://thediscordian.github.io/doubutsu-no-mori-english/**, matching the YouTube
@@ -15,7 +22,7 @@ upload copy. The public development repository contains the Pages setup;
 main-branch pushes validate and deploy the website. No rename or second
 repository is needed.
 
-## Use
+## Deployed V2 patcher use
 
 Choose an extracted original Japanese **Doubutsu no Mori** N64 ROM and an
 English **Animal Crossing (USA, Canada)** GameCube disc, ID `GAFE01`, revision 0.
@@ -66,8 +73,8 @@ its result against the existing target ROM, and copies only explicitly selected
 website/media/source-note files. Do not serve the repository or the parent of
 `build/`. Point the local unit at the new export's `site` directory when switching.
 
-For copy/style changes, `python3 tools/build_portal.py --output build/web-portal-08
---refresh-web` updates the verified live export from `web/`, including current
+For V2 copy/style changes, `python3 tools/build_portal.py --output build/web-portal-08
+--refresh-web` updates the preserved stable export from `web/`, including current
 download metadata. It rejects unrecorded edits to the served files and checks
 the existing patch identity. It does not rebuild the ROM, regenerate the patch,
 or edit the trailer. Exports contain no MP4. Source hashes and the

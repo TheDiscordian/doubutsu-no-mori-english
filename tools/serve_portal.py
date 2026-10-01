@@ -1,5 +1,6 @@
 """Read-only loopback server for an exported static portal, never the repository."""
 import argparse
+import json
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -39,17 +40,30 @@ class StaticPortal(SimpleHTTPRequestHandler):
     do_PUT = do_PATCH = do_DELETE = do_POST
 
 
+def validate_export(root):
+    """Accept completed stable or experimental exports, never game inputs."""
+    if any(p.suffix.lower() in {'.z64', '.n64', '.v64', '.iso', '.gcm', '.ciso', '.fla', '.sra'}
+           or p.is_symlink() for p in root.rglob('*')):
+        raise ValueError('Portal exports must not contain ROMs, saves, or symbolic links')
+    if not (root/'index.html').is_file():
+        raise ValueError('Serve only a completed portal export with its manifest')
+    if (root/'release/manifest.json').is_file():
+        return
+    manifest = root/'data/manifest.json'
+    if manifest.is_file():
+        bundle = json.loads(manifest.read_text())
+        if isinstance(bundle, dict) and bundle.get('format') == 'AFV3-BROWSER-BUNDLE-1':
+            return
+    raise ValueError('Serve only a completed portal export with its manifest')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--directory', type=Path, required=True)
     parser.add_argument('--port', type=int, default=8073)
     args = parser.parse_args()
     root = args.directory.resolve()
-    if not (root/'index.html').is_file() or not (root/'release/manifest.json').is_file():
-        raise ValueError('Serve only a completed portal export with its release manifest')
-    if any(p.suffix.lower() in {'.z64', '.n64', '.v64', '.iso', '.gcm', '.ciso', '.fla', '.sra'}
-           or p.is_symlink() for p in root.rglob('*')):
-        raise ValueError('Portal exports must not contain ROMs, saves, or symbolic links')
+    validate_export(root)
     handler = partial(StaticPortal, directory=str(root))
     with ThreadingHTTPServer(('127.0.0.1', args.port), handler) as server:
         print(f'Animal Forest portal: http://127.0.0.1:{args.port}/', flush=True)
