@@ -14,32 +14,28 @@ complete the import pipeline. Keep this as one connected implementation task:
    only owners write, other players read unlocked pages, and locked pages refuse
    access. Additional console play still rejects visitors. Finish those sessions
    with the original game's save rules, and retain the completed collection paths.
-2. Connect the house/manor models to their genuine existing HRA reward route,
-   scoring, catalogue policy, and independent selection. Review other remaining
-   exclusions against actual existing or already-built acquisition systems.
-   Their installed lifecycles are in `staged_furniture.rows`, not the offered
-   furniture catalogue. Promote them through the ordinary shared importer only
-   after binding acquisition; do not substitute shop stock. Donor
-   `m_mark_room_ovl.c:2791` chooses the 70,000-point reward before the 100,000-point
-   reward and `:2950` marks successful delivery, not attempted delivery. Current
-   native letter selection at `80925BB8` has the score thresholds but no gifts;
-   the complete current disassembly is `build/v3-travel-hra-inspect-01/code.asm`.
-   Reuse the installed English creator and HRA scoring-category adapter. Verify
-   saved reward flags against compiled native home consumers before assigning
-   storage. Imported reward mail, each model's independent selection, and
-   catalogue non-orderability need real connections, not preparation flags.
-   The V3-only reward-letter creator accepts official templates `0221`/`0222`,
-   matching presents `3024`/`3028`, and the original score thresholds. Failed
-   generation leaves the destination unchanged. The current 60-row theme table
-   is supported, including all five added names. The default MIPS object remains
-   identical to the retained translation creator; existing source/profile
-   validation remains strict. Component compilation evidence is
-   `build/v3-hra-reward-mail-02/verification.json`, and focused host checks are in
-   `tests/test_v3_hra_reward_mail.py`. This code is not yet installed in the
-   cartridge or preview. The next HRA connection is the checked on-demand creator
-   extension, retaining its complete accent/classic adapters and expanded names,
-   followed by the selector/success flags and shared furniture admission. Do not
-   replace the complete current creator with an earlier unextended build.
+2. Preserve the connected house/manor model imports and review remaining
+   exclusions only against actual existing or already-built acquisition systems.
+   Both models use the ordinary shared importer with reused artwork, their
+   original HRA scoring category, catalogue previews without ordering, and
+   independent selection. The source's 70,000-point reward precedes its
+   100,000-point reward; saved house flags change only after accepted delivery.
+   Official letters `0221`/`0222` carry presents `3024`/`3028`. The complete
+   English creator retains its accent/classic adapters and 60 theme-name rows.
+   The original post-office reader refuses a full mailbox even with queue space;
+   preserve that rule rather than forcing delivery. The shared English creator
+   accepts actual native scene allocations only within the existing exclusively
+   borrowed workspace, with all ownership checks and both complete guards.
+   `build/v3-travel-hra-rewards-native-07/results.json` passes 12 controlled
+   score/delivery cases, 28 native calls, and 62 assertions, including original
+   RNG, all four houses, failed creation, full mailboxes/queue, retained flags,
+   whole-town preservation, bounds, checkpoint restoration, and fault checks.
+   This is actual installed native execution, not an ordinary room-scoring or
+   rewarded-save/restart playthrough. Seventeen current-cartridge/source checks,
+   four allocation-boundary checks, and two changed selection/compatibility
+   checks pass. Preserve the earlier 20 scope checks for unchanged composition
+   paths. Browser reconstruction of both selected models matches offline at
+   `build/v3-travel-hra-rewards-browser-01/results.json`.
 3. Classify the unresolved four-instrument villager playback results and fix
    confirmed defects. Verify silently. Preserve the passing ordinary Save & Quit
    and fresh-process reload for the current full import selection; rerun only
@@ -55,9 +51,10 @@ complete the import pipeline. Keep this as one connected implementation task:
    on the experimental branch, refresh the local preview, and hand over the
    usable build with accurate compatibility and verification limits.
 
-The checked transport build is `build/v3-travel-native-dma-installed-02/build-lock.json`,
-ABI 392, with its full selection in `build/v3-travel-native-dma-profile-02`.
-The repaired local preview serves `build/v3-travel-website-browser-02/site`.
+The current proposal is `build/v3-travel-hra-rewards-installed-05/build-lock.json`,
+ABI 395, retaining the checked transport with 20 villagers and 277 requested
+items. Its full selection is `build/v3-travel-hra-rewards-profile-03`.
+The repaired local preview serves `build/v3-travel-website-browser-03/site`.
 No incomplete
 visitor behaviour or unresolved possible game defect is waived by a private
 playtest label. Broad human gameplay and original-hardware testing remain

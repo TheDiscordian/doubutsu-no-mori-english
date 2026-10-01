@@ -53,7 +53,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
         if not path.is_relative_to(ROOT) or not path.is_dir():
             raise ValueError('Compiler include directory must belong to the project')
         flags.append('-I/source/'+str(path.relative_to(ROOT)))
-    if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader'):
+    if part in ('catalogue', 'hra', 'hra_reward_mail', 'hra_rewards', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader'):
         flags += ['-fno-merge-constants', '-mno-explicit-relocs', '-mno-split-addresses']
     objects = []
     for i, source in enumerate((primary_source or f'overlays/v3/{part}.c', *extra_sources)):
@@ -76,7 +76,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
             raise ValueError('Invalid checked linker binding')
         bindings.append(f'--defsym={name}=0x{value:X}')
     run('ld', '-EB', *bindings, *(['--gc-sections'] if part in ('holiday_calendar','creature_carried_spawns','carried_quest') else []),
-        *(['--emit-relocs'] if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader') else []),
+        *(['--emit-relocs'] if part in ('catalogue', 'hra', 'hra_reward_mail', 'hra_rewards', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader') else []),
         '-T', f'/source/overlays/v3/{part}.ld', '-o', 'code.elf', *objects)
     if run('nm', '--undefined-only', 'code.elf').strip():
         raise ValueError('Unresolved V3 loader symbol')
@@ -85,7 +85,10 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'seasonal_stock': ('af_v3_seasonal_stock', 0x804F3500),
+    entry, expected = {'npc_mail_heap': ('af_v3_npc_mail_heap_range', 0x804F3820),
+                       'hra_rewards': ('af_hra_reward_send', 0x80925E48),
+                       'hra_reward_mail': ('af_academy_score_mail_create', (link_symbols or {}).get('AF_HRA_MAIL_RAM',0)),
+                       'seasonal_stock': ('af_v3_seasonal_stock', 0x804F3500),
                        'scene_arena': ('af_v3_scene_init', 0x804F3280),
                        'private_save_bank': ('af_v3_private_bank_init', 0x804F3100),
                       'paged_dma': ('af_v3_paged_dma', (link_symbols or {}).get('AF_RESOURCE_DMA_RAM',0)),
@@ -280,7 +283,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
         defaults = (out / 'defaults.bin').read_bytes()
         report['default_extension'] = {'ram': 0x804632E0, 'bytes': len(defaults),
                                        'sha256': sha256(defaults)}
-    if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader'):
+    if part in ('catalogue', 'hra', 'hra_reward_mail', 'hra_rewards', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader'):
         report['elf_relocations'] = run('readelf', '-rW', 'code.elf')
     return code, report
 

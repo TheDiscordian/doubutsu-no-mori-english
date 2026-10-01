@@ -122,7 +122,7 @@ def table_from_records(base, rel, symbols, furniture, records):
     result = []
     diary_rows = {}
     holiday_source=None
-    if any(r.get('holiday_acquisition') for r in records):
+    if any(r.get('holiday_acquisition') or r.get('hra_acquisition') for r in records):
         from v3_furniture_pipeline import Source
         holiday_source=Source(rel,symbols)
     if any(r.get('representation') == 'diary' for r in records):
@@ -144,6 +144,10 @@ def table_from_records(base, rel, symbols, furniture, records):
         if row.get('holiday_acquisition') and holiday_source is not None:
             from v3_holiday_acquisition import catalogue_source,acquisition_bytes
             goods=acquisition_bytes(holiday_source,group)
+            member=catalogue_source(holiday_source,donor_item,donor_index,row)
+        elif row.get('hra_acquisition') and holiday_source is not None:
+            from v3_hra_rewards import catalogue_source,DONOR_FUNCTIONS
+            goods=holiday_source.function(DONOR_FUNCTIONS[1][1])[0]
             member=catalogue_source(holiday_source,donor_item,donor_index,row)
         elif group=='mRmTp_birth_type':
             goods=symbol_data(rel,symbols.decode(),group)

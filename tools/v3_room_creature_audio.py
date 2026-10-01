@@ -110,7 +110,13 @@ def checked_binding(source,image,report):
         raise ValueError('Changed complete installed creature sound source')
     data=table_bytes(audio,core);blob=files[BLOB].extract(image)
     at=equipment['blob_offset']+TABLE-RAM
-    if (audio['table']!=dict(ram=TABLE,delay_ram=DELAY,count=COUNT,bytes=len(data),hex=data.hex(),sha256=sha256(data)) or
+    expected=dict(ram=TABLE,delay_ram=DELAY,count=COUNT,bytes=len(data),hex=data.hex(),sha256=sha256(data))
+    table=audio['table']
+    # The installed receipt also retains the compiler's digest. It is not an
+    # additional array field; authenticate it without rejecting the current
+    # unchanged native table because that provenance key is present.
+    if ({k:v for k,v in table.items() if k!='compiled_sha256'}!=expected or
+            table.get('compiled_sha256',expected['sha256'])!=expected['sha256'] or
             blob[at:at+len(data)]!=data):
         raise ValueError('Changed startup-loaded creature sound arrays')
     sequence,_,_=installed_resource(image,core,'seq',199)

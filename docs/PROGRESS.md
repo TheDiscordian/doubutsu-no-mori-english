@@ -29,11 +29,12 @@ V3 is not complete. The installed transport and shared item/paper collection
 handlers carry and update the visitor's added player records.
 Imported diaries now permit unlocked read-only access for visitors, preserving
 the original owner-only editing and locked refusal. Additional console play
-still rejects visitors. The
-house/manor models have installed art/room behaviour but no connected HRA
-acquisition, scoring, or catalogue policy. Four added villager instruments retain
-unresolved playback evidence. Ordinary Save & Quit and a fresh-process restart
-pass for the current full selection, with independent whole-save validation.
+still rejects visitors. The house/manor models now have their original HRA
+reward delivery, scoring, catalogue previews without ordering, and independent
+selection. Four added villager instruments retain unresolved playback evidence.
+Ordinary Save & Quit and a fresh-process restart pass for the ABI-392 full
+selection, with independent whole-save validation; this does not establish a
+rewarded-model save/restart cycle for ABI 395.
 The requested website design, villager dialog,
 and control-order repairs pass browser checks and run in the local preview.
 The [active task](WORK_QUEUE.md#active-task-complete-the-connected-v3-itemvillager-import-paths)
@@ -43,8 +44,32 @@ checks and resident-only behaviour do not establish completion.
 
 ### Installed player-record transport
 
-The checked cartridge is `build/v3-travel-native-dma-installed-02/build-lock.json`,
-ABI 392, with full selection in `build/v3-travel-native-dma-profile-02`.
+The current proposal is ABI 395 / format 21 at
+`build/v3-travel-hra-rewards-installed-05/build-lock.json`, with full selection in
+`build/v3-travel-hra-rewards-profile-03` (20 villagers and 277 requested items).
+Both HRA models use the shared importer and retain the source's acquisition and
+non-orderability. The complete English creator is extended without replacing
+unrelated adapters or theme names. Its heap check accepts allocations from the
+existing exclusive scene workspace only with confirmed ownership and intact
+guards; the ordinary heap bounds remain unchanged. Twelve native delivery cases,
+28 calls, and 62 assertions pass at
+`build/v3-travel-hra-rewards-native-07/results.json`. Scores and mailboxes are
+controlled fixtures, not an ordinary room-scoring or rewarded-save/restart
+playthrough. The original full-mailbox refusal is preserved, and failed delivery
+does not mark a reward earned. Seventeen source/current-cartridge checks and four
+allocation-boundary checks pass. Two changed composition/compatibility checks
+pass, retaining the earlier 20 checks for unchanged selection paths. The browser
+build for both selected models matches offline at
+`build/v3-travel-hra-rewards-browser-01/results.json`, with no page errors,
+uploads, or off-origin requests. The local preview serves
+`build/v3-travel-website-browser-03/site`, with 20 villagers and 277 item choices.
+Exported compatibility text describes separate saves and matching settings,
+without inherited banking or stale travel claims. The deployed V2 patcher stays
+unchanged. Saved format 21 and the transport owner are unchanged. The ABI-392
+save loads in the new full selection during the actual village-load prefix in
+`build/v3-travel-hra-rewards-native-05/results.json`; this does not establish
+backward compatibility or every cross-profile save combination.
+
 Native Pak read/write/status and departure/arrival/private-copy entries carry one
 complete identity-bound player's added records. Full diary pages, console progress,
 category ownership, and player rewards are retained; other residents and shared
@@ -550,7 +575,7 @@ code, import resources, public assets, or public deployment changes are involved
 
 ## Preserved experimental artifact and subsystem evidence
 
-The current proposal is ABI 391 / format 21 at
+The preserved experimental artifact uses ABI 391 / format 21 at
 `build/v3-nook-font-repaired-02/build-lock.json`.
 The complete linked bank/April resources, official dialogue, and saved-account
 owner are installed with banking still disabled by default. Real source mail

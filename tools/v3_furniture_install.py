@@ -40,7 +40,7 @@ STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
 SOURCES = capacity.SOURCES + physical.SOURCES + ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/v3_password_acquisition.py', 'tools/v3_harvest_acquisition.py', 'tools/map_artwork.py', 'tools/v3_room_aliases.py',
     'tools/v3_bank_install.py','tools/v3_bank_resources.py',
-    'tools/v3_holiday_acquisition.py',
+    'tools/v3_holiday_acquisition.py','tools/v3_hra_rewards.py',
     'tools/v3_furniture_rigs.py', 'tools/v3_furniture_materials.py', 'tools/v3_furniture_scroll.py', 'tools/v3_keyframes.py',
     'tools/v3_furniture_art.py', 'tools/v3_furniture_composite.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
@@ -162,7 +162,8 @@ def catalogue_record(row):
         shop_list_sha256=row['donor_list_sha256'], catalogue_orderable=row['catalogue_orderable'],
         **({'password_acquisition':row['password_acquisition']} if row.get('password_acquisition') else {}),
         **({'harvest_acquisition':row['harvest_acquisition']} if row.get('harvest_acquisition') else {}),
-        **({'holiday_acquisition':row['holiday_acquisition']} if row.get('holiday_acquisition') else {}))
+        **({'holiday_acquisition':row['holiday_acquisition']} if row.get('holiday_acquisition') else {}),
+        **({'hra_acquisition':row['hra_acquisition']} if row.get('hra_acquisition') else {}))
 
 
 def order_mask(row):
@@ -489,7 +490,7 @@ def build(output, art_path, lock=LOCK):
         **{k:r[k] for k in ('donor_item_id','donor_runtime_index') if k in r},
         donor_list=r['donor_list'],donor_list_sha256=r['donor_list_sha256']) for r in installed
         if not r['reward_route'] and not r.get('password_acquisition') and not r.get('harvest_acquisition')
-        and not r.get('holiday_acquisition')]
+        and not r.get('holiday_acquisition') and not r.get('hra_acquisition')]
     stock_ids = {r['item_id'] for r in stock_rows}
     goods,table_at,stock_rows = shops.goods(stable,source.rel,source.symbols.encode(),
         [r for r in imports if r['item_id'] in stock_ids],reviewed_rows=stock_rows)
@@ -735,7 +736,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
                     room_rigs_art=None, room_rigs_code=False, room_goods=None, room_carry=None, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
-                    material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
+                    material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,hra_rewards=False,
                     password_runtime=None,password_editor=False,password_nook=None,harvest_connected=None,bank_connected=None,private_save_bank=False,player_travel=False,scene_arena=False,seasonal_stock=False,nook_font_repair=False,room_effects=None,furniture_capacity=False,console_storage=False,
                     console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None,carried_items=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
@@ -772,6 +773,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if private_save_bank:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
+    if hra_rewards:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if player_travel:
@@ -1056,6 +1060,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         equipment_report=equipment.install(base,prior,blob,original,output,password_runtime,lock)
         report_updates['physical_resources']=copy.deepcopy(prior.get('physical_resources',[]))
+    elif hra_rewards:
+        import v3_hra_rewards as hra_reward_runtime
+        import v3_npc_mail_heap as equipment
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        owner_changes,report_updates,physical_writes=hra_reward_runtime.install(base,prior,core,module,output)
+        equipment_report=report_updates.pop('equipment_resources')
     elif furniture_scoring:
         import v3_furniture_scoring as scoring_categories
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
@@ -1505,6 +1515,16 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             in_place_owner_updates=owner_updates,additional_resident_bytes=0)
         report['sources'].update(report['furniture_scoring']['sources'])
         report['native_test']='pending expanded birth-point evaluator; acquisition remains incomplete'
+    if hra_rewards:
+        report['automatic_furniture']['resource_moves']=moved
+        report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
+        report['shared_runtime_refresh'].update(adapters=['hra_model_rewards'],
+            resource_allocations_changed=True,resource_tail_reuse=reused,
+            unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
+            in_place_owner_updates=owner_updates,additional_resident_bytes=0,
+            additional_on_demand_creator_bytes=report['hra']['score_letters']['bytes']-prior['hra']['score_letters']['bytes'])
+        report['sources'].update(report['hra']['model_rewards']['sources'])
+        report['native_test']='pending original HRA model selection, mailbox/queue delivery, and earned-flag execution'
     if room_surfaces_art is not None:
         report['automatic_furniture']['resource_moves']=moved
         report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
@@ -1952,6 +1972,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if report.get('resource_capacity'):
         report['resource_capacity']['resources']=capacity.text_records(result,report)
         capacity.checked_limit(result,report)
+    if hra_rewards:
+        report['sources'].update(report['equipment_resources']['scene_arena']['npc_mail_heap']['sources'])
+        hra_reward_runtime.verify_installed_items(result,report)
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())
@@ -2030,6 +2053,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install prepared floor/wall artwork and shared room readers without enabling items')
     parser.add_argument('--furniture-scoring',action='store_true',
         help='With --refresh-runtime, install complete donor themes, names, and source-mapped base-point categories')
+    parser.add_argument('--hra-rewards',action='store_true',
+        help='With --refresh-runtime, connect original HRA model reward acquisition')
     parser.add_argument('--diary-catalogue',action='store_true',
         help='With --refresh-runtime, connect all installed diary covers to catalogue previews and scoring metadata')
     parser.add_argument('--npc-registry-art',type=Path,
@@ -2107,6 +2132,7 @@ if __name__=='__main__':
     if args.scrolling_materials_art and not args.refresh_runtime:parser.error('--scrolling-materials-art requires --refresh-runtime')
     if args.room_surfaces_art and not args.refresh_runtime:parser.error('--room-surfaces-art requires --refresh-runtime')
     if args.furniture_scoring and not args.refresh_runtime:parser.error('--furniture-scoring requires --refresh-runtime')
+    if args.hra_rewards and not args.refresh_runtime:parser.error('--hra-rewards requires --refresh-runtime')
     if args.diary_catalogue and not args.refresh_runtime:parser.error('--diary-catalogue requires --refresh-runtime')
     if args.npc_registry_art is not None and not args.refresh_runtime:parser.error('--npc-registry-art requires --refresh-runtime')
     if args.holiday_actor_services and not args.refresh_runtime:parser.error('--holiday-actor-services requires --refresh-runtime')
@@ -2144,7 +2170,7 @@ if __name__=='__main__':
                             expand_storage=args.expand_storage,furniture_audio_art=args.furniture_audio_art,
                             furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art,
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
-                            furniture_scoring=args.furniture_scoring,password_runtime=args.password_runtime,
+                            furniture_scoring=args.furniture_scoring,hra_rewards=args.hra_rewards,password_runtime=args.password_runtime,
                             password_editor=args.password_editor,password_nook=args.password_nook,harvest_connected=args.harvest_connected,
                             bank_connected=args.bank_connected,private_save_bank=args.private_save_bank,player_travel=args.player_travel,scene_arena=args.scene_arena,seasonal_stock=args.seasonal_stock,nook_font_repair=args.nook_font_repair,room_effects=args.room_effects,
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,

@@ -64,16 +64,10 @@ def furniture_key(row):
 def save_compatibility(report):
     """Keep exported warnings tied to the cartridge's actual saved format."""
     version = report['save_codec']['format_version']
-    if version >= 3:
-        travel=report.get('equipment_resources',{}).get('creature_fish',{}).get('world',{}).get('creature_travel',{})
-        warning=report['save_warning']
-        if (report.get('equipment_resources',{}).get('carried_items',{}).get('optional_selection') and
-                'Carried-item saves require every carried family' not in warning):
-            warning+=' Carried-item saves require every carried family selected when the save was written. '
-            warning+='Removing a family is not a save migration; keep the matching selection profile and separate saves.'
-        return warning+(' '+travel['warning'] if travel else '')
-    return (f'Format {version}: equal or larger profiles accepted by codec; missing dependencies rejected. '
-            'Do not load imported saves in V2. Ordinary cross-profile reload is unverified.')
+    return (f'V3 save format {version}. Keep V3 saves separate from V2 saves; '
+            'V2 and older incompatible V3 versions cannot read them. '
+            'Keep the exported settings used for each save. Removing imports can '
+            'make an existing save incompatible, so use the matching settings.')
 
 
 def inputs():
@@ -164,8 +158,8 @@ def catalogue(image, report):
         result[row['id']] = {'id':row['id'], 'name':row['name'], 'kind':'furniture',
             'item_id':row['item_id'], 'runtime_index':index, 'dependencies':[],
             'enable_offset':at+4, 'enable_bytes':4, 'enable_ram':row_ram+4}
-        if row.get('harvest_acquisition') or row.get('holiday_acquisition'):
-            acquisition=row.get('harvest_acquisition') or row['holiday_acquisition']
+        if row.get('harvest_acquisition') or row.get('holiday_acquisition') or row.get('hra_acquisition'):
+            acquisition=row.get('harvest_acquisition') or row.get('holiday_acquisition') or row['hra_acquisition']
             if not acquisition['native_delivery_installed'] or acquisition['destination_item']!=row['item_id']:
                 raise ValueError('Incomplete source furniture acquisition binding')
             result[row['id']]['dependencies']=acquisition['dependencies']
@@ -258,6 +252,8 @@ def catalogue(image, report):
     bind_exercise_selection(image,report,result)
     from v3_harvest_acquisition import verify_installed_items as verify_harvest_items
     verify_harvest_items(image,report,result)
+    from v3_hra_rewards import verify_installed_items as verify_hra_items
+    verify_hra_items(image,report)
     from v3_carried_selection import verify_quest_items
     verify_quest_items(image,report)
     return dict(sorted(result.items()))

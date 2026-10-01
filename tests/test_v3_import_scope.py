@@ -51,6 +51,8 @@ class ImportScopeTests(unittest.TestCase):
         pool.update(existing_system_items(self.report))
         from v3_holiday_acquisition import installed_items
         pool.update(installed_items(self.report))
+        from v3_hra_rewards import installed_items as hra_items
+        pool.update(hra_items(self.report))
         from v3_holiday_acquisition import exercise_items
         pool.update(self.catalog[k]['item_id'] for k in exercise_items(self.report)
                     if self.catalog[k]['kind']=='furniture')
@@ -81,6 +83,26 @@ class ImportScopeTests(unittest.TestCase):
         self.assertFalse(any(active(g,selection['enabled'],selection['behaviours'],scope=PIPELINE,
                                    report=self.report) for g in groups(self.image,self.report)))
         self.assertTrue(all('deferred to V4' not in self.states[key]['reason'] for key in lottery))
+
+    def test_hra_models_are_independent_existing_system_reward_choices(self):
+        if not self.report['hra'].get('model_rewards'):
+            self.skipTest('HRA model route is not installed in this fixture')
+        from aflib import by_vrom
+        from v3_asset_loader import BLOB
+        from v3_hra_rewards import installed_items
+        items=installed_items(self.report)
+        if items!={'3024','3028'}:self.skipTest('Both HRA models are not admitted in this fixture')
+        keys=[f'GAFE01-r0/item/{item}' for item in sorted(items)]
+        for key in keys:
+            self.assertTrue(self.states[key]['selectable'])
+            selection=self.select([key]);self.assertEqual(selection['enabled'],[key])
+            result,_,_=composer.compose(self.image,self.report,self.catalog,selection)
+            blob=by_vrom(result)[BLOB].extract(result)
+            for candidate in keys:
+                at=self.catalog[candidate]['enable_offset']
+                self.assertEqual(struct.unpack_from('>I',blob,at)[0],int(candidate==key))
+            self.assertFalse(any(active(g,selection['enabled'],selection['behaviours'],scope=PIPELINE,
+                                       report=self.report) for g in groups(self.image,self.report)))
 
     def test_installed_golden_routes_are_independent_and_require_their_providers(self):
         golden = self.report['equipment_resources']['golden_tools']['items']
@@ -297,8 +319,10 @@ class ImportScopeTests(unittest.TestCase):
         pair={'GAFE01-r0/item/2523','GAFE01-r0/item/1FCC'}
         self.assertEqual(exercise_items(self.report),pair)
         warning=composer.save_compatibility(self.report)
-        self.assertIn('Carried-item saves require every carried family',warning)
-        self.assertIn('Removing a family is not a save migration',warning)
+        self.assertIn('Keep the exported settings used for each save',warning)
+        self.assertIn('Removing imports can make an existing save incompatible',warning)
+        self.assertNotIn('banking',warning)
+        self.assertNotIn('travel remains unfinished',warning)
         self.assertEqual(self.plan['save_compatibility'],warning)
         self.assertEqual(self.plan['import_groups'],[dict(id='summer-exercise',members=sorted(pair))])
         for key in sorted(pair):
