@@ -24,7 +24,8 @@ extern void af_patrol_old_swim(void *,void *),af_patrol_old_wait(void *,void *);
 extern void af_patrol_old_escape(void *,void *);
 extern void af_patrol_old_swim_init(void *),af_patrol_old_wait_init(void *),af_patrol_old_escape_init(void *);
 static int donor(void *actor) {
-    return ((u8 *)actor)[0x1DA] && *(volatile const u32 *)&af_v3_fish_patrol_mode==1;
+    (void)actor;
+    return *(volatile const u32 *)&af_v3_fish_patrol_mode==1;
 }
 static int uki(void *actor,void *game) {
     if (!af_patrol_player_near(actor,game) && af_patrol_search(actor,game)) {

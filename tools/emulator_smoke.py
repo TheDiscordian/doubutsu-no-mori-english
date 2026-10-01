@@ -873,7 +873,10 @@ def main():
         for suffix in ("flash", "rtc", "pak") + (("bs1",) if args.seed_state else ()):
             source = seed / ("test."+suffix)
             if not source.is_file():
-                if suffix in ("flash", "bs1"):
+                # A matching-ROM checkpoint can precede the first cartridge
+                # save. Only a game-save seed requires a FlashRAM file; the
+                # checkpoint path still requires the complete machine state.
+                if suffix == "bs1" or (suffix == "flash" and args.seed_save):
                     parser.error(f"missing seed file: {source}")
                 continue
             content = source.read_bytes()
@@ -1987,6 +1990,12 @@ def main():
                 from v3_optional_composition_smoke import exercise
                 if not (out/'test.bs1').is_file():
                     raise ValueError('Optional selection checks require a matching checkpoint')
+                needs_checkpoint_restore = True
+                record(exercise(debug, args.rom, record))
+            if action.get('test_v3_preview_options'):
+                from v3_preview_options_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native preview options require a matching checkpoint')
                 needs_checkpoint_restore = True
                 record(exercise(debug, args.rom, record))
             if 'place_test_player_near_npc' in action:

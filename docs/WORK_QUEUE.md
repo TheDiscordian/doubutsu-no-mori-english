@@ -2,6 +2,30 @@
 
 ## V3 import pipeline: private playtest handoff
 
+### Completed preview repairs and verified behaviour
+
+The local preview serves `build/v3-import-pipeline-browser-19/site` using the
+original patcher's design. Villagers and categorised items have separate panels
+and searches. N64/GameCube descriptions explain player-facing differences without
+internal banking wording. Settings export/import works before selecting game
+files, also accepts downloaded browser selection profiles, and rejects mismatched
+catalogues without changing choices. Dependencies are recalculated, not trusted
+from a friend's resolved profile. Visiting guidance explains the installed
+fish/insect passport support and remaining travel limits.
+
+The optional starting diary sits on the cardboard box inside each new house,
+as verified in GameCube `mHm_SetDefaultPlayerRoomData`, not in player pockets.
+Existing houses and inventories are unchanged. The ocean movement choice affects
+original and imported ocean fish; river and pond movement is unchanged. Focused
+browser/offline downloads, settings round trips, four layout widths, native
+alternatives, and C sanitizer checks pass. See the
+[current verification](PROGRESS.md#preview-controls-and-verified-behaviour) and
+`build/v3-preview-options-profile-04/handoff.json` for artifacts and limits.
+The V3 developer batch is complete and ready for private playtesting. Preserve
+completed evidence and the public V2 patcher. New systems and e/e+ donor expansion
+are outside this batch; subsequent changes address reported playtest defects or
+separately requested work.
+
 V3 imports items and villagers with working behaviours. Able Sisters (including
 its custom-design system), the Museum building, and comparable large features belong to V4. The
 unfinished design implementation is preserved on `v4/deferred-custom-designs`
@@ -52,8 +76,9 @@ Carry substantial N64/GameCube behaviour differences through the shared import
 path as explicit WebUI choices, following the
 [behaviour-choice contract](../specs/V3_OPTIONAL_IMPORTS.md#n64-and-gamecube-behaviour-choices).
 Implement the actual alternatives and bind selections to the build receipt.
-Fish/insect population and imported coastal movement have installed controls and
-runtime alternatives; other substantial differences still need real bindings.
+Fish/insect population, shared ocean movement, and source-verified house-start
+diary placement have installed controls and runtime alternatives. Present only
+behaviour choices with real bindings; unfinished alternatives stay unavailable.
 
 The V3 import pipeline is ready for private playtesting. Distinct save consumers,
 fresh-process native readback, and current controlled creature constructor/
@@ -109,10 +134,10 @@ none enters shop stock. The existing calendar choice works in both modes. This
 admission adds no runtime code, artwork, allocation, or save field. Unrelated
 selections leave this provider off; Wisp and the savings account remain independent.
 
-Current real-file browser worker and retained interface checks pass:
-`build/v3-import-pipeline-browser-16/build.json`,
+Current real-file browser and retained worker checks pass:
+`build/v3-import-pipeline-browser-19/build.json`,
 `build/v3-import-pipeline-worker-14/results.json`, and
-`build/v3-import-pipeline-interface-13/results.json`. Browser hashes match offline
+`build/v3-preview-interface-15/results.json`. Browser hashes match offline
 builds; empty selection returns V2-14. The private export is served by the
 local preview at [http://127.0.0.1:8073/](http://127.0.0.1:8073/), not publicly.
 Retained focused current-cartridge scope/browser-equivalence checks pass,
@@ -127,12 +152,13 @@ Five affected summer/provider/composition checks pass, including 36 actual
 browser/offline profile hashes. The complete summer acquisition providers and
 precise shared-hook forwarding authenticate; altered resources or missing
 providers reject admission.
-The interface result verifies export 12, not the current Harvest menu. The current
-export retains identical interface code, styles, and cartridge recipes; its
-composition validator admits the checked independent spirit group and rejects
-unknown enabled groups. New generated
-eligibility/review data has current differential and actual worker checks.
-No native code, artwork, allocation, or saved field changes. Fifteen JavaScript
+The current interface result verifies export 18; export 19 changes only static
+warning wording and passes the live preview checks. The other 15 file hashes
+agree. The composition validator admits the checked independent
+spirit group and rejects unknown enabled groups. Retained generated
+eligibility/review evidence has focused differential and actual worker checks.
+The new house/ocean alternatives have separate focused native evidence and do
+not change saved fields or resource allocations. Seventeen JavaScript
 checks pass. Ordinary exercise acquisition/save remains unverified. Keep matching
 selection profiles and separate saves; removing a carried family is not migration.
 Ten Harvest furnishings, its rug/wall, and cutlery use the installed Franklin

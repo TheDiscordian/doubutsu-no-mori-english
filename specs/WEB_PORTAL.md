@@ -2,7 +2,7 @@
 
 ## Contract
 
-Create the exact current V2-07 N64 cartridge in a static website using the user's
+Create the exact current V2-14 N64 cartridge in a static website using the user's
 Japanese N64 ROM and English USA/Canada GameCube disc. Both files stay in the
 browser. There is no upload endpoint, patcher telemetry, or account. Patcher
 assets are local; the optional trailer loads a YouTube frame only after Play.
@@ -78,6 +78,25 @@ folder after verifying its hash, preserving the original trailer.
 
 ## Deployment
 
+### Local V3 preview
+
+The ordinary loopback preview serves the reviewed private V3 export, not a second
+deployment. The one deployed public patcher stays on stable V2 until the user
+tests V3 and explicitly approves publication. Serving a preview or pushing the
+experimental source branch does not authorise public V3 recipes or assets.
+
+Reuse the original patcher's visual design, with separate villager and
+categorised item panels, independent searches, and clear selection controls.
+Behaviour descriptions compare the actual N64/GameCube outcomes. Settings
+export/import works before game files are chosen and accepts matching browser
+selection profiles, recalculates dependencies, and preserves choices on invalid
+input. See the [sharing contract](V3_OPTIONAL_IMPORTS.md#sharing-settings-and-village-visits).
+Visiting guidance states actual passport support and unverified travel limits.
+The generated preview has an exact 16-file export receipt, retains same-origin
+requests and read-only serving, and contains no embedded trailer/audio/frame.
+
+### Public website
+
 Use `TheDiscordian/doubutsu-no-mori-english` for both source and Pages; do not
 rename it or introduce a second repository. Its Pages source is GitHub Actions.
 The workflow runs on main-branch pushes, the private-to-public event, and manual
@@ -97,7 +116,7 @@ the website allowlist does not hide tracked development records from GitHub.
 ## Verification
 
 Run focused synthetic parser/recipe tests and a real headless-browser patch using
-the supplied files. Compare the downloaded result to the exact V2-07 hash. Check
+the supplied files. Compare the downloaded result to the exact V2-14 hash. Check
 bad/wrong inputs, corruption, cancellation, input changes, narrow layouts, relative
 paths, and network requests. Inspect desktop/mobile screenshots silently. No
 emulator replay or old-cartridge testing is needed for this portal.

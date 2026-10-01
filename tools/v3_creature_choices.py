@@ -7,7 +7,7 @@ from aflib import by_vrom,sha256,u32
 from v3_asset_loader import ROOT,BLOB
 
 FORMAT='AFV3-BEHAVIOUR-CHOICES-1'
-SOURCES=('tools/v3_creature_choices.py','tools/v3_optional_composition.py',
+SOURCES=('tools/v3_creature_choices.py','tools/v3_starting_diary.py','tools/v3_optional_composition.py',
     'tools/v3_browser_composition.py','tools/v3_creature_fish.py','tools/v3_furniture_pipeline.py',
     'overlays/v3/surface_bootstrap.c','experimental/imports/composer.mjs',
     'experimental/imports/worker.mjs','experimental/imports/app.mjs')
@@ -88,6 +88,20 @@ def options(image,report):
         at=start+row['ram']-p['ram']
         if image[at:at+4]!=bytes(4):raise ValueError('Changed pinned behaviour default')
         result.append({**row,'offset':at,'before':image[at:at+4].hex()})
+        if row['id']=='coastal-fish-movement':
+            # Preserve the pinned packet's layout while removing its shared
+            # origin gate in GameCube mode. All six coastal callbacks call
+            # this one helper; N64 mode retains the exact original instructions.
+            helper=start+world['compiled']['symbols']['donor']-p['ram']
+            mode=row['ram']
+            expected=struct.pack('>9I',0x908301DA,0x10600005,0x00001025,
+                0x3C020000|((mode+0x8000)>>16),0x8C420000|(mode&65535),
+                0x38420001,0x2C420001,0x03E00008,0)
+            if image[helper:helper+36]!=expected:
+                raise ValueError('Changed complete coastal movement origin/mode guard')
+            result[-1].update(name='Ocean fish swimming',scope='All original and imported ocean fish',
+                description='N64 uses its original swimming routines. GameCube uses its swimming patterns, pauses, and shoreline avoidance for all ocean fish. River and pond fish are unchanged.',
+                patches=[dict(offset=helper+4,before='10600005',after='00000000')])
     reward=report.get('equipment_resources',{}).get('carried_items',{}).get('quest',{}).get('rewards')
     if reward and reward.get('birthday_choice'):
         row=reward['birthday_choice'];p=reward['packet'];code=reward['code'];start=p['physical']
@@ -151,6 +165,9 @@ def options(image,report):
     from v3_seasonal_stock import option
     seasonal=option(image,report)
     if seasonal:result.append(seasonal)
+    from v3_starting_diary import option as starting_diary
+    starter=starting_diary(image,report)
+    if starter:result.append(starter)
     return result
 
 

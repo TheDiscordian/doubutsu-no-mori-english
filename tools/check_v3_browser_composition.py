@@ -1,4 +1,4 @@
-"""Silent worker check in a temporary private server; never switch a V2 service."""
+"""Silent browser check in a temporary private server; leave the preview untouched."""
 import argparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -52,7 +52,7 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
     equipment=[key for key,row in catalog.items() if row['kind']=='equipment']
     if equipment:
         page.locator('#kind').select_option('equipment')
-        assert page.locator('.option:visible').count()==len(equipment)
+        assert page.locator('#options .option:visible').count()==len(equipment)
         page.locator('#select-visible').click()
         assert page.locator('.option input:checked').count()==len(equipment)
         page.locator('#clear-visible').click()
@@ -67,15 +67,15 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
     assert page.locator('.unavailable input, .unavailable button').count() == 0
     results['search_category_all_clear_and_review_reasons'] = True
 
-    page.locator('#search').fill('Punchy')
+    page.locator('#villager-search').fill('Punchy')
     punchy = page.locator('[data-id="GAFE01-r0/villager/00EB"] input')
     punchy.focus(); punchy.press('Space')
     assert page.locator('.option input:checked').count() == 3
     for item in ('24BF', '3350'):
         required = page.locator(f'[data-id="GAFE01-r0/item/{item}"] input')
         assert required.is_checked() and required.is_disabled()
-    assert 'cherry shirt' in page.locator('#dependency-list').inner_text()
-    assert 'speed bag' in page.locator('#dependency-list').inner_text()
+    assert 'cherry shirt' in page.locator('#dependency-list').text_content()
+    assert 'speed bag' in page.locator('#dependency-list').text_content()
     punchy.uncheck()
     assert page.locator('.option input:checked').count() == 0
     punchy.check()
@@ -84,6 +84,31 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
     page.locator(f'[data-id="{extra_item}"] input').check()
     assert page.locator('.option input:checked').count() == 4
     results['keyboard_selection_dependencies_and_removal'] = True
+
+    # Shared settings work before selecting game files, and restore both kinds
+    # of choices. A failed import must leave the current choices untouched.
+    coast = page.locator('select[aria-describedby="behaviour-description-coastal-fish-movement"]')
+    coast.select_option('GameCube')
+    with page.expect_download() as event:
+        page.locator('#settings-export').click()
+    settings_path = out/'shared-settings.json'; event.value.save_as(settings_path)
+    shared = json.loads(settings_path.read_bytes())
+    assert shared['requested'] == sorted(['GAFE01-r0/villager/00EB', extra_item])
+    assert shared['behaviours']['coastal-fish-movement'] == 'GameCube'
+    assert set(shared) == {'format','donor','scope','runtime_abi','base_sha256','plan_sha256','requested','behaviours'}
+    page.locator('#clear-all').click(); coast.select_option('N64')
+    page.locator('#settings-import').set_input_files(str(settings_path))
+    page.wait_for_function("() => document.querySelector('#settings-status').textContent.startsWith('Settings imported.')")
+    assert coast.input_value() == 'GameCube'
+    assert punchy.is_checked() and page.locator('.option input:checked').count() == 4
+    assert not page.locator('#save-ack').is_checked()
+    bad = dict(shared, plan_sha256='0'*64)
+    page.locator('#settings-import').set_input_files({'name':'other.json','mimeType':'application/json','buffer':json.dumps(bad).encode()})
+    page.wait_for_function("() => document.querySelector('#settings-status').textContent.includes('different V3 catalogue')")
+    assert punchy.is_checked() and coast.input_value() == 'GameCube'
+    assert page.locator('.option input:checked').count() == 4
+    coast.select_option('N64')
+    results['shared_settings_round_trip_and_atomic_rejection'] = True
 
     native = ROOT/'local/rom/Doubutsu no Mori (Japan).z64'
     disc = ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso'
@@ -124,6 +149,12 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
         return selection
 
     build_and_download('villager-and-regular-subset' if scope == 'v3-pipeline' else 'villager-and-seasonal-subset')
+    page.locator('#settings-import').set_input_files(str(out/(('villager-and-regular-subset' if scope == 'v3-pipeline' else 'villager-and-seasonal-subset')+'.json')))
+    page.wait_for_function("() => document.querySelector('#success').hidden")
+    assert punchy.is_checked() and page.locator('.option input:checked').count() == 4
+    assert not page.locator('#save-ack').is_checked()
+    page.locator('#save-ack').check()
+    results['downloaded_receipt_import_and_download_invalidation'] = True
     old_urls = page.evaluate('window.__lifecycle.created.slice()')
     page.locator('#clear-all').click()
     assert page.locator('#success').is_hidden() and not page.locator('#download').get_attribute('href')
@@ -150,7 +181,7 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
                 checkbox=page.locator(f'[data-id="{peer}"] input')
                 assert checkbox.is_checked() and checkbox.is_disabled()==(peer!=chosen)
                 if peer!=chosen:
-                    assert catalog[peer]['name'] in page.locator('#dependency-list').inner_text()
+                    assert catalog[peer]['name'] in page.locator('#dependency-list').text_content()
             page.locator('#clear-all').click()
             assert page.locator('.option input:checked').count()==0
         chosen=group['members'][0]
@@ -176,6 +207,20 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
         assert page.locator('#success').is_hidden() and not page.locator('#receipt').get_attribute('href')
         results['behaviour_change_revokes_downloads'] = True
         page.locator('#clear-all').click()
+    starter = page.locator('select[aria-describedby="behaviour-description-starting-diary"]')
+    if starter.count():
+        starter.select_option('GameCube'); coast.select_option('GameCube')
+        assert page.locator('.option input:checked').count() == 2
+        for key in ('2B00','30F8'):
+            checkbox = page.locator(f'[data-id="GAFE01-r0/item/{key}"] input')
+            assert checkbox.is_checked() and checkbox.is_disabled()
+        page.locator('#save-ack').check()
+        selection = build_and_download('starting-house-and-ocean-GameCube')
+        assert selection['requested'] == []
+        assert selection['required'] == ['GAFE01-r0/item/2B00','GAFE01-r0/item/30F8']
+        starter.select_option('N64'); coast.select_option('N64')
+        assert page.locator('.option input:checked').count() == 0
+        results['starting_house_requirements_and_both_runtime_settings'] = True
     build_and_download('no-imports')
     old_urls = page.evaluate('window.__lifecycle.created.slice()')
     # Actually change the input. Re-selecting the identical file can leave the
@@ -219,6 +264,8 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
     for width in (320, 375, 768, 1440):
         page.set_viewport_size({'width': width, 'height': 950})
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), width
+        if width in (375, 1440):
+            page.screenshot(path=str(out/f'preview-{width}.png'), full_page=True)
     results['no_horizontal_overflow'] = [320, 375, 768, 1440]
     results['download_urls_all_revoked'] = set(page.evaluate('window.__lifecycle.created')) <= set(page.evaluate('window.__lifecycle.revoked'))
     assert results['download_urls_all_revoked']
@@ -239,7 +286,8 @@ def check(export, output, *, interface=False, selected=None):
                'experimental/imports/worker.mjs', 'web/core.mjs', 'data/review.json',
                'experimental/imports/bundle.mjs', 'experimental/imports/app.mjs',
                'experimental/imports/style.css', 'index.html'}
-    if set(receipt['files']) != allowed:
+    upgraded = allowed | {'experimental/imports/settings.mjs','web/style.css','web/mark.svg','web/media/town.webp'}
+    if set(receipt['files']) not in (allowed, upgraded):
         raise ValueError('Unexpected export file set; do not serve inputs or the repository')
     site = export/'site'
     resources = {path: (site/path).read_bytes() for path in receipt['files']}
@@ -270,7 +318,7 @@ def check(export, output, *, interface=False, selected=None):
             self.send_response(200)
             self.send_header('Content-Type', content_type)
             self.send_header('Content-Length', str(len(data)))
-            self.send_header('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'; connect-src 'self'")
+            self.send_header('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; worker-src 'self'; connect-src 'self'")
             self.end_headers()
             try:
                 self.wfile.write(data)
@@ -309,6 +357,10 @@ def check(export, output, *, interface=False, selected=None):
         result, _, _ = composer.compose(base, report, catalog, resolve(selected))
         expected[name] = sha256(result)
     behaviour_case = None
+    if interface and any(row['id']=='starting-diary' for row in choices):
+        selected = resolve([], {'starting-diary':'GameCube','coastal-fish-movement':'GameCube'})
+        result, _, _ = composer.compose(base, report, catalog, selected)
+        expected['starting-house-and-ocean-GameCube'] = sha256(result)
     seasonal = report.get('equipment_resources', {}).get('seasonal_stock')
     if interface and seasonal:
         behaviour_case = dict(id=seasonal['choice']['id'], label='seasonal-stock-GameCube',

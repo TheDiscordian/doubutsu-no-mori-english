@@ -291,6 +291,15 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None,
     peers={key:[child for child in g['members'] if child!=key]
            for g in selection_groups(catalog) for key in g['members']}
     pending = list(requested)
+    if behaviour_options is not None:
+        from v3_creature_choices import resolve as resolve_behaviours
+        chosen_behaviours=resolve_behaviours(behaviour_options,behaviours)
+        for row in behaviour_options:
+            if chosen_behaviours[row['id']]!='GameCube':continue
+            for child in row.get('required_imports',[]):
+                if child not in catalog:raise ValueError('Missing behaviour import dependency')
+                reasons.setdefault(child,set()).add(row['id'])
+                if child not in enabled:enabled.add(child);pending.append(child)
     while pending:
         parent = pending.pop()
         for child in sorted(set(catalog[parent]['dependencies']) | set(peers.get(parent,[]))):
@@ -524,6 +533,9 @@ def compose(image, report, catalog, selection):
     prefix(0x20, bytes.fromhex(selection['profile_hex']), 'complete saved import profile')
     for row in choices:
         change(row['offset'],struct.pack('>I',row['values'][values[row['id']]]),'behaviour: '+row['id'])
+        if values[row['id']]=='GameCube':
+            for patch in row.get('patches',[]):
+                change(patch['offset'],bytes.fromhex(patch['after']),'behaviour runtime: '+row['id'])
     enabled = set(selection['enabled'])
     from v3_holiday_selection import groups as event_groups, active as event_active, checksum_fields as event_checksums
     for group in event_groups(image, report):
@@ -643,6 +655,16 @@ def build(output, selected=(), *, select_all=False, behaviours=None, scope='v3-p
             composition=receipt, native_test='not executed for this composed profile',
             new_villager_ids_enabled=any(catalog[key]['kind']=='villager' for key in selection['enabled']))
         current['save_runtime'].update(profile_hex=selection['profile_hex'], profile_sha256=selection['profile_sha256'])
+        for choice in choices:
+            if choice['id']=='starting-diary':
+                active=selection['behaviours'][choice['id']]=='GameCube'
+                current['equipment_resources']['starting_diary']=dict(choice,
+                    resolved=selection['behaviours'][choice['id']],installed=active,
+                    native_execution_tested=False,ordinary_new_town_tested=False)
+                for field_patch in choice['patches']:
+                    expected=bytes.fromhex(field_patch['after'] if active else field_patch['before'])
+                    if result[field_patch['offset']:field_patch['offset']+len(expected)]!=expected:
+                        raise ValueError('Lost composed starting-house binding')
         from v3_shops import VROM as STOCK_VROM
         current['shops'].update(selected_only=True,
             output_sha256=sha256(by_vrom(result)[STOCK_VROM].extract(result)))

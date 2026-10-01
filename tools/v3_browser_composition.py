@@ -16,7 +16,61 @@ import v3_optional_composition as composition
 from v3_save_runtime import profile_bytes
 
 ROOT = composition.ROOT
-FILES = ('composer.mjs', 'worker.mjs', 'bundle.mjs', 'app.mjs', 'style.css')
+FILES = ('composer.mjs', 'worker.mjs', 'bundle.mjs', 'app.mjs', 'settings.mjs', 'style.css')
+SHARED_UI = ('style.css', 'mark.svg', 'media/town.webp')
+
+
+def copy_interface(site):
+    for name in FILES:
+        target = site/'experimental/imports'/name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT/'experimental/imports'/name, target)
+    shutil.copyfile(ROOT/'experimental/imports/index.html', site/'index.html')
+    for name in ('core.mjs', *SHARED_UI):
+        target = site/'web'/name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT/'web'/name, target)
+
+
+def refresh(source, output):
+    """Reuse authenticated recipes in a fresh private export, never edit a live site."""
+    source, output = source.resolve(), output.resolve()
+    if not source.is_relative_to(ROOT/'build') or not output.is_relative_to(ROOT/'build') or output.exists():
+        raise ValueError('Use an existing ignored export and a fresh ignored output')
+    receipt = json.loads((source/'build.json').read_bytes())
+    site = source/'site'
+    if receipt.get('format') != 'AFV3-BROWSER-EXPORT-1' or not receipt.get('recipes_included'):
+        raise ValueError('Refresh requires a completed browser export with recipes')
+    if any(p.is_symlink() for p in site.rglob('*')) or set(receipt['files']) != {
+            str(p.relative_to(site)) for p in site.rglob('*') if p.is_file()}:
+        raise ValueError('Changed export file set')
+    for name, digest in receipt['files'].items():
+        if sha256((site/name).read_bytes()) != digest:
+            raise ValueError('Changed export file: '+name)
+    image, report = composition.inputs()
+    if sha256(image) != receipt['base_sha256'] or composition.REPORT_SHA != receipt['base_report_sha256']:
+        raise ValueError('Refresh must retain the exact cartridge and report')
+    plan = rules(image, report, scope=receipt['scope'])
+    manifest = json.loads((site/'data/manifest.json').read_bytes())
+    review = json.loads((site/'data/review.json').read_bytes())
+    offered = {row['id'] for row in plan['options']}
+    pending = {row['id']:row for row in plan.get('pending_options',[])}
+    untouched = [row for row in review['unavailable'] if row['id'] not in offered and row['id'] not in pending]
+    review['unavailable'] = untouched + [{k:row[k] for k in ('id','name','kind','selectable','reason')}
+        for row in pending.values()]
+    shutil.copytree(site, output/'site')
+    fresh = output/'site'; copy_interface(fresh)
+    raw = composition.canonical(plan)
+    (fresh/'data/composition.json').write_bytes(raw)
+    review_raw = composition.canonical(review)
+    (fresh/'data/review.json').write_bytes(review_raw)
+    manifest['review'].update(size=len(review_raw), sha256=sha256(review_raw))
+    manifest['plan'].update(size=len(raw), sha256=sha256(raw))
+    (fresh/'data/manifest.json').write_bytes(composition.canonical(manifest))
+    receipt.update(served=False, refreshed_from=str(source.relative_to(ROOT)),
+        files={str(p.relative_to(fresh)):sha256(p.read_bytes()) for p in sorted(fresh.rglob('*')) if p.is_file()})
+    (output/'build.json').write_bytes(composition.canonical(receipt))
+    return receipt
 
 
 def rules(image, report, *, scope='development'):
@@ -291,13 +345,7 @@ def build(output, *, recipes=False, disc=None, scope='v3-pipeline'):
     data.mkdir(parents=True)
     (data/'composition.json').write_bytes(raw)
     (data/'review.json').write_bytes(review)
-    for name in FILES:
-        target = site/'experimental/imports'/name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT/'experimental/imports'/name, target)
-    shutil.copyfile(ROOT/'experimental/imports/index.html', site/'index.html')
-    (site/'web').mkdir()
-    shutil.copyfile(ROOT/'web/core.mjs', site/'web/core.mjs')
+    copy_interface(site)
     manifest = {'format': 'AFV3-BROWSER-BUNDLE-1', 'experimental': True,
                 'web_patcher_enabled': False, 'plan': {'file': 'composition.json',
                 'size': len(raw), 'sha256': sha256(raw)},
@@ -342,9 +390,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--recipes', action='store_true', help='Include two-game reconstruction recipes in the unserved export')
+    parser.add_argument('--refresh-from', type=Path, help='Reuse checked recipes in a fresh export with the current interface and rules')
     parser.add_argument('--disc', type=Path)
     parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock; never changes the deployed patcher or local preview')
     parser.add_argument('--scope', choices=('v3-pipeline','development'), default='v3-pipeline')
     args = parser.parse_args()
     if args.base_lock:composition.use_build_lock(args.base_lock)
-    print(json.dumps(build(args.output, recipes=args.recipes, disc=args.disc, scope=args.scope), indent=2))
+    print(json.dumps(refresh(args.refresh_from, args.output) if args.refresh_from else
+        build(args.output, recipes=args.recipes, disc=args.disc, scope=args.scope), indent=2))

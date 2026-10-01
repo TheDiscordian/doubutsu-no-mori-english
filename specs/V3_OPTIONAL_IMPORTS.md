@@ -82,6 +82,33 @@ Verify the changed shared path in each supported mode with focused checks, reusi
 unchanged evidence. These settings follow the existing V3 playtest and deployment
 approval requirement; they do not authorise a live-patcher update.
 
+The ocean movement choice affects original and imported ocean fish together;
+river and pond movement retains its native path. Authenticate the complete shared
+helper before replacing its imported-only origin gate. The GameCube house-start
+choice places the college-rule diary on the cardboard box in main/secondary room
+cell `[1][1]`, following the complete checked donor room initializer. Include both
+imports as setting requirements. Use the native house-creation path, not pockets
+or a migration of existing saved houses. N64 defaults preserve the pinned output.
+
+### Sharing settings and village visits
+
+Allow settings export before original game files are selected. Accept the shared
+settings format and downloaded browser selection receipts only when their exact
+composition-plan hash and scope match. Shared settings also bind donor identity,
+base hash, and runtime ABI. Include every available behaviour choice; reject
+unknown imports/values, malformed or excessive files, and mismatched builds
+without altering existing choices. Resolve dependencies from requested choices,
+never trust supplied enabled bits or profile bytes. Successful import cancels
+work, invalidates previous downloads, and resets save acknowledgement. Shared
+files contain no ROM/save bytes or local filenames.
+
+Explain that friends need the same patcher version, imports, and behaviour
+choices, and can compare output ROM hashes. Keep separate town saves and backups.
+The installed fish/insect passport support is not evidence of complete travel
+with other imported catalogue items or console-game records. Do not promise
+ordinary end-to-end village visits without verification, or make finishing new
+travel systems a prerequisite of this private V3 handoff.
+
 ## Verified starting facts
 
 The pinned source references are N64 decompilation

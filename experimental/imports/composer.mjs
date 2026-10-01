@@ -190,6 +190,14 @@ export function validatePlan(plan) {
     require(row.values && Object.keys(row.values).length === 2 && row.values.N64 === 0 && row.values.GameCube === 1 &&
       row.default === 'N64', 'Unsupported behaviour choices.');
     field(row, 4, 4); require(row.before === '00000000', 'Changed behaviour default.');
+    if (row.patches !== undefined) {
+      array(row.patches, 1, 16);
+      for (const patch of row.patches) { field(patch, 4, 1024); hexSize(patch.after, patch.before.length / 2, patch.before.length / 2); }
+    }
+    if (row.required_imports !== undefined) {
+      array(row.required_imports, 1, 16);
+      require(new Set(row.required_imports).size === row.required_imports.length && row.required_imports.every(id => options.has(id)), 'Unavailable behaviour import dependency.');
+    }
   }
   const groupIds = new Set();
   const carriedBits = new Set();
@@ -256,10 +264,17 @@ export function validatePlan(plan) {
 
 export function resolveSelection(plan, requested, behaviours = {}) {
   const options = validatePlan(plan);
+  require(behaviours !== null && typeof behaviours === 'object' && !Array.isArray(behaviours), 'Invalid behaviour settings.');
   array(requested, 0, 4096);
   require(requested.every(id => typeof id === 'string' && options.has(id) && !options.get(id).dependency_only),
     'Unknown or unimplemented standalone import.');
   const chosen = [...new Set(requested)].sort(), enabled = new Set(chosen), reasons = new Map(), pending = [...chosen];
+  for (const row of plan.behaviours || []) if ((behaviours[row.id] || row.default) === 'GameCube') {
+    for (const id of row.required_imports || []) {
+      if (!reasons.has(id)) reasons.set(id, new Set()); reasons.get(id).add(row.id);
+      if (!enabled.has(id)) { enabled.add(id); pending.push(id); }
+    }
+  }
   const peers = new Map();
   for (const group of plan.import_groups || []) for (const id of group.members)
     peers.set(id, group.members.filter(child => child !== id));
@@ -348,7 +363,8 @@ export async function composeSelection(source, plan, requested, behaviours = {})
       ...(plan.pending_options || []).flatMap(row => row.disable),
       ...(plan.runtime_groups || []).flatMap(row => row.fields),
       ...(plan.selection_masks || []),
-      ...plan.tables.flatMap(row => [row, ...row.counts]), ...plan.crc32, ...(plan.behaviours || [])];
+      ...plan.tables.flatMap(row => [row, ...row.counts]), ...plan.crc32, ...(plan.behaviours || []),
+      ...(plan.behaviours || []).flatMap(row => row.patches || [])];
     for (const field of fields) {
       const before = bytes(field.before);
       require(equal(output.subarray(field.offset, field.offset + before.length), before), 'Changed composition field.');
@@ -364,6 +380,7 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     for (const row of plan.behaviours || []) {
       const value = new Uint8Array(4); view(value).setUint32(0, row.values[selection.behaviours[row.id]]);
       write(row, value);
+      if (selection.behaviours[row.id] === 'GameCube') for (const patch of row.patches || []) write(patch, bytes(patch.after));
     }
     for (const group of plan.runtime_groups || []) {
       const active = !group.forced_disabled && (group.any_imports.some(id => enabled.has(id)) ||
@@ -399,7 +416,7 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     write(plan.header, n64Checksum(output));
   }
   const outputHash = await sha256(output);
-  if (selection.enabled.length === plan.options.length && !selection.behaviours_changed)
+  if (selection.requested.length === plan.options.filter(row => !row.dependency_only).length && !selection.behaviours_changed)
     require(outputHash === (plan.all_selected_sha256 || plan.base_sha256),
       'All-selected output differs from the pinned supported selection.');
   return { output, receipt: { format: 'AFV3-BROWSER-SELECTION-1', ...selection,

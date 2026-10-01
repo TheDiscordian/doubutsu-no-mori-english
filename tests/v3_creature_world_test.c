@@ -82,7 +82,7 @@ int main(void) {
     assert(af_v3_water_wall(a) && H(a,0x36)==1234 && !attribute_calls);
     a=reset();FISH_U32(a,0x98)=(1u<<21)|(7u<<18);assert(af_v3_water_wall(a));
     for(unsigned mode=0;mode<2;mode++)for(unsigned origin=0;origin<2;origin++) {
-        if(mode && origin)continue;
+        if(mode)continue;
         a=reset();af_v3_fish_patrol_mode=mode;((u8 *)a)[0x1DA]=(u8)origin;
         unsigned before=native_calls;
         af_v3_patrol_swim(a,0);assert(last_native==0);
@@ -93,11 +93,13 @@ int main(void) {
         af_v3_patrol_escape_init(a);assert(last_native==5);
         assert(native_calls==before+6);
     }
-    for(unsigned roll=0;roll<3;roll++) {
-        a=reset();af_v3_fish_patrol_mode=1;((u8 *)a)[0x1DA]=1;
+    for(unsigned origin=0;origin<2;origin++)for(unsigned roll=0;roll<3;roll++) {
+        a=reset();af_v3_fish_patrol_mode=1;((u8 *)a)[0x1DA]=(u8)origin;
+        unsigned before=native_calls;
         random_value=((float)roll+0.5f)/3.0f;W(a,0x214)=1;
         af_v3_patrol_wait(a,0);
         assert(((u8 *)a)[0x23E]==(roll==1) && W(a,0x1DC)==0);
+        assert(native_calls==before);
     }
     for(unsigned kind=0;kind<4;kind++) {
         a=reset();((u8 *)a)[0x1DA]=1;((u8 *)a)[0x23E]=(u8)kind;

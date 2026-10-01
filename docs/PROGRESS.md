@@ -37,6 +37,62 @@ as new V3 requirements. Preserve experiments and evaluate
 existing-system reward routes individually. See the
 [active pipeline queue](WORK_QUEUE.md#execution-order).
 
+### Preview controls and verified behaviour
+
+The running [local preview](http://127.0.0.1:8073/) serves
+`build/v3-import-pipeline-browser-19/site`. Its original-style layout separates
+villagers from categorised items, with independent searches and selection controls.
+N64/GameCube descriptions state the actual differences. The page contains no
+internal banking commentary. The deployed public V2 patcher is unchanged.
+
+Settings export/import works before choosing original games and accepts both
+`AFV3-SHARED-SETTINGS-1` and downloaded browser selection profiles. Shared files
+contain only requested imports and behaviour settings, tied to the exact build
+catalogue; they contain no game/save data or local filenames. Import validates
+the catalogue and choices, recalculates dependencies, and updates the interface
+only after successful validation. Malformed or mismatched files preserve current
+choices. A successful import invalidates any prior download and save acknowledgement.
+Friends should share settings and compare finished ROM hashes, keep separate town
+saves, and back up before travel. Fish/insect passport records have installed
+support; complete imported catalogue/console travel and ordinary end-to-end visits
+remain unverified or unfinished. Matching settings do not remove these limits.
+
+The optional GameCube starting diary is the college-rule diary on the cardboard
+box inside a newly created house, never in pockets. The complete donor room
+initializer authenticates against
+[GameCube source](https://github.com/ACreTeam/ac-decomp/blob/09ca8e8b5b24e6ab44047ee980cf0088ad7ecb4c/src/game/m_home.c#L330).
+The setting includes both required imports automatically. The checked native
+room initializer fills main/secondary cell `[1][1]`, preserving the original
+cassette, wall/floor, other room bytes, and all player inventories. Existing saved
+houses remain unchanged. The shared ocean movement option applies to original
+and imported ocean fish; it leaves river/pond movement unchanged.
+
+Seventeen JavaScript checks and eleven focused Python/static-server tests pass.
+`build/v3-preview-interface-15/results.json` verifies actual original-file
+browser/offline downloads, settings/receipt round trips, dependency displays,
+keyboard controls, cancellation and invalid-input rejection, and no uploads or
+off-origin requests. Layout checks pass at 320, 375, 768, and 1440 pixels.
+Export 19 changes only static warning wording from tested export 18; all other
+file hashes agree. `build/v3-local-preview-check-02/results.json` authenticates all
+16 served files and verifies the live controls, settings round trip, rejection
+without mutation, dependency inclusion, four widths, and no page errors/uploads.
+`build/v3-preview-options-native-03/results.json` passes 24 focused assertions
+across both house/ocean modes and all four home indices, including index masking,
+unchanged inventories, guards, checkpoint restoration, and graceful exit. The
+actual shared creature C passes address/undefined-behaviour sanitizers. These are
+controlled native function checks, not ordinary new-town play or a new save cycle.
+
+The default all-selected profile 17 and translation-only output retain their
+exact hashes. The all-selected profile with GameCube house diary and ocean
+movement is `build/v3-preview-options-profile-04/profile.json`; ROM SHA-256 is
+`98c3fbabe6c200ac9b8eb2c54d5dca03afa52009b5172c568404a668796dbe81`.
+Its `handoff.json` records artifacts and verification limits. It retains ABI 391,
+format 21/wire 7, eight-MiB RAM, FlashRAM, and fixed resource allocations. Keep the
+matching profile and separate test saves; current-profile ordinary saving,
+broad gameplay/travel, and original hardware are not claimed. Preserve retained
+passing ordinary-save evidence without replaying unchanged categories. Failed
+ignored attempts remain available and are not served or described as passing.
+
 ### Current import selections and verification
 
 Browser and offline builds default to the V3 pipeline scope. Both offer all
@@ -130,7 +186,7 @@ not enable the optional holiday, Wisp, birthday, or savings-account providers.
 Unavailable behaviour controls are hidden without a blanket V4 classification.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-16/build.json`, pinned to the ABI-391
+`build/v3-import-pipeline-browser-19/build.json`, pinned to the ABI-391
 cartridge. Retained focused scope checks pass,
 covering complete Redd stock routing, selected-only furniture
 lists, four independent
@@ -145,18 +201,14 @@ Chromium worker check at
 matches the offline summer-only request with no additional imports.
 Retained worker checks cover spirit-only, Harvest lamp/rug/wall with cutlery, the exercise pair, password-only choices,
 cancellation, and invalid-input rejection.
-The retained interface check passes at
-`build/v3-import-pipeline-interface-13/results.json`, including independent
-selection/dependencies, keyboard controls, unavailable-review data, and download
-lifecycle checks, the actual GameCube stock setting, its downloaded hash and
-receipt, both exercise-pair requirement displays/removal, its downloaded hash,
-and invalidation when settings change. That result targets export 12, not the
-current Harvest/spirit menu. The interface code,
-styles, and cartridge recipes retain their hashes. The composition validator
-admits the checked independent spirit group while keeping unknown groups guarded.
-The current export has generated eligibility, review data,
-and carried-family save warning. Current differential/worker checks verify its
-new selection data; unchanged interface checks are not replayed. Five focused seasonal checks
+The current interface check at `build/v3-preview-interface-15/results.json`
+covers the repaired panels and controls, settings/receipt sharing, actual
+downloads for stock, equipment, exercise, and starter/ocean alternatives, and
+translation-only output. The live export is checked separately as described above.
+The composition validator admits the checked independent spirit group while
+keeping unknown groups guarded. Generated eligibility, review data, and
+carried-family save warnings retain focused differential/worker evidence;
+unchanged category checks are not replayed. Five focused seasonal checks
 pass, including the actual C wrapper under address/undefined-behaviour sanitizers
 with native I/O doubled. The silent native result at
 `build/v3-seasonal-stock-native-02/results.json` passes 38 cases across both
@@ -173,7 +225,7 @@ shared world/reward C passes its connected sanitizer check on current installed
 data, including 128 handovers, four-player receipts, visitors, full/stale inventory,
 and resource gates, with native inventory I/O doubled. No exhausted holiday native
 fixture is replayed or relabelled as passing gameplay.
-Fifteen focused JavaScript checks pass with Node's
+Seventeen focused JavaScript checks pass with Node's
 `--experimental-global-webcrypto` flag.
 <!-- Verification work record: the initial Node invocation lacks the required
 Web Crypto flag and fails before crypto-dependent assertions; the corrected
@@ -372,7 +424,7 @@ incompatibility with V2/older V3 readers, exact profile requirements, and the
 controlled recompiler limitation. Broad human gameplay, original hardware,
 ordinary acquisition of every reward, and human acceptance are not claimed.
 The deployed patcher remains unchanged; the local preview serves
-`build/v3-import-pipeline-browser-16/site` for the user's V3 review. New buildings and
+`build/v3-import-pipeline-browser-19/site` for the user's V3 review. New buildings and
 entirely new features remain outside V3; subsequent work follows reported
 playtest bugs or a separately requested importing expansion.
 

@@ -3,86 +3,83 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Make Animal Crossing’s N64 hometown your own, with your choice of GameCube villagers and items. Build the English translation in your browser.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
-  <title>Animal Crossing N64 · Optional imports · Development</title>
+  <meta name="theme-color" content="#254d3f">
+  <title>Animal Crossing N64 · English Translation · V3 Preview</title>
+  <link rel="icon" href="./web/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./web/style.css">
   <link rel="stylesheet" href="./experimental/imports/style.css">
   <script type="module" src="./experimental/imports/app.mjs"></script>
 </head>
 <body>
-  <a class="skip" href="#search">Skip to import choices</a>
-  <header class="wrap">
-    <p class="eyebrow">Animal Crossing N64 <span>V3 development</span></p>
-    <h1>A few more neighbours.<br>A little more <em>you.</em></h1>
-    <p class="intro">Bring selected villagers and items from your English GameCube game into your N64 town—or keep the original English translation without imports.</p>
-    <p class="notice">Experimental build. These imports are installed for development, not fully playtested or approved for release. Use a separate test save.</p>
+  <a class="skip" href="#villager-search">Skip to import choices</a>
+  <header class="site-header wrap">
+    <a class="brand" href="./" aria-label="Animal Crossing N64 English translation home"><img src="./web/mark.svg" width="46" height="46" alt=""><span>Animal Crossing N64<small>ENGLISH TRANSLATION</small></span></a>
+    <a class="preview-badge" href="#additions">V3 PLAYTEST PREVIEW <span aria-hidden="true">↓</span></a>
   </header>
-  <main class="wrap layout">
-    <section class="card patcher" id="patcher" aria-labelledby="build-heading" aria-busy="false">
-      <p class="eyebrow">1 · Your game files</p>
-      <h2 id="build-heading">Build it locally</h2>
-      <p>Your files stay in this browser. Nothing is uploaded, and the patcher never reads or edits saves.</p>
-      <label class="file" for="n64"><strong>Doubutsu no Mori (Japan)</strong><span>Original N64 ROM · .z64, .v64, or .n64</span>
-        <input id="n64" type="file" accept=".z64,.v64,.n64" aria-describedby="file-help">
-      </label>
-      <label class="file" for="gamecube"><strong>Animal Crossing (USA, Canada)</strong><span>GameCube · GAFE01 revision 0 · .iso, .gcm, or .ciso</span>
-        <input id="gamecube" type="file" accept=".iso,.gcm,.ciso" aria-describedby="file-help">
-      </label>
-      <p class="muted small" id="file-help">Extract archives first. Both original games are required. Their contents are verified before a download is created.</p>
-      <div class="selection-summary" aria-live="polite" aria-atomic="true">
-        <h3 id="selection-heading">No imports selected</h3>
-        <p id="selection-summary">Loading the installed catalogue…</p>
-        <div id="dependencies" hidden><h4>Included requirements</h4><ul id="dependency-list"></ul></div>
-      </div>
-      <div class="warning" id="save-warning" hidden>
-        <h3>Keep your save and selections together</h3>
-        <p id="save-detail">Removing an import used by this profile is not a save migration. Do not load an imported save in V2 or an older build missing these imports. Ordinary reloads between different profiles remain unverified.</p>
-        <label class="ack"><input type="checkbox" id="save-ack"> <span>I’ll use a separate test save and keep its selection profile.</span></label>
-      </div>
-      <p class="small" id="baseline-note">No imports produces the unchanged V2 English translation. Do not load a V3 import save in V2.</p>
-      <button class="primary" id="build" type="button" disabled>Build translation only</button>
-      <div id="working" hidden><progress id="progress" max="100" value="0" aria-label="Build progress"></progress><button id="cancel" type="button">Cancel build</button></div>
-      <p class="status" id="status" role="status">Loading import data…</p>
-      <p class="error" id="error" role="alert" hidden></p>
-      <section id="success" hidden aria-labelledby="success-heading">
-        <h3 id="success-heading" tabindex="-1">Your build is ready</h3>
-        <a class="primary" id="download">Download ROM</a>
-        <a id="receipt" download="Animal Crossing N64 - Import profile.json">Download selection profile</a>
-        <details><summary>Output SHA-256</summary><code id="output-sha"></code></details>
+  <main class="wrap">
+    <div class="hero">
+      <section class="welcome" aria-labelledby="welcome-heading">
+        <p class="eyebrow"><span class="rule" aria-hidden="true"></span> A LITTLE TOWN. A FEW MORE FAMILIAR FACES.</p>
+        <h1 id="welcome-heading">Make yourself<br><em>at home.</em></h1>
+        <p class="intro">Your N64 hometown, in English.<br>With a few favourites from the GameCube.</p>
+        <p class="description">Bring over the neighbours and items you love, or keep the original town just as it is. Every addition is your choice.</p>
+        <a class="browse-link" href="#additions">Choose your additions <span aria-hidden="true">↓</span></a>
+        <figure class="postcard"><div class="tape" aria-hidden="true"></div><img src="./web/media/town.webp" width="800" height="600" alt="The English Animal Crossing title screen on Nintendo 64"><figcaption><span>Next stop: your kind of hometown.</span><span aria-hidden="true">✦</span></figcaption></figure>
+        <p class="preview-note"><strong>A little heads-up.</strong> V3 is an experimental playtest build, not a public release. Keep a separate test save.</p>
       </section>
-      <p class="hardware">Expansion Pak · 128-KiB FlashRAM · RTC</p>
-    </section>
-
-    <section class="choices" aria-labelledby="choices-heading">
-      <p class="eyebrow">2 · Make it your town</p>
-      <h2 id="choices-heading">Choose your additions</h2>
-      <p>All imports start off. Villagers bring their required outfits and house furnishings; those additions are listed before you build.</p>
+      <section class="patch-card" id="patcher" aria-labelledby="build-heading" aria-busy="false">
+        <div class="ticket-top"><span>YOUR TICKET TO TOWN</span><span aria-hidden="true">N64 ↔ GC</span></div>
+        <div class="ticket-body">
+          <div class="card-heading"><h2 id="build-heading">Let’s get you settled.</h2><span class="version">V3 preview</span></div>
+          <p class="card-intro">Choose both original games. Add your favourites below, then build your English N64 ROM.</p>
+          <p class="privacy"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 10V7a6 6 0 0 1 12 0v3m-13 0h14v11H5zm7 4v3"/></svg> Files stay on your device. Nothing is uploaded.</p>
+          <div class="file-field" id="n64-field"><div class="file-title"><span class="step">1</span><label for="n64">Doubutsu no Mori</label><span class="platform">NINTENDO 64</span></div><p>Japan · Original, unpatched ROM · 16 MiB</p><input id="n64" type="file" accept=".z64,.v64,.n64" aria-describedby="n64-hint n64-name"><span class="file-name" id="n64-name">No file chosen</span><small id="n64-hint">.z64, .v64, or .n64</small></div>
+          <div class="file-field" id="gc-field"><div class="file-title"><span class="step">2</span><label for="gamecube">Animal Crossing</label><span class="platform">GAMECUBE</span></div><p>USA / Canada · GAFE01, revision 0</p><input id="gamecube" type="file" accept=".iso,.gcm,.ciso" aria-describedby="gc-hint gc-name"><span class="file-name" id="gc-name">No file chosen</span><small id="gc-hint">.iso, .gcm, or .ciso</small></div>
+          <p class="archive-hint">Extract .7z or .zip first. For RVZ, GCZ, or NKit, convert to ISO in Dolphin.</p>
+          <div class="selection-summary" aria-live="polite" aria-atomic="true"><div class="selection-title"><h3 id="selection-heading">No imports selected</h3><a href="#additions">Change ↓</a></div><p id="selection-summary">Loading your choices…</p><details id="dependencies" hidden><summary>Included requirements</summary><ul id="dependency-list"></ul></details></div>
+          <div class="warning" id="save-warning" hidden>
+            <h3>A new town needs its own save.</h3><p>Use a separate V3 test save, and keep the selection profile you download with your ROM.</p>
+            <details class="save-details"><summary>Save compatibility</summary><p id="save-detail">V2 and V3 builds using an older save format cannot read these saves. Keep the same imports and behaviour settings: removing an import is not a save migration. Ordinary reloads between different profiles remain unverified. Imported fish and insects can travel only between compatible V3 profiles; travel support for other imported catalogue items and console-game records remains unfinished.</p></details>
+            <label class="ack"><input type="checkbox" id="save-ack"> <span>I’ll use a separate test save and keep its selection profile.</span></label>
+          </div>
+          <p class="baseline-note" id="baseline-note">No additions? You’ll get the original V2 English translation. Don’t use a V3 save with V2.</p>
+          <button class="primary" id="build" type="button" disabled>Build translation only</button>
+          <div id="working" hidden><progress id="progress" max="100" value="0" aria-label="Build progress"></progress><button class="text-button" id="cancel" type="button">Cancel</button></div>
+          <p class="status" id="status" role="status" aria-live="polite">Loading your choices…</p><p class="error" id="error" role="alert" hidden></p>
+          <section class="success" id="success" hidden aria-labelledby="success-heading"><h3 id="success-heading" tabindex="-1">Welcome to the neighbourhood.</h3><p>Your ROM is ready and has passed verification. Keep its selection profile with your test save.</p><a class="primary" id="download">Download ROM <span aria-hidden="true">↓</span></a><a class="receipt" id="receipt" download="Animal Crossing N64 - Import profile.json">Download selection profile</a><details class="checksum"><summary>Finished ROM SHA-256</summary><code id="output-sha"></code></details></section>
+          <noscript><p class="error">Enable JavaScript to verify your files and build the ROM locally.</p></noscript>
+        </div><div class="ticket-bottom"><span aria-hidden="true">✳</span> Two originals. Your own little adventure.</div>
+      </section>
+    </div>
+    <section class="choices" id="additions" aria-labelledby="choices-heading">
+      <div class="catalogue-heading"><div><p class="eyebrow"><span class="rule" aria-hidden="true"></span> PACK A FEW FAVOURITES</p><h2 id="choices-heading">Make it your town.</h2></div><p>All additions are optional. Villagers bring their outfits and house furnishings; you’ll see included requirements before building.</p></div>
       <fieldset id="selection-controls" disabled>
-        <legend class="sr-only">Find and select installed development imports</legend>
-        <div class="filters">
-          <label for="search">Search by name or donor ID<input id="search" type="search" placeholder="Try Punchy, sleigh, or 31E0" autocomplete="off"></label>
-          <label for="kind">Category<select id="kind"><option value="all">All categories</option><option value="villager">Villagers</option><option value="furniture">Furniture</option><option value="clothing">Clothing</option><option value="equipment">Equipment</option><option value="floor">Floors</option><option value="wall">Wallpapers</option><option value="fish">Fish</option><option value="insect">Insects</option><option value="diary">Diaries</option><option value="carried">Carried items</option></select></label>
-        </div>
-        <div class="actions"><button id="select-visible" type="button">Select visible</button><button id="clear-visible" type="button">Clear visible</button><button id="select-all" type="button">Select all available</button><button id="clear-all" type="button">Clear all</button></div>
+        <legend class="sr-only">Choose your villagers and items</legend>
+        <section class="share-settings" aria-labelledby="share-heading"><div><h3 id="share-heading">Build the same town rules.</h3><p>Export your choices before building, or import a friend’s settings file. A downloaded selection profile works too. Each player still needs their own original games.</p></div><div class="settings-actions"><button id="settings-export" type="button">Export settings ↓</button><label class="settings-import" for="settings-import">Import settings ↑<input id="settings-import" type="file" accept=".json,application/json"></label></div><p id="settings-status" role="status" aria-live="polite"></p></section>
+        <section class="catalogue neighbours" aria-labelledby="neighbours-heading">
+          <div class="panel-heading"><div><p class="eyebrow">FAMILIAR FACES</p><h3 id="neighbours-heading">A few more neighbours.</h3></div><span class="count" id="villager-count" role="status"></span></div>
+          <div class="villager-toolbar"><label class="sr-only" for="villager-search">Search villagers</label><input id="villager-search" type="search" placeholder="Find a neighbour…" autocomplete="off"><div class="actions"><button id="select-villagers" type="button">Select visible villagers</button><button id="clear-villagers" type="button">Clear visible villagers</button></div></div>
+          <div id="villager-options" class="villager-grid" role="group" aria-label="Optional villagers"></div><p class="empty-state" id="no-villagers" hidden>No neighbours match that name.</p>
+          <p class="panel-note">Selected villagers join the possible residents of your town. Their required outfits and furnishings come along.</p>
+        </section>
+        <section class="catalogue items" aria-labelledby="items-heading">
+          <div class="panel-heading"><div><p class="eyebrow">LITTLE THINGS YOU LOVE</p><h3 id="items-heading">Something for your pockets.</h3></div><span class="count" id="visible-count" role="status"></span></div>
+          <div class="filters"><label for="search">Find an item<input id="search" type="search" placeholder="Search names or donor IDs…" autocomplete="off"></label><label for="kind">Browse a category<select id="kind"><option value="all">All items</option><option value="furniture">Furniture</option><option value="clothing">Clothing</option><option value="equipment">Equipment</option><option value="floor">Floors</option><option value="wall">Wallpapers</option><option value="fish">Fish</option><option value="insect">Insects</option><option value="diary">Diaries</option><option value="carried">Carried items</option></select></label></div>
+          <div class="actions"><div><button id="select-visible" type="button">Select visible items</button><button id="clear-visible" type="button">Clear visible items</button></div><div><button id="select-items" type="button">Select all items</button><button id="clear-items" type="button">Clear all items</button></div></div>
+          <div id="options" class="option-grid" role="group" aria-label="Optional items"></div><p class="empty-state" id="no-results" hidden>No matches. Try another name or category.</p>
+          <div class="catalogue-bottom"><span>Your choices stay off until you select them.</span><a href="#patcher">Back to your build ↑</a></div>
+        </section>
+        <div class="all-actions"><p>Or bring the whole available collection.</p><div class="actions"><button id="select-all" type="button">Select all villagers &amp; items</button><button id="clear-all" type="button">Clear everything</button></div></div>
       </fieldset>
-      <fieldset id="behaviour-controls" hidden>
-        <legend>Game behaviour</legend>
-        <p>These settings are separate from the villagers and items you include.</p>
-        <div id="behaviour-options"></div>
-        <p class="small muted" id="behaviour-note"></p>
-      </fieldset>
-      <p class="small muted" id="visible-count" role="status"></p>
-      <div id="options" class="option-grid"></div>
-      <p id="no-results" hidden>No installed imports match this search.</p>
-      <details class="review" id="review">
-        <summary>Unavailable and deferred donor items <span id="review-count"></span></summary>
-        <p>These entries cannot be selected. Prepared special items wait for their acquisition features in V4; they are not added to ordinary stock. Other entries show their missing support or identity checks. This queue is not an inventory of every GameCube item.</p>
-        <div id="unavailable" class="review-grid"></div>
-        <p id="no-review-results" hidden>No review entries match this search.</p>
-      </details>
+      <fieldset id="behaviour-controls" hidden><legend>Keep the familiar. Or try something new.</legend><p class="settings-intro">Choose N64 or GameCube rules for these details. The N64 rules are selected by default.</p><div id="behaviour-options"></div><p class="behaviour-note" id="behaviour-note"></p></fieldset>
+      <details class="review" id="review"><summary>Items that aren’t available yet <span id="review-count"></span></summary><p>These entries can’t be selected. Each lists its missing behaviour, acquisition route, or identity check. This is not a list of every GameCube item.</p><div id="unavailable" class="review-grid"></div><p id="no-review-results" hidden>No unavailable items match this search.</p></details>
     </section>
+    <section class="visiting" aria-labelledby="visiting-heading"><p class="eyebrow">A TRAIN RIDE AWAY</p><h2 id="visiting-heading">Visiting a friend’s village.</h2><p>Use the same V3 patcher version, imports, and behaviour settings in both villages. Share an exported settings file, then each build your own ROM. Compare the finished ROM SHA-256 checksums to confirm you built the same game. Keep separate saves for each town, and back them up before travelling.</p><div class="travel-warning"><h3>Matching settings aren’t a promise that every import can travel.</h3><p>Added fish and insect records have Controller Pak passport support between compatible V3 profiles. Travel with other imported catalogue items and console-game records remains unfinished. Ordinary end-to-end village visits with the complete import set are unverified; sharing settings does not remove those limits. Do not use a V3 passport or save with V2 or a V3 build lacking the matching import and save/passport support.</p></div></section>
+    <section class="hardware" aria-labelledby="hardware-heading"><div class="section-label"><p class="eyebrow">BEFORE YOU PACK YOUR BAGS</p><h2 id="hardware-heading">Playing on a real N64?</h2></div><div class="hardware-grid"><article><span class="hardware-icon" aria-hidden="true">8</span><div><h3>Expansion Pak</h3><p>8 MiB of memory is required.</p></div></article><article><span class="hardware-icon small-icon" aria-hidden="true">SAVE</span><div><h3>FlashRAM · 128 KiB</h3><p>Select this save type if your flashcart asks.</p></div></article><article><span class="hardware-icon" aria-hidden="true">◷</span><div><h3>Real-time clock</h3><p>Your flashcart needs RTC support.</p></div></article></div><p class="save-note">Use a separate V3 test save and back up your existing saves. Original-hardware compatibility and a full gameplay playthrough remain unverified.</p></section>
   </main>
-  <footer class="wrap"><p>Private development export · GAFE01 revision 0 · No public V3 patcher release</p><p>Changing a file or selection cancels the current build and clears its downloads.</p></footer>
-  <noscript><p class="wrap notice">JavaScript is required to verify your files and build the ROM locally.</p></noscript>
+  <footer class="wrap site-footer"><p>A fan translation, made with care. Not affiliated with Nintendo.<br>V3 playtest preview · Your original games and saves stay untouched.</p><nav aria-label="Project links"><a href="https://github.com/TheDiscordian/doubutsu-no-mori-english">Source code</a><a href="https://github.com/TheDiscordian/doubutsu-no-mori-english/issues">Report a bug</a><a href="#patcher">Back to the patcher ↑</a></nav></footer>
 </body>
 </html>

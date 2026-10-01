@@ -3,12 +3,83 @@ import assert from 'node:assert/strict';
 import { sha256 } from '../web/core.mjs';
 import { validatePlan, resolveSelection, composeSelection, crc32, n64Checksum } from '../experimental/imports/composer.mjs';
 import { loadReview } from '../experimental/imports/bundle.mjs';
+import { exportSettings, importSettings } from '../experimental/imports/settings.mjs';
 
 const hex = data => Buffer.from(data).toString('hex');
 const id = (kind, number) => `GAFE01-r0/${kind}/${number}`;
 const A = id('item', '3100'), B = id('item', '3104'), C = id('villager', '00D8');
 const fromHex = s => Buffer.from(s, 'hex');
 const clone = structuredClone;
+
+async function behaviourFixture() {
+  const result = await fixture();
+  const { source, plan } = result;
+  source.fill(0, 0x102240, 0x102244);
+  source.set(fromHex('10600005'), 0x103080);
+  const v = new DataView(source.buffer);
+  v.setUint32(0x102200, crc32(source.subarray(0x103000, 0x103100)));
+  v.setUint32(0x200, crc32(source.subarray(0x102000, 0x102300)));
+  source.set(n64Checksum(source), 0x10);
+  plan.crc32[0].before = hex(source.subarray(0x102200, 0x102204));
+  plan.crc32[1].before = hex(source.subarray(0x200, 0x204));
+  plan.header.before = hex(source.subarray(0x10, 0x18));
+  plan.base_sha256 = await sha256(source);
+  plan.scope = 'v3-pipeline';
+  plan.options[1].kind = 'clothing';
+  plan.options[1].dependency_only = true;
+  plan.options[1].reason = 'Required only by a selected villager or house setting.';
+  plan.behaviours = [{ id: 'starting-diary', name: 'Start with a diary',
+    scope: 'New houses', description: 'Diaries start inside houses.',
+    default: 'N64', values: { N64: 0, GameCube: 1 },
+    offset: 0x102240, before: '00000000', required_imports: [B],
+    patches: [{ offset: 0x103080, before: '10600005', after: '00000000' }] }];
+  return result;
+}
+
+test('behaviour dependencies and checked conditional patches change only the selected alternative', async () => {
+  const { source, plan } = await behaviourFixture();
+  const n64 = await composeSelection(source, plan, [A]);
+  assert.equal(hex(n64.output.subarray(0x103080, 0x103084)), '10600005');
+  assert.deepEqual(n64.receipt.enabled, [A]);
+  const gc = await composeSelection(source, plan, [], { 'starting-diary': 'GameCube' });
+  assert.deepEqual(gc.receipt.requested, []);
+  assert.deepEqual(gc.receipt.required, [B]);
+  assert.deepEqual(gc.receipt.dependency_reasons[B], ['starting-diary']);
+  assert.equal(hex(gc.output.subarray(0x103080, 0x103084)), '00000000');
+  assert.equal(hex(source.subarray(0x103080, 0x103084)), '10600005');
+  assert.deepEqual(gc.output.subarray(0x10, 0x18), n64Checksum(gc.output));
+  assert.equal(new DataView(gc.output.buffer).getUint32(0x102200), crc32(gc.output.subarray(0x103000, 0x103100)));
+  assert.throws(() => resolveSelection(plan, [B]), /standalone/);
+  for (const mutate of [
+    p => p.behaviours[0].required_imports.push(B),
+    p => p.behaviours[0].required_imports.push('missing'),
+    p => p.behaviours[0].patches[0].offset = p.profile.offset,
+    p => p.behaviours[0].patches[0].after = '00',
+  ]) {
+    const changed = clone(plan); mutate(changed); assert.throws(() => validatePlan(changed));
+  }
+  const changed = clone(plan); changed.behaviours[0].patches[0].before = '00000000';
+  await assert.rejects(composeSelection(source, changed, [A]), /Changed composition field/);
+});
+
+test('shareable settings and build receipts round-trip choices without trusting saved enabled bits', async () => {
+  const { plan } = await behaviourFixture();
+  const planHash = 'a'.repeat(64), choices = { 'starting-diary': 'GameCube' };
+  const shared = exportSettings(plan, planHash, [C, A, C], choices);
+  assert.deepEqual(shared.requested, [A, C]);
+  assert.deepEqual(importSettings(plan, planHash, clone(shared)), { requested: [A, C], behaviours: choices });
+  assert.equal('enabled' in shared, false);
+  const receipt = { ...shared, format: 'AFV3-BROWSER-SELECTION-1', enabled: ['unknown'], profile_hex: 'bad' };
+  assert.deepEqual(importSettings(plan, planHash, receipt), { requested: [A, C], behaviours: choices });
+  for (const mutate of [
+    p => p.format = 'other', p => p.plan_sha256 = 'b'.repeat(64),
+    p => p.base_sha256 = 'b'.repeat(64), p => p.runtime_abi++, p => p.donor = 'other',
+    p => p.requested = ['unknown'], p => p.requested = [B],
+    p => p.behaviours = {}, p => p.behaviours['starting-diary'] = 'Unknown',
+    p => p.behaviours.other = 'N64', p => p.behaviours = null,
+  ]) { const changed = clone(shared); mutate(changed); assert.throws(() => importSettings(plan, planHash, changed)); }
+  assert.throws(() => importSettings(plan, planHash, null));
+});
 
 test('deferred equipment and carried reviews match the checked plan exactly', async () => {
   const pending = ['equipment', 'carried'].map((kind, i) => ({ id: id('item', `253${i}`),
