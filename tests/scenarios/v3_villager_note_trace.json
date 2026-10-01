@@ -1,0 +1,6 @@
+[
+  {"pause_game_thread": true},
+  {"test_v3_complete_audio": "note-trace"},
+  {"load_state": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"}
+]

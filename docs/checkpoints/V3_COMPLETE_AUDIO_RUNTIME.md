@@ -1,5 +1,49 @@
 # Complete V3 audio-runtime checkpoint
 
+## Current instrument resolution
+
+The ABI-396 full selection at
+`build/v3-travel-console-visitors-profile-01/animal-forest-v3-asset-loader.z64`
+has SHA-256
+`11f072d0ca3797b3dfed07b7347e6677a6bd3ec4f441f56a5ff63076b5aa0ce8`.
+`build/v3-travel-villager-note-trace-03/results.json` passes 96 records and
+nine explicit assertions, with actual note selection and matching ROM sample
+transfers for all four instruments. Results SHA-256:
+`43e031ce9dbd8ed4663472cc98aee41e04aff3e9a2f19fddd129eba61873a6e2`.
+
+The controlled Maelle tune uses `0,14,14,1,14,14,2,14,14,3,14,14,15,15,15,15`:
+original held notes (14) and ending (15), not edited melody or engine data.
+Instrument 87 first selects with a matching transfer at frame 9; instrument 84
+at frame 32, 85 at frame 54, and 86 at frame 76. All relocated instrument
+pointers identify bank `801ED280` and the corresponding complete compiled
+descriptions. Loaded/resident melody data, the checked 864-byte save/profile
+region, fixture/translation
+guards, zero fault state, checkpoint restoration, and graceful shutdown pass.
+The isolated FlashRAM and Pak hashes remain unchanged. Physical audio is disabled.
+
+The complete original tune-controller commands match between N64 and GameCube
+after relocation normalization; the current imported cartridge keeps those same
+commands. The focused source/current test passes with:
+
+```sh
+V3_COMPLETE_AUDIO_BUILD=build/v3-travel-console-visitors-profile-01 python3 -m unittest tests.test_v3_all_villager_audio.ActualDonorTests.test_original_tune_controller_preserves_hold_and_instrument_tail_timing -v
+```
+
+`build/v3-travel-villager-note-trace-01/results.json` records progressing native
+note layers, but its unheld tune correctly ends notes before the later instrument
+changes. This identifies the earlier absence as the test-tune setup, not a game
+defect. `build/v3-travel-villager-note-trace-02/results.json` uses held notes but
+ends prematurely: DMA read-ahead includes instrument 86's neighbouring waveform
+before its actual selection. It is not accepted as all-four playback evidence.
+The third run requires actual selection and matching sample transfer for every
+instrument, resolving that diagnostic gap without changing any game code.
+
+This closes the unresolved native instrument result, not ordinary conversation,
+listening, or original-hardware acceptance. Existing font/resource checks remain
+retained. No ROM rebuild, ABI/save change, or preview recipe refresh is required.
+The historical installation and incomplete attempts below remain their original
+records, not the current playback status.
+
 ## Output
 
 ABI 53 installs all twenty melody sources, the expanded loader, and actual

@@ -9,6 +9,144 @@ from v3_all_audio_runtime import BLOB, BLOB_RAM, PACKAGE_RAM, PACKAGE_VROM, PACK
 from v3_audio_runtime import STATE
 
 
+def trace_notes(debug, rom_path, record):
+    """Follow real tune commands, note layers, and streamed samples on this build.
+
+    This is a controlled valid town tune, not an ordinary NPC conversation.
+    No audio program, instrument, engine flag, or instruction is rewritten.
+    """
+    from v3_villager_audio import extended_native_interpreter, extended_sequence_programs
+    path = Path(rom_path)
+    rom = path.read_bytes()
+    report = json.loads((path.parent/'build.json').read_text())
+    if sha256(rom) != report['output_sha256'] or not report.get('complete_villager_audio'):
+        raise ValueError('Note tracing requires its exact full-audio cartridge')
+    files = by_vrom(rom)
+    code = files[CODE_VROM].extract(rom)
+    extended_native_interpreter(lambda at, size: code[at-CODE_RAM:at-CODE_RAM+size])
+    resources = report['complete_villager_audio']['files']
+    bank_row, wave_row = resources['bank'], resources['wave']
+    font = rom[bank_row['physical_rom']:bank_row['physical_rom']+bank_row['bytes']]
+    if sha256(font) != bank_row['sha256']:
+        raise ValueError('Changed compiled voice font')
+
+    def bounded(at, size):
+        if at & 3 or not 0x80000400 <= at <= 0x80400000-size:
+            raise ValueError(f'Note trace address escapes native audio RAM: {at:08X}')
+        return at
+
+    def word(at):
+        return u32(debug.read_memory(at, 4), 0)
+
+    def check(label, at, expected):
+        actual = debug.read_memory(at, len(expected))
+        record({'note_trace_check': label, 'address': f'{at:08X}', 'bytes': len(expected),
+                'assertion': 'passed' if actual == expected else 'failed'})
+        if actual != expected:
+            raise ValueError('Note trace mismatch: '+label)
+
+    samples = {}
+    for index in range(84, 88):
+        instrument = u32(font, 8+index*4)
+        sample = u32(font, instrument+16)
+        length, source = struct.unpack_from('>2I', font, sample)
+        samples[index] = (wave_row['physical_rom']+source, length & 0xFFFFFF)
+    group = bounded(word(0x80151B70), 0x160)
+    sequence = bounded(word(group+0x18), 0x4D20)
+    channel = bounded(word(group+0x38+15*4), 0x100)
+    voice = 263
+    melody = next(row for row in report['villager_audio']['imports'] if row['voice'] == voice)
+    original = debug.read_memory(int(melody['ram'], 16), melody['bytes'])
+    if sha256(original) != melody['sha256']:
+        raise ValueError('Changed resident imported melody')
+    programs = extended_sequence_programs(original)
+    record({'note_trace_source': voice, 'runtime_abi': report['runtime_abi'],
+            'group': f'{group:08X}', 'channel': f'{channel:08X}',
+            'sequence': f'{sequence:08X}', 'program_instruments':
+            [programs[i]['instruments'] for i in range(4)],
+            'physical_audio_playback': False, 'engine_or_program_writes': False})
+    saved = debug.read_memory(0x8046C000, 864)
+    notes = MODULE_RAM+0x6500
+    # Native and donor controllers recognise 14 as hold and 15 as end. The
+    # islander programs change instruments after 24 ticks; ordinary unheld
+    # notes finish at that boundary, correctly omitting their extended tails.
+    tune = bytes((0, 14, 14, 1, 14, 14, 2, 14, 14, 3, 14, 14, 15, 15, 15, 15))
+    edge = b'V3NT'*4
+    debug.write_memory(notes, tune)
+    for at in (notes-16, notes+16):
+        debug.write_memory(at, edge)
+    record(debug.call('800FCE80', [voice, notes], return_address=MODULE_RAM+0x6480))
+    copied = bytearray(original)
+    for index in range(19):
+        at = 4+2*index
+        struct.pack_into('>H', copied, at, struct.unpack_from('>H', copied, at)[0]+0x4610)
+    check('unaltered complete melody with native pointer relocation', sequence+0x4610, copied)
+    observed, selected = set(), set()
+    for frame in range(97):
+        state = debug.read_memory(channel, 0x100)
+        layers = []
+        for slot in range(4):
+            at = u32(state, 0x54+slot*4)
+            if not at:
+                continue
+            layer = debug.read_memory(bounded(at, 0x90), 0x90)
+            instrument = layer[2]
+            if instrument-2 in samples and layer[0] & 0x80:
+                selected.add(instrument-2)
+            layers.append({'address': f'{at:08X}', 'flags': layer[0],
+                'inst_or_wave': instrument, 'delay': struct.unpack_from('>h', layer, 0x1A)[0],
+                'pc': f'{u32(layer, 0x64):08X}', 'instrument': f'{u32(layer, 0x58):08X}',
+                'tuned_sample': f'{u32(layer, 0x5C):08X}',
+                'native_channel': f'{u32(layer, 0x3C):08X}'})
+        count = word(0x8014BB20)
+        if not 0 < count <= 256:
+            raise ValueError('Unbounded native sample-DMA list')
+        cache = debug.read_memory(bounded(word(0x8014BB1C), count*16), count*16)
+        transfers = []
+        for slot in range(count):
+            row = cache[slot*16:(slot+1)*16]
+            ram, source = struct.unpack_from('>2I', row)
+            size = struct.unpack_from('>H', row, 10)[0]
+            if not row[14] or not size:
+                continue
+            for instrument, (begin, length) in samples.items():
+                first, end = max(source, begin), min(source+size, begin+length)
+                if first >= end:
+                    continue
+                data = debug.read_memory(bounded(ram, size)+first-source, end-first)
+                matched = data == rom[first:end]
+                transfers.append({'instrument': instrument, 'source': f'{first:08X}',
+                    'bytes': end-first, 'ttl': row[14], 'matches_rom': matched})
+                if matched:
+                    observed.add(instrument)
+        record({'note_trace_frame': frame, 'channel_flags': state[0], 'bank_id': state[7],
+            'channel_pc': f'{u32(state, 0x64):08X}', 'ports': state[0xC8:0xD0].hex(),
+            'layers': layers, 'completed_imported_transfers': transfers})
+        # A cache transfer can include a neighbouring waveform through DMA
+        # read-ahead. Require actual note selection too, not overlap alone.
+        if observed == set(samples) and selected == set(samples):
+            break
+        if frame < 96:
+            debug.advance_game_frame()
+    check('resident melody remains intact', int(melody['ram'], 16), original)
+    check('loaded melody remains intact', sequence+0x4610, copied)
+    check('save/profile state remains intact', 0x8046C000, saved)
+    for at in (notes-16, notes+16):
+        check('town tune fixture guard', at, edge)
+    check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE')*4)
+    check('no faulted thread', 0x8003CE34, bytes(4))
+    result = {'native_note_trace': True, 'selected_imported_instruments': sorted(selected),
+        'new_instrument_dma': sorted(observed),
+        'all_four_streamed': observed == set(samples) and selected == set(samples),
+        'frames': frame, 'requires_checkpoint_restore': True,
+        'physical_audio_played': False, 'ordinary_conversation': False,
+        'town_tune': list(tune)}
+    record(result)
+    if not result['all_four_streamed']:
+        raise ValueError('Not all four imported instruments reached actual note selection and sample transfer')
+    return result
+
+
 def exercise(debug, rom_path, record, *, speech_tail=False):
     path = Path(rom_path)
     rom = path.read_bytes()

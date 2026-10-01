@@ -35,7 +35,9 @@ Native cartridge/disk launch, execution, reset, and close pass; the connected
 station/room return and current device-save cycle remain unfinished.
 The house/manor models now have their original HRA
 reward delivery, scoring, catalogue previews without ordering, and independent
-selection. Four added villager instruments retain unresolved playback evidence.
+selection. All four added villager instruments have confirmed native note
+selection and matching sample transfers; the earlier missing observations came
+from test tunes without held notes, not an import defect.
 Ordinary Save & Quit and a fresh-process restart pass for the ABI-392 full
 selection, with independent whole-save validation; this does not establish a
 rewarded-model or visitor-console save/restart cycle for ABI 396.
@@ -145,9 +147,24 @@ ownership. Retained inner collection bridges are replaced without bypassing the
 outer diary/surface/display/paper chain. Creature acquisition
 already reaches the complete visitor record through both retained exports. Both
 native note kinds together and the actual station path still require connected
-verification. HRA model rewards and four instruments remain part of the same
-unfinished V3 task. The local preview serves the
+verification. The model/visitor-console current save cycle remains part of the
+same unfinished V3 task. The local preview serves the
 repaired interface and ABI-396 recipes; the deployed public V2 patcher is unchanged.
+
+### Imported villager instruments
+
+`build/v3-travel-villager-note-trace-03/results.json` verifies actual native
+selection and streamed waveform data for instruments 84–87 on the unchanged
+ABI-396 full selection. The 76-frame controlled town tune uses original held
+notes; all four instrument selections coincide with matching ROM sample data.
+Melodies, the checked 864-byte save/profile region, guards, fault state, checkpoint restoration, and
+graceful shutdown pass. The original GameCube and N64 tune-controller commands
+match after address normalization, and the current imported controller retains
+that rule. Neither melodies nor game code need repair. DMA read-ahead can include
+a neighbouring sample, so cache overlap alone is not accepted as playback proof.
+The [audio checkpoint](checkpoints/V3_COMPLETE_AUDIO_RUNTIME.md) retains the
+diagnostic attempts and exact result identity. This is silent native note/sample
+verification, not listening, an ordinary conversation, or hardware acceptance.
 
 ### Full-selection ordinary save and restart
 

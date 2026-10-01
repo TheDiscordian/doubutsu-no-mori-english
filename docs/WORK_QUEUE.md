@@ -39,8 +39,12 @@ complete the import pipeline. Keep this as one connected implementation task:
    checks pass. Preserve the earlier 20 scope checks for unchanged composition
    paths. Browser reconstruction of both selected models matches offline at
    `build/v3-travel-hra-rewards-browser-01/results.json`.
-3. Classify the unresolved four-instrument villager playback results and fix
-   confirmed defects. Verify silently. Preserve the passing ordinary Save & Quit
+3. Preserve the confirmed four-instrument villager note/sample verification.
+   The original held-note rule resolves the earlier missing observations without
+   changing melodies or game code. All four actual instrument selections and
+   matching sample transfers pass in
+   `build/v3-travel-villager-note-trace-03/results.json`; cache read-ahead alone
+   does not count. Preserve the passing ordinary Save & Quit
    and fresh-process reload for the current full import selection; rerun only
    when a later connected change affects that path.
 4. Preserve the verified website repairs: ROM selectors before settings/import
@@ -160,7 +164,7 @@ rows and travelling record, storage guards, checkpoint restoration, and no fault
 This is a controlled title-checkpoint session, not ordinary furniture interaction,
 a walked station trip, or cartridge saving. The next connected check is the
 remaining station/room return and current save cycle, including both native
-note kinds. Continue unresolved instruments under this same task; no additional
+note kinds. The instrument check is closed under this same task; no additional
 NES save permissions or new game systems are required.
 
 ### Completed preview repairs and verified behaviour

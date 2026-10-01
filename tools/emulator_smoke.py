@@ -1995,12 +1995,15 @@ def main():
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_complete_audio'):
-                from v3_complete_audio_smoke import exercise
+                from v3_complete_audio_smoke import exercise, trace_notes
                 if not (out/'test.bs1').is_file():
                     raise ValueError('Complete audio probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
-                results.append(exercise(debug, args.rom, record,
-                                        speech_tail=action['test_v3_complete_audio'] == 'speech-tail'))
+                if action['test_v3_complete_audio'] == 'note-trace':
+                    results.append(trace_notes(debug, args.rom, record))
+                else:
+                    results.append(exercise(debug, args.rom, record,
+                                            speech_tail=action['test_v3_complete_audio'] == 'speech-tail'))
             if 'observe_v3_voice' in action:
                 from v3_voice_observation import observe
                 message = message_snapshot(debug)

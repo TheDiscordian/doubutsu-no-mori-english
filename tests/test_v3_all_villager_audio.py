@@ -1,5 +1,6 @@
 """Complete donor melodies and additive instrument resources, without playback."""
 import json
+import os
 from pathlib import Path
 import struct
 import sys
@@ -9,7 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 from v3_villager_audio import (build_audio, extended_envelope, extended_native_interpreter,
-    extended_program, extended_sequence_programs, read_audio_donor)
+    extended_program, extended_sequence_programs, read_audio_donor, header_entry,
+    resource, GC_SECTIONS, NATIVE_HEADERS, NATIVE_FILES)
 from v3_villager_assets_runtime import ART, ART_SHA
 
 
@@ -106,6 +108,66 @@ class ActualDonorTests(unittest.TestCase):
         damaged = bytearray(self.donor[1]); damaged[-1] ^= 1
         with self.assertRaises(ValueError): build_audio(self.native, self.donor[0], damaged,
                                                         villagers=self.roster, extended=True)
+
+    def test_original_tune_controller_preserves_hold_and_instrument_tail_timing(self):
+        # Compare the complete original tune-controller programs, including
+        # held-note and stop-layer branches, rather than extending their timing
+        # to force the new sample test to pass.
+        files = by_vrom(self.native)
+        code = files[CODE_VROM].extract(self.native)
+        read = lambda at, size: code[at-CODE_RAM:at-CODE_RAM+size]
+        native, _ = resource(read, NATIVE_HEADERS,
+            {'seq': files[NATIVE_FILES['seq']].extract(self.native)}, 'seq', 199)
+        dol, audio = self.donor
+        start, size = struct.unpack_from('>II', header_entry(dol.read, 0x800CE450, 0))
+        donor, _ = resource(dol.read, GC_SECTIONS,
+            {'seq': audio[start:start+size]}, 'seq', 242)
+
+        def commands(sequence, begin, end, pool):
+            result, cursor = [], begin
+            while cursor < end:
+                opcode = sequence[cursor]
+                cursor += 1
+                self.assertGreaterEqual(opcode, 0x50)
+                spec = read(0x80113210+opcode, 1)[0] if opcode >= 0xA0 else 0
+                args = []
+                for index in range(spec & 3):
+                    width = 2 if spec & (0x80 >> index) else 1
+                    value = int.from_bytes(sequence[cursor:cursor+width], 'big')
+                    cursor += width
+                    if (opcode in (0xC2, 0xF5, 0xFA, 0xFB, 0xFC)
+                            or opcode == 0xC7 and index == 1):
+                        if value >= pool:
+                            value = ('melody', value-pool)
+                        else:
+                            self.assertTrue(begin <= value <= end)
+                            value = ('controller', value-begin)
+                    args.append(value)
+                if opcode == 0xE8:
+                    # The env command reads five further bytes in its handler,
+                    # after the three operands described by SCOM_TABLE.
+                    args.extend(sequence[cursor:cursor+5])
+                    cursor += 5
+                result.append((opcode, tuple(args)))
+            self.assertEqual(cursor, end)
+            return result
+
+        native_commands = commands(native, 0x38F6, 0x3A06, 0x3A10)
+        donor_commands = commands(donor, 0x4614, 0x4724, 0x4740)
+        self.assertEqual(native_commands, donor_commands)
+        self.assertIn((0xC8, (14,)), native_commands)
+        self.assertIn((0xC8, (15,)), native_commands)
+        self.assertIn((0x90, ()), native_commands)
+        current_path = os.environ.get('V3_COMPLETE_AUDIO_BUILD')
+        if current_path:
+            current_path = Path(current_path)
+            current_rom = (current_path/'animal-forest-v3-asset-loader.z64').read_bytes()
+            current = json.loads((current_path/'build.json').read_text())
+            self.assertEqual(sha256(current_rom), current['output_sha256'])
+            row = current['fire_sound']['resources']['seq']
+            sequence = current_rom[row['physical']:row['physical']+row['bytes']]
+            self.assertEqual(sha256(sequence), row['sha256'])
+            self.assertEqual(commands(sequence, 0x38F6, 0x3A06, 0x3A10), donor_commands)
 
 
 if __name__ == '__main__':

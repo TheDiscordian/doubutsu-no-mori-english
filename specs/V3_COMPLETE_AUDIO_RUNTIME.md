@@ -3,11 +3,12 @@
 ## Implemented boundary
 
 `tools/v3_all_audio_runtime.py` installs all twenty donor melodies and the four
-additional instruments in ABI 53. Existing villagers, instruments, artwork,
-physical audio-file locations, save/profile formats, and both V2 patchers are
-retained. Move-in flags remain disabled. Native loading and melody handling
-have passing evidence; playback of the four new instruments remains unresolved.
-Do not describe these components as complete playable villagers.
+additional instruments. Existing villagers, instruments, artwork, and
+save/profile formats are retained. Native loading, melody handling, selection
+of all four added instruments, and matching sample transfers pass. The original
+GameCube and N64 tune controllers share the held-note rule; preserve their
+timing rather than extending unheld notes to reach later instrument changes.
+The public deployed patcher stays on V2; the local preview serves experimental V3.
 
 ## Resources and memory
 
@@ -56,44 +57,46 @@ loader loads the font and streams samples through its existing PI path.
 The native initializer adds a physical group base to each audio-header source
 offset; it does not use the VROM directory to resolve those audio entries.
 Bank 2 and wave 2 therefore receive offsets to their new physical resources
-relative to the unchanged bank/wave initializer bases. This supports the actual
-audio loader without relocating the complete original audio files.
+relative to their checked initializer bases. The current wave initializer map
+is `fire_sound.wave_headers`; the older complete-audio receipt is not the current
+wave-group placement. Unsigned native base addition retains external wave two's
+absolute address even when the complete wave group is above it.
 
 Header `80114730` has source offset `00E72780`, size `3F40`, and instrument
-capacity 88. Header `80115050` has offset `00E1B040` and size `5DD50`.
+capacity 88. Header `80115050` has offset `FED416B0` and size `5DD50` in the
+current full selection, resolving to physical `01F51D60`.
 The empty instrument slot 83 remains empty; instruments 0–82 are retained,
 and donor instruments 84–87 are added. The native loader's complete relocated
 font, including all sample addresses, matches the expected resource.
 
-The V3 file is the final live physical allocation. Composition extends it in
-place into checked zero padding to 925,008 bytes, updates only its directory
-row, and retains every existing file identity and physical start. All other
-native code changes are limited to the two melody hooks and two audio headers;
-the translation module receives the checked startup/configuration update.
-The cartridge remains 32 MiB. CRC and complete UPS reconstruction pass.
+The current full selection uses a 64-MiB cartridge and an Expansion Pak. Audio
+resources remain local and ignored. CRC and complete UPS reconstruction are
+checked by the shared composition path.
 
 ## Audio capacity
 
-All seven permanent sequence/font entries require 108,512 bytes under conservative
-32-byte alignment, within the original 108,544-byte permanent heap. The 32-byte
-remainder is small: future audio additions require a new capacity review, not
-unchecked appends. Total/fixed/permanent heap settings and cache policies remain
-unchanged. Native execution observes five loaded resources using 74,368 bytes;
-the static inventory also includes the two resources absent from that scene.
+The current complete item/villager selection's seven permanent sequence/font
+entries require 118,688 bytes under conservative 32-byte alignment, within the
+118,784-byte permanent heap. Future audio additions require a new capacity
+review, not unchecked appends. These figures include imported item audio; the
+four villager instruments do not themselves enlarge the ordinary heaps.
 
 ## Verification boundary and continuation
 
-Fourteen focused tests pass. Native checks prove startup, complete font
-relocation, actual physical headers, melody pool copies/relocations, full-ID
-handling, and the previously unfinished accessory guard tail. Two bounded
-playback attempts do not observe a completed transfer for the four new
-instruments. The final post-audio guard checks are therefore not reached.
-This is unresolved playback evidence, not a passed synthesis test or an
-established fixture-only failure. The
-[checkpoint](../docs/checkpoints/V3_COMPLETE_AUDIO_RUNTIME.md) records both runs.
+Native checks prove startup, complete font relocation, actual physical headers,
+melody pool copies/relocations, full-ID handling, and accessory guards. The
+current-build note trace additionally proves native selection and matching
+sample transfers for every added instrument. Require actual instrument selection
+as well as sample transfers: DMA read-ahead can include a neighbouring waveform
+before that instrument plays. Melodies and the checked 864-byte save/profile
+region stay unchanged;
+post-audio guards, zero fault state, checkpoint restoration, and shutdown pass.
+The [checkpoint](../docs/checkpoints/V3_COMPLETE_AUDIO_RUNTIME.md) records exact
+current evidence and the earlier missing observations' test-tune cause. The
+controller source comparison and current cartridge check retain the original
+held-note and stop rules. No audio game-code repair is required.
 
-Continue full text/defaults, houses, and town behaviour. During the next
-meaningful combined native check, inspect the actual note-layer progress and
-sample requests to resolve the missing playback evidence. Do not replay the
-passing font/attachment checks or start another setup loop. Ordinary conversation,
-GPU appearance, move-in, persistence, and hardware acceptance remain open.
+Ordinary in-world conversation, listening, and hardware acceptance are not
+claimed by this controlled silent tune test. Continue the remaining connected
+visiting and current save-cycle checks under the active V3 task; do not replay
+unchanged font/attachment checks or redesign the original audio behaviour.

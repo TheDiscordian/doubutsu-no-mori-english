@@ -10,8 +10,9 @@ retains the two-pilot converter and its exact fragment output.
 
 The [runtime installer](V3_COMPLETE_AUDIO_RUNTIME.md) connects the complete
 bundle, expanded source storage, and font/wave headers. Native loading and
-melody handling pass; actual new-instrument sample playback remains unresolved.
-No move-in flag or web patcher changes.
+melody handling, native selection of all four added instruments, and matching
+sample transfers pass. The source's held-note timing is retained. These audio
+checks do not establish listening or an ordinary conversation.
 
 ## Melody preservation
 
@@ -80,5 +81,6 @@ The [installer](V3_COMPLETE_AUDIO_RUNTIME.md) preserves full-ID tags, native
 synchronization, nineteen-pointer relocation, and CPU copying. It installs
 larger bank/wave resources with checked physical addresses and updated counts,
 without moving the original audio files or growing the audio heap. Its
-checkpoint records the passing loading checks and unresolved sample-transfer
-observations. Preserve all user saves and keep both served patchers on V2.
+checkpoint records the passing loading and current note/sample checks, including
+the test-tune cause of earlier missing observations. Preserve all user saves.
+The public deployed patcher stays on V2; the local preview serves experimental V3.
