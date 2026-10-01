@@ -2268,7 +2268,8 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='joint_rigs':return room_rigs(debug,rom_path,record,mode=6)
     if section=='rolling_rigs':return room_rigs(debug,rom_path,record,mode=5)
     if section=='creature_audio':return creature_audio(debug,rom_path,record)
-    if section=='creature_field':return creature_field(debug,rom_path,record)
+    if section in ('creature_field', 'creature_constructors'):
+        return creature_field(debug,rom_path,record,constructors_only=section=='creature_constructors')
     if section=='item_categories':return item_categories(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()
@@ -4499,7 +4500,7 @@ def staged_profiles(debug,rom_path,record):
         category_representatives=len(selected),acquisition_tested=False,ordinary_gameplay_tested=False)
 
 
-def creature_field(debug,rom_path,record):
+def creature_field(debug,rom_path,record,*,constructors_only=False):
     """One combined current-build PI/table/capture/release check; no save writes."""
     from runtime_layout import TEST_STACK
     from v3_creature_field_native import RAM,SIZE
@@ -4520,8 +4521,9 @@ def creature_field(debug,rom_path,record):
         record(result);return result['return_value']
     check('complete startup-loaded field packet',RAM,packet)
     size=0x12000;allocation=call(0x8009BFC0,[size])
-    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
-        raise ValueError('Creature-field fixture allocation outside native heap')
+    from v3_save_runtime_smoke import diagnostic_arena_checks
+    arena_checks=diagnostic_arena_checks(report,allocation,size)
+    for at,want in arena_checks:check('native diagnostic arena ownership/guard',at,want)
     root=allocation+16;controller=allocation+0xF000;graphics=allocation+0x10000;actor=allocation+0x11000;edge=b'V3CF'*4
     debug.write_memory(allocation,bytes(size))
     guards=(allocation,controller-16,controller+0x680,graphics-16,graphics+0xC00,actor-16,actor+0x400,
@@ -4552,18 +4554,20 @@ def creature_field(debug,rom_path,record):
         pool=r['pool'];physical=image[pool['physical']:pool['physical']+pool['bytes']]
         world=report['equipment_resources'].get('creature_fish')
         owners=r['owners']+([o for o in world['owners'] if o['name'] in ('river','sea')] if world else [])
+        if constructors_only:owners=[o for o in owners if o['name'] in ('fish','uki','release')]
         for owner in owners:
             data=files[owner['vrom']].extract(image);reloc=files[owner['reloc']].extract(image)
             sections=struct.unpack_from('>5I',reloc);resident=sum(sections[:4]);ram=owner['ram']
             expected=relocate_verified_data(SimpleNamespace(ram=ram,resident_bytes=resident,sections=sections),data,reloc,root,
-                address_constants=(ram+resident,) if owner['name']=='fish' else ())
+                address_constants=(ram+resident,) if owner['name']=='fish' else (),
+                memory_end=getattr(debug,'ram_end',0x80400000))
             call(0x800262D0,[owner['vrom'],owner['vrom']+len(data),ram,ram+resident,root,root+resident,len(reloc)])
             check('complete relocated '+owner['name']+' actor and BSS',root,expected)
             # Enter through the real relocated consumers. The debugger's direct
             # call guard intentionally accepts only ordinary-RAM native code;
             # the installed hook itself enters the verified Expansion Pak code.
             proof=(root,expected[:sections[0]])
-            if owner['name'] in ('fish','insect'):
+            if not constructors_only and owner['name'] in ('fish','insect'):
                 if owner['name']=='fish':debug.write_memory(root+0x80A5C540-ram,struct.pack('>I',controller))
                 for row in (r for r in r['rows'] if r['category']==owner['name']):
                     if owner['name']=='fish':
@@ -4632,10 +4636,12 @@ def creature_field(debug,rom_path,record):
                 check('source small-fish rubbish class',actor+0x1D4,struct.pack('>I',32))
                 check('rubbish retains imported origin',actor+0x1DA,b'\1')
         for at in guards:check('allocation/stack guard',at,edge)
+        for at,want in arena_checks:check('native diagnostic arena ownership/guard',at,want)
         check('retained save state',saved['state_ram'],saved_bytes)
         check('retained field packet',RAM,packet)
     finally:call(0x8009C010,[allocation])
-    return dict(native_creature_field=True,assertions=assertions,models=17,
+    return dict(native_creature_field=not constructors_only,native_creature_constructors=constructors_only,
+        assertions=assertions,models=0 if constructors_only else 17,
         ordinary_capture_release_tested=False,gpu_or_hardware_tested=False,
         flash_written=False,physical_audio_played=False,requires_checkpoint_restore=True)
 

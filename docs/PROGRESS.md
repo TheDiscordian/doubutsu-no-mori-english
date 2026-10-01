@@ -22,7 +22,7 @@ The current imported V3 includes the dresser, credits, and museum corrections.
 Its empty-selection baseline returns V2-14. This does not change the main V3
 lock or publish experimental V3.
 
-## Active development
+## V3 private playtest build
 
 V3 is only the import pipeline for items and villagers. Regular items should be
 importable and obtainable through the regular item pool. Rewards that fit existing
@@ -314,8 +314,15 @@ The current artifact locator and save warnings are
 reconstruction, and all three complete synchronous-writer/diary-preflight bodies
 authenticate against the current profile. Each acquire/release call points to
 the installed private bank, retains its delay slot, and restores the whole
-original function hash when only those two calls are reverted. This is static
-evidence, not execution of the distinct save consumers or larger-profile reload.
+original function hash when only those two calls are reverted. Current native
+execution at `build/v3-import-pipeline-save-entries-05/results.json` passes 82
+assertions and 37 calls for all three distinct entries. Both actual synchronous
+writers return success, erase the chip, write a complete format-21 bank, preserve
+the live body, and release private ownership. Independent decoding verifies the
+complete canonical town, 6,528 console bytes, 48,336 extended bytes, and 1,232
+working-state bytes. The complete 16,640-byte diagnostic allocation and all guards
+remain intact. Diary preflight preserves all records and physical FlashRAM.
+No game code, ROM, artwork, selected identity, or saved format changes.
 
 The creature runs record the original runner hash
 `db6b7e3f0e9dd8c6d7b83f479076be22202a1f5e8c1fc866ceab0f9d83c310ec`, matching
@@ -325,14 +332,46 @@ memory-error handler does not capture timeout/disconnect machine state. Neither
 run records the imported probe source hash or a post-failure register/RAM dump.
 The scheduler stops before a recorded graph pause or scheduler assertion, and
 the fish run stops after all nine model transfers, before a recorded constructor
-result. Missing fault records do not establish a harness-only cause. Both
-failures remain unresolved; no exhausted fixture is replayed.
+result. Missing original fault records do not establish a harness-only cause;
+those runs remain inconclusive, not retroactively passed. Current diagnosis uses
+the unchanged installed consumers rather than old cartridges or already-passing
+model transfers. The current interpreter result at
+`build/v3-import-pipeline-creature-diagnostics-03/results.json` passes 55
+constructor/capture/release/ownership assertions and 52 native scheduler assertions
+across four sound-category representatives. Native countdowns, imported-origin
+markers, retained coastal salmon, capture/release identities, complete owner
+relocation/BSS, and saved-state restoration pass. Ordinary gameplay, native
+synthesis, and hardware are not claimed. The same current constructor window
+times out with the recompiler at `build/v3-import-pipeline-creature-diagnostics-02/`:
+the captured descriptor is correct, but its requested breakpoint is not reached.
+This establishes a recompiler-specific controlled-test failure, not an ordinary
+game crash. First-failure transport records capture registers before cleanup;
+probe hashes identify current source. Eighteen debugger tests and nine complete
+save-proof/readback tests pass.
 
-Next verify the remaining synchronous writing/diary consumers, classify retained
-creature failures, and finish V3 acceptance and the private handoff. Do not replace
-failed checks with smaller buffers, replay exhausted fixtures, reset their
-debugging budgets, or silently omit a save consumer. New buildings and entirely
-new features remain outside V3.
+Complete fresh-process native readback passes at
+`build/v3-import-pipeline-save-entries-readback-05/results.json`. It starts from
+the actual current writer's exported FlashRAM chip, not a checkpoint seed. All
+6,528 console bytes, 48,336 extended bytes, and 1,232 working-state bytes match
+that export after ordinary controller loading. A post-load diagnostic checkpoint
+protects a real native loader call; the complete consumed bank independently
+decodes to all 63,872 live town bytes. The original exported player identities,
+inventories, clothing, town identity, houses, field items, and villager records
+remain intact across 47,090 checked bytes. Native reset/time bookkeeping can
+change and save during ordinary startup; it is not mistaken for import damage.
+Checkpoint restoration, zero native fault state, and graceful shutdown pass.
+The larger profile's ordinary Save & Quit is not repeated or claimed.
+
+The V3 import pipeline is ready for private playtesting at
+`build/v3-import-pipeline-profile-17/handoff.json`. All four artifact hashes
+authenticate, and retained UPS reconstruction agrees with the cartridge. The
+handoff states the eight-MiB Expansion Pak and FlashRAM requirements, format-21
+incompatibility with V2/older V3 readers, exact profile requirements, and the
+controlled recompiler limitation. Broad human gameplay, original hardware,
+ordinary acquisition of every reward, and human acceptance are not claimed.
+The deployed patcher and local preview remain unchanged. New buildings and
+entirely new features remain outside V3; subsequent work follows reported
+playtest bugs or a separately requested importing expansion.
 
 ## Preserved experimental artifact and subsystem evidence
 

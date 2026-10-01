@@ -1,6 +1,6 @@
 # Completion queue
 
-## Active: V3 import pipeline only
+## V3 import pipeline: private playtest handoff
 
 V3 imports items and villagers with working behaviours. Able Sisters (including
 its custom-design system), the Museum building, and comparable large features belong to V4. The
@@ -55,8 +55,10 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: finish remaining focused save consumers,
-classify retained creature failures, and prepare the private import-pipeline handoff.
+The V3 import pipeline is ready for private playtesting. Distinct save consumers,
+fresh-process native readback, and current controlled creature constructor/
+capture/release/scheduler checks pass. Broad human gameplay and hardware testing
+follow the handoff; they are not claimed as completed developer checks.
 The checked current build is
 `build/v3-nook-font-repaired-02/build-lock.json`, ABI 391. The all-available
 profile is `build/v3-import-pipeline-profile-17/profile.json`: twenty villagers,
@@ -192,31 +194,45 @@ gyroids and 186,896 free scene bytes. The exhausted direct native save fixture
 remains retained and unverified; ordinary save/reload does not relabel that
 failure or restart its budget.
 
-Remaining connected work:
+Current focused verification:
 
-1. Verify both actual synchronous writers (`af_v3_save_sync` and
-   `af_cw_save_sync`) and `af_v3_diary_preflight` using bounded existing paths.
-   Their complete current-profile function bodies and acquire/release bindings
-   authenticate; this is static evidence, not native execution. The ordinary
-   Save & Quit result does not establish those distinct entries. Preserve
-   complete data, native I/O, asynchronous
-   framebuffer ownership, and save format 21. Do not shrink diagnostic buffers,
-   silently omit a consumer, or replay an unchanged failed setup. Follow the
-   current testing policy in `CLAUDE.md` and `docs/V0_PLAN.md`: continue focused
-   verification autonomously, without requesting permission for extra test time.
-2. Classify retained creature constructor/scheduler failures from existing
-   evidence and targeted current-build diagnostics; unexplained failures remain
-   unresolved, not declared harness faults or passing checks. The original
-   runner is identified by its recorded hash, but the probe source identity and
-   post-failure machine state are not recorded. Read-only inspection cannot
-   establish either remaining cause from those missing records. Gather the
-   missing diagnostics with bounded runs and a concrete investigation purpose;
-   preserve old evidence instead of relabelling it or replaying old cartridges.
-3. Finish the private handoff with exact artifacts, hashes, compatibility
-   warnings, and known limits. The current artifact locator is
-   `build/v3-import-pipeline-profile-17/handoff.json`; it explicitly remains an
-   incomplete development build, not completed V3 acceptance. Do not switch the
-   deployed patcher or local preview.
+Both actual synchronous writers and diary preflight pass 82 assertions and 37
+native calls at `build/v3-import-pipeline-save-entries-05/results.json`. The full
+16,640-byte diagnostic allocation uses the exact guarded native gameplay block.
+Complete chip erasure/single-bank writes, all 48,336 extended bytes, all 1,232
+working-state bytes, live payload, asynchronous ownership, and guards pass.
+No game code, ROM, artwork, selected identity, or saved format changes.
+The current constructor/capture/release checks pass 55 assertions, and the native
+scheduler passes 52 across four sound-category representatives, at
+`build/v3-import-pipeline-creature-diagnostics-03/results.json`, using the emulator
+interpreter. The same constructor window times out with the recompiler at
+`build/v3-import-pipeline-creature-diagnostics-02/`, with a correct captured
+descriptor but no requested breakpoint completion. This is a recompiler-specific
+controlled-test limitation, not an ordinary gameplay or hardware claim. Earlier
+failed runs remain inconclusive because their diagnostic records are missing;
+current passing execution does not relabel those runs as passes.
+
+Fresh-process readback passes at
+`build/v3-import-pipeline-save-entries-readback-05/results.json`. The process
+starts from the writer's actual exported chip, not an emulator checkpoint.
+Ordinary controller loading restores all imported extended/profile records.
+Native startup changes its own bookkeeping and can write those changes before
+the diagnostic. A post-load checkpoint protects the diagnostic native reload;
+the complete physical bank actually consumed by the native loader, its 63,872-byte
+live copy, and 47,090 bytes of original player/item/town/villager records all
+check. All 6,528 console, 48,336 extended, and 1,232 working-state bytes match the
+original export. No expected game-data bytes are injected to simulate readback.
+Checkpoint restoration, zero native fault state, and graceful shutdown pass.
+This does not repeat ordinary Save & Quit on the larger profile.
+
+The private handoff is `build/v3-import-pipeline-profile-17/handoff.json`, with
+exact ROM/UPS/profile/report hashes, an eight-MiB Expansion Pak requirement,
+FlashRAM/save-format warnings, current native evidence, and explicit known limits.
+The build and patch remain private and unserved. Human acceptance, original
+hardware, broad gameplay, and ordinary current-profile Save & Quit remain
+unclaimed. Do not switch the deployed patcher or local preview. Subsequent work
+is reported playtest bugs or a separately requested importing expansion, not
+new V4 systems or repairs to historical emulator fixtures without a current need.
 
 Fix demonstrated game faults and record remaining limits honestly. Missing
 new V4 features do not make every reward a V4 item.

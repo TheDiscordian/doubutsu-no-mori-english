@@ -14,6 +14,359 @@ from v3_save_runtime import STATE_RAM, STATE_BYTES
 from v3_npc_draw_smoke import boot_proofs
 
 
+def entry_proofs(rom, report):
+    """Authenticate whole current consumers, not old metadata or short windows."""
+    from v3_private_save_bank import FUNCTIONS
+    equipment = report['equipment_resources']
+    private = equipment['private_save_bank']
+    owners = (equipment['diaries']['packets']['storage'],
+              equipment['carried_items']['quest']['packet'])
+    result = {}
+    for receipt, contract in zip(private['consumers'], FUNCTIONS, strict=True):
+        name, first, last, digest, sites = contract
+        if (receipt['name'], receipt['first'], receipt['last'], receipt['before_sha256']) != (
+                name, first, last, digest):
+            raise ValueError('Changed complete save-entry contract')
+        owner = next(p for p in owners if p['ram'] <= first < last <= p['ram']+p['bytes'])
+        packet = rom[owner['physical']:owner['physical']+owner['bytes']]
+        if sha256(packet) != owner['sha256']:
+            raise ValueError('Changed complete save-entry packet')
+        body = packet[first-owner['ram']:last-owner['ram']]
+        if sha256(body) != receipt['after_sha256']:
+            raise ValueError('Changed complete save-entry function')
+        restored = bytearray(body)
+        for patch, (address, kind) in zip(receipt['patches'], sites, strict=True):
+            target = private['code']['symbols']['af_v3_private_bank_'+kind]
+            expected = 0x0C000000 | (target >> 2 & 0x3FFFFFF)
+            offset = address-first
+            if (patch['address'] != address or patch['kind'] != kind or
+                    patch['before'] != 0x0040F809 or patch['after'] != expected or
+                    struct.unpack_from('>2I', body, offset) != (expected, patch['delay_slot'])):
+                raise ValueError('Changed save-entry bank binding or delay slot')
+            struct.pack_into('>I', restored, offset, patch['before'])
+        if sha256(restored) != digest:
+            raise ValueError('Changed retained save-entry instructions')
+        result[name] = (first, body)
+    return result
+
+
+def decode_current_bank(bank, console, extra, state, registry):
+    """Independently check the complete format-21 chip and canonical records."""
+    ext = bank[SAVE_BYTES:]
+    total = 72064+len(extra)
+    if (len(bank) != BANK or ext[:16] != struct.pack('>4I', 0x41465333,
+            21 << 16 | 0x680, registry, total) or
+            struct.unpack_from('>I', ext, 20)[0] != 1 or any(ext[40:])):
+        raise ValueError('Invalid complete format-21 bank metadata')
+    seal = bytearray(bank)
+    seal[18:20] = bytes(2)
+    seal[SAVE_BYTES+24:SAVE_BYTES+28] = bytes(4)
+    if (zlib.crc32(seal) != struct.unpack_from('>I', ext, 24)[0] or
+            sum(struct.unpack('>31936H', bank[:SAVE_BYTES])) & 65535):
+        raise ValueError('Invalid complete format-21 bank checksum')
+    length = struct.unpack_from('>I', ext, 16)[0]
+    stream = bank[20:0x2F68]+bank[0x2F6A:SAVE_BYTES]
+    if not 0 < length <= len(stream) or any(stream[length:]):
+        raise ValueError('Invalid complete format-21 compression/padding')
+    decoded = yaz0_decode(b'Yaz0'+struct.pack('>I', total)+bytes(8)+stream[:length])
+    if (len(decoded) != total or decoded[BANK:72064] != console or
+            decoded[72064:] != extra or
+            struct.unpack_from('>3I', ext, 28) != tuple(zlib.crc32(part) for part in
+                (decoded[:BANK], decoded[BANK:72064], decoded[72064:]))):
+        raise ValueError('Complete format-21 town/console/extended records differ')
+    if len(state) != 1232:
+        raise ValueError('Save-entry probe requires the whole canonical creature state')
+    canonical = bytearray(0x680)
+    struct.pack_into('>3I', canonical, 0, 0x41465333, 0x00080680, 5)
+    for destination, first, last in ((0x18, 0, 160), (0xC0, 192, 704),
+            (0x2C0, 160, 192), (0x2E0, 704, 832), (0x360, 832, 880),
+            (0x390, 880, 1200), (0x4D0, 1200, 1232)):
+        canonical[destination:destination+last-first] = state[first:last]
+    payload = bytearray(decoded[:SAVE_BYTES])
+    payload[18:20] = bytes(2)
+    struct.pack_into('>I', canonical, 12, zlib.crc32(payload))
+    struct.pack_into('>I', canonical, 16, zlib.crc32(canonical))
+    if (decoded[SAVE_BYTES:BANK] != canonical or
+            sum(struct.unpack('>31936H', decoded[:SAVE_BYTES])) & 65535):
+        raise ValueError('Complete canonical profile/catalogue/creature state differs')
+    return decoded[:BANK]
+
+
+def diagnostic_arena_checks(report, allocation, size):
+    """Accept the native main arena or its exact installed exclusive play block."""
+    if allocation & 15 or not size > 0:
+        raise ValueError('Full save-entry diagnostic allocation failed')
+    if MODULE_RAM+RESERVATION <= allocation <= 0x80400000-size:
+        return ()
+    scene = report['equipment_resources'].get('scene_arena', {})
+    workspace = scene.get('workspace', {})
+    if (not scene.get('installed') or scene.get('native_main_heap_end') != 0x80400000 or
+            scene.get('title_loaded_pointer') != 0x80102200 or
+            scene.get('borrowed_state') != dict(ram=0x804F4900, bytes=4) or
+            workspace.get('ram') != 0x80400000 or workspace.get('end') != 0x80450000 or
+            workspace.get('front_guard') != 0x80400000 or workspace.get('end_guard') != 0x8044FFF0 or
+            workspace.get('free_block') != 0x80400030 or
+            not 0x80400040 <= allocation <= 0x8044FFF0-size):
+        raise ValueError('Full save-entry diagnostic allocation escapes native owned arenas')
+    return ((0x80102200, bytes(4)), (0x804F4900, struct.pack('>I', 1)),
+            (0x80400000, bytes.fromhex('AF53434E')*4),
+            (0x8044FFF0, bytes.fromhex('AF53434E')*4),
+            (0x80400010, bytes.fromhex('7373000000000010')))
+
+
+def exercise_entries(debug, rom_path, record, export_directory):
+    """Distinct current native entries in a loaded disposable town; real I/O.
+
+    Retain the full 0x4100 diagnostic allocation and complete bank sizes. This
+    does not retry the failed title-screen allocation or fabricate game data.
+    """
+    path = Path(rom_path)
+    rom = path.read_bytes()
+    report = json.loads((path.parent/'build.json').read_bytes())
+    if (sha256(rom) != report['output_sha256'] or report['save_codec']['format_version'] != 21
+            or report['save_codec']['canonical_format_version'] != 8):
+        raise ValueError('Save-entry probe requires the exact current format-21 cartridge')
+    entries = entry_proofs(rom, report)
+    e = report['equipment_resources']
+    private = e['private_save_bank']
+    storage = e['console_storage']
+    state_ram = report['save_runtime']['state_ram']
+    state_bytes = report['save_runtime']['state_bytes']
+    if state_bytes != 1264:
+        raise ValueError('Changed complete current save-state size')
+    records = [('diary', storage['diary_state']['ram'], storage['diary_state']['bytes']),
+        ('fishing', report['save_codec']['active_storage_code']['symbols']['af_v3_fishing_state'], 176),
+        ('cards', report['save_codec']['active_storage_code']['symbols']['af_v3_card_state'], 64),
+        ('account', e['bank']['memory']['account']['ram'], 48)]
+    candidate = e['diaries']['memory']['ui_candidate']
+    if (candidate['ram'] != e['diaries']['ui_compiled']['bindings']['af_diary_native_candidate'] or
+            candidate['bytes'] != records[0][2]+16 or candidate['ram'] != 0x806D4000):
+        raise ValueError('Changed complete native diary candidate reservation')
+    proofs = boot_proofs(rom)
+    assertions = calls = 0
+    def check(label, at, expected):
+        nonlocal assertions
+        actual = debug.read_memory(at, len(expected))
+        record(dict(save_entry_check=label, address=f'{at:08X}', bytes=len(expected),
+                    expected_sha256=sha256(expected), actual_sha256=sha256(actual), passed=actual == expected))
+        if actual != expected:
+            raise ValueError('Save-entry mismatch: '+label)
+        assertions += 1
+    def call(at, arguments=(), proof=None):
+        nonlocal calls
+        record(dict(save_entry_call_begin=f'{at:08X}', arguments=list(arguments)))
+        result = debug.call(f'{at:08X}', list(arguments), return_address=MODULE_RAM+0x6480,
+                            verified_code=proof or proofs.get(at))
+        calls += 1
+        record(result)
+        return result['return_value']
+    def guards():
+        check('private bank released and front guards', private['workspace']['ram'],
+              struct.pack('>4I', 0x41465042, 0, 0xAF53B0DE, 0xAF53B0DE))
+        check('private bank end guards', private['workspace']['bank_ram']+BANK,
+              struct.pack('>4I', *([0xAF53B0DE]*4)))
+        check('complete save-state guard', state_ram+state_bytes-16, bytes.fromhex('AF53C0DE')*4)
+        check('save error', state_ram+4, bytes(4))
+        check('no CPU fault', 0x8003CE34, bytes(4))
+    record(dict(save_entry_probe_sha256=sha256(Path(__file__).read_bytes()),
+                rom_sha256=sha256(rom), ordinary_gameplay_tested=False,
+                diagnostic_allocation_bytes=0x4100, complete_bank_bytes=BANK))
+    code = by_vrom(rom)[CODE_VROM].extract(rom)
+    for first, last in ((0x8008ECA0, 0x80090120), (0x800CDB10, 0x800CE120)):
+        check('complete native FlashRAM owner', first, code[first-CODE_RAM:last-CODE_RAM])
+    for name, (first, body) in entries.items():
+        check('complete '+name, first, body)
+    packet = private['packet']
+    first, size = private['code']['ram'], private['code']['bytes']
+    check('complete private bank code', first,
+          rom[packet['physical']+first-packet['ram']:packet['physical']+first-packet['ram']+size])
+    ready = struct.unpack('>4I', debug.read_memory(state_ram, 16))
+    if ready[0] != 0xAF535633 or ready[1] or ready[2] != 1 or not ready[3]:
+        raise ValueError('Save-entry probe requires an actually loaded saved town')
+    guards()
+    if call(0x800CDBE0) != 1:
+        raise ValueError('Native FlashRAM initialization failed')
+    allocation = call(0x8009BFC0, [0x4100])
+    arena_checks = diagnostic_arena_checks(report, allocation, 0x4100)
+    for at, expected in arena_checks:
+        check('native diagnostic arena ownership/guard', at, expected)
+    transfer = allocation+16
+    edge = b'V3SE'*4
+    diagnostic_guards = (allocation, transfer+0x4000, allocation+0x4100-16,
+                         TEST_STACK-0xA00, TEST_STACK+0x40)
+    for at in diagnostic_guards:
+        debug.write_memory(at, edge)
+    def chip():
+        pieces = []
+        for start in range(0, FLASH_BYTES, 0x4000):
+            if call(0x800CDE54, [transfer, start//128, 0x4000//128]) != 0:
+                raise ValueError('Native complete chip read failed')
+            pieces.append(debug.read_memory(transfer, 0x4000))
+        for at in diagnostic_guards:
+            check('full diagnostic allocation/stack guard', at, edge)
+        for at, expected in arena_checks:
+            check('native diagnostic arena ownership/guard', at, expected)
+        return b''.join(pieces)
+    try:
+        initial = chip()
+        live = debug.read_memory(SAVE_RAM, SAVE_BYTES)
+        state = debug.read_memory(state_ram, state_bytes)
+        console = debug.read_memory(storage['state']['ram']+16, 6528)
+        extra = b''.join(debug.read_memory(at, n) for _, at, n in records)
+        prior_candidate = debug.read_memory(candidate['ram'], candidate['bytes'])
+        # The native capacity API deliberately rejects the live diary as an
+        # argument. Use its actual separate UI candidate, retaining every page.
+        debug.write_memory(candidate['ram'], extra[:records[0][2]]+edge)
+        asynchronous = debug.read_memory(SAVE_STATE, 32)
+        if asynchronous != bytes(32):
+            raise ValueError('Save-entry probe requires an idle asynchronous writer')
+        export_directory.mkdir()
+        (export_directory/'initial.flash').write_bytes(initial)
+        (export_directory/'initial-live.bin').write_bytes(live)
+        (export_directory/'initial-extended.bin').write_bytes(extra)
+        # Probe the real complete candidate, without writing pages or changing it.
+        first, body = entries['af_v3_diary_preflight']
+        measured = call(first, [candidate['ram']], (first, body))
+        if not 0 < measured <= SAVE_BYTES-22:
+            raise ValueError(f'Native diary preflight rejected the complete candidate: {measured:08X}')
+        check('preflight preserves complete town', SAVE_RAM, live)
+        check('preflight preserves complete saved state', state_ram, state)
+        check('preflight preserves complete separate candidate', candidate['ram'], extra[:records[0][2]]+edge)
+        offset = 0
+        for name, at, n in records:
+            check('preflight preserves complete '+name, at, extra[offset:offset+n])
+            offset += n
+        if chip() != initial:
+            raise ValueError('Diary preflight changed physical FlashRAM')
+        guards()
+        written = []
+        for name in ('af_v3_save_sync', 'af_cw_save_sync'):
+            first, body = entries[name]
+            if call(first, proof=(first, body)) != 0:
+                raise ValueError('Actual synchronous writer failed: '+name)
+            saved = chip()
+            working = debug.read_memory(state_ram+16, state_bytes-32)
+            canonical = decode_current_bank(saved[:BANK], console, extra, working,
+                                            report['save_codec']['registry_version'])
+            target = export_directory/(name+'.flash')
+            target.write_bytes(saved)
+            (export_directory/(name+'-canonical.bin')).write_bytes(canonical)
+            (export_directory/(name+'-live.bin')).write_bytes(debug.read_memory(SAVE_RAM, SAVE_BYTES))
+            changed = [i for i in range(20, SAVE_BYTES) if canonical[i] != live[i]]
+            record(dict(save_entry_complete_chip_comparison=name,
+                second_bank_erased=saved[BANK:] == b'\xFF'*BANK,
+                second_bank_unchanged=saved[BANK:] == initial[BANK:],
+                second_bank_sha256=sha256(saved[BANK:]),
+                changed_town_bytes=len(changed), first_changed_town_offsets=changed[:32]))
+            # Both native synchronous APIs call the original whole-chip erase
+            # and then write only bank zero, unlike ordinary two-bank saving.
+            if saved[BANK:] != b'\xFF'*BANK or changed:
+                raise ValueError('Synchronous writer violated native single-bank or complete town semantics')
+            # The synchronous contract copies the physical bank's first 20
+            # bytes back, including its compressed-bank checksum. The logical
+            # checksum belongs to the decoded bank, not the live header.
+            check(name+' retains physical header and complete live body',
+                  SAVE_RAM, saved[:20]+live[20:])
+            check(name+' retains asynchronous writer ownership', SAVE_STATE, asynchronous)
+            guards()
+            written.append(dict(consumer=name, file=target.name, bytes=len(saved),
+                sha256=sha256(saved), bank_sha256=sha256(saved[:BANK]),
+                complete_extended_bytes=len(extra), complete_working_state_bytes=len(working)))
+        result = dict(native_distinct_save_entries=True, diary_preflight=True,
+            complete_single_bank_writers=written, assertions=assertions, native_calls=calls,
+            diagnostic_allocation_bytes=0x4100, flash_written=True,
+            ordinary_save_menu_tested=False, fresh_reload_tested=False, hardware_tested=False,
+            requires_checkpoint_restore=True)
+        (export_directory/'manifest.json').write_text(json.dumps(result, indent=2)+'\n')
+        return result
+    finally:
+        if 'prior_candidate' in locals():
+            debug.write_memory(candidate['ram'], prior_candidate)
+            check('complete native UI candidate restored', candidate['ram'], prior_candidate)
+        call(0x8009C040, [allocation])
+
+
+def readback_entries(debug, rom_path, export_directory, record, *, native_reload=False):
+    """Check all saved records after a fresh ordinary load of the native chip."""
+    path = Path(rom_path)
+    report = json.loads((path.parent/'build.json').read_bytes())
+    record(dict(save_entry_readback_probe_sha256=sha256(Path(__file__).read_bytes())))
+    provenance = json.loads((export_directory.parent/'run.json').read_bytes())
+    manifest = json.loads((export_directory/'manifest.json').read_bytes())
+    rom_hash = sha256(path.read_bytes())
+    if (rom_hash != report['output_sha256'] or provenance['rom_sha256'] != rom_hash or
+            not manifest['native_distinct_save_entries'] or not manifest['diary_preflight']):
+        raise ValueError('Readback requires the passing exact-current native save export')
+    writer = manifest['complete_single_bank_writers'][-1]
+    chip = (export_directory/writer['file']).read_bytes()
+    if len(chip) != FLASH_BYTES or sha256(chip) != writer['sha256']:
+        raise ValueError('Changed native save chip for fresh readback')
+    e = report['equipment_resources']
+    storage = e['console_storage']
+    runtime = report['save_runtime']
+    ready = struct.unpack('>4I', debug.read_memory(runtime['state_ram'], 16))
+    if ready[0] != 0xAF535633 or ready[1] or ready[2] != 1 or not ready[3]:
+        raise ValueError('Fresh readback requires the actually loaded saved town')
+    if native_reload:
+        # Ordinary startup changes native reset, clock, and town housekeeping
+        # fields. Compare the complete loader copy before another game frame,
+        # using its real native entry, not writes of expected fixture bytes.
+        core = by_vrom(path.read_bytes())[CODE_VROM].extract(path.read_bytes())
+        result = debug.call('8008F968', [], return_address=MODULE_RAM+0x6480,
+                            verified_code=(0x8008ECA0, core[0x8008ECA0-CODE_RAM:0x80090120-CODE_RAM]))
+        record(result)
+        if result['return_value'] != 1:
+            raise ValueError('Fresh native complete-bank loader failed')
+    console = debug.read_memory(storage['state']['ram']+16, 6528)
+    records = (storage['diary_state'],
+        dict(ram=report['save_codec']['active_storage_code']['symbols']['af_v3_fishing_state'], bytes=176),
+        dict(ram=report['save_codec']['active_storage_code']['symbols']['af_v3_card_state'], bytes=64),
+        dict(ram=e['bank']['memory']['account']['ram'], bytes=48))
+    extra = b''.join(debug.read_memory(row['ram'], row['bytes']) for row in records)
+    working = debug.read_memory(runtime['state_ram']+16, runtime['state_bytes']-32)
+    canonical = decode_current_bank(chip[:BANK], console, extra, working,
+                                    report['save_codec']['registry_version'])
+    live = debug.read_memory(SAVE_RAM, SAVE_BYTES)
+    original_canonical = canonical
+    if native_reload:
+        # Native startup can write its ordinary reset/time bookkeeping before
+        # this diagnostic. The released private workspace still holds the full
+        # physical bank actually consumed by the loader; validate that bank and
+        # its complete live copy, independently of the original exported bank.
+        consumed = debug.read_memory(e['private_save_bank']['workspace']['bank_ram'], BANK)
+        canonical = decode_current_bank(consumed, console, extra, working,
+                                        report['save_codec']['registry_version'])
+        protected = [(0x2F60, 0x2F6A), (0x3588, 0xEC70)]
+        for player in range(4):
+            base = 0x20+player*0xBD0
+            protected += [(base, base+16), (base+0x14, base+0x40),
+                          (base+0xA76, base+0xA7A)]
+        for first, last in protected:
+            if canonical[first:last] != original_canonical[first:last]:
+                raise ValueError('Fresh restart changed saved player/items/town/villager records')
+        record(dict(native_consumed_bank_sha256=sha256(consumed),
+                    complete_import_record_bytes=sum(last-first for first,last in protected),
+                    original_exported_import_records_preserved=True))
+    if live != canonical[:SAVE_BYTES]:
+        changed = [i for i in range(SAVE_BYTES) if live[i] != canonical[i]]
+        record(dict(fresh_readback_changed_town_bytes=len(changed),
+                    first_changed_town_offsets=changed[:32]))
+        raise ValueError('Fresh native readback changed the complete saved town')
+    for at, want in ((0x8003CE34, bytes(4)),
+            (runtime['state_ram']+runtime['state_bytes']-16, bytes.fromhex('AF53C0DE')*4),
+            (e['private_save_bank']['workspace']['ram'],
+             struct.pack('>4I', 0x41465042, 0, 0xAF53B0DE, 0xAF53B0DE))):
+        if debug.read_memory(at, len(want)) != want:
+            raise ValueError('Fresh native readback fault or save guard mismatch')
+    return dict(native_save_entry_fresh_readback=True, rom_sha256=rom_hash,
+        written_chip_sha256=sha256(chip), complete_town_bytes=SAVE_BYTES,
+        complete_console_bytes=len(console), complete_extended_bytes=len(extra),
+        complete_working_state_bytes=len(working), ordinary_controller_load=True,
+        emulator_checkpoint_used=native_reload, checkpoint_seed_used=False,
+        complete_native_loader_called=native_reload, ordinary_save_menu_tested=False,
+        hardware_tested=False)
+
+
 def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=None, test_sync=True, collect_items=False):
     path = Path(rom_path)
     rom, report = path.read_bytes(), json.loads((path.parent / 'build.json').read_text())

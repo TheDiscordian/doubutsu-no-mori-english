@@ -98,6 +98,54 @@ def require_program_counter(registers, expected):
     return f'{actual:08X}'
 
 
+def capture_debugger_failure(debug, directory, command, error):
+    """Capture the first transport failure before fixture cleanup changes RAM.
+
+    Raw replies remain raw: a pending stop reply is not relabelled as registers
+    or memory. No register, instruction, or saved-data writes are performed.
+    """
+    diagnostic = dict(command=command, error=str(error), replies=[])
+    prior_timeout = debug.sock.gettimeout()
+    try:
+        debug.sock.settimeout(2)
+        debug.sock.sendall(b'\x03')
+        # The interrupted continue may produce S05 before our explicit query's
+        # T05. Drain that stop before issuing register/memory requests.
+        debug.send('?')
+        for _ in range(3):
+            response = debug.receive()
+            diagnostic['replies'].append(dict(command='?', response=response))
+            if response == 'T05':
+                break
+        else:
+            raise ValueError('Could not synchronise the stopped debugger replies')
+        for request in ('g', 'm8003ce30,20', 'm80145630,1b0'):
+            try:
+                debug.send(request)
+                response = debug.receive()
+                diagnostic['replies'].append(dict(command=request, response=response))
+                if request == 'g' and len(response) == 71*16 and all(
+                        c in '0123456789abcdefABCDEF' for c in response):
+                    diagnostic['registers'] = response
+            except (OSError, RuntimeError, ValueError) as failure:
+                diagnostic['replies'].append(dict(command=request, error=str(failure)))
+                break
+        registers = diagnostic.get('registers')
+        if registers:
+            pc = int(registers[37*16:38*16], 16) & 0xFFFFFFFF
+            diagnostic['pc'] = f'{pc:08X}'
+            if 0x80000000 <= pc <= getattr(debug, 'ram_end', 0x80400000)-64:
+                request = f'm{pc & ~7:x},40'
+                debug.send(request)
+                diagnostic['replies'].append(dict(command=request, response=debug.receive()))
+    except (OSError, RuntimeError, ValueError) as failure:
+        diagnostic['capture_error'] = str(failure)
+    finally:
+        debug.sock.settimeout(prior_timeout)
+        (directory/'debugger-transport-failure.json').write_text(
+            json.dumps(diagnostic, indent=2)+'\n')
+
+
 class DebuggerMemoryError(ValueError):
     """Retain the exact request/reply instead of losing it in bytes.fromhex."""
 
@@ -138,8 +186,15 @@ class RSP:
             self.buf += data
 
     def command(self, text):
-        self.send(text)
-        return self.receive()
+        try:
+            self.send(text)
+            return self.receive()
+        except (OSError, RuntimeError) as error:
+            handler = getattr(self, 'failure_handler', None)
+            if handler:
+                self.failure_handler = None
+                handler(self, text, error)
+            raise
 
     def read_memory(self, address, length):
         """Return exact bytes despite ares' aligned short-read optimisation."""
@@ -768,6 +823,8 @@ def main():
                         help='Use the debugger setting names supported by the selected emulator build')
     parser.add_argument("--seconds", type=int, default=40)
     parser.add_argument('--expansion-pak', action='store_true', help='Enable eight MiB for an explicitly compatible test build')
+    parser.add_argument('--force-interpreter', action='store_true',
+                        help='Compare native instruction execution without the emulator recompiler')
     parser.add_argument("--scenario", type=Path)
     parser.add_argument('--no-initial-screenshot',action='store_true',
                         help='Skip the diagnostic startup image for memory-only batches; scenario image checks still run')
@@ -799,6 +856,7 @@ def main():
     rom_hash = hashlib.sha256(rom.read_bytes()).hexdigest()
     audio_mode = 'private null-sink capture, no hardware playback' if args.record_game_audio else 'disabled'
     provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": audio_mode, "expansion_pak": args.expansion_pak,
+                  "force_interpreter": args.force_interpreter,
                   "initial_screenshot": not args.no_initial_screenshot,
                   "allow_test_flash_write": args.allow_test_flash_write,
                   "allow_test_pak_write": args.allow_test_pak_write,
@@ -882,6 +940,8 @@ def main():
                    "--setting", f"Nintendo64/ExpansionPak={str(args.expansion_pak).lower()}", str(rom)]
         if args.seed_state:
             command[5:5] = ["--save-state", "1"]
+        if args.force_interpreter:
+            command[-1:-1] = ['--setting', 'Developer/ForceInterpreter=true']
         if recording:
             # Audio goes only to the verified private null sink. Ordinary
             # recording also retains both internal mute and zero volume.
@@ -906,6 +966,8 @@ def main():
                 raise ValueError('Initial screenshot failed: '+error.stderr.decode(errors='replace')) from error
         debug = connect_debugger(ares, args.port)
         debug.ram_end = 0x80800000 if args.expansion_pak else 0x80400000
+        debug.failure_handler = lambda client, command, error: capture_debugger_failure(
+            client, out, command, error)
         results.append({"debug_features": debug.command("qSupported:multiprocess+")})
         keyboard = Keyboard(display)
         actions = json.loads(args.scenario.read_text()) if args.scenario else [
@@ -1412,6 +1474,26 @@ def main():
                     raise ValueError('Console image probes require a checkpoint and blank isolated storage')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,args.rom,record))
+            if action.get('test_v3_save_entries_readback'):
+                from v3_save_runtime_smoke import readback_entries
+                if not args.seed_save or args.seed_state or not (out/'test.bs1').is_file():
+                    raise ValueError('Save-entry readback requires a fresh cartridge-save load '
+                                     'and a post-load diagnostic checkpoint, not a checkpoint seed')
+                export = Path(action['test_v3_save_entries_readback'])
+                receipt = json.loads((export/'manifest.json').read_bytes())['complete_single_bank_writers'][-1]
+                if hashlib.sha256((args.seed_save/'test.flash').read_bytes()).hexdigest() != receipt['sha256']:
+                    raise ValueError('Fresh readback seed does not match the actual native writer export')
+                needs_checkpoint_restore = True
+                record(readback_entries(debug, args.rom, export, record, native_reload=True))
+            if action.get('test_v3_save_entries'):
+                from v3_save_runtime_smoke import exercise_entries
+                if (not args.expansion_pak or not (out/'test.bs1').is_file() or
+                        not args.allow_test_flash_write or not (args.seed_save or args.seed_state)):
+                    raise ValueError('Distinct save entries require eight MiB, a checkpoint, '
+                                     'an isolated cartridge seed or matching-ROM state, '
+                                     'and explicit write opt-in')
+                needs_checkpoint_restore = True
+                record(exercise_entries(debug, args.rom, record, out/'native-entry-export'))
             if 'test_v3_save_runtime' in action:
                 from v3_save_runtime_smoke import exercise
                 mode = action['test_v3_save_runtime']
@@ -1664,6 +1746,9 @@ def main():
                 if not (out/'test.bs1').is_file():
                     raise ValueError('Furniture batch probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
+                record(dict(item_batch_probe_sha256=hashlib.sha256(
+                    (Path(__file__).parent/'v3_furniture_batch_smoke.py').read_bytes()).hexdigest(),
+                    section=action.get('item_batch_section','automatic_furniture')))
                 results.append(exercise(debug,args.rom,record,
                     section=action.get('item_batch_section','automatic_furniture')))
             if action.get('test_v3_school_desks'):

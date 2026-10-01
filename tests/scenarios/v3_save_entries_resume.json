@@ -1,0 +1,14 @@
+[
+  {"read": ["80400000", 16], "expect": "AF53434EAF53434EAF53434EAF53434E"},
+  {"read": ["8044FFF0", 16], "expect": "AF53434EAF53434EAF53434EAF53434E"},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"pause_game_thread": true},
+  {"command": "QPassSignals:10", "expect_result": "OK"},
+  {"test_v3_save_entries": true},
+  {"load_state": true},
+  {"resume": true},
+  {"wait": 2},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["804E3000", 16], "expect": "4146504200000000AF53B0DEAF53B0DE"},
+  {"read": ["804F3010", 16], "expect": "AF53B0DEAF53B0DEAF53B0DEAF53B0DE"}
+]
