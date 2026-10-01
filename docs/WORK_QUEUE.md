@@ -55,12 +55,12 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: finish existing-system acquisition selection,
-remaining focused save consumers, and the private import-pipeline handoff.
+Current implementation task: finish remaining focused save consumers,
+classify retained creature failures, and prepare the private import-pipeline handoff.
 The checked current build is
 `build/v3-nook-font-repaired-02/build-lock.json`, ABI 391. The all-available
-profile is `build/v3-import-pipeline-profile-16/profile.json`: twenty villagers,
-263 independent item choices, the linked exercise-card/radio pair, and two
+profile is `build/v3-import-pipeline-profile-17/profile.json`: twenty villagers,
+273 independent item choices, the linked exercise-card/radio pair, and two
 required starting-outfit resources.
 Seven included furniture rewards use the existing native lottery; no new event
 provider is enabled for those rewards. Ordinary regular-pool integration remains
@@ -82,9 +82,17 @@ the complete installed selection-aware helper and existing native handovers.
 Complete source lists, metadata, helper/guards, native owner/descriptor, winter
 trade code/relocation, hooks, and allocations authenticate before composition.
 Missing providers or unfinished item behaviour keep the affected items unavailable.
-The ten summer rewards retain their built tent/scene resources but remain
-unavailable while their complete acquisition is unfinished. The V4-type label
-alone does not exclude an already-built working feature.
+Ten summer rewards use the complete already-built calendar, tent scene, masked
+camper, greeting/conversation, and selected native trade route. Admission checks
+actual current manager/directory bindings, complete art and dialogue, shared
+structure/profile/floor forwarding, and retained lamp callbacks. Independent
+choices use actual furniture flags and enable no unrelated event provider.
+No new game code, art, allocation, stock, or saved field is added. Ordinary summer
+gameplay/save remains unverified. The V4-type label alone does not exclude a
+working already-built route.
+The postal mailbox remains unavailable because the retained helper has no
+game-side caller or native mail submission binding. This completes its exclusion
+review without completing the unrelated account/mail feature port.
 Reward and trade code hashes match retained passing native evidence; no unchanged
 fixture is replayed. Ordinary conversations and current-profile saving are unclaimed.
 All four installed golden tools follow the shared readiness checks; missing
@@ -100,18 +108,22 @@ admission adds no runtime code, artwork, allocation, or save field. Unrelated
 selections leave this provider off; Wisp and the savings account remain independent.
 
 Current real-file browser worker and retained interface checks pass:
-`build/v3-import-pipeline-browser-15/build.json`,
-`build/v3-import-pipeline-worker-13/results.json`, and
+`build/v3-import-pipeline-browser-16/build.json`,
+`build/v3-import-pipeline-worker-14/results.json`, and
 `build/v3-import-pipeline-interface-13/results.json`. Browser hashes match offline
 builds; empty selection returns V2-14. The private export is unserved.
-Eighteen focused current-cartridge scope/browser-equivalence checks pass,
-including thirty-four actual profile hashes, both seasonal modes
+Retained focused current-cartridge scope/browser-equivalence checks pass,
+including both seasonal modes
 with each item selected alone,
 complete native Redd routing, stock selection, four standalone golden tools,
 complete/sparse Gulliver and igloo rewards, independent Mayor gifts, Harvest
 furniture/surface/cutlery selections, and both
 exercise-pair directions, and independent spirit/provider selections. Selecting card or radio includes the pair, matching
 the retained actual acquisition guard, with an explicit added requirement.
+Five affected summer/provider/composition checks pass, including 36 actual
+browser/offline profile hashes. The complete summer acquisition providers and
+precise shared-hook forwarding authenticate; altered resources or missing
+providers reject admission.
 The interface result verifies export 12, not the current Harvest menu. The current
 export retains identical interface code, styles, and cartridge recipes; its
 composition validator admits the checked independent spirit group and rejects
@@ -182,31 +194,15 @@ failure or restart its budget.
 
 Remaining connected work:
 
-1. Review remaining existing-system reward exclusions individually. Golden-tool,
-   Redd, fixed-ID seasonal stock, Gulliver, and winter-igloo admission are connected.
-   The fifty installed Mayor gifts and their existing calendar choice are admitted.
-   Password acquisition admission and its font/save-code collision repair are connected.
-   Exercise-card/radio admission and mutual selection are connected.
-   Harvest/cutlery admission and current manager/cleanup bindings are connected.
-   Spirit/Wisp admission and independent activation are connected.
-   Review the remaining postal,
-   and retained summer-camping acquisition routes against their actual
-   acquisition dependencies, retaining already-built features.
-   Reuse installed
-   resources and passing category evidence. Do not blanket-admit
-   optional event providers or require completing entirely new V4 features.
-   Pool names alone do not prove a new-feature requirement or a complete route.
-   Separate dependencies on entirely new features from extensions to existing
-   systems; do not resume savings accounts or other unrelated feature ports.
-2. Verify the actual synchronous writer and diary-preflight consumers using
+1. Verify the actual synchronous writer and diary-preflight consumers using
    bounded existing paths. The ordinary Save & Quit result does not establish
    those distinct entries. Preserve complete data, native I/O, asynchronous
    framebuffer ownership, and save format 21. Do not shrink diagnostic buffers,
    silently omit a consumer, replay exhausted fixtures, or reset their budgets.
-3. Classify retained creature constructor/scheduler failures from existing
+2. Classify retained creature constructor/scheduler failures from existing
    evidence without replaying exhausted old fixtures; unexplained failures remain
    unresolved, not declared harness faults or passing checks.
-4. Finish the private handoff with exact artifacts, hashes, compatibility
+3. Finish the private handoff with exact artifacts, hashes, compatibility
    warnings, and known limits. Do not switch the deployed patcher or local preview.
 
 Fix demonstrated game faults and record remaining limits honestly. Missing

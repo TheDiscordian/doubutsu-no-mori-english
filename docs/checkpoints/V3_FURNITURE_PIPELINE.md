@@ -1,6 +1,66 @@
 # Automatic furniture pipeline checkpoint
 
-## Current independent spirit acquisition
+## Current summer reward admission and postal exclusion
+
+Ten summer rewards are independently selectable through the complete already-built
+route. No game code, scene, building, artwork, allocation, saved field, stock route,
+or unrelated gift is added. The shared helper authenticates complete donor lists
+and metadata for all 38 Gulliver/winter/summer rewards.
+
+Summer checks cover complete scene/art/calendar packets, visitor/quest/placement/
+environment/registration code, the whole source manager callback object with its
+precise 64-day-directory patches, and actual type-70 callbacks at row 28 in the
+current 76-control manager. Complete current manager/relocation and calendar/
+descriptor forwarding retain their existing checks. All 253 official messages
+and 49 choices authenticate in their present banks, alongside greeting/last-gift
+hooks/allocation, current shared structure/profile/floor forwarding, and the
+complete retained lamp controller/relocation/callbacks. Old preparation flags do
+not override later installed consumers. Missing providers exclude affected items.
+
+Five affected focused checks pass: provider/independent selection, complete shared
+reward resources, summer mutation rejection, current all-selected flags and
+reversibility, and 36 actual browser/offline profiles. The first two pass within
+the initial 60.929-second run; the other three pass in 239.230 seconds after
+correcting a test's artwork offset to use the actual blob VROM. The initial
+mutation addresses unrelated bytes and establishes no game defect. Prior scope,
+JavaScript, native, and interface results retain their exact identities; unchanged
+fixtures are not replayed. Ordinary summer entry, appearance, conversations,
+save/reload, and hardware remain unverified.
+
+Current outputs retain raw ABI-391 `build/v3-nook-font-repaired-02/build-lock.json`:
+
+- `build/v3-import-pipeline-profile-17/profile.json`: 295 requests, twenty
+  villagers, 273 independent items, the linked exercise pair, and two required
+  starting outfits. Carried mask 125. Receipt SHA-256:
+  `06e35b4223652822fdf6ea9084da31d521a84323d2cccb01de14b8afaec46db0`.
+  ROM SHA-256: `2f0431103dbcc49d346957f82edcebd5e476bf24886188c2c7977f1f2e8421e9`.
+  UPS SHA-256: `226148f5dba788c94d8ec5903158e577606c88bfd20a0290e6bc16d89a0bf460`.
+  UPS reconstruction passes.
+- `build/v3-import-pipeline-browser-16/build.json`: unserved, 295 choices.
+  Plan SHA-256: `edc8c63b723262a7c6888d2d04f438d3ae857410f93f707a5725fc54b5f156e2`.
+  Build receipt SHA-256: `5b9aedcb7790e171e0be9d4d81d75a18d967ca58da8014d6ce53387fc30656c3`.
+- `build/v3-import-pipeline-worker-14/results.json`: real local game inputs,
+  summer-only `335C`, no added imports, matching offline ROM SHA-256
+  `9fffe4ae842fc459671b68e2e645223bfd973a692cb2ec03d0cae017a3c9d305`.
+  Result SHA-256: `14633eab5b2fb4a8f3ce90e63f882a963d47b892befd9f91d9f6eede9885941e`.
+  No upload/browser error; the temporary server stops. Interface, styles,
+  composition code, and cartridge recipes retain their prior hashes.
+
+Mailbox `3294` stays unavailable because `af_bank_send_rewards` has no game-side
+caller or native mail-submission binding. Converted resources and the account
+experiment remain intact. Finishing that unrelated feature port is not required.
+Format 21/wire 7, eight-MiB RAM, FlashRAM, stable identities, and allocations are
+unchanged. The larger profile's ordinary save/reload is unverified. Narrower
+profiles can reject added identities despite the unchanged layout. Keep matching
+profiles, separate builds/saves, and backups; removing carried families is not
+migration. V2 and format-20-or-earlier readers reject these saves. No main lock,
+service, deployed patcher, or local preview changes.
+
+Next consumer: distinct synchronous-writer/diary-preflight checks, retained
+creature-failure classification without exhausted-fixture replay, and the private
+handoff. Acquisition exclusion review is complete.
+
+## Retained independent spirit acquisition
 
 The ABI-391 cartridge retains its complete installed Wisp actor, field/spirit
 consumers, saved quest state, dialogue, artwork, and shared sound programs.

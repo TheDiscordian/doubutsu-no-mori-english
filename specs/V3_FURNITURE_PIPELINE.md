@@ -2573,7 +2573,8 @@ and state outside the two entry hooks remain unchanged at two relocation bases.
 The ten summer items come from source-derived records, not a runtime item array.
 Both camping categories stay non-orderable and outside ordinary shop stock.
 
-V3 selection admits the twenty Gulliver souvenirs and eight winter-igloo rewards
+V3 selection admits twenty Gulliver souvenirs, eight winter-igloo rewards, and
+ten already-built summer-camping rewards
 only through the complete installed providers. `existing_system_items` checks
 provider readiness and each item's remaining behaviour requirements;
 `verify_existing_system_items` authenticates the complete helper/guards, actual
@@ -2581,9 +2582,14 @@ donor lists, canonical metadata, unchanged native Gulliver handover outside its
 two selection patches, actor descriptor/relocation, and complete winter trade
 owner, hooks, code, relocation, and allocation. Neither route enables unrelated
 event providers. Sparse selections use the same actual profile flags as ordinary
-imports. Retained summer-camping rewards remain unavailable while their complete
-acquisition is unfinished; already-built tent/scene resources stay in V3, and
-their version label alone does not exclude a working route.
+imports. Summer admission also authenticates the complete scene/art packets,
+calendar/visitor/quest/placement/environment code, 64-row daily lookup, actual
+summer manager callbacks, official 253-message/49-choice dialogue, greeting and
+last-gift entries, current shared structure/profile/floor forwarding, and retained
+lamp controller/callbacks. Historical preparation flags do not override the
+later installed consumers. Missing providers keep these imports unavailable.
+Ordinary summer entry, conversations, appearance, save/reload, and hardware
+remain unverified; admission does not claim those checks.
 Admission changes selection data only; installed artwork, native runtime, and
 saved layouts are retained. Keep older native evidence attached to its tested
 build and warn that narrower saved profiles can reject added reward identities.

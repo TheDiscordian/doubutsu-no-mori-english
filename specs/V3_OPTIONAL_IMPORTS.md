@@ -378,8 +378,11 @@ pair. Neither alternative requires a new feature or building. See the
 Gulliver souvenirs and winter-igloo rewards extend existing native handovers and
 are admitted when their complete installed shared providers and item behaviours
 are ready. Their independent selections enable no unrelated event features.
-Summer-camping rewards retain the built enterable tent and scene but remain
-unavailable while their complete acquisition is unfinished. Fifty installed
+Ten summer-camping rewards use the complete already-built calendar, tent scene,
+masked camper, official conversations, and selected native trade route. Admission
+authenticates those actual providers, including current shared-hook forwarding;
+it builds no new feature and adds no shop stock. Ordinary summer gameplay and
+current-profile save/reload remain unverified. Fifty installed
 Mayor gifts are independently admitted through the retained gift/diary provider,
 with the existing calendar choice, no diary dependency, and source catalogue
 ordering where appropriate. See [shared optional rewards](V3_FURNITURE_PIPELINE.md#shared-optional-npc-rewards).

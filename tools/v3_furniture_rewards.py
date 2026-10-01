@@ -27,8 +27,31 @@ DONOR_FUNCTIONS = {
 }
 
 
+def summer_installed(report):
+    """Require the connected installed camper route, not old preparation flags."""
+    requirements = {
+        'campsite': ('scene_loading_installed',),
+        'campsite_calendar': ('calendar_installed', 'manager_installed'),
+        'campsite_manager': ('manager_installed',),
+        'campsite_placement': ('manager_installed',),
+        'camper': ('npc_reader_installed', 'manager_installed'),
+        'camper_quest': ('summer_english_message_selection',),
+        'camper_text': ('summer_selector_installed', 'native_expression_and_trade_operations_retained'),
+        'camper_greeting': ('summer_selection_installed', 'selected_rewards_installed', 'last_gift_tracking_installed'),
+        'camper_trade': ('summer_selection_installed', 'selected_rewards_installed'),
+        'campsite_environment': ('floor_sound_installed', 'point_parameters_installed', 'timed_lamp_installed'),
+    }
+    return bool(all(all(report.get(section, {}).get(k) for k in fields)
+                for section, fields in requirements.items())
+            and report.get('camper_movein', {}).get('natural_growth_guard')
+            and report.get('camper_movein', {}).get('transferred_villager_guard')
+            and report.get('tent_lamp', {}).get('timed_lamp_installed')
+            and report.get('campsite_exterior', {}).get('code', {}).get('symbols', {}).get('af_v3_campsite_exterior_ct')
+            and report.get('equipment_resources', {}).get('harvest', {}).get('manager', {}).get('installed'))
+
+
 def existing_system_items(report):
-    """Admit existing Gulliver and winter-igloo routes, not the new summer scene."""
+    """Admit complete Gulliver, winter-igloo, and already-built summer routes."""
     owner = report.get('furniture_rewards', {})
     if (not owner.get('selected_profile_aware') or owner.get('entry') != RAM
             or owner.get('reservation_start') != FIRST or owner.get('reservation_end') != END
@@ -41,6 +64,9 @@ def existing_system_items(report):
             and 19 in trade.get('shared_reward_categories', [])
             and trade.get('reward_count_entry') == owner['code']['symbols']['af_v3_furniture_reward_count']):
         routes.add(19)
+    if (summer_installed(report) and 23 in trade.get('shared_reward_categories', [])
+            and trade.get('reward_count_entry') == owner['code']['symbols']['af_v3_furniture_reward_count']):
+        routes.add(23)
     installed = {r['item_id']:r for r in report['furniture']['imports']}
     result = set()
     for row in owner.get('imports', []):
@@ -107,12 +133,12 @@ def verify_existing_system_items(image, report):
             struct.pack_into('>I',native,at,before)
         if sha256(native) != rule['owner_sha256']:
             raise ValueError('Changed native Gulliver handover outside reward selection')
-    if any(r['route'] == 19 and r['item_id'] in admitted for r in owner['imports']):
+    if any(r['route'] in (19,23) and r['item_id'] in admitted for r in owner['imports']):
         from v3_camper_trade import VROM, RELOC, QUEST, RAM as TRADE_RAM
         trade = report['camper_trade']; data = files[VROM].extract(image)
         relocation = files[RELOC].extract(image)
         code = trade['code']; suffix = data[trade['original_bytes']:trade['original_bytes']+code['bytes']]
-        if (not trade.get('winter_selection_installed') or len(data) != trade['bytes']
+        if (not trade.get('selected_rewards_installed') or len(data) != trade['bytes']
                 or sha256(data) != trade['sha256'] or sha256(relocation) != trade['relocation_sha256']
                 or struct.unpack_from('>5I',relocation) != tuple(trade['sections'])
                 or sha256(suffix) != code['sha256']
@@ -129,7 +155,149 @@ def verify_existing_system_items(image, report):
         if not any(r.get('donor_list') == 'ftr_listKamakura' and r['donor_list_sha256'] == sha256(donor)
                    for r in owner.get('trade_routes', [])):
             raise ValueError('Missing complete native winter reward membership')
+    if any(r['route']==23 and r['item_id'] in admitted for r in owner['imports']):
+        verify_summer(image, report, files, blob, core)
     return admitted
+
+
+def verify_summer(image, report, files, blob, core):
+    """Authenticate the retained calendar, scene, visitor, dialogue, and handover."""
+    from v3_optional_composition import resident_offset
+    from v3_harvest_acquisition import verify_manager
+    from v3_holiday_selection import packets
+    from v3_campsite_manager import VROM, RAM as MANAGER_RAM
+    from v3_campsite_runtime import PLAY, PLAY_RAM
+    from textbanks import Bank
+
+    def resident(address, size):
+        at=resident_offset(blob,address,size)
+        return blob[at:at+size]
+
+    def resource(vrom, size):
+        if vrom in files:return files[vrom].extract(image)
+        at=vrom-BLOB
+        if at<0 or at+size>len(blob):raise ValueError('Missing complete summer scene resource')
+        return blob[at:at+size]
+
+    def checked(raw, size, digest, label):
+        if len(raw)!=size or sha256(raw)!=digest:
+            raise ValueError('Changed complete summer '+label)
+
+    def hook(raw, ram, row):
+        after=row['after']
+        after=struct.pack('>I',after) if isinstance(after,int) else bytes.fromhex(after)
+        at=row['address']-ram
+        if raw[at:at+len(after)]!=after:
+            raise ValueError('Changed actual summer acquisition hook')
+
+    for section, part, start in (
+        ('campsite','code',0x804A0100),('campsite_calendar','code',0x804A2740),
+        ('campsite_calendar','event_code',0x804A2100),('campsite_exterior','code',0x804A0360),
+        ('campsite_placement','code',0x804A2A70),('camper','reader',0x804A29A0),
+        ('camper','registration',0x804A2D00),('camper_quest','code',0x804A2EC0),
+        ('camper_movein','code',0x80463EE0),('camper_greeting','gift_code',0x804A2F30),
+        ('campsite_environment','code',0x804A2F54)):
+        code=report[section][part]
+        checked(resident(start,code['bytes']),code['bytes'],code['sha256'],section+' '+part)
+    for section, address, size, digest in (
+        ('scene packet',report['campsite']['packet_ram'],0x1000,report['campsite']['packet_sha256']),
+        ('calendar packet',report['campsite_calendar']['packet'],0x100,report['campsite_calendar']['packet_sha256']),
+        ('exterior packet',report['campsite_exterior']['packet_ram'],report['campsite_exterior']['packet_bytes'],report['campsite_exterior']['packet_sha256']),
+        ('visitor',report['camper']['owner'],report['camper']['owner_bytes'],report['camper']['owner_sha256']),
+        ('cleanup',report['campsite_placement']['cleanup'],report['campsite_placement']['cleanup_bytes'],report['campsite_placement']['cleanup_sha256'])):
+        checked(resident(address,size),size,digest,section)
+    for row in report['campsite']['resources']:
+        checked(resource(row['vrom'],row['bytes']),row['bytes'],row['sha256'],'scene resource')
+    decorations=report['equipment_resources']['npc_extra']['events']['decorations']['controllers']
+    setup=decorations['code']['symbols']
+    if setup['af_decor_previous_setup']!=report['campsite_exterior']['code']['symbols']['af_v3_campsite_structure_setup']:
+        raise ValueError('Missing actual summer structure setup forwarding')
+    for row in report['campsite_exterior']['resource_moves']:
+        raw=bytearray(resource(row['vrom'],row['bytes']))
+        if row['vrom']==0x8CB690:
+            target=setup['af_decor_actor_setup']
+            for address,after,before in ((0x809E93F8,0x3C0F0000|((target+0x8000)>>16),0x3C0F804A),
+                                         (0x809E9400,0x25EF0000|(target&65535),0x25EF0A90)):
+                at=address-0x809E7ED0
+                if u32(raw,at)!=after:raise ValueError('Changed current summer structure setup hook')
+                struct.pack_into('>I',raw,at,before)
+        checked(raw,row['bytes'],row['sha256'],'scene resource')
+    for row in report['campsite']['hooks']:
+        hook(core,CODE_RAM,row) if row['address']<PLAY_RAM else hook(files[PLAY].extract(image),PLAY_RAM,row)
+    for section in ('campsite_placement','camper_movein'):
+        for row in report[section]['hooks']:
+            if row['address']<0x80400000:hook(core,CODE_RAM,row)
+            else:hook(resident(0x80460000,0xC000),0x80460000,row)
+    hook(core,CODE_RAM,report['camper']['hook'])
+    hook(core,CODE_RAM,report['campsite_environment']['hooks'][1])
+
+    e=report['equipment_resources']
+    for p in packets(e):
+        checked(image[p['physical']:p['physical']+p['bytes']],p['bytes'],p['sha256'],'calendar dependency packet')
+    verify_manager(image,report,e['harvest'])
+    manager=files[VROM].extract(image);m=report['campsite_manager'];symbols=m['code']['symbols']
+    start=symbols['af_v3_camper_event_start'];size=m['code']['bytes']
+    suffix=bytearray(manager[start-MANAGER_RAM:start-MANAGER_RAM+size])
+    # The installed directory extender redirects the compiled 16-row lookup to
+    # all 64 daily rows. The compiler's zero control reservation is populated.
+    for address,before,after in ((0x8096502C,0x2C640010,0x2C640040),
+        (0x8096503C,0x3C038014,0x3C03806F),(0x80965040,0x24639F98,0x24631500)):
+        at=address-start
+        if u32(suffix,at)!=after:raise ValueError('Changed expanded summer daily directory')
+        struct.pack_into('>I',suffix,at,before)
+    suffix[symbols['af_v3_camper_controls']-start:]=bytes(start+size-symbols['af_v3_camper_controls'])
+    checked(suffix,size,m['code']['sha256'],'manager callback object')
+    current=e['harvest']['manager'];at=current['table']-MANAGER_RAM+28*32
+    expected=struct.pack('>8I',70,*(symbols['af_v3_camper_event_'+name] for name in ('start','stop','in','out')),0,0,0)
+    if manager[at:at+32]!=expected or report['campsite_calendar']['today_capacity']!=64:
+        raise ValueError('Changed complete summer manager control')
+
+    greeting=report['camper_greeting']
+    for key,digest in (('vrom','sha256'),('relocation_vrom','relocation_sha256')):
+        raw=files[greeting[key]].extract(image)
+        checked(raw,greeting['bytes'] if key=='vrom' else greeting['relocation_bytes'],greeting[digest],'greeting owner')
+    for row in greeting['hooks']:
+        hook(files[row['vrom']].extract(image),row['ram'],row)
+    for row in report['camper_quest']['owners']:
+        raw=files[int(row['vrom'],16)].extract(image);at=row['hook']-row['ram']
+        expected=bytes.fromhex(row['after'])
+        if row['vrom'] in ('008681F0','008798C0'):
+            n=e['npc_extra'];p=n['events']['participants']['code']['symbols']
+            if (n['code']['symbols']['af_npc_previous_spawn']!=p['af_hp_spawn_profile'] or
+                p['af_hp_previous_spawn_profile']!=report['camper_quest']['code']['symbols']['af_v3_camper_profile']):
+                raise ValueError('Missing actual summer profile forwarding')
+            target=n['code']['symbols']['af_npc_identity_spawn']
+            expected=expected[:4]+struct.pack('>I',0x0C000000|((target>>2)&0x3FFFFFF))
+        if raw[at:at+len(expected)]!=expected:
+            raise ValueError('Changed summer quest profile or talk entry')
+    text=report['camper_text']
+    for kind,a,b,key,count in (('message',text['message_vrom'],text['message_table_vrom'],'messages',253),
+                             ('select',report['import_storage']['choice_vrom'],text['choice_table_vrom'],'choices',49)):
+        entries=Bank(kind,a,b,files[a].extract(image),files[b].extract(image)).entries()
+        if len(text[key])!=count:raise ValueError('Incomplete official summer dialogue')
+        for row in text[key]:
+            if row['id']>=len(entries) or sha256(entries[row['id']])!=row['encoded_sha256']:
+                raise ValueError('Changed retained official summer dialogue')
+
+    surface=report['room_surfaces']['items'];code=surface['code']
+    at=surface['blob_offset']
+    checked(blob[at:at+code['bytes']],code['bytes'],code['sha256'],'shared floor reader')
+    if code['symbols']['af_surface_prior_floor']!=0x804A2F54:
+        raise ValueError('Missing actual summer floor forwarding')
+    hook(core,CODE_RAM,report['room_surfaces']['application']['floor_hook'])
+    lamp=report['tent_lamp']
+    controller=e['room_rigs']['effects']['controller']
+    if (not controller.get('installed') or not controller['original']['timed_lamp_retained'] or
+        controller['original']['sha256']!=lamp['owner_sha256']):
+        raise ValueError('Missing complete retained summer lamp controller')
+    raw=files[controller['vrom']].extract(image)
+    checked(raw,controller['bytes'],controller['sha256'],'current lamp controller')
+    relocation=files[controller['reloc']].extract(image)
+    checked(relocation,len(relocation),controller['reloc_sha256'],'current lamp relocation')
+    hook(core,CODE_RAM,controller['descriptor'])
+    for row in lamp['profile_hooks']:hook(raw,controller['ram'],row)
+    checked(resource(lamp['extra_vrom'],lamp['extra_bytes']),lamp['extra_bytes'],lamp['extra_sha256'],'lamp resident packet')
+    for row in lamp['native_hooks']:hook(core,CODE_RAM,row)
 
 
 def install(original, base, prior, blob, imports, source, output):

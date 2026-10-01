@@ -122,18 +122,15 @@ class ImportScopeTests(unittest.TestCase):
         self.assertFalse(any(active(g,redd,{},scope=PIPELINE,report=self.report)
                              for g in groups(self.image,self.report)))
 
-    def test_existing_gulliver_and_igloo_rewards_require_their_actual_providers(self):
+    def test_existing_gulliver_and_built_camping_rewards_require_their_actual_providers(self):
         from v3_furniture_rewards import existing_system_items
         by_item = {r['item_id']:key for key,r in self.catalog.items() if r['kind']=='furniture'}
         rewards = self.report['furniture_rewards']
         categories = {route:[by_item[r['item_id']] for r in rewards['imports'] if r['route']==route]
                       for route in (12,19,23)}
         self.assertEqual({route:len(keys) for route,keys in categories.items()}, {12:20,19:8,23:10})
-        self.assertTrue(all(self.states[key]['selectable'] for route in (12,19) for key in categories[route]))
-        self.assertTrue(all(not self.states[key]['selectable'] for key in categories[23]))
-        self.assertTrue(all('summer-camping acquisition path is unfinished' in self.states[key]['reason']
-                            for key in categories[23]))
-        for route in (12,19):
+        self.assertTrue(all(self.states[key]['selectable'] for keys in categories.values() for key in keys))
+        for route in (12,19,23):
             for key in (categories[route][0], categories[route][-1]):
                 selection = self.select([key])
                 self.assertEqual(selection['enabled'],[key])
@@ -144,10 +141,24 @@ class ImportScopeTests(unittest.TestCase):
         bad = copy.deepcopy(self.report); bad['furniture_rewards']['selected_profile_aware'] = False
         self.assertEqual(existing_system_items(bad),set())
         self.assertTrue(all(not availability(self.catalog,bad)[key]['selectable']
-                            for route in (12,19) for key in categories[route]))
+                            for route in (12,19,23) for key in categories[route]))
         bad = copy.deepcopy(self.report); bad['camper_trade']['winter_selection_installed'] = False
         self.assertTrue(all(not availability(self.catalog,bad)[key]['selectable'] for key in categories[19]))
         self.assertTrue(all(availability(self.catalog,bad)[key]['selectable'] for key in categories[12]))
+        for section,field in (('camper_trade','summer_selection_installed'),
+                              ('camper_greeting','selected_rewards_installed'),
+                              ('camper_quest','summer_english_message_selection'),
+                              ('campsite','scene_loading_installed'),
+                              ('campsite_calendar','calendar_installed'),
+                              ('camper','npc_reader_installed'),
+                              ('camper_movein','natural_growth_guard'),
+                              ('campsite_environment','timed_lamp_installed')):
+            bad=copy.deepcopy(self.report);bad[section][field]=False
+            self.assertTrue(all(not availability(self.catalog,bad)[key]['selectable'] for key in categories[23]))
+            self.assertTrue(all(availability(self.catalog,bad)[key]['selectable'] for key in categories[19]))
+        postal=next(k for k,r in self.catalog.items() if r.get('item_id')=='3294')
+        self.assertFalse(self.states[postal]['selectable'])
+        self.assertIn('no game-side caller',self.states[postal]['reason'])
         bad = copy.deepcopy(self.report); bad['furniture_rewards']['routes'] = []
         self.assertTrue(all(not availability(self.catalog,bad)[key]['selectable'] for key in categories[12]))
         bad = copy.deepcopy(self.report)
@@ -162,7 +173,7 @@ class ImportScopeTests(unittest.TestCase):
         from v3_import_storage import PACKAGE, PACKAGE_RAM
         from v3_camper_trade import QUEST
         files = by_vrom(self.image)
-        self.assertEqual(len(verify_existing_system_items(self.image,self.report)),28)
+        self.assertEqual(len(verify_existing_system_items(self.image,self.report)),38)
         broken = bytearray(self.image); broken[files[BLOB].pstart+PACKAGE+FIRST-PACKAGE_RAM] ^= 1
         with self.assertRaisesRegex(ValueError,'reward helper'):
             verify_existing_system_items(broken,self.report)
@@ -176,6 +187,27 @@ class ImportScopeTests(unittest.TestCase):
         bad = copy.deepcopy(self.report)
         bad['furniture_rewards']['routes'][0]['donor_list_sha256'] = '0'*64
         with self.assertRaisesRegex(ValueError,'membership or metadata'):
+            verify_existing_system_items(self.image,bad)
+
+    def test_summer_admission_authenticates_actual_calendar_scene_and_dialogue(self):
+        from v3_furniture_rewards import verify_existing_system_items
+        from aflib import by_vrom,CODE_VROM,CODE_RAM
+        from v3_asset_loader import BLOB
+        files=by_vrom(self.image);h=self.report['equipment_resources']['harvest']['manager']
+        lamp=self.report['equipment_resources']['room_rigs']['effects']['controller']
+        for at in (files[BLOB].pstart+0x02484000-BLOB,  # Complete tent interior artwork.
+                   files[h['vrom']].pstart+h['table']-h['ram']+28*32+4,
+                   files[CODE_VROM].pstart+0x80086AF0-CODE_RAM,
+                   files[lamp['vrom']].pstart+0x80A1A840-lamp['ram']):
+            with self.subTest(offset=at):
+                broken=bytearray(self.image);broken[at]^=1
+                with self.assertRaises(ValueError):verify_existing_system_items(broken,self.report)
+        bad=copy.deepcopy(self.report);bad['camper_text']['messages'][0]['encoded_sha256']='0'*64
+        with self.assertRaisesRegex(ValueError,'official summer dialogue'):
+            verify_existing_system_items(self.image,bad)
+        bad=copy.deepcopy(self.report)
+        bad['equipment_resources']['npc_extra']['code']['symbols']['af_npc_previous_spawn']=0
+        with self.assertRaisesRegex(ValueError,'summer profile forwarding'):
             verify_existing_system_items(self.image,bad)
 
     def test_stock_composition_removes_every_unselected_import_and_preserves_native_lists(self):
@@ -463,7 +495,7 @@ class ImportScopeTests(unittest.TestCase):
             if row['kind']=='furniture' and row['item_id'] in summer:
                 # Both preserved summer calendar/manager admission predicates
                 # read these actual four-byte furniture flags.
-                self.assertEqual(struct.unpack_from('>I',result,base+row['enable_offset'])[0],0)
+                self.assertEqual(struct.unpack_from('>I',result,base+row['enable_offset'])[0],1)
         for group in groups(self.image, self.report):
             on=active(group,requested,self.select(requested)['behaviours'],scope=PIPELINE,report=self.report)
             for field in group['fields']:
@@ -494,7 +526,7 @@ class ImportScopeTests(unittest.TestCase):
                     ('regular-furniture', [normal]), ('diary-and-creature', [diary, fish, surface]),
                     ('redd-stock', redd), ('one-redd-item', redd[-1:]),
                     *((key.rsplit('/',1)[-1], [key]) for key in golden)]
-        for route in (12,19):
+        for route in (12,19,23):
             keys = [by_item[r['item_id']] for r in rewards if r['route']==route]
             profiles.extend([(f'reward-route-{route}',keys),(f'sparse-reward-{route}',keys[-1:])])
         for key in ('GAFE01-r0/item/1FC0','GAFE01-r0/item/30A8','GAFE01-r0/item/3378'):

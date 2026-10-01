@@ -39,10 +39,10 @@ existing-system reward routes individually. See the
 ### Current import selections and verification
 
 Browser and offline builds default to the V3 pipeline scope. Both offer all
-twenty villagers, 263 independent item choices, and the linked exercise-card/radio
+twenty villagers, 273 independent item choices, and the linked exercise-card/radio
 pair. Two exclusive
 starting-outfit resources follow their villagers as dependencies, not standalone
-item choices. Select all requests 285 choices and includes those two resources.
+item choices. Select all requests 295 choices and includes those two resources.
 Actual checked stock tables determine regular furniture, clothing, and surfaces;
 the remaining item categories use their installed native acquisition paths.
 Seven furniture choices use the existing native lottery, with checked donor
@@ -69,6 +69,16 @@ shared helper, donor lists, canonical metadata, native Gulliver handover/descrip
 and winter trade code, relocation, hooks, and allocation. Missing providers or
 unfinished item behaviour keep the affected imports unavailable. Selecting these
 rewards enables no unrelated event provider and adds no runtime or artwork.
+Ten summer-camping rewards also use the complete already-built route. Actual
+calendar/scene/art/visitor/quest/greeting/trade providers authenticate, including
+the current 64-day directory, manager callbacks, shared-hook forwarding, all 253
+official messages and 49 choices, and retained lamp controller. Independent
+selection uses the actual furniture flags; no unrelated event provider activates.
+No game code, artwork, allocation, stock route, or saved field changes. Ordinary
+summer entry, appearance, conversations, and save/reload remain unverified.
+The postal mailbox stays unavailable: its reward helper has no game-side caller
+or native mail submission binding. Retaining that experiment does not require
+finishing savings accounts or mail-delivery feature ports.
 Fifty Mayor holiday gifts use the retained complete selector, English dialogue,
 native inventory handover, and saved reward records. Independent choices activate
 the already-built gift/diary provider without requiring diary imports or enabling
@@ -98,8 +108,6 @@ relocation; current cleanup hooks are checked through their precise supersession
 Two cutlery services retain their original complete bodies behind the installed
 shared event redirects. No shop stock, ordering, game code, artwork, allocation,
 or saved field is added. Ordinary Harvest gameplay/save remains unverified.
-The ten summer-camping rewards remain unavailable while their complete acquisition
-path is unfinished, not merely because the retained tent and scene are V4-type work.
 The spirit item uses the complete already-installed Wisp route as an independent
 choice. All five stack states, actual field spawning, native manager callbacks,
 the current shared registry, complete gameplay/save owners, ten native hooks,
@@ -121,19 +129,20 @@ not enable the optional holiday, Wisp, birthday, or savings-account providers.
 Unavailable behaviour controls are hidden without a blanket V4 classification.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-15/build.json`, pinned to the ABI-391
-cartridge. Eighteen current-cartridge scope/browser-equivalence checks pass,
+`build/v3-import-pipeline-browser-16/build.json`, pinned to the ABI-391
+cartridge. Retained focused scope checks pass,
 covering complete Redd stock routing, selected-only furniture
 lists, four independent
 golden tools, reward-provider/resource rejection, and the existing Gulliver/igloo
 routes, independent Mayor gifts/provider activation, password-only selections,
 both exercise-pair directions, Harvest furniture/surface/cutlery selections,
-and independent spirit/provider selections. Thirty-four actual
-browser/offline profiles match. The current headless
+and independent spirit/provider selections. Current summer checks extend
+that evidence to the already-built camper route. Five affected focused checks
+pass, including 36 actual browser/offline profile hashes. The current headless
 Chromium worker check at
-`build/v3-import-pipeline-worker-13/results.json` reads actual game files and
-matches the offline spirit-only request with no additional imports.
-Retained worker checks cover Harvest lamp/rug/wall with cutlery, the exercise pair, password-only choices,
+`build/v3-import-pipeline-worker-14/results.json` reads actual game files and
+matches the offline summer-only request with no additional imports.
+Retained worker checks cover spirit-only, Harvest lamp/rug/wall with cutlery, the exercise pair, password-only choices,
 cancellation, and invalid-input rejection.
 The retained interface check passes at
 `build/v3-import-pipeline-interface-13/results.json`, including independent
@@ -172,11 +181,11 @@ Empty selection returns exact V2-14. No game files are uploaded; the temporary
 check servers are stopped. The export is unserved.
 
 The all-available offline profile is
-`build/v3-import-pipeline-profile-16/profile.json`; UPS reconstruction passes.
+`build/v3-import-pipeline-profile-17/profile.json`; UPS reconstruction passes.
 ROM SHA-256:
-`53a90af277e5772a4a71387a623d565efd6deb5079ab71c62c1a1190eefba25b`.
+`2f0431103dbcc49d346957f82edcebd5e476bf24886188c2c7977f1f2e8421e9`.
 UPS SHA-256:
-`d744cf1431ce4c37dc663749a4fe489513d6a1bed31ca9d0476964f2941e1e2e`.
+`226148f5dba788c94d8ec5903158e577606c88bfd20a0290e6bc16d89a0bf460`.
 It uses ABI 391 and retains format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and
 format-20-or-earlier V3 readers cannot read these saves; preserve separate saves
 and backups. Supported older saves migrate forward. Carried-item saves require
@@ -216,18 +225,18 @@ CRC, decompression, all three saved-record CRCs, canonical selected profiles,
 zero unused padding, and the preserved imported fan. Five focused scene/save
 tests pass, including that actual written-chip check. This verifies this town's
 ordinary save/restart, not every item behaviour, synchronous writing,
-diary-preflight execution, or hardware. The current 285-choice profile extends
+diary-preflight execution, or hardware. The current 295-choice profile extends
 that selection with four golden tools, twelve native Redd items, and the seasonal
 candle/flag, the Gulliver and winter-igloo rewards, fifty Mayor gifts, and eighteen
 password-only items, the linked exercise-card/radio pair, and thirteen Harvest
-reward/cutlery choices, and the independent spirit item. Its stock adapter occupies
+reward/cutlery choices, the independent spirit item, and ten summer rewards. Its stock adapter occupies
 an existing preloaded gap, preserving complete artwork and save format;
 selected-only stock data stays connected.
 It has not repeated ordinary save/reload. Compatibility with ABI 389 is expected
 in both directions when import profiles and other behaviour settings match;
 cross-version save/restart is not verified.
 The added reward identities require a build selecting those same imports; a
-profile-16 save may be rejected by profile-15's narrower selection despite the
+profile-17 save may be rejected by profile-16's narrower selection despite the
 unchanged saved layout. Preserve separate builds, saves, and backups.
 The native format-20 golden reward/state and shovel-rule evidence remains at
 `build/v3-golden-rewards-native-01/results.json` and

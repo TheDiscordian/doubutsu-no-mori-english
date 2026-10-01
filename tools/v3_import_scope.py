@@ -41,6 +41,8 @@ def availability(catalog, report):
     spirits=quest_items(report)
     summer_rewards = {r['item_id'] for r in report.get('furniture_rewards', {}).get('imports', [])
                       if r['route'] == 23}
+    postal_rewards = {r['item_id'] for r in report['furniture']['imports']
+                      if r.get('donor_list') == 'ftr_listPostoffice'}
     shirts = {item for group in report['clothing']['stock']['groups']
               for item in group['items']}
     surfaces = {r['id'] for group in report.get('room_surfaces', {}).get('stock', {}).get('resources', [])
@@ -88,8 +90,10 @@ def availability(catalog, report):
         result[key] = dict(selectable=ready, dependency_only=dependency_only,
             reason=('Included only as an authentic villager starting-outfit resource; not a standalone item choice.'
                     if dependency_only else '' if ready else
-                    'The retained summer-camping acquisition path is unfinished; its new building and scene alone do not establish working rewards.'
+                    'The complete installed summer-camping acquisition providers are unavailable.'
                     if kind == 'furniture' and row['item_id'] in summer_rewards else
+                    'Postal reward delivery is unbound: the retained helper has no game-side caller or native mail submission binding.'
+                    if kind == 'furniture' and row['item_id'] in postal_rewards else
                     'Acquisition is not admitted by the current V3 selection policy; existing-system reward routes require individual review.'))
     for key, row in catalog.items():
         if result[key]['selectable']:
