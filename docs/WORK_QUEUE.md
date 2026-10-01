@@ -29,8 +29,9 @@ complete the import pipeline. Keep this as one connected implementation task:
    storage. Imported reward mail, each model's independent selection, and
    catalogue non-orderability need real connections, not preparation flags.
 3. Classify the unresolved four-instrument villager playback results and fix
-   confirmed defects. Verify silently. Run ordinary Save & Quit and fresh-process
-   reload on the current full import selection, preserving existing save evidence.
+   confirmed defects. Verify silently. Preserve the passing ordinary Save & Quit
+   and fresh-process reload for the current full import selection; rerun only
+   when a later connected change affects that path.
 4. Preserve the verified website repairs: ROM selectors before settings/import
    choices, and the patch button after those choices; the original visual design,
    separate villager window and categorised item selection, no unavailable lists
@@ -170,6 +171,28 @@ alternatives, and C sanitizer checks pass. See the
 `build/v3-preview-options-profile-04/handoff.json` for artifacts and limits.
 Preserve these passing checks without treating them as complete V3 acceptance.
 Website checks do not establish completed native visiting or save/restart.
+
+### Verified full-selection ordinary save and restart
+
+The ABI-392 full selection in `build/v3-travel-native-dma-profile-02` passes
+the ordinary controller path through the gyroid's Save & Quit, writing both
+complete FlashRAM banks and returning to title. A separate fresh emulator
+process loads the written cartridge save without a checkpoint seed. Results
+are `build/v3-travel-ordinary-save-02/results.json` (40 steps, 18 assertions)
+and `build/v3-travel-ordinary-reload-01/results.json` (23 steps, 12 assertions).
+Imported fan `2255`, pockets, clothing, and the player's loan survive; scene,
+save, resident, and workspace guards and the zero fault pointer pass. Both
+processes shut down normally with physical audio disabled.
+
+The shared `OrdinarySaveChipTests` accepts explicit current writer, reader, and
+profile paths. Two checks independently validate both whole save banks,
+additive checksums, compression and all saved-record CRCs, selected villager/item
+and creature profiles, reserved padding, imported fan, the exact restart seed,
+and matching restored inventory. This proves this full-selection town's ordinary
+save/restart, not all item interactions, station visiting, or hardware. The first
+attempt in `build/v3-travel-ordinary-save-01` is interrupted, not passed; its
+receipt preserves the missing runner and incomplete assertions. The successful
+bounded transient test unit survives turn interruptions and is now stopped.
 
 V3 imports items and villagers with working behaviours. Able Sisters (including
 its custom-design system), the Museum building, and comparable large features belong to V4. The

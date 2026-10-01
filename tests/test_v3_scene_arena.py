@@ -1,5 +1,6 @@
 """Bounded scene-workspace control and exact current-cartridge installation."""
 import json
+import os
 from pathlib import Path
 import subprocess
 import struct
@@ -61,12 +62,19 @@ class SceneArenaCartridgeTests(unittest.TestCase):
         patch=(self.out/'asset-loader.ups').read_bytes()
         self.assertEqual(apply_ups(native,patch),self.rom)
 
-@unittest.skipUnless((ROOT/'build/v3-import-pipeline-ordinary-save-03/results.json').is_file(),
-                     'Current ordinary gameplay save output is required')
 class OrdinarySaveChipTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.directory=Path(os.environ.get('V3_ORDINARY_SAVE_BUILD',
+            str(ROOT/'build/v3-import-pipeline-ordinary-save-03')))
+        cls.profile_path=Path(os.environ.get('V3_ORDINARY_SAVE_PROFILE',
+            str(ROOT/'build/v3-import-pipeline-profile-06/profile.json')))
+        if not (cls.directory/'results.json').is_file() or not cls.profile_path.is_file():
+            raise unittest.SkipTest('An actual ordinary gameplay save and its selection profile are required')
+
     def test_complete_actual_banks_profiles_and_imported_item(self):
-        directory=ROOT/'build/v3-import-pipeline-ordinary-save-03'
-        profile=json.loads((ROOT/'build/v3-import-pipeline-profile-06/profile.json').read_bytes())
+        directory=self.directory
+        profile=json.loads(self.profile_path.read_bytes())
         results=json.loads((directory/'results.json').read_bytes())
         self.assertEqual(results[0]['rom_sha256'],profile['output_sha256'])
         self.assertTrue(results[-1]['graceful_shutdown'])
@@ -98,5 +106,37 @@ class OrdinarySaveChipTests(unittest.TestCase):
             self.assertEqual(canonical[0x2C0:0x2E0],expected[160:192])
             self.assertEqual(canonical[0x4D0:0x4D4],bytes.fromhex(profile['creature_profile_hex']))
             self.assertEqual(raw[0x40C:0x40E],bytes.fromhex('2255'))
+
+    def test_fresh_process_seed_and_restored_imported_inventory(self):
+        reload_directory=Path(os.environ.get('V3_ORDINARY_RELOAD_BUILD',
+            str(ROOT/'build/v3-import-pipeline-ordinary-reload-01')))
+        if not (reload_directory/'results.json').is_file():
+            self.skipTest('The matching fresh-process reload is required')
+        writer=json.loads((self.directory/'results.json').read_bytes())
+        reader=json.loads((reload_directory/'results.json').read_bytes())
+        run=json.loads((reload_directory/'run.json').read_bytes())
+        profile=json.loads(self.profile_path.read_bytes())
+        self.assertEqual(reader[0]['rom_sha256'],profile['output_sha256'])
+        self.assertEqual(run['rom_sha256'],profile['output_sha256'])
+        self.assertTrue(writer[-1]['graceful_shutdown'])
+        self.assertTrue(reader[-1]['graceful_shutdown'])
+        self.assertFalse(run['allow_test_flash_write'])
+        self.assertFalse(run['allow_test_pak_write'])
+        self.assertEqual(run['audio'],'disabled')
+        seeds={s['file']:s for s in run['seed_files']}
+        self.assertNotIn('test.bs1',seeds)
+        self.assertEqual(seeds['test.flash']['bytes'],131072)
+        self.assertEqual(seeds['test.flash']['sha256'],
+                         sha256((self.directory/'test.flash').read_bytes()))
+        before=next(r for r in writer if 'equipment_item' in r)
+        after=next(r for r in reader if 'equipment_item' in r)
+        for key in ('pockets','item_conditions','equipment_item','cloth_id','cloth_item','loan'):
+            self.assertEqual(after[key],before[key],key)
+        expected_reads={tuple(r['read']):r['data'] for r in writer if r.get('assertion')=='passed'}
+        for r in reader:
+            if 'assertion' in r:
+                self.assertEqual(r['assertion'],'passed')
+                self.assertEqual(r['data'],expected_reads[tuple(r['read'])])
+        self.assertGreaterEqual(sum(r.get('assertion')=='passed' for r in reader),10)
 
 if __name__=='__main__':unittest.main()

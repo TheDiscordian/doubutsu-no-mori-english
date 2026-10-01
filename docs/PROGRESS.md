@@ -32,8 +32,9 @@ the original owner-only editing and locked refusal. Additional console play
 still rejects visitors. The
 house/manor models have installed art/room behaviour but no connected HRA
 acquisition, scoring, or catalogue policy. Four added villager instruments retain
-unresolved playback evidence. Ordinary Save & Quit/restart is not established
-for the current full selection. The requested website design, villager dialog,
+unresolved playback evidence. Ordinary Save & Quit and a fresh-process restart
+pass for the current full selection, with independent whole-save validation.
+The requested website design, villager dialog,
 and control-order repairs pass browser checks and run in the local preview.
 The [active task](WORK_QUEUE.md#active-task-complete-the-connected-v3-itemvillager-import-paths)
 owns implementation and verification of these connected paths, plus any further
@@ -92,9 +93,30 @@ ownership. Retained inner collection bridges are replaced without bypassing the
 outer diary/surface/display/paper chain. Creature acquisition
 already reaches the complete visitor record through both retained exports. Both
 native note kinds together and the actual station path still require connected
-verification. HRA model rewards, four instruments, current full-selection save/
-restart remain part of the same unfinished V3 task. The local preview serves the
+verification. HRA model rewards and four instruments remain part of the same
+unfinished V3 task. The local preview serves the
 repaired interface and ABI-392 recipes; the deployed public V2 patcher is unchanged.
+
+### Full-selection ordinary save and restart
+
+The current 295-choice profile at `build/v3-travel-native-dma-profile-02`
+passes the actual controller Save & Quit path and a fresh-process cartridge-save
+load. `build/v3-travel-ordinary-save-02/results.json` records 40 steps and
+18 passing assertions, and `build/v3-travel-ordinary-reload-01/results.json`
+records 23 steps and 12 passing assertions. The gyroid offers Save & Quit,
+the native saving message appears, both whole FlashRAM banks are written, and
+the game returns to title. The reader copies those exact cartridge saves,
+not an emulator checkpoint. Imported fan `2255`, pockets, clothing, and loan
+match after restarting. Native fault state stays zero; scene, save, workspace,
+and resident guards and graceful shutdown pass. Physical audio is disabled.
+
+Two shared `OrdinarySaveChipTests` checks validate the complete actual banks,
+their checksums, decompression and all three record CRCs, the full selected
+profiles and padding, imported fan, exact fresh-process seed, and restored
+inventory. This establishes this town's ordinary current-build save/restart,
+not every item interaction, station visiting, synchronous writes, or hardware.
+Keep this passing path closed unless a subsequent change affects it. The
+interrupted first runner attempt stays recorded without a success claim.
 
 V3 is only the import pipeline for items and villagers. Regular items should be
 importable and obtainable through the regular item pool. Rewards that fit existing
@@ -371,9 +393,15 @@ password-only items, the linked exercise-card/radio pair, and thirteen Harvest
 reward/cutlery choices, the independent spirit item, and ten summer rewards. Its stock adapter occupies
 an existing preloaded gap, preserving complete artwork and save format;
 selected-only stock data stays connected.
-It has not repeated ordinary save/reload. Compatibility with ABI 389 is expected
-in both directions when import profiles and other behaviour settings match;
-cross-version save/restart is not verified.
+The ABI-392 full selection at `build/v3-travel-native-dma-profile-02` has passing
+ordinary Save & Quit and fresh-process reload at
+`build/v3-travel-ordinary-save-02/results.json` and
+`build/v3-travel-ordinary-reload-01/results.json`, with whole-chip validation.
+The writer loads a disposable copy of the narrower profile's saved town,
+then the fresh reader loads the current full-selection save. This establishes
+that forward load and current-build restart, not backward compatibility with
+ABI 389 or every pair of behaviour settings. Preserve earlier passing evidence
+without replaying historical cartridges.
 The added reward identities require a build selecting those same imports; a
 profile-17 save may be rejected by profile-16's narrower selection despite the
 unchanged saved layout. Preserve separate builds, saves, and backups.
