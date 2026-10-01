@@ -1,5 +1,8 @@
 /* Shared held-parent ownership; stored in the existing four-player extension. */
 #include "save_runtime.h"
+#ifdef AF_V3_PLAYER_TRAVEL
+#include "travel_collection.h"
+#endif
 typedef af_save_u8 u8;
 typedef af_save_u32 u32;
 #ifdef __mips__
@@ -31,9 +34,13 @@ void af_v3_held_catalogue_record(u32 argument) {
         if (item-0x2224u>=56u) af_v3_prior_catalogue_record(argument);
         return;
     }
-    af_v3_require_save_state();
     u32 player=player_slot(active);
+#ifdef AF_V3_PLAYER_TRAVEL
+    if (player==4) {af_travel_collection(active,display,1);return;}
+#else
     if (player==4) af_v3_save_halt(AF_SAVE_ARGUMENT);
+#endif
+    af_v3_require_save_state();
     int result=af_v3_save_collect(state->working,player,display,1);
     if (result<0) af_v3_save_halt(result);
 }
@@ -42,7 +49,11 @@ int af_v3_held_catalogue_owned(const u8 *private,u32 item) {
     u32 display=af_v3_held_item_collection(item);
     if (!display) return item-0x2224u<56u ? 0 : af_v3_prior_catalogue_owned(private,item);
     u32 player=player_slot(private);
+#ifdef AF_V3_PLAYER_TRAVEL
+    if (player==4) return af_travel_collection(private,display,0);
+#else
     if (player==4) return 0;
+#endif
     af_v3_require_save_state();
     int result=af_v3_save_collect(state->working,player,display,0);
     if (result<0) af_v3_save_halt(result);

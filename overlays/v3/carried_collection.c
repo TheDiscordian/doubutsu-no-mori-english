@@ -6,6 +6,9 @@
 #endif
 #include "holiday_cards.h"
 #include "save_codec.h"
+#ifdef AF_V3_PLAYER_TRAVEL
+#include "travel_collection.h"
+#endif
 typedef unsigned char u8;
 typedef unsigned int u32;
 extern void af_carried_prior_record(u32);
@@ -36,7 +39,11 @@ void af_carried_record(u32 argument) {
     if(!af_carried_reserved(item)) {af_carried_prior_record(argument);return;}
     if(item-0x2040u>=4 || af_carried_category(item)!=49)return;
     u32 player=slot(active);
+#ifdef AF_V3_PLAYER_TRAVEL
+    if(player==4) {af_travel_paper(active,1);return;}
+#else
     if(player==4)af_v3_save_halt(AF_SAVE_ARGUMENT);
+#endif
     if(af_carried_paper_collect(af_v3_card_data(),player,1)<0)af_v3_save_halt(AF_SAVE_CATALOGUE_INVALID);
 }
 int af_carried_owned(const u8 *player,u32 item) {
@@ -46,7 +53,12 @@ int af_carried_owned(const u8 *player,u32 item) {
 #endif
     if(!af_carried_reserved(item))return af_carried_prior_owned(player,item);
     u32 index=slot(player);
-    if(item-0x2040u>=4 || index==4 || af_carried_category(item)!=49)return 0;
+    if(item-0x2040u>=4 || af_carried_category(item)!=49)return 0;
+#ifdef AF_V3_PLAYER_TRAVEL
+    if(index==4)return af_travel_paper(player,0);
+#else
+    if(index==4)return 0;
+#endif
     int result=af_carried_paper_collect(af_v3_card_data(),index,0);
     if(result<0)af_v3_save_halt(AF_SAVE_CATALOGUE_INVALID);
     return result;

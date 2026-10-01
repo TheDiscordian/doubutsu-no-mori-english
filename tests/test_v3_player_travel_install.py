@@ -13,7 +13,7 @@ from v3_furniture_install import inputs
 from v3_player_travel_install import STATE,STATE_BYTES,RECORD_BYTES,IO,IO_END,LIFE,LIFE_END
 from v3_physical_resources import verify
 
-OUT=ROOT/os.environ.get('V3_PLAYER_TRAVEL_BUILD','build/v3-player-travel-installed-07')
+OUT=ROOT/os.environ.get('V3_PLAYER_TRAVEL_BUILD','build/v3-travel-consumers-installed-04')
 
 
 class PlayerTravelInstallation(unittest.TestCase):
@@ -32,7 +32,8 @@ class PlayerTravelInstallation(unittest.TestCase):
         self.assertEqual(self.report['furniture']['bank_pool'],self.prior['furniture']['bank_pool'])
         self.assertEqual(self.prior['furniture']['bank_pool']['end'],STATE)
         self.assertLess(STATE+STATE_BYTES,self.e['console_disk']['packet']['ram'])
-        self.assertEqual(self.report['save_codec'],self.prior['save_codec'])
+        for key in ('format_version','registry_version'):
+            self.assertEqual(self.report['save_codec'][key],self.prior['save_codec'][key])
         self.assertEqual(self.report['save_runtime']['profile_hex'],self.prior['save_runtime']['profile_hex'])
         core=by_vrom(self.image)[CODE_VROM].extract(self.image)
         self.assertEqual(core[0x80116808-CODE_RAM:0x80116810-CODE_RAM],struct.pack('>2I',0x1200,0x6700))
@@ -70,6 +71,10 @@ class PlayerTravelInstallation(unittest.TestCase):
         for h in self.t['hooks']:
             address=h['address']
             if address<0x80400000:raw=files[CODE_VROM].extract(self.image);offset=address-CODE_RAM
+            elif h.get('owner'):
+                source=h['packet_source'];delta=address-h['packet_ram']
+                if h['storage']=='physical-ROM':raw=self.image;offset=(source&0x7FFFFFFF)+delta
+                else:raw=blob;offset=source-BLOB+delta
             elif address==0x806558DC:
                 p=self.e['creature_fish']['world']['packet'];raw=blob;offset=p['blob_offset']+address-p['ram']
             else:
@@ -82,6 +87,9 @@ class PlayerTravelInstallation(unittest.TestCase):
             self.assertEqual(sha256((ROOT/name).read_bytes()),digest,name)
         verify(self.image,self.report['physical_resources'])
         changed={'harvest-connected','diary-ui-GAFE01-r0',self.e['carried_items']['quest']['packet']['id']}
+        changed.update(p['id'] for p in self.prior['physical_resources']
+            if any(h.get('storage')=='physical-ROM' and h['packet_source']&0x7FFFFFFF==p['physical']
+                   for h in self.t['hooks']))
         for p in self.prior['physical_resources']:
             if p['id'] in changed:continue
             self.assertEqual(self.image[p['physical']:p['physical']+p['bytes']],

@@ -30,8 +30,8 @@ complete the import pipeline. Keep this as one connected implementation task:
    on the experimental branch, refresh the local preview, and hand over the
    usable build with accurate compatibility and verification limits.
 
-The checked transport build is `build/v3-player-travel-installed-07/build-lock.json`,
-ABI 392, with its full selection in `build/v3-player-travel-profile-03`.
+The checked transport build is `build/v3-travel-consumers-installed-04/build-lock.json`,
+ABI 392, with its full selection in `build/v3-travel-consumers-profile-02`.
 Preserve the incomplete changes in `experimental/imports/index.html`;
 do not serve them before the accompanying interface repairs pass. No incomplete
 visitor behaviour or unresolved possible game defect is waived by a private
@@ -58,13 +58,15 @@ I/O fragment, preserving the startup loader's `804A8FF0` guard boundary. Source
 checks cover the original code, BSS, state, guards, saved formats, native note-size
 table, physical resources, and patch reconstruction.
 
-Five transport checks and current full-storage workspace checks pass, including
+Six transport/collection checks and retained full-storage workspace checks pass, including
 four identities, editable record preservation, failed departure, legacy return,
 and status/nonce isolation. Four installed-cartridge checks pass. The silent
-`build/v3-player-travel-native-04/results.json` check executes the installed native
+`build/v3-travel-consumers-native-02/results.json` check executes the installed native
 departure/arrival/copy entries with actual emulated Pak I/O, controlled resident
-identities, selected furniture/creature/paper acquisition, and diary/console record
-mutations. It checks return, other-resident preservation, storage guards, and
+identities, actual public collection/query entries, selected furniture, clothing,
+surface, handheld-parent, diary-cover, creature, and stationery acquisition, plus
+diary/console record mutations. It checks returned ownership, shared aliases,
+other-resident preservation, storage guards, and
 checkpoint restoration. Diary UI, NES play, a walked station visit, physical Pak
 hardware, and ordinary Save & Quit/restart are not established by this fixture.
 The full selected profile has 20 villagers and 275 requested items, with the two
@@ -74,12 +76,20 @@ ownership can return without overwriting diary, console, card, or account data
 which the legacy note never contained. The connected host fixture covers that
 conversion/departure/rearrival case, not only direct legacy readback.
 
-The next consumer is the current visitor collection/reward/paper handling in
-`collection.c`, `surface_save.c`, `held_collection.c`, `carried_collection.c`, and
-`diary_items.c`. Connect their shared record/query entries to the new visitor
-record, preserving selected canonical identities and resident behaviour. Creature
-acquisition already reaches the complete record through both retained exports.
-Then connect visitor diary UI and console sessions to the visitor's actual rows,
+The five shared collection/paper handlers in `collection.c`, `surface_save.c`,
+`held_collection.c`, `carried_collection.c`, and `diary_items.c` use the complete
+visitor record. Installation preserves the outer collection chain and redirects
+the inner copied-prologue bridges, not the native dispatchers which now serve
+other item categories. Host checks exercise all four identities, selection
+rejection, native delegation, and exact returned ownership. Creature acquisition
+reaches the same record through both retained exports.
+
+The next consumer is visitor diary UI: `diary_native.c`, `diary_menu.c`, and
+`diary.c` still reject viewer index four. The native owner is a real host resident;
+verify donor reading/privacy/editing rules, connect the viewer's own calendar,
+and preserve host page ownership. Also preserve the existing zero-result query
+behaviour for pointers which are neither residents nor the live visitor when
+extending the shared collection helper. Then connect console sessions to the visitor's actual rows,
 not a fabricated fifth resident or another resident's storage. Verify both native
 note kinds together and the actual station path as part of the connected visiting
 batch. Continue HRA rewards, instruments, current save/restart, and website repairs

@@ -1,6 +1,9 @@
 /* One guarded carried/cover identity path for all sixteen diary styles. */
 #include "diary_items.h"
 #include "save_runtime.h"
+#ifdef AF_V3_PLAYER_TRAVEL
+#include "travel_collection.h"
+#endif
 typedef DiaryByte u8;
 typedef DiaryHalf u16;
 typedef DiaryWord u32;
@@ -99,16 +102,25 @@ void af_diary_item_record(u32 argument) {
     if(!extended(item)) {af_diary_prior_record(argument);return;}
     u32 cover=af_diary_item_collection(item);
     if(!cover)return;
-    af_v3_require_save_state();
     u32 player=player_slot(active);
+#ifdef AF_V3_PLAYER_TRAVEL
+    if(player==4) {af_travel_collection(active,cover,1);return;}
+#else
     if(player==4)af_v3_save_halt(AF_SAVE_ARGUMENT);
+#endif
+    af_v3_require_save_state();
     int result=af_v3_save_collect(state->working,player,cover,1);
     if(result<0)af_v3_save_halt(result);
 }
 int af_diary_item_owned(const u8 *player,u32 item) {
     if(!extended(item))return af_diary_prior_owned(player,item);
     u32 cover=af_diary_item_collection(item),slot=player_slot(player);
-    if(!cover || slot==4)return 0;
+    if(!cover)return 0;
+#ifdef AF_V3_PLAYER_TRAVEL
+    if(slot==4)return af_travel_collection(player,cover,0);
+#else
+    if(slot==4)return 0;
+#endif
     af_v3_require_save_state();
     int result=af_v3_save_collect(state->working,slot,cover,0);
     if(result<0)af_v3_save_halt(result);

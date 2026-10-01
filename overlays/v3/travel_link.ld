@@ -21,6 +21,11 @@ SECTIONS {
    travel_native.o(.text .text.* .rodata .rodata.* .data .data.*)
    travel_player.o(.text .text.* .rodata .rodata.* .data .data.*)
    travel_context.o(.text .text.* .rodata .rodata.* .data .data.*)
+   collection.o(.text .text.* .rodata .rodata.* .data .data.*)
+   surface_save.o(.text .text.* .rodata .rodata.* .data .data.*)
+   held_collection.o(.text .text.* .rodata .rodata.* .data .data.*)
+   carried_collection.o(.text .text.* .rodata .rodata.* .data .data.*)
+   diary_items.o(.text .text.* .rodata .rodata.* .data .data.*)
    . = ALIGN(16);
    /* Explicit loaded zero data, not an uninitialised heap/BSS allocation. */
    BYTE(0); . = ALIGN(16);

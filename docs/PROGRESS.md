@@ -25,9 +25,8 @@ lock or publish experimental V3.
 
 ## V3 development build: unfinished import integration
 
-V3 is not complete. Imported collection handlers still have resident-only
-restrictions. The installed development transport carries full added player
-records, but the remaining item/paper consumers are not connected to it.
+V3 is not complete. The installed transport and shared item/paper collection
+handlers carry and update the visitor's added player records.
 Imported diary opening and additional console play also reject visitors. The
 house/manor models have installed art/room behaviour but no connected HRA
 acquisition, scoring, or catalogue policy. Four added villager instruments retain
@@ -40,8 +39,8 @@ checks and resident-only behaviour do not establish completion.
 
 ### Installed player-record transport
 
-The checked cartridge is `build/v3-player-travel-installed-07/build-lock.json`,
-ABI 392, with full selection in `build/v3-player-travel-profile-03`.
+The checked cartridge is `build/v3-travel-consumers-installed-04/build-lock.json`,
+ABI 392, with full selection in `build/v3-travel-consumers-profile-02`.
 Native Pak read/write/status and departure/arrival/private-copy entries carry one
 complete identity-bound player's added records. Full diary pages, console progress,
 category ownership, and player rewards are retained; other residents and shared
@@ -51,20 +50,25 @@ The new guarded visitor reservation is checked against the actual model pool and
 startup packets; code uses authenticated unused padding, preserving existing BSS,
 UI state, guards, and the startup loader's size limit.
 
-Five transport checks, current full-storage workspace checks, and four installed
-cartridge/patch checks pass. The silent
-`build/v3-player-travel-native-04/results.json` fixture executes installed native
+Six transport/collection checks, retained full-storage workspace checks, and four
+current installed cartridge/patch checks pass. The silent
+`build/v3-travel-consumers-native-02/results.json` fixture executes installed native
 departure, arrival, return, and status with actual emulated Pak reads/writes and
-controlled resident identities. Imported acquisition and changed diary/console
-records survive return; other residents and guards remain intact. This is focused
+controlled resident identities. Imported acquisition through the actual native
+collection entry and retained catalogue query survives return for furniture,
+clothing, surfaces, handheld parents, diary covers, and added stationery. Changed
+diary/console records also survive return; other residents and guards remain intact. This is focused
 native execution, not a walked station visit, diary UI interaction, NES gameplay,
 physical Pak testing, or ordinary Save & Quit/restart.
 Converted legacy notes preserve unknown editable-record provenance, retaining
 home diary, console, card, and account data which the old note never carried.
 The connected host fixture covers conversion, departure, and return.
 
-The next connected consumers are the resident-only item/paper record and query
-handlers, visitor diary UI, and visitor console sessions. Creature acquisition
+The next connected consumers are visitor diary UI and visitor console sessions.
+The five shared item/paper record/query handlers use the same visitor record,
+preserving native delegation, display/parent aliases, selection gates, and resident
+ownership. Retained inner collection bridges are replaced without bypassing the
+outer diary/surface/display/paper chain. Creature acquisition
 already reaches the complete visitor record through both retained exports. Both
 native note kinds together and the actual station path still require connected
 verification. HRA model rewards, four instruments, current full-selection save/

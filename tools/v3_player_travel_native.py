@@ -11,6 +11,7 @@ import struct
 from aflib import CODE_VROM, CODE_RAM, by_vrom, sha256
 from apply_translation import write_new
 from v3_player_travel_install import STATE, STATE_BYTES, RECORD_BYTES
+from v3_asset_loader import BLOB
 
 PLAYERS, FOREIGN, PASSPORT, PAK = 0x80126EC0, 0x801439A0, 0x80137C40, 0x80137960
 
@@ -44,7 +45,16 @@ def scenario(directory):
         # Title startup has not used a furniture bank yet, so the model pool's
         # lazy guard is still zero. The visitor initializer must not touch it.
         checks.append(dict(read=[f'{ram:08X}',16],expect=data.hex()))
-    request=dict(rom_sha256=sha256(image),symbols=symbols,state=t['state_packet'],proofs=proofs)
+    consumers={h['symbol']:h['address'] for h in t['hooks'] if h.get('owner')}
+    if consumers:
+        consumers.update(af_carried_record=0x800B88EC,af_carried_owned=0x80469AD4)
+        # The public catalogue query is outside the runner's ordinary call
+        # range. Authenticate its complete immutable source body, rather than
+        # widening that range or trusting whatever happens to be loaded.
+        blob=files[BLOB].extract(image);n=report['collection']['code']['bytes']
+        proofs.append(dict(ram=0x804699C0,data=blob[0x99C0:0x99C0+n].hex()))
+    request=dict(rom_sha256=sha256(image),symbols=symbols,state=t['state_packet'],proofs=proofs,
+        consumers=consumers)
     return [{'wait':16},*checks,{'save_state':True},{'pause_game_thread':True},
         {'test_v3_player_travel':request},{'load_state':True},{'wait':1},
         {'read':['8003CE34',4],'expect':'00000000'}]
@@ -89,7 +99,18 @@ def exercise(debug, request, record, out):
     check('arrival binds the exact traveller',FOREIGN,home[:16])
     check('host residents unchanged',PLAYERS,host)
     check('full visitor cache admitted',STATE,struct.pack('>2I',0x41465431,1))
-    call('af_v3_travel_visitor_collect',[FOREIGN,0x3224,1],1)
+    write(0x80136FD8,struct.pack('>I',FOREIGN))
+    consumers=request.get('consumers',{})
+    if consumers:
+        # Enter the actual retained public chain, not only the transport API.
+        for item in (0x3224,0x34BF,0x2649,0x2749,0x2244,0x2B10,0x2040):
+            call(consumers['af_carried_owned'],[FOREIGN,item],0)
+            call(consumers['af_carried_record'],[item])
+            call(consumers['af_carried_owned'],[FOREIGN,item],1)
+        for item in (0x3227,0x3C03,0x30FF,0x2041,0x2042,0x2043):
+            call(consumers['af_carried_owned'],[FOREIGN,item],1)
+    else:
+        call('af_v3_travel_visitor_collect',[FOREIGN,0x3224,1],1)
     call('af_v3_travel_creature_collect',[FOREIGN,0x2328,1],1)
     call('af_v3_travel_visitor_paper',[FOREIGN,1],1)
     # Record-only mutation checks transport; diary UI/NES sessions are separate.
@@ -108,6 +129,9 @@ def exercise(debug, request, record, out):
     call('af_v3_travel_prepare',expected=1)
     # Verify restored diary/console bytes through the actual guarded getters.
     diary=call('af_v3_diary_data');console=call('af_v3_console_player_data')
+    if consumers:
+        for item in (0x3224,0x34BF,0x2649,0x2749,0x2244,0x2B10,0x2040):
+            call(consumers['af_carried_owned'],[PLAYERS,item],1)
     check('returned diary page',diary+16+104+17,b'Z')
     check('returned console progress',console+23,b'\xAE')
     check('visitor storage guard',STATE+16+RECORD_BYTES,struct.pack('>4I',*([0xAF54524C]*4)))
@@ -116,6 +140,7 @@ def exercise(debug, request, record, out):
     write_new(out/'records.bin',acquired)
     return dict(installed_native_player_transport=True,emulated_controller_pak_io=True,
         imported_acquisition_and_return=True,diary_ui_played=False,console_game_played=False,
+        actual_collection_consumers=bool(consumers),
         walked_station_visit=False,hardware_tested=False)
 
 

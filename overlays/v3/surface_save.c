@@ -1,5 +1,8 @@
 /* Shared surface profile and collection adapters; native ownership stays intact. */
 #include "save_runtime.h"
+#ifdef AF_V3_PLAYER_TRAVEL
+#include "travel_collection.h"
+#endif
 typedef af_save_u8 u8;
 typedef af_save_u32 u32;
 typedef unsigned short u16;
@@ -48,15 +51,24 @@ void af_v3_surface_record(u32 argument) {
     u32 item=(u16)argument;
     if (!extended(item)) {af_surface_prior_record(argument);return;}
     if (!enabled(item)) return;
+    u32 player=slot(active);
+#ifdef AF_V3_PLAYER_TRAVEL
+    if (player>=4) {af_travel_collection(active,item,1);return;}
+#endif
     af_v3_require_save_state();
-    int result=af_v3_save_collect(state->working,slot(active),item,1);
+    int result=af_v3_save_collect(state->working,player,item,1);
     if (result<0) af_v3_save_halt(result);
 }
 
 int af_v3_surface_owned(const u8 *private,u32 item) {
     if (!extended(item)) return af_surface_prior_owned(private,item);
     u32 player=slot(private);
-    if (player>=4 || !enabled(item)) return 0;
+    if (!enabled(item)) return 0;
+#ifdef AF_V3_PLAYER_TRAVEL
+    if (player>=4) return af_travel_collection(private,item,0);
+#else
+    if (player>=4) return 0;
+#endif
     af_v3_require_save_state();
     int result=af_v3_save_collect(state->working,player,item,0);
     if (result<0) af_v3_save_halt(result);

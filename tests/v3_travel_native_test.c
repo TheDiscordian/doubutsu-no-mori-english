@@ -14,6 +14,78 @@ static struct TownRecords live,home,host_before;
 static AFTravelSelection settings;
 static u8 animal[0x528],animal_out[0x528],cache_before[AF_TP_BYTES],foreign_before[0xBD0];
 static int completed,staged;
+#ifdef AF_TEST_COLLECTIONS
+#include "../overlays/v3/save_runtime.h"
+#include "../overlays/v3/diary_items.h"
+typedef unsigned short u16;
+struct AfSaveRuntime af_collection_state,af_surface_test_state,af_test_diary_item_state;
+u8 af_collection_players[4*0xBD0],*af_collection_active;
+u8 af_surface_test_players[4*0xBD0],*af_surface_test_active;
+u8 af_console_players[4*0xBD0],*af_test_carried_active;
+u8 af_test_diary_item_players[4*0xBD0],*af_test_diary_item_active;
+u32 af_surface_test_header[64],af_test_diary_items[100],af_test_diary_icons[4];
+void af_v3_catalogue_record(u32),af_v3_surface_record(u32),af_v3_held_catalogue_record(u32);
+void af_carried_record(u32),af_diary_item_record(u32);
+int af_v3_catalogue_owned(const u8 *,u32),af_v3_surface_owned(const u8 *,u32);
+int af_v3_held_catalogue_owned(const u8 *,u32),af_carried_owned(const u8 *,u32);
+int af_diary_item_owned(const u8 *,u32);
+static unsigned native_records,native_argument;
+void af_v3_require_save_state(void) {assert(!busy);}
+void af_v3_original_collect(u32 item) {native_records++;native_argument=item;}
+int af_v3_item_type(u32 item) {return item!=0x3FFC && item>>12==3;}
+u32 af_v3_held_item_collection(u32 item) {return item==0x2244?0x3C00:0;}
+void af_v3_prior_catalogue_record(u32 item) {af_v3_catalogue_record(item);}
+int af_v3_prior_catalogue_owned(const u8 *p,u32 item) {return af_v3_catalogue_owned(p,item);}
+void af_surface_prior_record(u32 item) {af_v3_held_catalogue_record(item);}
+int af_surface_prior_owned(const u8 *p,u32 item) {return af_v3_held_catalogue_owned(p,item);}
+void af_diary_prior_record(u32 item) {af_v3_surface_record(item);}
+int af_diary_prior_owned(const u8 *p,u32 item) {return af_v3_surface_owned(p,item);}
+void af_carried_prior_record(u32 item) {af_diary_item_record(item);}
+int af_carried_prior_owned(const u8 *p,u32 item) {return af_diary_item_owned(p,item);}
+u8 *af_v3_card_data(void) {assert(!busy);return live.cards;}
+int af_carried_reserved(u32 item) {return item-0x2040<4;}
+int af_carried_category(u32 item) {return item-0x2040<4?49:0;}
+int af_carried_paper_reserved(u32 item) {return item-0x2E40<192;}
+int af_carried_paper_packs_enabled(void) {return 1;}
+int af_carried_paper_style(u32 item) {return (int)((item-0x2E40)/3);}
+u16 af_diary_native_selected(void) {return 0xFFFF;}
+static void collection_init(void) {
+    af_collection_active=af_surface_test_active=af_test_carried_active=af_test_diary_item_active=active;
+    struct SurfaceFixture {u16 item,price;u32 enabled;u8 name[16];};
+    af_surface_test_header[0]=0x41465349;af_surface_test_header[1]=1;
+    af_surface_test_header[2]=10;af_surface_test_header[3]=24;
+    struct SurfaceFixture *s=(void *)(af_surface_test_header+4);
+    for(unsigned i=0;i<10;i++) {s[i].item=(u16)(0x2649+i/5*256+i%5);s[i].enabled=i!=4;}
+    af_test_diary_items[0]=0x41464449;af_test_diary_items[1]=1;
+    af_test_diary_items[2]=16;af_test_diary_items[3]=24;
+    AFDiaryItem *d=(void *)(af_test_diary_items+4);
+    for(unsigned i=0;i<16;i++)d[i]=(AFDiaryItem){.item=AF_DIARY_ITEM_FIRST+i,
+        .cover=AF_DIARY_COVER_FIRST+i*4,.category=AF_DIARY_ITEM_CATEGORY,.style=i};
+}
+static void collection_acquire(void) {
+    collection_init();
+    assert(!af_carried_owned(active,0x3224) && !af_carried_owned(active,0x34BF));
+    assert(!af_carried_owned(active,0x2649) && !af_carried_owned(active,0x2749));
+    assert(!af_carried_owned(active,0x2244) && !af_carried_owned(active,AF_DIARY_ITEM_FIRST));
+    assert(!af_carried_owned(active,0x2040));
+    const unsigned items[]={0x3224,0x34BF,0x2649,0x2749,0x2244,AF_DIARY_ITEM_FIRST,0x2040};
+    for(unsigned i=0;i<sizeof(items)/sizeof(*items);i++) {
+        af_carried_record(items[i]);assert(af_carried_owned(active,items[i])==1);
+    }
+    /* Rotation, diary-cover, and stationery quantities share genuine identities. */
+    assert(af_carried_owned(active,0x3227) && af_carried_owned(active,0x30FF));
+    assert(af_carried_owned(active,0x3C03));
+    for(unsigned i=0;i<4;i++)assert(af_carried_owned(active,0x2040+i));
+    memcpy(cache_before,af_travel_test_visitor.record,AF_TP_BYTES);
+    af_carried_record(0x3FFC);af_carried_record(0x264D);af_carried_record(0x2225);
+    assert(!af_carried_owned(active,0x3FFC) && !af_carried_owned(active,0x264D));
+    assert(!af_carried_owned(active,0x2225));
+    assert(!memcmp(cache_before,af_travel_test_visitor.record,AF_TP_BYTES));
+    native_records=0;af_carried_record(0x2001);assert(native_records==1 && native_argument==0x2001);
+    af_carried_record(0x2E40+3*7+2);assert(native_records==2 && native_argument==0x2007);
+    assert(!memcmp(cache_before,af_travel_test_visitor.record,AF_TP_BYTES));
+}
+#endif
 int af_travel_storage_idle(void) {return !busy;}
 u8 *af_travel_active(void) {return active;}
 int af_travel_town(AFTravelTown *t,AFTravelSelection *s) {
@@ -93,6 +165,9 @@ static void complete_visit(unsigned slot) {
     assert(!memcmp(&live,&host_before,sizeof(live)));
     assert(!memcmp(active,home.players+slot*0xBD0,0xBD0) && !memcmp(animal,animal_out,sizeof(animal)));
     assert(af_travel_test_visitor.ready==1);
+#ifdef AF_TEST_COLLECTIONS
+    collection_acquire();
+#endif
     const unsigned acquired[]={0x3224,0x34BF,0x2649,0x2749,0x2328,0x2D27};
     for(unsigned i=0;i<sizeof(acquired)/sizeof(*acquired);i++)
         assert(af_v3_travel_visitor_collect(active,acquired[i],1)==1);
@@ -124,6 +199,13 @@ static void complete_visit(unsigned slot) {
     assert(live.console[slot*1632+23]==0xAE);
     assert(live.diary.bytes[AF_DIARY_HEADER+slot*AF_DIARY_PLAYER+AF_DIARY_CALENDAR+17]=='Z');
     assert(live.cards[9+slot]==1);
+#ifdef AF_TEST_COLLECTIONS
+    assert(live.working[AF_SAVE_PROFILE+slot*128+(0xFC>>2)/8]&(1u<<((0xFC>>2)&7)));
+    assert(live.working[AF_SAVE_PROFILE+512+slot*32+0xBF/8]&(1u<<(0xBF&7)));
+    assert(live.working[AF_SAVE_PROFILE+slot*128+0xC00/32]&1u);
+    assert(live.working[AF_SAVE_SURFACE_OFFSET+64*(slot+1)+0x49/8]&(1u<<(0x49&7)));
+    assert(live.working[AF_SAVE_SURFACE_OFFSET+64*(slot+1)+32+0x49/8]&(1u<<(0x49&7)));
+#endif
     assert(live.working[AF_SAVE_PROFILE+slot*128+(0x224>>2)/8]&(1u<<((0x224>>2)&7)));
     for(unsigned other=0;other<4;other++)if(other!=slot) {
         assert(!memcmp(live.console+other*1632,home.console+other*1632,1632));
@@ -169,6 +251,9 @@ static void legacy_return(void) {
 int main(void) {
     for(unsigned slot=0;slot<4;slot++)complete_visit(slot);
     legacy_return();
+#ifdef AF_TEST_COLLECTIONS
+    puts("Actual collection consumers preserve added furniture/clothing/surfaces/held/diary/paper ownership through all four home returns, native delegation, and unavailable-selection rejection");
+#endif
     puts("Connected native departure/arrival/acquisition/nonce/status/return lifecycle passes for all four identities; legacy return retains editable progress; device I/O is doubled");
     return 0;
 }

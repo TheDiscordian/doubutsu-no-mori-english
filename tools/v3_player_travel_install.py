@@ -2,7 +2,8 @@
 
 Code uses authenticated unused padding in two already-loaded packets. One new
 startup packet owns the complete visiting player's record; resident save formats
-and the model pool remain unchanged. Connected item/UI consumers follow this step.
+and the model pool remain unchanged. All shared item/paper ownership consumers
+use the complete visitor record; diary UI and console sessions follow this step.
 """
 import copy
 import json
@@ -27,16 +28,22 @@ BASE_SHA='1e978bc58945b255f601ac0cb0a163e528e3e728c13b50ca065127eca4ce9a60'
 STATE, STATE_BYTES, RECORD_BYTES = 0x8062C020, 14240, 14204
 IO, IO_END, LIFE, LIFE_END = 0x806A4800, 0x806A7FF0, 0x807F7B50, 0x807FC000
 PARTS=('pak_native','pak_codec','pak_workspace','console_storage',
-       'travel_native','travel_player','travel_context')
+       'travel_native','travel_player','travel_context','collection','surface_save',
+       'held_collection','carried_collection','diary_items')
+CONSUMERS=('af_v3_catalogue_record','af_v3_catalogue_owned',
+    'af_v3_surface_record','af_v3_surface_owned',
+    'af_v3_held_catalogue_record','af_v3_held_catalogue_owned',
+    'af_carried_record','af_carried_owned','af_diary_item_record','af_diary_item_owned')
 ROOTS=('af_v3_pak_native_read','af_v3_pak_native_write','af_v3_pak_native_status',
        'af_v3_travel_passport_clear','af_v3_travel_passport_save',
        'af_v3_travel_passport_load','af_v3_travel_private_copy',
        'af_v3_travel_visitor_collect','af_v3_travel_visitor_paper',
-       'af_v3_travel_creature_collect')
+       'af_v3_travel_creature_collect',*CONSUMERS)
 SOURCES=tuple(dict.fromkeys((*PLAYER_SOURCES,'tools/v3_player_travel_install.py',
     'tools/v3_room_goods.py','tools/v3_furniture_install.py','overlays/v3/surface_bootstrap.c',
     'overlays/v3/travel_link.ld','overlays/v3/travel_native.c','overlays/v3/travel_native.h',
-    'overlays/v3/travel_context.c','tests/v3_travel_native_test.c')))
+    'overlays/v3/travel_context.c','tests/v3_travel_native_test.c',
+    'overlays/v3/travel_collection.h',*[f'overlays/v3/{p}.c' for p in PARTS])))
 NATIVE={
     'af_pi_lock':'padmgr_LockSerialMesgQ','af_pi_unlock':'padmgr_UnlockSerialMesgQ',
     'af_pi_open':'mCPk_NoteOpen','af_pi_make':'mCPk_NoteMake',
@@ -126,11 +133,20 @@ def compile_connected(prior, output):
     quest=prior['equipment_resources']['carried_items']['quest']['npc']['code']['symbols']
     providers.update({n:quest[n] for n in ('af_cw_passport_stage','af_cw_passport_complete')})
     providers['af_diary_native_selected']=prior['equipment_resources']['diaries']['ui_compiled']['symbols']['af_diary_native_selected']
+    owners=(prior['collection']['code'],prior['room_surfaces']['save']['helpers'],
+        prior['equipment_resources']['collection']['code'],
+        prior['equipment_resources']['diary_items']['code'])
+    for owner in owners:
+        providers.update(owner.get('link_symbols',{}))
+        providers.update(owner['symbols'])
+    providers.update(prior['save_codec']['code']['symbols'])
+    providers['af_v3_require_save_state']=prior['save_runtime']['diary_runtime_code']['symbols']['af_v3_require_save_state']
+    providers['af_v3_save_halt']=prior['save_runtime']['diary_runtime_code']['symbols']['af_v3_save_halt']
     defined=set();undefined=set();compiled={};objects=[]
     storage_flags=prior['save_codec']['active_storage_code']['flags']
     for part in PARTS:
         flags=storage_flags if part in ('console_storage','travel_context') else list(FLAGS)+['-D'+d+'=1' for d in DEFINES]
-        flags=[*flags,f'-DAF_TRAVEL_STATE_RAM=0x{STATE:X}u']
+        flags=[*flags,f'-DAF_TRAVEL_STATE_RAM=0x{STATE:X}u','-DAF_V3_PLAYER_TRAVEL=1']
         obj=part+'.o';objects.append(obj)
         run('gcc',*flags,'/source/overlays/v3/'+part+'.c','-o',obj)
         defined.update(line.split()[-1] for line in run('nm','--defined-only','--extern-only',obj).splitlines())
@@ -157,12 +173,101 @@ def compile_connected(prior, output):
     return dict(toolchain=IMAGE,objects=compiled,symbols=symbols,bindings=bindings,fragments=fragments)
 
 
+def connect_consumers(base,prior,live,blob,rows,writes,compiled,hooks,records):
+    """Replace public ownership entries, retaining callers and native aliases.
+
+    Authenticate each complete current owner before patching. Physical changes
+    merge with staged creature redirects; blob owners retain their load mapping.
+    """
+    e=live['equipment_resources'];old_e=prior['equipment_resources']
+    owners=(('collection/code',0x804699C0,CONSUMERS[0:2]),
+        ('room_surfaces/save/helpers',0x804BC900,CONSUMERS[2:4]),
+        ('equipment_resources/collection/code',0x804AFA00,CONSUMERS[4:6]),
+        ('save_codec/active_storage_code',prior['save_codec']['active_storage_code']['ram'],CONSUMERS[6:8]),
+        ('equipment_resources/diary_items/code',0x806E0000,CONSUMERS[8:10]))
+    def node(report,path):
+        for key in path.split('/'):report=report[key]
+        return report
+    staged={p['physical']:(p,bytearray(raw)) for p,raw in writes}
+    initial=((0x80460000,0xC000,0),(old_e['ram'],old_e['bytes'],old_e['blob_offset']))
+    for path,ram,names in owners:
+        old=node(prior,path);owner=node(live,path);n=old['bytes']
+        packet=next((r for r in rows if r['ram']<=ram and ram+n<=r['end']),None)
+        if packet and packet['source']&0x80000000:
+            physical_at=packet['source']&0x7FFFFFFF;offset=ram-packet['ram']
+            before=base[physical_at:physical_at+packet['bytes']]
+            if physical_at in staged:p,raw=staged[physical_at]
+            else:
+                row=next(r for r in records if r['physical']==physical_at)
+                p=dict(row,previous_sha256=row['sha256'])
+                raw=bytearray(before)
+        else:
+            if packet:
+                start=packet['source']-BLOB;packet_ram=packet['ram'];size=packet['bytes']
+            else:
+                packet_ram,size,start=next((a,n,b) for a,n,b in initial if a<=ram<ram+old['bytes']<=a+n)
+            offset=ram-packet_ram;before=bytes(blob[start:start+size]);raw=bytearray(before)
+        preceding=bytes(raw)
+        authenticated=bytearray(before[offset:offset+n])
+        bridges={}
+        if path=='collection/code':
+            # Public native entries now dispatch through paper/diary/surface/
+            # display handlers. Replace only the retained innermost bridges,
+            # never bypass that chain. Reconstruct their copied prologues to
+            # authenticate the original complete inner collection body.
+            for name,h in zip(names,prior['clothing']['display']['readers']['collection_hooks']):
+                entry=old['symbols'][name];at=entry-ram
+                bridge=h['bridge']-packet_ram
+                if (h['entry']!=entry or raw[offset+at:offset+at+8].hex()!=h['after'] or
+                        raw[bridge:bridge+16].hex()!=h['bridge_bytes']):
+                    raise ValueError('Changed retained inner collection bridge')
+                authenticated[at:at+8]=bytes.fromhex(h['before'])
+                bridges[name]=h['bridge']
+        if sha256(authenticated)!=old['sha256']:
+            raise ValueError('Changed complete collection owner: '+path)
+        for name in names:
+            address=bridges.get(name,old['symbols'][name]);at=offset+address-ram
+            if not 0<=at<at+8<=len(raw):raise ValueError('Collection entry outside loaded packet')
+            previous=bytes(raw[at:at+8]);after=struct.pack('>2I',jump(compiled['symbols'][name]),0)
+            raw[at:at+8]=after
+            hooks.append(dict(address=address,symbol=name,target=compiled['symbols'][name],
+                before=previous.hex(),after=after.hex(),owner=path,
+                storage='physical-ROM' if packet and packet['source']&0x80000000 else 'blob',
+                packet_ram=packet['ram'] if packet else packet_ram,
+                packet_source=packet['source'] if packet else BLOB+start))
+        if packet and packet['source']&0x80000000:
+            refresh_code(live,preceding,raw,packet['ram'])
+            previous=dict(p);replacement=dict(p,sha256=sha256(raw),crc32=zlib.crc32(raw))
+            refresh_aliases(live,previous,replacement);p.update(replacement)
+            next(r for r in records if r['physical']==physical_at)['sha256']=replacement['sha256']
+            staged[physical_at]=(p,raw)
+        else:
+            refresh_code(live,before,raw,packet_ram)
+            blob[start:start+len(raw)]=raw
+            if packet:
+                def refresh_packet(value):
+                    if isinstance(value,dict):
+                        if value.get('ram')==packet_ram and value.get('blob_offset')==start and value.get('bytes')==len(raw):
+                            value.update(sha256=sha256(raw),crc32=zlib.crc32(raw))
+                        for child in value.values():refresh_packet(child)
+                    elif isinstance(value,list):
+                        for child in value:refresh_packet(child)
+                refresh_packet(live)
+        # Older compile receipts omit RAM. Refresh their complete authenticated
+        # code digest explicitly without changing public symbols or providers.
+        if path!='collection/code':
+            owner.setdefault('compiled_sha256',old['sha256'])
+            owner['sha256']=sha256(raw[offset:offset+n])
+    live['collection']['foreign_import_collection']='complete identity-bound visitor ownership'
+    writes[:]=[(p,bytes(raw)) for p,raw in staged.values()]
+
+
 def install(base, prior, blob, core, module, output):
     del module
     rows=authenticate(base,prior,blob)
     directory=output/'player_travel'
     compiled=compile_connected(prior,directory)
-    e=copy.deepcopy(prior['equipment_resources']);updates={};records=copy.deepcopy(prior['physical_resources'])
+    live=copy.deepcopy(prior);e=live['equipment_resources'];updates={};records=copy.deepcopy(prior['physical_resources'])
     state=bytearray(STATE_BYTES);struct.pack_into('>I',state,0,0x41465431)
     struct.pack_into('>4I',state,16+RECORD_BYTES,*([0xAF54524C]*4))
     row=physical.allocate(base,records,state,'v3-travelling-player',best_fit=True)
@@ -219,6 +324,9 @@ def install(base, prior, blob, core, module, output):
     fish.update(sha256=sha256(raw_after),crc32=zlib.crc32(raw_after))
     hooks.append(dict(address=0x806558DC,symbol='retained_creature_visitor_collect',target=target,before=old.hex(),after=after.hex()))
     writes.append((next(r for r in records if r['id']==packet['id']),bytes(state)))
+    connect_consumers(base,prior,live,blob,rows,writes,compiled,hooks,records)
+    for key in ('collection','room_surfaces','save_codec','clothing','catalogue'):
+        if live[key]!=prior[key]:updates[key]=live[key]
     report=dict(format='AFV3-PLAYER-TRAVEL-INSTALLED-1',installed=True,
         state_packet=packet,record_bytes=RECORD_BYTES,compiled=compiled,hooks=hooks,
         checked_previous_startup=rows,shared_workspace_bytes=119932,
@@ -227,7 +335,8 @@ def install(base, prior, blob, core, module, output):
         passport_binding='AFV3-PASSPORT-PLAYER-1',journal_version=1,player_record_version=1,
         saved_format_changed=False,original_pak_notes_retained=True,
         startup_descriptor_growth=1,native_execution_verified=False,ordinary_visiting_verified=False,
-        pending=['visitor item/paper consumers','visitor diary interaction','visitor console sessions',
+        collection_consumers_connected=True,
+        pending=['visitor diary interaction','visitor console sessions',
             'native execution and actual card path verification'],
         sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
     e['player_travel']=report;updates['physical_resources']=records

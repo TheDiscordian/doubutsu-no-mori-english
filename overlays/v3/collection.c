@@ -1,5 +1,8 @@
 /* Imported ownership follows native collection and live player-slot clearing. */
 #include "save_runtime.h"
+#ifdef AF_V3_PLAYER_TRAVEL
+#include "travel_collection.h"
+#endif
 typedef af_save_u8 u8;
 typedef af_save_u32 u32;
 #ifdef __mips__
@@ -50,18 +53,25 @@ void af_v3_catalogue_record(u32 argument) {
         return;
     }
     if (!selected(item)) return;
-    af_v3_require_save_state();
     u32 player = player_slot(active);
-    /* A visiting player's Controller Pak catalogue needs its own transport.
-     * Never silently credit a resident's slot or drop the acquired ownership. */
+#ifdef AF_V3_PLAYER_TRAVEL
+    if (player == 4) {af_travel_collection(active,item,1);return;}
+#else
     if (player == 4) af_v3_save_halt(AF_SAVE_ARGUMENT);
+#endif
+    af_v3_require_save_state();
     int result = af_v3_save_collect(state->working, player, item, 1);
     if (result < 0) af_v3_save_halt(result);
 }
 
 int af_v3_catalogue_owned(const u8 *private, u32 item) {
     u32 player = player_slot(private);
-    if (player == 4 || !selected(item)) return 0;
+    if (!selected(item)) return 0;
+#ifdef AF_V3_PLAYER_TRAVEL
+    if (player == 4) return af_travel_collection(private,item,0);
+#else
+    if (player == 4) return 0;
+#endif
     af_v3_require_save_state();
     int result = af_v3_save_collect(state->working, player, item, 0);
     if (result < 0) af_v3_save_halt(result);

@@ -22,6 +22,29 @@ class Input(ctypes.Structure):
 
 
 class PakCodecTests(unittest.TestCase):
+    def test_sanitized_actual_collection_consumers_acquire_and_return(self):
+        with tempfile.TemporaryDirectory(prefix='af-travel-consumers-') as directory:
+            binary=Path(directory)/'check'
+            sources=('tests/v3_travel_native_test.c','overlays/v3/travel_native.c',
+                'overlays/v3/travel_player.c','overlays/v3/pak_native.c','overlays/v3/pak_codec.c',
+                'overlays/v3/diary.c','overlays/v3/diary_calendar.c',
+                'overlays/v3/holiday_cards.c','overlays/v3/bank_account.c',
+                'overlays/v3/collection.c','overlays/v3/surface_save.c',
+                'overlays/v3/held_collection.c','overlays/v3/carried_collection.c',
+                'overlays/v3/diary_items.c','overlays/v3/save_codec.c')
+            result=subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
+                '-ffunction-sections','-fdata-sections','-Wl,--gc-sections',
+                '-DAF_V3_PLAYER_TRAVEL=1','-DAF_TEST_COLLECTIONS=1',
+                *['-D'+d+'=1' for d in PLAYER_DEFINES],
+                *[str(ROOT/p) for p in sources],'-o',str(binary)],
+                capture_output=True,text=True,timeout=30)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            result=subprocess.run([str(binary)],capture_output=True,text=True,timeout=30)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            self.assertIn('Actual collection consumers',result.stdout)
+            print(result.stdout.strip())
+
     def test_sanitized_connected_native_player_lifecycle(self):
         with tempfile.TemporaryDirectory(prefix='af-travel-native-') as directory:
             binary=Path(directory)/'check'
