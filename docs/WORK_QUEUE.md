@@ -194,16 +194,24 @@ failure or restart its budget.
 
 Remaining connected work:
 
-1. Verify the actual synchronous writer and diary-preflight consumers using
-   bounded existing paths. The ordinary Save & Quit result does not establish
-   those distinct entries. Preserve complete data, native I/O, asynchronous
+1. Verify both actual synchronous writers (`af_v3_save_sync` and
+   `af_cw_save_sync`) and `af_v3_diary_preflight` using bounded existing paths.
+   Their complete current-profile function bodies and acquire/release bindings
+   authenticate; this is static evidence, not native execution. The ordinary
+   Save & Quit result does not establish those distinct entries. Preserve complete data, native I/O, asynchronous
    framebuffer ownership, and save format 21. Do not shrink diagnostic buffers,
    silently omit a consumer, replay exhausted fixtures, or reset their budgets.
 2. Classify retained creature constructor/scheduler failures from existing
    evidence without replaying exhausted old fixtures; unexplained failures remain
-   unresolved, not declared harness faults or passing checks.
+   unresolved, not declared harness faults or passing checks. The original
+   runner is identified by its recorded hash, but the probe source identity and
+   post-failure machine state are not recorded. Read-only inspection cannot
+   establish either remaining cause from those missing records.
 3. Finish the private handoff with exact artifacts, hashes, compatibility
-   warnings, and known limits. Do not switch the deployed patcher or local preview.
+   warnings, and known limits. The current artifact locator is
+   `build/v3-import-pipeline-profile-17/handoff.json`; it explicitly remains an
+   incomplete development build, not completed V3 acceptance. Do not switch the
+   deployed patcher or local preview.
 
 Fix demonstrated game faults and record remaining limits honestly. Missing
 new V4 features do not make every reward a V4 item.

@@ -309,9 +309,27 @@ Ordinary reload contains all four gyroids and 186,896 free scene bytes; the
 failed pre-repair ordinary save capture has 480 free bytes and no gyroids.
 That missing-actor defect is repaired, not dismissed as test navigation.
 
-Next review current selector exclusions against existing-system acquisition,
-verify the remaining synchronous writing/diary consumers, classify retained
-creature failures from evidence, and finish the private handoff. Do not replace
+The current artifact locator and save warnings are
+`build/v3-import-pipeline-profile-17/handoff.json`. Artifact hashes, UPS
+reconstruction, and all three complete synchronous-writer/diary-preflight bodies
+authenticate against the current profile. Each acquire/release call points to
+the installed private bank, retains its delay slot, and restores the whole
+original function hash when only those two calls are reverted. This is static
+evidence, not execution of the distinct save consumers or larger-profile reload.
+
+The creature runs record the original runner hash
+`db6b7e3f0e9dd8c6d7b83f479076be22202a1f5e8c1fc866ceab0f9d83c310ec`, matching
+`tools/emulator_smoke.py` at `dcdfbe99b3307d73e295010a39c6e92895af6c80`.
+That runner requires the actual graph-thread pause before native calls; its
+memory-error handler does not capture timeout/disconnect machine state. Neither
+run records the imported probe source hash or a post-failure register/RAM dump.
+The scheduler stops before a recorded graph pause or scheduler assertion, and
+the fish run stops after all nine model transfers, before a recorded constructor
+result. Missing fault records do not establish a harness-only cause. Both
+failures remain unresolved; no exhausted fixture is replayed.
+
+Next verify the remaining synchronous writing/diary consumers, classify retained
+creature failures, and finish V3 acceptance and the private handoff. Do not replace
 failed checks with smaller buffers, replay exhausted fixtures, reset their
 debugging budgets, or silently omit a save consumer. New buildings and entirely
 new features remain outside V3.
