@@ -33,8 +33,9 @@ still rejects visitors. The
 house/manor models have installed art/room behaviour but no connected HRA
 acquisition, scoring, or catalogue policy. Four added villager instruments retain
 unresolved playback evidence. Ordinary Save & Quit/restart is not established
-for the current full selection. Website design and control-order repairs remain
-unfinished. The [active task](WORK_QUEUE.md#active-task-complete-the-connected-v3-itemvillager-import-paths)
+for the current full selection. The requested website design, villager dialog,
+and control-order repairs pass browser checks and run in the local preview.
+The [active task](WORK_QUEUE.md#active-task-complete-the-connected-v3-itemvillager-import-paths)
 owns implementation and verification of these connected paths, plus any further
 in-scope omissions found while checking the remaining consumers. Passing narrow
 checks and resident-only behaviour do not establish completion.
@@ -92,8 +93,8 @@ outer diary/surface/display/paper chain. Creature acquisition
 already reaches the complete visitor record through both retained exports. Both
 native note kinds together and the actual station path still require connected
 verification. HRA model rewards, four instruments, current full-selection save/
-restart, and website repairs remain part of the same unfinished V3 task. The local
-preview and deployed public V2 patcher remain unchanged.
+restart remain part of the same unfinished V3 task. The local preview serves the
+repaired interface and ABI-392 recipes; the deployed public V2 patcher is unchanged.
 
 V3 is only the import pipeline for items and villagers. Regular items should be
 importable and obtainable through the regular item pool. Rewards that fit existing
@@ -110,8 +111,11 @@ existing-system reward routes individually. See the
 ### Preview controls and verified behaviour
 
 The running [local preview](http://127.0.0.1:8073/) serves
-`build/v3-import-pipeline-browser-19/site`. Its original-style layout separates
-villagers from categorised items, with independent searches and selection controls.
+`build/v3-travel-website-browser-02/site`, tied to the ABI-392 cartridge.
+Its original-style layout puts ROM selectors first, imports/settings next,
+and the build button last. Villagers have a separate dialog with search,
+keyboard selection, Done, and Escape; items use categorised selectable cards.
+The user-facing unavailable list is absent.
 N64/GameCube descriptions state the actual differences. The page contains no
 internal banking commentary. The deployed public V2 patcher is unchanged.
 
@@ -123,9 +127,20 @@ the catalogue and choices, recalculates dependencies, and updates the interface
 only after successful validation. Malformed or mismatched files preserve current
 choices. A successful import invalidates any prior download and save acknowledgement.
 Friends need the same patcher version and shared settings, with separate town
-saves. The fish/insect passport adapter is installed, but visiting-player
-catalogue and console handling are unfinished game code, not acceptable user
-limitations. Finish and verify these paths before claiming V3 completion.
+saves. Imported collection handlers use the complete visitor record; NES visitor
+sessions and full native village-visit verification remain unfinished. Finish
+those paths before claiming V3 completion.
+
+`build/v3-travel-website-ui-01/results.json` verifies six actual original-file
+downloads against the offline outputs, settings/receipt round trips, dependency
+displays, keyboard/modal controls, cancellation, invalid-input rejection, and
+no uploads or off-origin requests. Control order, dialog bounds, and no horizontal
+overflow pass at 320, 375, 768, and 1440 pixels. Seventeen JavaScript
+composition/settings checks and ten static-server/copy checks pass. Export 02
+changes only save-warning wording from that tested export; other file hashes
+match. All sixteen live served files match the export receipt. A live headless
+browser also verifies initial loading, twenty villagers, 275 visible item choices,
+control order, dialog opening/Escape, and four widths without page errors or uploads.
 
 The optional GameCube starting diary is the college-rule diary on the cardboard
 box inside a newly created house, never in pockets. The complete donor room
@@ -256,7 +271,7 @@ not enable the optional holiday, Wisp, birthday, or savings-account providers.
 Unavailable behaviour controls are hidden without a blanket V4 classification.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-19/build.json`, pinned to the ABI-391
+`build/v3-travel-website-browser-02/build.json`, pinned to the ABI-392
 cartridge. Retained focused scope checks pass,
 covering complete Redd stock routing, selected-only furniture
 lists, four independent

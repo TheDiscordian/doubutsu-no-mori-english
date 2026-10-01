@@ -15,7 +15,7 @@ ROOT = composer.ROOT
 PROBE = b'<!doctype html><meta charset="utf-8"><title>Private worker check</title><input id="n64" type="file"><input id="disc" type="file">'
 
 
-def check_interface(page, origin, out, expected, catalog, review, *, scope='development', extra_item=None,
+def check_interface(page, origin, out, expected, catalog, *, scope='development', extra_item=None,
                     behaviour_case=None, import_groups=()):
     """Exercise the actual UI; keep native gameplay checks out of this batch."""
     results = {}
@@ -59,15 +59,17 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
         assert page.locator('.option input:checked').count()==0
         results['equipment_category_select_and_clear']=len(equipment)
     page.locator('#kind').select_option('all')
-    pending=review['unavailable'][0]
-    page.locator('#search').fill(pending['id'])
-    page.locator('#review summary').click()
-    assert page.locator('.unavailable:visible').count() == 1
-    assert pending['reason'] in page.locator('.unavailable:visible').inner_text()
-    assert page.locator('.unavailable input, .unavailable button').count() == 0
-    results['search_category_all_clear_and_review_reasons'] = True
+    page.locator('#search').fill('not-a-real-item')
+    assert page.locator('#options .option:visible').count() == 0
+    assert page.locator('#no-results').is_visible()
+    assert page.locator('#review, .unavailable').count() == 0
+    results['search_category_all_clear_without_unavailable_list'] = True
 
+    assert page.locator('#villager-dialog').is_hidden()
+    page.locator('#open-villagers').click()
+    assert page.locator('#villager-dialog').is_visible()
     page.locator('#villager-search').fill('Punchy')
+    assert page.locator('#villager-options .option:visible').count() == 1
     punchy = page.locator('[data-id="GAFE01-r0/villager/00EB"] input')
     punchy.focus(); punchy.press('Space')
     assert page.locator('.option input:checked').count() == 3
@@ -79,6 +81,14 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
     punchy.uncheck()
     assert page.locator('.option input:checked').count() == 0
     punchy.check()
+    assert '1 selected' in page.locator('#villager-count').inner_text()
+    page.locator('#close-villagers').click()
+    assert page.locator('#villager-dialog').is_hidden()
+    assert page.locator('#open-villagers').evaluate('(button) => button === document.activeElement')
+    page.locator('#open-villagers').click()
+    page.keyboard.press('Escape')
+    assert page.locator('#villager-dialog').is_hidden()
+    results['separate_villager_dialog_keyboard_selection_and_close'] = True
     extra_item = extra_item or 'GAFE01-r0/item/31D4'
     page.locator('#search').fill(extra_item)
     page.locator(f'[data-id="{extra_item}"] input').check()
@@ -264,9 +274,25 @@ def check_interface(page, origin, out, expected, catalog, review, *, scope='deve
     for width in (320, 375, 768, 1440):
         page.set_viewport_size({'width': width, 'height': 950})
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), width
+        assert page.evaluate('''() => {
+          const box = id => document.getElementById(id).getBoundingClientRect();
+          return box('game-inputs').bottom <= box('additions').top &&
+            box('additions').bottom <= box('behaviour-controls').top &&
+            box('behaviour-controls').bottom <= box('build').top;
+        }'''), width
         if width in (375, 1440):
             page.screenshot(path=str(out/f'preview-{width}.png'), full_page=True)
+        page.locator('#open-villagers').click()
+        assert page.evaluate('''() => {
+          const box = document.getElementById('villager-dialog').getBoundingClientRect();
+          return box.left >= 0 && box.right <= innerWidth && box.top >= 0 && box.bottom <= innerHeight &&
+            document.documentElement.scrollWidth <= innerWidth;
+        }'''), width
+        if width in (375, 1440):
+            page.screenshot(path=str(out/f'villagers-{width}.png'))
+        page.locator('#close-villagers').click()
     results['no_horizontal_overflow'] = [320, 375, 768, 1440]
+    results['rom_choices_settings_build_order_and_dialog_bounds'] = [320, 375, 768, 1440]
     results['download_urls_all_revoked'] = set(page.evaluate('window.__lifecycle.created')) <= set(page.evaluate('window.__lifecycle.revoked'))
     assert results['download_urls_all_revoked']
     assert page.evaluate('window.__lifecycle.terminations') >= 4
@@ -409,7 +435,7 @@ def check(export, output, *, interface=False, selected=None):
 
                 if interface:
                     results['interface'] = check_interface(page, origin, out, expected, menu,
-                        json.loads(resources['data/review.json']), scope=scope, extra_item=extra_item,
+                        scope=scope, extra_item=extra_item,
                         behaviour_case=behaviour_case, import_groups=import_groups)
                 else:
                     if not focused:

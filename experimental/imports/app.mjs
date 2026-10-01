@@ -5,7 +5,7 @@ import { exportSettings, importSettings, MAX_SETTINGS_BYTES } from './settings.m
 
 const $ = id => document.getElementById(id);
 const inputs = [$('n64'), $('gamecube')];
-const requested = new Set(), cards = new Map(), reviews = [];
+const requested = new Set(), cards = new Map();
 const behaviours = {};
 const kinds = { villager: 'Villager', furniture: 'Furniture', clothing: 'Clothing', equipment: 'Equipment', floor: 'Floor', wall: 'Wallpaper', fish: 'Fish', insect: 'Insect', diary: 'Diary', carried: 'Carried item' };
 const choiceCopy = {
@@ -56,18 +56,14 @@ function matches(row) {
   return (kind === 'all' || row.kind === kind) && `${row.name} ${row.id}`.toLocaleLowerCase().includes(query);
 }
 function filter() {
-  let visible = 0, neighbours = 0, pending = 0;
+  let visible = 0, neighbours = 0;
   for (const { row, card } of cards.values()) {
     card.hidden = Boolean(row.dependency_only) || !matches(row);
     if (!card.hidden) { if (row.kind === 'villager') neighbours++; else visible++; }
   }
-  for (const { row, card } of reviews) { card.hidden = !matches(row); if (!card.hidden) pending++; }
   const offered = [...cards.values()].filter(({ row }) => !row.dependency_only && row.kind !== 'villager').length;
-  const residents = [...cards.values()].filter(({ row }) => row.kind === 'villager').length;
   $('visible-count').textContent = `${visible} of ${offered} items`;
-  $('villager-count').textContent = `${neighbours} of ${residents} villagers`;
-  $('review-count').textContent = `(${pending} shown)`;
-  $('no-results').hidden = Boolean(visible); $('no-review-results').hidden = Boolean(pending);
+  $('no-results').hidden = Boolean(visible);
   $('no-villagers').hidden = Boolean(neighbours);
   $('select-visible').disabled = !visible; $('clear-visible').disabled = !visible;
   $('select-villagers').disabled = !neighbours; $('clear-villagers').disabled = !neighbours;
@@ -77,6 +73,8 @@ function renderSelection() {
   selection = resolveSelection(loaded.plan, [...requested], behaviours);
   const custom = Boolean(selection.enabled.length || selection.behaviours_changed);
   const enabled = new Set(selection.enabled), required = new Set(selection.required);
+  const residents = [...cards.values()].filter(({ row }) => row.kind === 'villager');
+  $('villager-count').textContent = `${residents.filter(({ row }) => enabled.has(row.id)).length} selected · ${residents.length} available`;
   for (const [id, { checkbox, card, note }] of cards) {
     checkbox.checked = enabled.has(id); checkbox.disabled = required.has(id) || cards.get(id).row.dependency_only === true;
     card.dataset.selected = String(enabled.has(id)); card.dataset.required = String(required.has(id));
@@ -105,7 +103,7 @@ function changeSelection(change) {
     invalidate('Selections changed. Review the included requirements before building.', true); renderSelection();
   }
 }
-function addChoices(plan, review) {
+function addChoices(plan) {
   // Keep the full technical save-format record in profiles, not page copy.
   for (const row of plan.behaviours || []) {
     if (row.pipeline_unavailable) continue;
@@ -146,7 +144,7 @@ function addChoices(plan, review) {
     card.className = 'option'; card.dataset.id = row.id;
     checkbox.type = 'checkbox'; checkbox.setAttribute('aria-label', row.name);
     note.className = 'requirement'; note.id = `requirement-${cards.size}`; checkbox.setAttribute('aria-describedby', note.id);
-    name.textContent = row.name; detail.textContent = `${kinds[row.kind]} · ${row.id.split('/').at(-1)}`;
+    name.textContent = row.name; detail.textContent = kinds[row.kind];
     if (row.native_artwork_variant) detail.textContent += ' · GameCube appearance; N64 version retained';
     text.append(name, detail, note); card.append(checkbox, text);
     $(row.kind === 'villager' ? 'villager-options' : 'options').append(card);
@@ -160,13 +158,14 @@ function addChoices(plan, review) {
       if (checkbox.checked) requested.add(row.id); else requested.delete(row.id);
     }));
   }
-  for (const row of [...review.unavailable].sort((a, b) => a.name.localeCompare(b.name))) {
-    const card = document.createElement('article'), name = document.createElement('strong'), reason = document.createElement('p');
-    card.className = 'unavailable'; card.dataset.id = row.id;
-    name.textContent = `${row.name} · ${row.id.split('/').at(-1)}`; reason.textContent = row.reason;
-    card.append(name, reason); $('unavailable').append(card); reviews.push({ row, card });
-  }
 }
+$('open-villagers').addEventListener('click', () => $('villager-dialog').showModal());
+$('close-villagers').addEventListener('click', () => $('villager-dialog').close());
+$('villager-dialog').addEventListener('click', event => {
+  if (event.target !== $('villager-dialog')) return;
+  const box = event.target.getBoundingClientRect();
+  if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) event.target.close();
+});
 for (const input of inputs) input.addEventListener('change', () => {
   const native = input.id === 'n64';
   $(native ? 'n64-name' : 'gc-name').textContent = input.files[0]?.name || 'No file chosen';
@@ -264,8 +263,9 @@ async function init() {
     if (!window.isSecureContext || !crypto.subtle || !window.Worker || !window.DecompressionStream) {
       throw new Error('Use a current browser on localhost or HTTPS for local file verification.');
     }
-    const current = await loadBundle(), review = await loadReview(current.bundle, current.plan);
-    loaded = current; addChoices(current.plan, review); $('selection-controls').disabled = false;
+    const current = await loadBundle();
+    await loadReview(current.bundle, current.plan);
+    loaded = current; addChoices(current.plan); $('selection-controls').disabled = false;
     renderSelection(); filter(); status('Choose both original game files. Imports are optional.');
   } catch (problem) { loaded = null; error(problem.message || 'The import catalogue could not be loaded.'); }
 }

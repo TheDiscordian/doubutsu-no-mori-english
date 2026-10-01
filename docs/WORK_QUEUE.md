@@ -20,12 +20,12 @@ complete the import pipeline. Keep this as one connected implementation task:
 3. Classify the unresolved four-instrument villager playback results and fix
    confirmed defects. Verify silently. Run ordinary Save & Quit and fresh-process
    reload on the current full import selection, preserving existing save evidence.
-4. Complete the website repairs. Put ROM selectors before settings/import
-   choices, and the patch button after those choices. Finish the design pass,
-   separate villager window and categorised item selection, remove unavailable
-   lists and internal wording, and give plain version/settings guidance for
-   friends without requiring checksum knowledge. Preserve settings export/import,
-   verified house-start diary placement, and shared ocean movement.
+4. Preserve the verified website repairs: ROM selectors before settings/import
+   choices, and the patch button after those choices; the original visual design,
+   separate villager window and categorised item selection, no unavailable lists
+   or internal wording, and plain version/settings guidance for friends without
+   requiring checksum knowledge. Keep settings export/import, verified house-start
+   diary placement, and shared ocean movement working as remaining imports land.
 5. Verify the changed connected paths and audit other item/villager consumers for
    actual omissions. Fix discovered in-scope defects. Commit/push original source
    on the experimental branch, refresh the local preview, and hand over the
@@ -33,8 +33,8 @@ complete the import pipeline. Keep this as one connected implementation task:
 
 The checked transport build is `build/v3-travel-native-dma-installed-02/build-lock.json`,
 ABI 392, with its full selection in `build/v3-travel-native-dma-profile-02`.
-Preserve the incomplete changes in `experimental/imports/index.html`;
-do not serve them before the accompanying interface repairs pass. No incomplete
+The repaired local preview serves `build/v3-travel-website-browser-02/site`.
+No incomplete
 visitor behaviour or unresolved possible game defect is waived by a private
 playtest label. Broad human gameplay and original-hardware testing remain
 separate from focused developer verification. The deployed public V2 patcher
@@ -126,14 +126,28 @@ under this same active task; the installed transport alone is not V3 completion.
 
 ### Completed preview repairs and verified behaviour
 
-The local preview serves `build/v3-import-pipeline-browser-19/site` using the
-original patcher's design. Villagers and categorised items have separate panels
-and searches. N64/GameCube descriptions explain player-facing differences without
+The local preview serves `build/v3-travel-website-browser-02/site`, tied to the
+checked ABI-392 cartridge, using the original patcher's design. ROM selectors
+come first, followed by imports/settings and the build button. Villagers have a
+separate native dialog with search, keyboard selection, Done, and Escape;
+items have a categorised card grid. No unavailable list is displayed.
+N64/GameCube descriptions explain player-facing differences without
 internal banking wording. Settings export/import works before selecting game
 files, also accepts downloaded browser selection profiles, and rejects mismatched
 catalogues without changing choices. Dependencies are recalculated, not trusted
-from a friend's resolved profile. Visiting guidance explains the installed
-fish/insect passport support and remaining travel limits.
+from a friend's resolved profile. Visiting guidance explains using the same
+patcher version and sharing settings, without requiring checksum knowledge;
+it identifies full village-visit verification as unfinished preview work.
+
+`build/v3-travel-website-ui-01/results.json` verifies six actual original-file
+browser downloads against the offline build, settings/receipt sharing,
+dependency displays, modal focus/keyboard handling, cancellation, rejection,
+control order, dialog bounds, and no horizontal overflow at four widths.
+All requests stay local, with no uploads or browser errors. Seventeen JavaScript
+composition/settings checks and ten static-server/copy checks pass. Export 02
+changes only save-warning wording from that tested export; all other file hashes
+match. All sixteen live served files match the receipt, and a live headless
+browser verifies initial loading, counts, order, modal handling, and four widths.
 
 The optional starting diary sits on the cardboard box inside each new house,
 as verified in GameCube `mHm_SetDefaultPlayerRoomData`, not in player pockets.
@@ -144,7 +158,7 @@ alternatives, and C sanitizer checks pass. See the
 [current verification](PROGRESS.md#preview-controls-and-verified-behaviour) and
 `build/v3-preview-options-profile-04/handoff.json` for artifacts and limits.
 Preserve these passing checks without treating them as complete V3 acceptance.
-The requested website design and ordering repairs remain part of the active task.
+Website checks do not establish completed native visiting or save/restart.
 
 V3 imports items and villagers with working behaviours. Able Sisters (including
 its custom-design system), the Museum building, and comparable large features belong to V4. The
