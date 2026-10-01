@@ -1,6 +1,79 @@
 # Completion queue
 
-## V3 import pipeline: private playtest handoff
+## Active task: complete the connected V3 item/villager import paths
+
+V3 is unfinished. Resident-only imports and a warning about visiting do not
+complete the import pipeline. Keep this as one connected implementation task:
+
+1. Extend the existing village-visiting path to carry the imported player's
+   ownership and required records through departure, arrival, acquisition while
+   visiting, and return. Implement correct visitor storage and restore it to the
+   returning player; never discard records or credit a resident instead.
+   Furniture/clothing, surfaces, equipment, stationery, and diaries currently
+   have resident-only collection handling. Diary opening and additional console
+   play also reject visitors. Replace those restrictions with working behaviour,
+   and replace tests that treat the visitor halt as successful support.
+2. Connect the house/manor models to their genuine existing HRA reward route,
+   scoring, catalogue policy, and independent selection. Review other remaining
+   exclusions against actual existing or already-built acquisition systems.
+3. Classify the unresolved four-instrument villager playback results and fix
+   confirmed defects. Verify silently. Run ordinary Save & Quit and fresh-process
+   reload on the current full import selection, preserving existing save evidence.
+4. Complete the website repairs. Put ROM selectors before settings/import
+   choices, and the patch button after those choices. Finish the design pass,
+   separate villager window and categorised item selection, remove unavailable
+   lists and internal wording, and give plain version/settings guidance for
+   friends without requiring checksum knowledge. Preserve settings export/import,
+   verified house-start diary placement, and shared ocean movement.
+5. Verify the changed connected paths and audit other item/villager consumers for
+   actual omissions. Fix discovered in-scope defects. Commit/push original source
+   on the experimental branch, refresh the local preview, and hand over the
+   usable build with accurate compatibility and verification limits.
+
+The checked starting build is `build/v3-nook-font-repaired-02/build-lock.json`,
+ABI 391. Preserve the incomplete changes in `experimental/imports/index.html`;
+do not serve them before the accompanying interface repairs pass. No incomplete
+visitor behaviour or unresolved possible game defect is waived by a private
+playtest label. Broad human gameplay and original-hardware testing remain
+separate from focused developer verification. The deployed public V2 patcher
+stays unchanged; new systems and e/e+ imports are outside this task.
+
+The shared storage/record core is prepared in `overlays/v3/pak_codec.c` and
+`overlays/v3/travel_player.c`, with the repeatable preparation command
+`python3 tools/v3_player_travel.py --output <new ignored build directory>`.
+`build/v3-player-travel-prepared-02/prepared.json` pins the current sources,
+base cartridge, three passing focused host checks, and N64 compiler results.
+Its 14,204-byte identity-bound record carries the full 12,008-byte diary, all
+1,632 console bytes, selection requirements, category ownership, reward flags,
+and retained player progress. Four-player export/acquisition/return tests verify
+that the other residents, native private bytes, shared holiday header, seasonal
+state, hunt state, and town-first reward flags remain unchanged. This core is
+not installed or native-execution-tested; the live preview retains the visitor
+restrictions. Do not confuse prepared serialization with finished visiting.
+
+The next implementation consumer remains the shared passport I/O, before changing
+collection restrictions. `upstream/af/src/code/m_cpak.c` owns more than the
+save/load entries already wrapped by `creature_travel.c`: note-status, player
+identity, nonce/writeback, and clearing paths also read/write the original
+passport. Its `1200`-byte buffer is immediately followed by the serial queue and
+other control fields. Do not grow the note-size constant while those callers
+still use that buffer. Bind all passport callers to a separately bounded extended
+buffer, preserve native `BD0` private/`528` animal layouts and the nonce protocol,
+and validate the imported record before copying or committing it. Transport
+the player's records rather than copying the host town's shared event state.
+An individual diary record is 12,008 bytes and console progress is 1,632 bytes;
+the existing 48-byte creature capsule cannot carry these. Preserve old notes and
+test device/capacity failures before enabling the extended route.
+The native backup note also consumes `6700` bytes on the same Pak in relevant
+travel flows. Integrate the lossless codec with both note kinds and actual free
+space checks, rather than assuming an expanded uncompressed passport fits beside
+that backup. Borrowed scratch/hash memory needs an explicit ownership/guard
+contract with the existing save runtime. The visitor record needs a checked
+separate reservation; do not treat gaps from the incomplete generic reservation
+scan as free RAM without checking startup/model-pool ownership. All existing
+passport status, identity, nonce, clear, and save/load callers need bounded
+framing/native views. Then connect the current visitor collection/reward/paper,
+diary, and console consumers, preserving resident behaviour and exact identities.
 
 ### Completed preview repairs and verified behaviour
 
@@ -21,10 +94,8 @@ browser/offline downloads, settings round trips, four layout widths, native
 alternatives, and C sanitizer checks pass. See the
 [current verification](PROGRESS.md#preview-controls-and-verified-behaviour) and
 `build/v3-preview-options-profile-04/handoff.json` for artifacts and limits.
-The V3 developer batch is complete and ready for private playtesting. Preserve
-completed evidence and the public V2 patcher. New systems and e/e+ donor expansion
-are outside this batch; subsequent changes address reported playtest defects or
-separately requested work.
+Preserve these passing checks without treating them as complete V3 acceptance.
+The requested website design and ordering repairs remain part of the active task.
 
 V3 imports items and villagers with working behaviours. Able Sisters (including
 its custom-design system), the Museum building, and comparable large features belong to V4. The
@@ -80,7 +151,7 @@ Fish/insect population, shared ocean movement, and source-verified house-start
 diary placement have installed controls and runtime alternatives. Present only
 behaviour choices with real bindings; unfinished alternatives stay unavailable.
 
-The V3 import pipeline is ready for private playtesting. Distinct save consumers,
+V3 completion remains blocked by the active task above. Distinct save consumers,
 fresh-process native readback, and current controlled creature constructor/
 capture/release/scheduler checks pass. Broad human gameplay and hardware testing
 follow the handoff; they are not claimed as completed developer checks.

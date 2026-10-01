@@ -102,12 +102,16 @@ never trust supplied enabled bits or profile bytes. Successful import cancels
 work, invalidates previous downloads, and resets save acknowledgement. Shared
 files contain no ROM/save bytes or local filenames.
 
-Explain that friends need the same patcher version, imports, and behaviour
-choices, and can compare output ROM hashes. Keep separate town saves and backups.
-The installed fish/insect passport support is not evidence of complete travel
-with other imported catalogue items or console-game records. Do not promise
-ordinary end-to-end village visits without verification, or make finishing new
-travel systems a prerequisite of this private V3 handoff.
+Explain that friends need the same patcher version and can export/import the
+same settings, including imports and behaviour choices. Keep separate town saves
+and backups. Do not require users to understand checksums to follow the guidance.
+The installed fish/insect passport adapter is not complete support for other
+imported ownership, diary, or console-game records. Finish those records through
+the existing visiting system, including acquisition and interaction by a visitor
+and return to the home village. This is connected import work, not a new V4
+system or an acceptable limitation to cover with a warning. Verify the changed
+path before promising working visits; do not claim unperformed broad gameplay
+or original-hardware testing.
 
 ## Verified starting facts
 

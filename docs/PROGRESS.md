@@ -23,7 +23,40 @@ The current imported V3 includes the dresser, credits, and museum corrections.
 Its empty-selection baseline returns V2-14. This does not change the main V3
 lock or publish experimental V3.
 
-## V3 private playtest build
+## V3 development build: unfinished import integration
+
+V3 is not complete. Imported collection handlers can halt for visiting players;
+the existing passport adapter does not carry all added ownership records.
+Imported diary opening and additional console play also reject visitors. The
+house/manor models have installed art/room behaviour but no connected HRA
+acquisition, scoring, or catalogue policy. Four added villager instruments retain
+unresolved playback evidence. Ordinary Save & Quit/restart is not established
+for the current full selection. Website design and control-order repairs remain
+unfinished. The [active task](WORK_QUEUE.md#active-task-complete-the-connected-v3-itemvillager-import-paths)
+owns implementation and verification of these connected paths, plus any further
+in-scope omissions found while checking the remaining consumers. Passing narrow
+checks and resident-only behaviour do not establish completion.
+
+### Prepared player-record transport
+
+The shared `pak_codec` and `travel_player` core implements lossless, page-aligned
+note framing and one complete identity-bound player's added records. It preserves
+full diary pages and console progress rather than shortening them to fit. Capacity
+failure leaves output untouched. Return merges ownership and restores editable
+progress only to the matched resident; other residents and shared town fields
+remain unchanged. Three focused checks pass, including address/undefined-behaviour
+sanitizers, independent wire decoding, corrupted/malformed note rejection, all four
+resident identities, acquisition in each ownership family, and a complete player
+record through note encoding/decoding and return. N64 compilation passes with
+only the four expected existing validation dependencies; the framing core has no
+unresolved library calls. The preparation receipt is
+`build/v3-player-travel-prepared-02/prepared.json`.
+
+This is prepared code, not an installed cartridge or completed village visit.
+Native Pak I/O/status/nonce/clear callers, bounded workspace ownership, live
+visitor collection, diary UI, and console sessions still require integration
+and current-game verification. The checked cartridge and running preview are
+unchanged. Resume the shared I/O consumer in the active queue.
 
 V3 is only the import pipeline for items and villagers. Regular items should be
 importable and obtainable through the regular item pool. Rewards that fit existing
@@ -52,10 +85,10 @@ catalogue; they contain no game/save data or local filenames. Import validates
 the catalogue and choices, recalculates dependencies, and updates the interface
 only after successful validation. Malformed or mismatched files preserve current
 choices. A successful import invalidates any prior download and save acknowledgement.
-Friends should share settings and compare finished ROM hashes, keep separate town
-saves, and back up before travel. Fish/insect passport records have installed
-support; complete imported catalogue/console travel and ordinary end-to-end visits
-remain unverified or unfinished. Matching settings do not remove these limits.
+Friends need the same patcher version and shared settings, with separate town
+saves. The fish/insect passport adapter is installed, but visiting-player
+catalogue and console handling are unfinished game code, not acceptable user
+limitations. Finish and verify these paths before claiming V3 completion.
 
 The optional GameCube starting diary is the college-rule diary on the cardboard
 box inside a newly created house, never in pockets. The complete donor room
