@@ -44,19 +44,27 @@ note framing and one complete identity-bound player's added records. It preserve
 full diary pages and console progress rather than shortening them to fit. Capacity
 failure leaves output untouched. Return merges ownership and restores editable
 progress only to the matched resident; other residents and shared town fields
-remain unchanged. Three focused checks pass, including address/undefined-behaviour
+remain unchanged. Four focused transport checks pass, including address/undefined-behaviour
 sanitizers, independent wire decoding, corrupted/malformed note rejection, all four
 resident identities, acquisition in each ownership family, and a complete player
 record through note encoding/decoding and return. N64 compilation passes with
 only the four expected existing validation dependencies; the framing core has no
-unresolved library calls. The preparation receipt is
-`build/v3-player-travel-prepared-02/prepared.json`.
+unresolved library calls. Shared native read/write/status replacement code handles
+both note kinds with actual physical-size checks and commit-last generation slots.
+Device doubles check capacity/directory errors, interrupted writes and retries,
+original-note retention, and refusal to publish damaged or unsupported records.
+The save runtime has a checked scratch/hash loan; the current full-storage fixture
+checks re-entry rejection, guard checks, and the actual Pak workspace bridge.
+The preparation receipt, including all five N64-compiled components, is
+`build/v3-player-travel-prepared-06/prepared.json`.
 
 This is prepared code, not an installed cartridge or completed village visit.
-Native Pak I/O/status/nonce/clear callers, bounded workspace ownership, live
-visitor collection, diary UI, and console sessions still require integration
-and current-game verification. The checked cartridge and running preview are
-unchanged. Resume the shared I/O consumer in the active queue.
+The new I/O code and workspace entries are not installed. Record lifecycle
+providers, a checked visitor reservation, all native hooks, live visitor
+collection, diary UI, and console sessions still require integration and
+current-game verification. Status/nonce reads must remain read-only for live
+visitor progress. The checked cartridge and running preview are unchanged.
+Resume the lifecycle/provider and installation consumer in the active queue.
 
 V3 is only the import pipeline for items and villagers. Regular items should be
 importable and obtainable through the regular item pool. Rewards that fit existing

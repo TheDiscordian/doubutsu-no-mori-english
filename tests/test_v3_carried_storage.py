@@ -71,7 +71,7 @@ class CarriedStorageTests(unittest.TestCase):
                 *(['-DAF_V3_CARRIED_NPC=1',str(out/'v18.o')] if rewards else []),
                 *(['-DAF_V3_GOLDEN_REWARD_STORAGE=1',str(out/'v19.o')] if golden_rewards else []),
                 *(['-DAF_V3_BANK_STORAGE=1',f'-DTEST_BANK_MODE={bank_mode}',str(out/'v20.o'),
-                    'overlays/v3/bank_account.c'] if bank else []),
+                    'overlays/v3/bank_account.c','overlays/v3/pak_workspace.c'] if bank else []),
                 '-DAF_V3_CONSOLE_STORAGE=1','-Wl,--gc-sections',
                 'tests/v3_bank_storage_test.c' if bank else 'tests/v3_carried_storage_test.c',
                 *(f'overlays/v3/{s}.c' for s in ('save_runtime','console_storage','save_compressed',

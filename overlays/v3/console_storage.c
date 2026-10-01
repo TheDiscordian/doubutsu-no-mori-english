@@ -186,6 +186,19 @@ static int leave(int result) {
     if(!guards() || storage->busy!=1)result=AF_SAVE_ARGUMENT;
     storage->busy=0;return result;
 }
+int af_v3_save_workspace_acquire(AFConsoleWorkspace *out) {
+    if(!external(out,sizeof(*out)) || !af_v3_console_storage_valid())return 0;
+    /* require_state itself checks !busy: do not take the loan first. */
+    af_v3_require_save_state();
+    if(!enter())return 0;
+    out->data=scratch;out->index=hash;
+    out->scratch_bytes=AF_CONSOLE_RAW;out->hash_bytes=AF_CZ_WORK_BYTES;
+    return 1;
+}
+int af_v3_save_workspace_release(void) {
+    if(storage->busy!=1)return AF_SAVE_ARGUMENT;
+    return leave(AF_SAVE_OK);
+}
 static int expand(const u8 *bank,const u8 **logical) {
     *logical=bank;
     u32 version=word(bank+AF_SAVE_PAYLOAD+4);

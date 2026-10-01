@@ -30,6 +30,16 @@ struct AFConsoleStorage {
     af_save_u8 players[AF_CZ_CONSOLE];
     af_save_u32 guard[4];
 };
+/* A single synchronous owner may borrow the bounded compression workspaces.
+ * The save codec rejects re-entry while borrowed; callers preserve resident
+ * records and must release before invoking APIs which require save state. */
+typedef struct {
+    af_save_u8 *data;
+    af_save_u32 *index;
+    af_save_u32 scratch_bytes,hash_bytes;
+} AFConsoleWorkspace;
+int af_v3_save_workspace_acquire(AFConsoleWorkspace *);
+int af_v3_save_workspace_release(void);
 _Static_assert(sizeof(struct AFConsoleStorage)==0x19A0,"Console state allocation");
 void af_v3_console_storage_reset(void);
 int af_v3_console_storage_valid(void);

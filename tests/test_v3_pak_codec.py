@@ -1,4 +1,4 @@
-"""Prepared travel framing only; no claim of installed or native visiting support."""
+"""Travel records and native I/O with device doubles; no installed visiting claim."""
 import ctypes
 from pathlib import Path
 import struct
@@ -22,6 +22,20 @@ class Input(ctypes.Structure):
 
 
 class PakCodecTests(unittest.TestCase):
+    def test_sanitized_native_pak_callers_and_device_failures(self):
+        with tempfile.TemporaryDirectory(prefix='af-pak-native-') as directory:
+            binary=Path(directory)/'check'
+            result=subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
+                *[str(ROOT/p) for p in ('tests/v3_pak_native_test.c',
+                    'overlays/v3/pak_native.c','overlays/v3/pak_codec.c')],'-o',str(binary)],
+                capture_output=True,text=True,timeout=30)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            result=subprocess.run([str(binary)],capture_output=True,text=True,timeout=30)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            self.assertIn('original-note preservation passed',result.stdout)
+            print(result.stdout.strip())
+
     def test_sanitized_player_export_visiting_acquisition_and_isolated_return(self):
         with tempfile.TemporaryDirectory(prefix='af-travel-player-') as directory:
             binary=Path(directory)/'check'

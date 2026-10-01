@@ -41,8 +41,9 @@ stays unchanged; new systems and e/e+ imports are outside this task.
 The shared storage/record core is prepared in `overlays/v3/pak_codec.c` and
 `overlays/v3/travel_player.c`, with the repeatable preparation command
 `python3 tools/v3_player_travel.py --output <new ignored build directory>`.
-`build/v3-player-travel-prepared-02/prepared.json` pins the current sources,
-base cartridge, three passing focused host checks, and N64 compiler results.
+`build/v3-player-travel-prepared-06/prepared.json` pins the current sources,
+base cartridge, four passing focused transport checks, current full-storage
+workspace checks, and N64 compiler results.
 Its 14,204-byte identity-bound record carries the full 12,008-byte diary, all
 1,632 console bytes, selection requirements, category ownership, reward flags,
 and retained player progress. Four-player export/acquisition/return tests verify
@@ -51,8 +52,24 @@ state, hunt state, and town-first reward flags remain unchanged. This core is
 not installed or native-execution-tested; the live preview retains the visitor
 restrictions. Do not confuse prepared serialization with finished visiting.
 
-The next implementation consumer remains the shared passport I/O, before changing
-collection restrictions. `upstream/af/src/code/m_cpak.c` owns more than the
+The shared read/write/status replacements are implemented in
+`overlays/v3/pak_native.c`, with the borrowed save-workspace bridge in
+`overlays/v3/pak_workspace.c`. Both physical note kinds use bounded lossless
+frames, actual allocation-size reads, free-space/directory checks, and two
+generation slots. Payload is written and read back before the commit header;
+the complete committed note is read back before success. Only an older owned
+slot or this attempt's uncommitted allocation is reclaimed. Original native and
+unrelated notes are retained. Device doubles check interrupted writes, initial
+write retry, capacity/directory errors, malformed/unsupported records, original
+note retention, status callers, and both kinds on one ordinary-sized Pak. This
+does not establish real controller/Pak execution or install the hooks.
+`console_storage` now exposes a guard-checked synchronous scratch/hash loan;
+save re-entry is rejected while held, and release checks the guards. The current
+full-storage fixture checks both existing profile modes and the actual bridge.
+
+The next implementation consumer is the player-record lifecycle/provider and
+checked cartridge installation, before changing collection restrictions.
+`upstream/af/src/code/m_cpak.c` owns more than the
 save/load entries already wrapped by `creature_travel.c`: note-status, player
 identity, nonce/writeback, and clearing paths also read/write the original
 passport. Its `1200`-byte buffer is immediately followed by the serial queue and
@@ -67,8 +84,14 @@ test device/capacity failures before enabling the extended route.
 The native backup note also consumes `6700` bytes on the same Pak in relevant
 travel flows. Integrate the lossless codec with both note kinds and actual free
 space checks, rather than assuming an expanded uncompressed passport fits beside
-that backup. Borrowed scratch/hash memory needs an explicit ownership/guard
-contract with the existing save runtime. The visitor record needs a checked
+that backup. The adapter borrows 105,728 scratch bytes and the existing hash under
+the shared busy flag. Rebuild/bind the loan-enabled storage as part of the same
+installation; no current cartridge contains the new entry points. Record
+providers must use references checked before the loan, not the existing getters
+which require idle save storage. Publish records only on explicit arrival/return;
+ordinary status, identity, and nonce reads must not replace the live visitor's
+new acquisitions with an older departure snapshot. Handle empty-note clearing
+and legacy creature capsules explicitly. The visitor record needs a checked
 separate reservation; do not treat gaps from the incomplete generic reservation
 scan as free RAM without checking startup/model-pool ownership. All existing
 passport status, identity, nonce, clear, and save/load callers need bounded

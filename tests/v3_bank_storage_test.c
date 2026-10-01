@@ -1,6 +1,7 @@
 /* Exercise the actual saved-town owner. Physical FlashRAM is doubled, not
  * claimed as ordinary native gameplay or original-hardware persistence. */
 #include "v3_carried_storage_test.c"
+#include "../overlays/v3/pak_native.h"
 extern int af_v20_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8 *,u32 *,u32);
 extern int af_v20_expand_cards(const u8 *,u32,u8 *,u32);
 static u8 bank_expanded[AF_CZ_BANK_RAW],account_before[AF_BANK_BYTES];
@@ -32,6 +33,29 @@ static int encode_version(unsigned version,const u8 *raw) {
 }
 int main(void) {
     profile(127);init();fill_console();
+    /* Visiting I/O shares the current full save workspace, not a guessed RAM
+     * gap or enlarged legacy buffer. No save operation may re-enter it. */
+    AFConsoleWorkspace loan,again;
+    CHECK(af_v3_save_workspace_acquire(&loan));
+    CHECK(loan.data==af_console_scratch && loan.index==af_console_hash);
+    CHECK(loan.scratch_bytes==AF_CONSOLE_RAW && loan.hash_bytes==AF_CZ_WORK_BYTES);
+    CHECK(!af_v3_console_storage_valid());memset(&again,0xA5,sizeof(again));
+    CHECK(!af_v3_save_workspace_acquire(&again));
+    for(u32 i=0;i<sizeof(again);i++)CHECK(((u8 *)&again)[i]==0xA5);
+    CHECK(af_v3_save_check(saved,65536,af_save_current,0)==AF_SAVE_ARGUMENT);
+    CHECK(af_v3_save_workspace_release()==AF_SAVE_OK && af_v3_console_storage_valid());
+    CHECK(af_v3_save_workspace_release()==AF_SAVE_ARGUMENT);
+    CHECK(!af_v3_save_workspace_acquire((AFConsoleWorkspace *)af_console_scratch));
+    CHECK(af_v3_save_workspace_acquire(&loan));af_console_hash_guard[0]^=1;
+    CHECK(af_v3_save_workspace_release()==AF_SAVE_ARGUMENT);af_console_hash_guard[0]^=1;
+    CHECK(af_v3_console_storage_valid());
+    AFPIWorkspace pak;
+    CHECK(af_pi_workspace_acquire(&pak));
+    CHECK(pak.notes[0]==af_console_scratch && pak.notes[1]==af_console_scratch+AF_PI_NOTE);
+    CHECK(pak.raw==af_console_scratch+2*AF_PI_NOTE && pak.hash==af_console_hash);
+    CHECK((u32)AF_PI_SCRATCH<=AF_CONSOLE_RAW && !memcmp(pak.binding,"AFV3-PASSPORT-PLAYER-1",21));
+    CHECK(!af_v3_save_workspace_acquire(&loan));
+    CHECK(af_pi_workspace_release() && af_v3_console_storage_valid());
     CHECK(AF_CONSOLE_RAW==AF_CZ_CARD_RAW+48);
     CHECK(af_bank_native_account()==af_v3_bank_data());
     CHECK(af_bank_required(af_v3_bank_data(),AF_BANK_BYTES)==selected);
