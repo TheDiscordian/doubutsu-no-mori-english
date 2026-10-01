@@ -12,8 +12,11 @@ complete the import pipeline. Keep this as one connected implementation task:
    Furniture/clothing, surfaces, equipment, stationery, and diary covers use
    the visitor's actual records. Diary reading retains the donor's privacy rules:
    only owners write, other players read unlocked pages, and locked pages refuse
-   access. Additional console play still rejects visitors. Finish those sessions
-   with the original game's save rules, and retain the completed collection paths.
+   access. Additional console play retains the original GameCube visitor rule:
+   the visited town's first NES save block, not an independent travelling NES
+   save or a fifth owner. Native cartridge/disk execution, reset, and close pass;
+   finish the connected station/room return and current device-save cycle while
+   retaining the completed collection paths.
 2. Preserve the connected house/manor model imports and review remaining
    exclusions only against actual existing or already-built acquisition systems.
    Both models use the ordinary shared importer with reused artwork, their
@@ -51,10 +54,15 @@ complete the import pipeline. Keep this as one connected implementation task:
    on the experimental branch, refresh the local preview, and hand over the
    usable build with accurate compatibility and verification limits.
 
-The current proposal is `build/v3-travel-hra-rewards-installed-05/build-lock.json`,
-ABI 395, retaining the checked transport with 20 villagers and 277 requested
-items. Its full selection is `build/v3-travel-hra-rewards-profile-03`.
-The repaired local preview serves `build/v3-travel-website-browser-03/site`.
+The current proposal is `build/v3-travel-console-visitors-installed-01/build-lock.json`,
+ABI 396, retaining the checked transport with 20 villagers and 277 requested
+items. Its full selection is `build/v3-travel-console-visitors-profile-01`.
+The repaired local preview serves `build/v3-travel-website-browser-04/site`.
+Its fresh ABI-396 two-game recipes have 16 authenticated live static files;
+the focused Clu Clu Land D browser selection matches offline at
+`build/v3-travel-console-visitors-browser-02/results.json`, with passing category
+controls and no page errors, uploads, or off-origin requests. The existing
+unchanged layout/settings checks remain retained.
 No incomplete
 visitor behaviour or unresolved possible game defect is waived by a private
 playtest label. Broad human gameplay and original-hardware testing remain
@@ -131,19 +139,29 @@ behaviour; this repair adds no unrelated features. Resource loading does not pro
 ordinary actor interactions. Every top-level test reopening uses the actual
 parent unlink/reload, preserving the native child lifetime and destructor path.
 
-The next consumer is console sessions. Verify the complete donor entry and
-storage selection before choosing a visitor save row. GameCube
-`local/ac-decomp/src/static/Famicom/famicom.cpp:1623` selects the supplied resident
-index when valid and zero otherwise; `:1661` uses that index for the shared NES
-save area. An independent visiting-player NES session row is not established by
-the import specification and should not be invented as a faithful source rule.
-Check the pinned executable entry and surrounding save/visit lifecycle to resolve
-the actual player-facing behaviour. The donor recipes span the complete
-1,632-byte player row, not equal per-game slots. Preserve original console IDs
-and source save operations. Verify both native
-note kinds together and the actual station path as part of the connected visiting
-batch. Continue HRA rewards, instruments, current save/restart, and website repairs
-under this same active task; the installed transport alone is not V3 completion.
+The shared console lifecycle preserves the complete verified donor rule:
+`famicom_init` selects the supplied resident index when valid and zero otherwise;
+the room itself loads/saves the current town's NES file for visitors. The
+`mCD_GetThisLandSlotNo_code` callback identifies that town's card, not the
+traveller's home card. Do not mistake the separate resident-only station wrappers
+for the room's save permissions, invent a fifth owner, or redirect NES progress
+to the travelling-player record. Ten complete compiled functions are authenticated
+in `tests/test_v3_console_games.py`. The donor recipes span the complete
+1,632-byte row, not equal per-game slots; original IDs, images, operations,
+four-row storage, and saved format 21 remain unchanged.
+
+The two sanitized adapters pass original paths, all additional cartridge/disk
+games, four resident rows, foreign fallback, repeat play, reset, capture, bounds,
+and rejection. The installed native-hook/resource check also passes.
+`build/v3-travel-console-visitors-native-01/results.json` passes 51 records for
+actual Clu Clu Land D and Wario's Woods launch/execution/reset/close as player 4,
+row-zero selection, unchanged foreign identity, unchanged other three resident
+rows and travelling record, storage guards, checkpoint restoration, and no fault.
+This is a controlled title-checkpoint session, not ordinary furniture interaction,
+a walked station trip, or cartridge saving. The next connected check is the
+remaining station/room return and current save cycle, including both native
+note kinds. Continue unresolved instruments under this same task; no additional
+NES save permissions or new game systems are required.
 
 ### Completed preview repairs and verified behaviour
 

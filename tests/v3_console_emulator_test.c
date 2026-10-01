@@ -247,9 +247,11 @@ int main(int argc,char **argv) {
         const u8 *entry=meta+32+(game-1)*64;
         if(word(entry+4)!=1)continue;
         imported_games++;
-        for(u32 player=0;player<4;player++)for(u32 repeat=0;repeat<2;repeat++) {
+        for(u32 actor=0;actor<5;actor++)for(u32 repeat=0;repeat<2;repeat++) {
+            u32 player=actor<4?actor:0; /* Original visitor fallback, not a fifth saved row. */
             memcpy(saved_snapshot,players,sizeof(players));
-            void *graphics=start(game,player);CHECK(graphics);
+            void *graphics=start(game,actor);CHECK(graphics);
+            CHECK(session->player==player);
             u32 need=0x2008+((u32)meta[word(entry+16)+5]<<13);
             CHECK(alloc_sizes[1]==(need>0x25008?need:0x25008));
             u8 *image=af_v3_console_setup();CHECK(image && !session->error);
@@ -265,7 +267,7 @@ int main(int argc,char **argv) {
                     u8 *battery=state_pointer+0x20A0+word(op+8);
                     /* Zelda's special repair intentionally changes its save
                      * markers/checksums on re-open; the core has donor tests. */
-                    if(!repeat)for(u32 j=0;j<length;j++)CHECK(battery[j]==0);
+                    if(!repeat && actor<4)for(u32 j=0;j<length;j++)CHECK(battery[j]==0);
                     else if(game!=19)CHECK(!memcmp(battery,players+player*AF_CONSOLE_PLAYER_BYTES+8+word(op+4),length));
                 }
             }
@@ -286,9 +288,11 @@ int main(int argc,char **argv) {
     CHECK(imported_games==11 && setup_calls==8 && !return_calls);
 #ifdef AF_CONSOLE_DISK
     u32 prior_inits=init_calls,prior_resets=reset_calls;
-    for(u32 player=0;player<4;player++)for(u32 repeat=0;repeat<2;repeat++) {
+    for(u32 actor=0;actor<5;actor++)for(u32 repeat=0;repeat<2;repeat++) {
+        u32 player=actor<4?actor:0;
         memcpy(saved_snapshot,players,sizeof(players));
-        void *graphics=start(10,player);u8 *image=af_v3_console_setup();CHECK(image && disk_game());
+        void *graphics=start(10,actor);u8 *image=af_v3_console_setup();CHECK(image && disk_game());
+        CHECK(session->player==player);
         CHECK(session->image_bytes==65536);
         af_v3_console_extent(image);CHECK(*global(0x80854B74)==65536);
         CHECK(*global(0x80854B7C)==addr(image+65536));
@@ -297,7 +301,7 @@ int main(int argc,char **argv) {
         CHECK(init_calls==prior_inits && qd()->disk.disk==image && !qd()->disk.frame_flags);
         CHECK(session->save.operation_count==1 && session->save.operations[0]==3);
         const u8 *op=session->save.operations;u32 from=word(op+8),to=8+word(op+4),length=(u32)op[2]<<8|op[3];
-        if(repeat)CHECK(!memcmp(image+from,players+player*AF_CONSOLE_PLAYER_BYTES+to,length));
+        if(repeat || actor>=4)CHECK(!memcmp(image+from,players+player*AF_CONSOLE_PLAYER_BYTES+to,length));
         CHECK(!af_v3_qd_boot(&qd()->disk));
         qd()->disk.ready=119;qd()->disk.control=0;disk_cpu_calls=0;
         af_v3_console_frame_native(native);
@@ -322,7 +326,8 @@ int main(int argc,char **argv) {
 #ifdef AF_CONSOLE_DISK
         if(failure_case==1)disk_memory[0x16000]^=1;
 #endif
-        start(failure_case==0?20:failure_case==1?10:8,failure_case==2?4:0);
+        start(failure_case==0?20:failure_case==1?10:8,0);
+        if(failure_case==2)session->guard[0]^=1;
         if(failure_case==9)meta[0]^=1;
         CHECK(!af_v3_console_setup());CHECK(!*global(0x80854B78));
         CHECK(!memcmp(players,saved_snapshot,sizeof(players)));
@@ -339,9 +344,9 @@ int main(int argc,char **argv) {
     CHECK(session->error==4 && failure==1 && return_calls==1 && !session->save.active);
     CHECK(!memcmp(players,saved_snapshot,sizeof(players)));af_v3_console_close_native();check_guards();
 #ifdef AF_CONSOLE_DISK
-    printf("%u disk-session checks: original/iNES routes, full QD boot, four-player repeat play, image extent, per-frame motor timing, soft reset, close capture and rejection; CPU/PPU/audio stubbed\n",checks);
+    printf("%u disk-session checks: original/iNES routes, full QD boot, four residents and original visitor row-zero fallback, repeat play, image extent, per-frame motor timing, soft reset, close capture and rejection; CPU/PPU/audio stubbed\n",checks);
 #else
-    printf("%u native-adapter checks: original paths, eleven full iNES images, four players, reset, close, and rejection; CPU/PPU/audio stubbed\n",checks);
+    printf("%u native-adapter checks: original paths, eleven full iNES images, four residents and original visitor row-zero fallback, reset, close, and rejection; CPU/PPU/audio stubbed\n",checks);
 #endif
     return 0;
 }

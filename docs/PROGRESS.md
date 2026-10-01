@@ -28,13 +28,17 @@ lock or publish experimental V3.
 V3 is not complete. The installed transport and shared item/paper collection
 handlers carry and update the visitor's added player records.
 Imported diaries now permit unlocked read-only access for visitors, preserving
-the original owner-only editing and locked refusal. Additional console play
-still rejects visitors. The house/manor models now have their original HRA
+the original owner-only editing and locked refusal. Additional console games
+permit visitors using the original GameCube rule: the visited town's first NES
+save block, without a fifth saved owner or independent travelling NES progress.
+Native cartridge/disk launch, execution, reset, and close pass; the connected
+station/room return and current device-save cycle remain unfinished.
+The house/manor models now have their original HRA
 reward delivery, scoring, catalogue previews without ordering, and independent
 selection. Four added villager instruments retain unresolved playback evidence.
 Ordinary Save & Quit and a fresh-process restart pass for the ABI-392 full
 selection, with independent whole-save validation; this does not establish a
-rewarded-model save/restart cycle for ABI 395.
+rewarded-model or visitor-console save/restart cycle for ABI 396.
 The requested website design, villager dialog,
 and control-order repairs pass browser checks and run in the local preview.
 The [active task](WORK_QUEUE.md#active-task-complete-the-connected-v3-itemvillager-import-paths)
@@ -44,9 +48,22 @@ checks and resident-only behaviour do not establish completion.
 
 ### Installed player-record transport
 
-The current proposal is ABI 395 / format 21 at
-`build/v3-travel-hra-rewards-installed-05/build-lock.json`, with full selection in
-`build/v3-travel-hra-rewards-profile-03` (20 villagers and 277 requested items).
+The current proposal is ABI 396 / format 21 at
+`build/v3-travel-console-visitors-installed-01/build-lock.json`, with full selection in
+`build/v3-travel-console-visitors-profile-01` (20 villagers and 277 requested items).
+The shared console lifecycle removes visitor rejection while retaining the
+original current-town row-zero rule. Ten complete compiled donor functions
+authenticate the initializer, card lookup/load/save, and room interaction.
+Both sanitized adapters pass, including all supplied additional games, four
+residents, and visitors; the installed-hook/resource check also passes.
+`build/v3-travel-console-visitors-native-01/results.json` passes 51 records for
+actual Clu Clu Land D and Wario's Woods execution as player 4, reset, close,
+row-zero selection, unchanged actual visitor identity and other three resident
+rows, unchanged traveller records, storage guards, checkpoint restoration,
+and zero native fault state. This uses a controlled foreign player on a title
+checkpoint, not an ordinary room interaction or walked station visit. Saved
+format 21 and all four resident rows stay unchanged; cross-build ordinary
+loading is not newly verified for ABI 396.
 Both HRA models use the shared importer and retain the source's acquisition and
 non-orderability. The complete English creator is extended without replacing
 unrelated adapters or theme names. Its heap check accepts allocations from the
@@ -62,13 +79,22 @@ pass, retaining the earlier 20 checks for unchanged selection paths. The browser
 build for both selected models matches offline at
 `build/v3-travel-hra-rewards-browser-01/results.json`, with no page errors,
 uploads, or off-origin requests. The local preview serves
-`build/v3-travel-website-browser-03/site`, with 20 villagers and 277 item choices.
+`build/v3-travel-website-browser-04/site`, with 20 villagers and 277 item choices.
 Exported compatibility text describes separate saves and matching settings,
 without inherited banking or stale travel claims. The deployed V2 patcher stays
 unchanged. Saved format 21 and the transport owner are unchanged. The ABI-392
 save loads in the new full selection during the actual village-load prefix in
 `build/v3-travel-hra-rewards-native-05/results.json`; this does not establish
 backward compatibility or every cross-profile save combination.
+
+The ABI-396 preview has fresh authenticated two-game reconstruction recipes;
+all 16 live static files match its export receipt. The selected Clu Clu Land D
+browser build matches offline in
+`build/v3-travel-console-visitors-browser-02/results.json`, with passing focused
+category controls, no page errors, and no uploads or off-origin requests.
+The initial browser invocation rejects an incompatible combination of test
+options before running; it makes no game-code or preview change. The corrected
+focused check retains the existing passing interface/layout evidence.
 
 Native Pak read/write/status and departure/arrival/private-copy entries carry one
 complete identity-bound player's added records. Full diary pages, console progress,
@@ -111,7 +137,8 @@ virtual space. `build/v3-travel-native-dma-native-02/results.json` passes all te
 native loads against independently relocated complete images, guarded bounds,
 and checkpoint restoration. No new systems or gameplay rules are introduced.
 
-The next connected consumer is visitor console sessions.
+The next connected consumer is the remaining station/room return and current
+save cycle, with the original console save rule retained.
 The five shared item/paper record/query handlers use the same visitor record,
 preserving native delegation, display/parent aliases, selection gates, and resident
 ownership. Retained inner collection bridges are replaced without bypassing the
@@ -120,7 +147,7 @@ already reaches the complete visitor record through both retained exports. Both
 native note kinds together and the actual station path still require connected
 verification. HRA model rewards and four instruments remain part of the same
 unfinished V3 task. The local preview serves the
-repaired interface and ABI-392 recipes; the deployed public V2 patcher is unchanged.
+repaired interface and ABI-396 recipes; the deployed public V2 patcher is unchanged.
 
 ### Full-selection ordinary save and restart
 

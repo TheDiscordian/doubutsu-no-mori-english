@@ -57,6 +57,29 @@ class DonorTests(unittest.TestCase):
         cls.dol, cls.archive = games.read_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
         cls.report, cls.blob = games.build_bundle(cls.dol, cls.archive)
 
+    def test_original_visitor_console_owner_and_room_save_rules(self):
+        # Check complete compiled functions, not just the station wrappers:
+        # the room itself loads/saves the current town's NES file for visitors.
+        for address, size, digest in (
+            (0x80043C54,0xD7C,'5efa64d552e7ac9c7b972643c8b3d9a899d27e87e8420659f8cf47907c7fa97b'),
+            (0x80041F04,0x278,'fa91713f7e9617c3bfc90fb21b7305787e46c154d3313b5806d2afd82ea2ba01'),
+            (0x8004618C,0x144,'22e542ff8c20e981881b79f38789b6b0bf17294f53aee340858ab55e67b12bc5'),
+            (0x800462D0,0x1DC,'124f35e256ee8901ae7d74a1e0b6464015f1d403409f08a159935f5bf676363c'),
+            (0x80046670,0xAC,'b335db7ebef62d395abdcda9acd4dfe12c3d3e6a817bbfd9eccfba8ac0ed646f')):
+            self.assertEqual(sha256(self.dol.read(address,size)),digest)
+        for offset, name, size, digest in (
+            (0x90570,'mCD_GetLandSlotNo_code_com',448,'2df361a4caa4756790069a4273dd7636660c8514987fa5a3b01b6f4494d6047a'),
+            (0x90730,'mCD_GetThisLandSlotNo_code',128,'8eb2db6019d2079600d095243fc4e4b99dfb730f5cd935a4da490b7db63d5664'),
+            (0x104130,'aMR_SetEmulatorStartMessage',504,'2808dc2c2d6affc75f5e07069fecc3fc7a0c41e22244951ea0e06b5bb22f86ec'),
+            (0x10675C,'aMR_MsgControlSaveFamicom',600,'ddb77737d7b2077cc039835c4fce696020aa59374791ae27da4c9360018bb9cb'),
+            (0x106B28,'aMR_MessageControl',716,'e2b173bc0b532a44611ec217cc0a2d29a6205784e80733ea28a3fee7de44984e')):
+            raw, receipt=self.source.function(offset)
+            self.assertEqual((receipt['symbol'],len(raw),sha256(raw)),(name,size,digest))
+        self.assertEqual(self.source.function(0x104130)[1]['relocations'][56],
+                         (10,0,4,0x8004618C))
+        self.assertEqual(self.source.function(0x10675C)[1]['relocations'][96],
+                         (10,0,4,0x800462D0))
+
     def test_complete_bundle_retains_every_game_and_each_save_dependency(self):
         r, blob = self.report, self.blob
         self.assertEqual(len(r['rows']), 19)

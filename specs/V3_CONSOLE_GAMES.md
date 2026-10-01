@@ -40,10 +40,42 @@ use save IDs thirteen and twelve respectively. The complete shared recipes
 contain sixty ordered operations and address 1,623 bytes after an eight-byte
 save header **per player**. The donor allocates four independent `660`-byte
 player blocks: 6,528 bytes, plus its separate 64-byte memory-card container
-header. The N64 container may differ, but player progress must remain independent.
+header. The N64 container may differ, but the four resident records remain separate.
 Eleven complete donor functions, including allocation, loading, saving, and
 checksum handling, are pinned in `persistence_contract`. They retain high-score defaults/reset flags, battery RAM regions,
 QD write-back regions, and Zelda's special checksum/marker restoration.
+
+### Visiting-player rule
+
+GameCube `src/static/Famicom/famicom.cpp:1623` selects a resident's own row for
+indices 0–3 and row zero otherwise. The room's `aMR_SetEmulatorStartMessage`
+loads the current town's NES file before play, and `aMR_MsgControlSaveFamicom`
+saves it afterwards. Neither internal-game call excludes visitors. The callback
+installed in `first_game.c` is `mCD_GetThisLandSlotNo_code`: it identifies the
+currently visited town's card, not the visitor's home card. Thus visitors use
+the visited town's first NES save block; there is no fifth saved owner or
+independent travelling NES progress. The resident-only station/save wrappers do
+not replace the room's load/save calls.
+
+The shared imported cartridge/disk lifecycle preserves that rule. The actual
+player identity remains foreign; only the NES save-row selection falls back to
+zero. Rows 1–3 and the complete travelling-player record remain untouched.
+The recipe executor still accepts exactly four resident rows. Complete compiled
+initializer, card loader/saver, current-town lookup, and room control functions
+are authenticated in `tests/test_v3_console_games.py`.
+
+ABI 396 at `build/v3-travel-console-visitors-installed-01/build-lock.json`
+removes the incorrect visitor rejection without changing game IDs, images,
+recipes, storage layout, or permissions. Sanitized cartridge and disk adapters
+pass first/repeat sessions for four residents and the foreign row-zero fallback.
+`build/v3-travel-console-visitors-native-01/results.json` passes 51 records:
+actual game-state transitions, executing Clu Clu Land D and Wario's Woods,
+native menu reset and close, original save pointer, unrelated records, guards,
+checkpoint restoration, and zero fault state. The player is a controlled foreign
+identity on a title checkpoint; ordinary furniture interaction, a walked station
+visit, and device saving are not established by that fixture.
+
+### Save recipes
 
 High-score bit fifteen preserves the loaded-score state on reset; lower eleven
 bits address emulator work RAM. It is not a numeric comparison direction.

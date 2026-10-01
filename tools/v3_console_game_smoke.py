@@ -14,6 +14,7 @@ from v3_asset_loader import BLOB
 from v3_console_games import NATIVE_RAM
 
 HANDOVER=(0x800D20B4,32,'d84dc83756b24c65fa3eaf674d26684786090b342450e5c1cdd390841408b743')
+PLAYERS,PLAYER_BYTES=0x804DC810,0x660
 
 
 def graph_snapshot(debug):
@@ -44,6 +45,8 @@ def exercise(debug,rom_path,action,state,record):
     if action.get('launch'):
         game=action['launch']
         if type(game) is not int or not 8<=game<=19:raise ValueError('Invalid imported test game')
+        actor=action.get('player',0)
+        if type(actor) is not int or not 0<=actor<=4:raise ValueError('Invalid console test player')
         actual=debug.read_memory(packet['ram'],packet['bytes'])
         if actual!=blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']]:
             raise ValueError('Console startup packet differs from cartridge')
@@ -54,8 +57,13 @@ def exercise(debug,rom_path,action,state,record):
                 raise ValueError('Complete disk startup packet differs from cartridge')
         if words(0x804DC800,1)!=(0x41464335,):raise ValueError('Console storage is not initialized')
         debug.write_memory(0x80137898,bytes((game,0)))
-        debug.write_memory(0x80136EA3,b'\0')
-        state.clear();state['game']=game
+        debug.write_memory(0x80136EA3,bytes((actor,)))
+        state.clear();state.update(game=game,actor=actor,player=actor if actor<4 else 0,
+            players=debug.read_memory(PLAYERS,4*PLAYER_BYTES))
+        t=report['equipment_resources'].get('player_travel')
+        if t:
+            p=t['state_packet']
+            state['traveller']=(p['ram'],debug.read_memory(p['ram'],p['bytes']))
         state['metadata']=actual[images['metadata']['ram']-packet['ram']:]
         # The real room calls sAdo_SubGameStart after requesting the transition
         # (8093A4F8..8093A518). Title-state launch must provide the same handover;
@@ -66,7 +74,7 @@ def exercise(debug,rom_path,action,state,record):
         core_call(0x800D36F4,32,[owner])
         core_call(at,size,[])
         return dict(console_native_launch=game,transition='native_game_state_manager',
-                    source_audio_handover=True,
+                    source_audio_handover=True,actor=actor,source_save_player=state['player'],
                     ordinary_room_entry_tested=False)
     header=words(0x804FE820,18)
     magic,base,game,player,image_bytes,error,image_ram,emulator,battery=header[:9]
@@ -78,9 +86,26 @@ def exercise(debug,rom_path,action,state,record):
         current_registers=debug.command('g'),thread=debug.thread_snapshot(),
         graph_thread=graph_snapshot(debug),
         fault_context=debug.read_memory(fault,0x1B0).hex() if 0x80000400<=fault<=0x80400000-0x1B0 else None)))
-    if (magic!=0x41464E45 or game!=state['game'] or player!=0 or error or not emulator or
+    if (magic!=0x41464E45 or game!=state['game'] or player!=state['player'] or error or not emulator or
             header[17]!=0x41464E53 or fault or base&15 or not 0x80000400<=base<=0x80400000-0x2E990):
         raise ValueError('Native console did not reach an active healthy imported session')
+    if header[11]!=PLAYERS+player*PLAYER_BYTES:
+        raise ValueError('Native console does not use the original save-owner rule')
+    def check_ownership():
+        if debug.read_memory(0x80136EA3,1)!=bytes((state['actor'],)):
+            raise ValueError('Console adapter changes the actual visiting-player identity')
+        saved=debug.read_memory(PLAYERS,4*PLAYER_BYTES)
+        for other in range(4):
+            at=other*PLAYER_BYTES
+            if other!=player and saved[at:at+PLAYER_BYTES]!=state['players'][at:at+PLAYER_BYTES]:
+                raise ValueError('Console session changes an unrelated resident save')
+        if 'traveller' in state:
+            at,wanted=state['traveller']
+            if debug.read_memory(at,len(wanted))!=wanted:
+                raise ValueError('Console session changes the travelling-player record')
+        if debug.read_memory(PLAYERS+4*PLAYER_BYTES,16)!=bytes.fromhex('AF4355DE')*4:
+            raise ValueError('Console session changes the four-player storage guard')
+    check_ownership()
     if not 0x80000400<=start<=head<=tail<=start+size<=0x80400000:
         raise ValueError('Native console game arena is out of bounds')
     globals_at=base+0x80854A08-NATIVE_RAM
@@ -146,7 +171,10 @@ def exercise(debug,rom_path,action,state,record):
         if (words(0x804FE820,1)[0] or words(0x8003CE34,1)[0] or
                 values[1]==2 and words(0x80638088,1)[0]):
             raise ValueError('Native console close retained an active context or fault')
+        check_ownership()
         return dict(console_native_close='passed',game=game,audio_shutdown_path=True,
+                    actor=state['actor'],source_save_player=player,
+                    unrelated_resident_saves_and_traveller_unchanged=True,
                     world_return_tested=False,checkpoint_restore_required=True)
     return dict(console_native_execution='passed',game=game,full_image_bytes=image_bytes,
         graphics_bytes=graphics_bytes,arena_free_bytes=tail-head,work_sha256=sha256(work),

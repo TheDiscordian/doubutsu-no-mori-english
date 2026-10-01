@@ -120,12 +120,16 @@ void *af_v3_console_graphics(u32 requested) {
     for(u32 i=0;i<4;i++)session->guard[i]=GUARD;
     session->game=*(u8 *)MEMORY(0x80137898u);
     session->player=*(u8 *)MEMORY(0x80136EA3u);
+    /* The donor's famicom_init selects row zero for a foreign player. Its
+     * room interaction loads/saves the current town's console file, even
+     * while visiting. Do not invent a fifth row or a travelling save owner. */
+    if(session->player>=4)session->player=0;
     if(!valid() || requested!=0x25008u) {
         session->magic=0;
         return 0;
     }
     if(session->game>7) {
-        if(session->game>19 || session->player>=4 ||
+        if(session->game>19 ||
             af_v3_console_validate(metadata,AF_CONSOLE_METADATA_BYTES)<0)session->error=1;
         else {
             const u8 *entry=metadata+32+(session->game-1)*64;
