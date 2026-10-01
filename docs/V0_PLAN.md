@@ -43,16 +43,20 @@ the GameCube-style keyboard are v1 stretch goals, not unfinished v0 features.
 - Prefer one representative combined native check over a new per-record or
   all-combinations harness. Add cases for a concrete uncovered risk or reproduced
   defect, not merely to accumulate more proof of already checked behaviour.
-- For a testing-setup failure, allow one initial attempt and at most one retry
-  after a concrete setup correction. Cap new harness construction/debugging at
-  30 minutes per implementation batch, not per case. Changing a timeout, fixture
-  name, or invocation does not reset that budget. Do not replay a completed
+- Time-bound every emulator run. After a testing-setup failure, retry only with
+  a concrete correction or additional diagnostics. If a corrected retry remains
+  inconclusive, record the build, failing step, evidence, suspected game-versus-
+  harness cause, and next useful check, then change the diagnostic approach.
+  Elapsed setup time and retry counts are not permission gates: continue
+  autonomously to resolve failures relevant to the current deliverable without
+  asking the user to authorise more testing. Preserve all failed attempts and
+  reuse passing unchanged evidence. Changing a timeout, fixture name, or
+  invocation does not justify repeating unchanged work. Do not replay a completed
   prefix just because a later case fails when a safe focused resume is possible.
-  These limits govern testing infrastructure, not attempts to fix actual game
-  defects. A game crash, save damage, or memory corruption must be fixed before
-  v0, with focused verification of the fix.
-- At that limit, record the build, failing step, evidence, suspected game-versus-
-  harness cause, and next useful check. Continue unrelated implementation.
+  A game crash, save damage, or memory corruption must be fixed before v0, with
+  focused verification of the fix. This policy governs older fixture-budget and
+  retry-limit wording in specifications, checkpoints, and work records.
+- Continue unrelated implementation while an appropriate investigation proceeds.
   Inconclusive tests stay inconclusive; they are neither successful tests nor
   established game defects. Do not assume an unexplained failure is a harness
   problem. Keep possible game failures unresolved until classified, and retain

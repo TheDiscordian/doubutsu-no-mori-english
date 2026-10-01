@@ -198,15 +198,20 @@ Remaining connected work:
    `af_cw_save_sync`) and `af_v3_diary_preflight` using bounded existing paths.
    Their complete current-profile function bodies and acquire/release bindings
    authenticate; this is static evidence, not native execution. The ordinary
-   Save & Quit result does not establish those distinct entries. Preserve complete data, native I/O, asynchronous
+   Save & Quit result does not establish those distinct entries. Preserve
+   complete data, native I/O, asynchronous
    framebuffer ownership, and save format 21. Do not shrink diagnostic buffers,
-   silently omit a consumer, replay exhausted fixtures, or reset their budgets.
+   silently omit a consumer, or replay an unchanged failed setup. Follow the
+   current testing policy in `CLAUDE.md` and `docs/V0_PLAN.md`: continue focused
+   verification autonomously, without requesting permission for extra test time.
 2. Classify retained creature constructor/scheduler failures from existing
-   evidence without replaying exhausted old fixtures; unexplained failures remain
+   evidence and targeted current-build diagnostics; unexplained failures remain
    unresolved, not declared harness faults or passing checks. The original
    runner is identified by its recorded hash, but the probe source identity and
    post-failure machine state are not recorded. Read-only inspection cannot
-   establish either remaining cause from those missing records.
+   establish either remaining cause from those missing records. Gather the
+   missing diagnostics with bounded runs and a concrete investigation purpose;
+   preserve old evidence instead of relabelling it or replaying old cartridges.
 3. Finish the private handoff with exact artifacts, hashes, compatibility
    warnings, and known limits. The current artifact locator is
    `build/v3-import-pipeline-profile-17/handoff.json`; it explicitly remains an

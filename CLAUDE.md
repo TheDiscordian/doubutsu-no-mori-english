@@ -148,7 +148,7 @@ the experimental V3 publication hold does not apply to V2 fixes.
   make the batch look complete.
 - Internal build locks and commits are durability checkpoints, not new tasks or
   completion claims. If interrupted, record the exact next consumer and resume
-  the same task; do not start a fresh audit or reset the harness budget. Keep
+  the same task; do not restart unchanged tests or start a fresh audit. Keep
   detailed technical evidence in its existing build reports. Update the current
   queue and progress once per connected batch or necessary handoff, rather than
   repeating each sub-step across several documents. Report newly usable paths
@@ -178,11 +178,17 @@ the experimental V3 publication hold does not apply to V2 fixes.
   behaviours and existing evidence without expanding unrelated feature checks.
 - Use existing focused checks once per meaningful change. Reuse passing native
   evidence for unchanged code/resources; do not add exhaustive per-record or
-  all-combinations harnesses without a concrete uncovered risk. For a testing-
-  setup failure, allow one initial attempt and one retry after a concrete setup
-  correction. New harness construction/debugging has a 30-minute budget per
-  implementation batch; record unresolved results and continue unrelated work
-  at that limit. These limits do not apply to fixing actual game defects.
+  all-combinations harnesses without a concrete uncovered risk. Time-bound each
+  emulator run. After a setup failure, identify a concrete correction or missing
+  diagnostic before retrying. If a corrected retry remains inconclusive, record
+  the exact evidence and change the diagnostic approach instead of repeating
+  unchanged setup. Continue autonomously to classify unresolved failures and
+  verify the current deliverable; elapsed setup time and retry counts are not
+  permission gates and do not require the user to authorise more testing.
+  Preserve failed attempts and passing unchanged evidence. Do not disguise
+  repeated work as a fresh batch, weaken safeguards, or expand the project scope.
+  This current policy governs older fixture-budget and retry-limit wording in
+  specifications, checkpoints, and work records.
   Confirmed crashes, save damage, and memory corruption block v0. Unexplained
   failures that could be game defects remain unresolved until classified;
   never assume a harness cause or mark an incomplete test passed.
