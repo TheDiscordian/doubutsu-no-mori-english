@@ -17,6 +17,17 @@ complete the import pipeline. Keep this as one connected implementation task:
 2. Connect the house/manor models to their genuine existing HRA reward route,
    scoring, catalogue policy, and independent selection. Review other remaining
    exclusions against actual existing or already-built acquisition systems.
+   Their installed lifecycles are in `staged_furniture.rows`, not the offered
+   furniture catalogue. Promote them through the ordinary shared importer only
+   after binding acquisition; do not substitute shop stock. Donor
+   `m_mark_room_ovl.c:2791` chooses the 70,000-point reward before the 100,000-point
+   reward and `:2950` marks successful delivery, not attempted delivery. Current
+   native letter selection at `80925BB8` has the score thresholds but no gifts;
+   the complete current disassembly is `build/v3-travel-hra-inspect-01/code.asm`.
+   Reuse the installed English creator and HRA scoring-category adapter. Verify
+   saved reward flags against compiled native home consumers before assigning
+   storage. Imported reward mail, each model's independent selection, and
+   catalogue non-orderability need real connections, not preparation flags.
 3. Classify the unresolved four-instrument villager playback results and fix
    confirmed defects. Verify silently. Run ordinary Save & Quit and fresh-process
    reload on the current full import selection, preserving existing save evidence.

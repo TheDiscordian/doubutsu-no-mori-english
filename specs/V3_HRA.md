@@ -10,8 +10,9 @@ delivery-success handling remain intact. This is not a port of GameCube's
 additional rooms or house-model rewards.
 
 The [checkpoint](../docs/checkpoints/V3_HRA.md) owns executed evidence. The
-[feng shui adapter](V3_FENG_SHUI.md) connects its separate native evaluator. No import is
-enabled in either web patcher; V3 testing and explicit user approval are required.
+[feng shui adapter](V3_FENG_SHUI.md) connects its separate native evaluator.
+The local preview exposes eligible V3 imports. The deployed patcher stays on
+stable V2 until V3 testing and explicit public-publication approval.
 
 ## Sources and metadata conversion
 
