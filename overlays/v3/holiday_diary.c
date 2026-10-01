@@ -115,6 +115,7 @@ int af_holiday_diary_draw(const AFDiaryEventMonth *c,const AFDiaryMenu *m,
             while(draw->event_length && draw->event_label[draw->event_length-1]==' ')--draw->event_length;
             if(!draw->event_length)return AF_DIARY_ARGUMENT;
         }
+        if(m->viewer==4)return AF_DIARY_OK;
         if(event==AF_DIARY_EVENT_BIRTHDAY) {
             int mark=af_diary_calendar_mark(live,m->owner,m->today,m->selected,c->special);
             if(mark<0)return mark;

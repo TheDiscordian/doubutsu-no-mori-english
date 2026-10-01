@@ -67,7 +67,7 @@ static int capacity(void *context,const AFDiary *candidate) {
 }
 int af_diary_native_open(void *game,int owner) {
     unsigned int viewer=af_diary_native_player;
-    if(!game || owner<0 || owner>=4 || viewer>=4 || !af_diary_native_selected())return 0;
+    if(!game || owner<0 || owner>=4 || viewer>=AF_DIARY_VIEWERS || !af_diary_native_selected())return 0;
     void *submenu=(unsigned char *)game+0x1CBC;
     /* Do not disturb an already-owned editor or its width/calendar buffers. */
     if(*(unsigned int *)((unsigned char *)submenu+4))return 0;

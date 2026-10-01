@@ -39,6 +39,11 @@ Never describe these as two patchers or two deployments.
 Use `v3/optional-imports` for experimental implementation, preserving the stable
 V2 cartridge and deployed patcher. Imports need complete gameplay and
 persistence support; an extracted name or disabled web option is not completion.
+V3 imports faithfully; it does not redesign item rules or add new permissions.
+Check the original source before implementing an unfamiliar behaviour. Diary
+owners can write; other players can only read unlocked diaries. Foreign viewers
+do not become a fifth saved owner or add calendar attendance marks. Preserve
+native behaviour outside the selected imports and explicit behaviour choices.
 Do not repurpose existing villagers/items or assign IDs by checkbox order.
 V3 development source may be pushed to GitHub on `v3/optional-imports`.
 The local preview serves V3 for the user's import-selector review and playtesting.

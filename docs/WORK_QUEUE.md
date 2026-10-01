@@ -9,10 +9,11 @@ complete the import pipeline. Keep this as one connected implementation task:
    ownership and required records through departure, arrival, acquisition while
    visiting, and return. Implement correct visitor storage and restore it to the
    returning player; never discard records or credit a resident instead.
-   Furniture/clothing, surfaces, equipment, stationery, and diaries currently
-   have resident-only collection handling. Diary opening and additional console
-   play also reject visitors. Replace those restrictions with working behaviour,
-   and replace tests that treat the visitor halt as successful support.
+   Furniture/clothing, surfaces, equipment, stationery, and diary covers use
+   the visitor's actual records. Diary reading retains the donor's privacy rules:
+   only owners write, other players read unlocked pages, and locked pages refuse
+   access. Additional console play still rejects visitors. Connect those sessions
+   to the visitor's actual progress, and retain the completed collection paths.
 2. Connect the house/manor models to their genuine existing HRA reward route,
    scoring, catalogue policy, and independent selection. Review other remaining
    exclusions against actual existing or already-built acquisition systems.
@@ -30,8 +31,8 @@ complete the import pipeline. Keep this as one connected implementation task:
    on the experimental branch, refresh the local preview, and hand over the
    usable build with accurate compatibility and verification limits.
 
-The checked transport build is `build/v3-travel-consumers-installed-04/build-lock.json`,
-ABI 392, with its full selection in `build/v3-travel-consumers-profile-02`.
+The checked transport build is `build/v3-travel-native-dma-installed-02/build-lock.json`,
+ABI 392, with its full selection in `build/v3-travel-native-dma-profile-02`.
 Preserve the incomplete changes in `experimental/imports/index.html`;
 do not serve them before the accompanying interface repairs pass. No incomplete
 visitor behaviour or unresolved possible game defect is waived by a private
@@ -60,7 +61,7 @@ table, physical resources, and patch reconstruction.
 
 Six transport/collection checks and retained full-storage workspace checks pass, including
 four identities, editable record preservation, failed departure, legacy return,
-and status/nonce isolation. Four installed-cartridge checks pass. The silent
+and status/nonce isolation. Six current installed-cartridge checks pass. The silent
 `build/v3-travel-consumers-native-02/results.json` check executes the installed native
 departure/arrival/copy entries with actual emulated Pak I/O, controlled resident
 identities, actual public collection/query entries, selected furniture, clothing,
@@ -84,13 +85,35 @@ other item categories. Host checks exercise all four identities, selection
 rejection, native delegation, and exact returned ownership. Creature acquisition
 reaches the same record through both retained exports.
 
-The next consumer is visitor diary UI: `diary_native.c`, `diary_menu.c`, and
-`diary.c` still reject viewer index four. The native owner is a real host resident;
-verify donor reading/privacy/editing rules, connect the viewer's own calendar,
-and preserve host page ownership. Also preserve the existing zero-result query
-behaviour for pointers which are neither residents nor the live visitor when
-extending the shared collection helper. Then connect console sessions to the visitor's actual rows,
-not a fabricated fifth resident or another resident's storage. Verify both native
+Visitor diary readers accept the native foreign viewer without expanding the
+four saved owner rows. Donor `m_calendar_ovl.c` and `m_diary_ovl.c` establish owner
+editing, unlocked read-only access, locked refusal, and return without entering
+the editor. Foreign viewers add no visit/attendance marks. Two focused diary
+sanitizer checks pass, including all four host diaries and complete unchanged
+saved pages; the collection/transport sanitizer check retains zero-result queries
+for pointers which are neither residents nor the actual visitor.
+`build/v3-travel-diary-native-09/results.json` passes 353 actual native calls,
+19 assertions, and both calendar modes: native loading, calendar/page drawing,
+read-only access, locked warning/dismissal, closing, unchanged saved pages,
+guards, and checkpoint restoration. The fixture uses a paused game and controlled
+owner/viewer data; it is not ordinary room entry, device saving, or a station visit.
+Its diary and linked travel fragments match the current full selected build.
+
+The installed native menu/actor resources use checked free VROM space below
+the original DMA limit, preserving physical bytes, directory indices, and native
+loader validation. Their original synthetic addresses exceeded the loader's
+`04000000` request limit. Ten complete code/relocation pairs pass actual native
+loading and independent relocated-image comparisons in
+`build/v3-travel-native-dma-native-02/results.json`, with allocation/stack guards
+and checkpoint restoration. Retained shop and menu/actor adapters keep their
+behaviour; this repair adds no unrelated features. Resource loading does not prove
+ordinary actor interactions. Every top-level test reopening uses the actual
+parent unlink/reload, preserving the native child lifetime and destructor path.
+
+The next consumer is console sessions using the visitor's actual progress row,
+not a fabricated fifth resident or another resident's storage. The donor recipes
+span the complete 1,632-byte player row, not equal per-game slots. Preserve
+original console IDs and source save operations. Verify both native
 note kinds together and the actual station path as part of the connected visiting
 batch. Continue HRA rewards, instruments, current save/restart, and website repairs
 under this same active task; the installed transport alone is not V3 completion.

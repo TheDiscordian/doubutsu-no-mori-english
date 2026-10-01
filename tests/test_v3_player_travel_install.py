@@ -13,7 +13,7 @@ from v3_furniture_install import inputs
 from v3_player_travel_install import STATE,STATE_BYTES,RECORD_BYTES,IO,IO_END,LIFE,LIFE_END
 from v3_physical_resources import verify
 
-OUT=ROOT/os.environ.get('V3_PLAYER_TRAVEL_BUILD','build/v3-travel-consumers-installed-04')
+OUT=ROOT/os.environ.get('V3_PLAYER_TRAVEL_BUILD','build/v3-travel-native-dma-installed-02')
 
 
 class PlayerTravelInstallation(unittest.TestCase):
@@ -46,7 +46,11 @@ class PlayerTravelInstallation(unittest.TestCase):
             start=f['ram']-p['ram'];end=start+f['bytes']
             self.assertEqual(sha256(raw[start:end]),f['sha256'])
             self.assertEqual(before[start:end],bytes(end-start))
-            self.assertEqual(raw[:start],before[:start]);self.assertEqual(raw[end:],before[end:])
+            retained=bytearray(before)
+            for h in self.t['hooks']:
+                if h.get('packet_ram')==p['ram']:
+                    at=h['address']-p['ram'];retained[at:at+8]=bytes.fromhex(h['after'])
+            self.assertEqual(raw[:start],retained[:start]);self.assertEqual(raw[end:],retained[end:])
             self.assertLessEqual(f['ram']+f['bytes'],IO_END if name=='io' else LIFE_END)
         self.assertEqual(self.t['compiled']['fragments']['io']['ram'],IO)
         self.assertEqual(self.t['compiled']['fragments']['life']['ram'],LIFE)
@@ -96,6 +100,44 @@ class PlayerTravelInstallation(unittest.TestCase):
                 self.base[p['physical']:p['physical']+p['bytes']])
         source=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         self.assertEqual(apply_ups(source,(OUT/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_diary_menus_keep_native_dma_limit_and_complete_original_resources(self):
+        files=by_vrom(self.image);old=by_vrom(self.base)
+        parent=files[0x7749C0].extract(self.image)
+        for row in self.t['diary_menu_virtual_moves']:
+            self.assertLessEqual(row['vrom']+row['bytes'],0x04000000)
+            self.assertEqual(files[row['vrom']].extract(self.image),old[row['old_vrom']].extract(self.base))
+            self.assertEqual(files[row['vrom']].index,row['directory_index'])
+            self.assertNotIn(row['old_vrom'],files)
+        self.assertEqual(files[0x1060].extract(self.image),old[0x1060].extract(self.base))
+        for row in self.e['diaries']['hooks']['menus'].values():
+            self.assertEqual(list(struct.unpack_from('>7I',parent,row['owner_at'])),row['owner_after'])
+            self.assertIn(row['target_vrom'],files);self.assertIn(row['target_reloc'],files)
+
+    def test_all_relocated_native_menu_actor_resources_keep_loader_limit_and_indices(self):
+        files=by_vrom(self.image);old=by_vrom(self.base)
+        moves=self.t['native_dma_virtual_moves']
+        self.assertEqual(len(moves),20)
+        self.assertFalse(any(0x04600000<=v<0x04800000 for v in files))
+        for row in moves:
+            self.assertLessEqual(row['vrom']+row['bytes'],0x04000000)
+            self.assertEqual(files[row['vrom']].extract(self.image),old[row['old_vrom']].extract(self.base))
+            self.assertEqual((files[row['vrom']].index,files[row['vrom']].pstart,files[row['vrom']].pend),
+                (row['directory_index'],row['physical'],row['physical_end']))
+        core=files[CODE_VROM].extract(self.image)
+        rows=self.e['carried_items']['paper']['quantities']['native_consumers']
+        for row in rows:
+            if not row['name'].startswith('shop-'):continue
+            v=row['installed_vrom'];rel=row['installed_reloc']
+            self.assertEqual(files[rel].index,files[v].index+1)
+            self.assertEqual(struct.unpack_from('>4I',core,row['descriptor']-CODE_RAM),
+                (v,v+files[v].size,row['ram'],row['ram']+files[v].size))
+        for row in self.e['passwords']['nook']['native']['descriptors']:
+            self.assertIn(row['after'][0],files)
+        for row in self.e['passwords']['nook']['native']['owners'].values():
+            self.assertIn(row['installed_reloc_vrom'],files)
+        from v3_bank_resources import menu_allocation
+        menu_allocation(self.image,self.report)
 
 
 if __name__=='__main__':unittest.main()

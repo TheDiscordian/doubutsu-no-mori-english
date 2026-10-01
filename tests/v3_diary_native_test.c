@@ -25,7 +25,12 @@ AFDiary af_diary_native_candidate;
 unsigned int af_diary_native_candidate_guard[4];
 const unsigned char af_diary_native_art[16]={0};
 const unsigned char af_diary_native_rtc[8]={0,30,12,21,0,6,7,234};
-const unsigned char af_diary_native_player=0;
+const unsigned char af_diary_native_player=
+#ifdef AF_TEST_DIARY_VISITOR
+    4;
+#else
+    0;
+#endif
 const unsigned char af_diary_native_players[4][0xBD0]={
     {[0xA92]=6,[0xA93]=21},{[0xA92]=6,[0xA93]=19},
     {[0xA92]=255,[0xA93]=255},{[0xA92]=2,[0xA93]=29}};
@@ -82,7 +87,51 @@ static void calendar_checks(void) {
     assert(af_diary_events_month(&c,2028,2,2,29)==1 && c.counts[28]==1);
     assert(af_diary_events_month(&c,2026,0,0,0)==AF_DIARY_ARGUMENT);
 }
+static void visitor_checks(void) {
+    static AFDiary before;
+    const AFDiaryDate today={2026,6,21};
+    af_diary_reset(&live);
+    for(unsigned owner=0;owner<4;owner++) {
+        assert(af_diary_calendar_visit(&live,owner,today,(AFDiaryDates){0,0,0})==1);
+        live.bytes[16+owner*AF_DIARY_PLAYER+AF_DIARY_CALENDAR+5*AF_DIARY_PAGE]='A'+owner;
+    }
+    before=live;
+    assert(af_diary_native_visit()==0 && af_diary_native_attend(27)==0);
+    assert(!memcmp(&live,&before,sizeof(live)));
+    for(unsigned owner=0;owner<4;owner++) {
+        *(unsigned int *)(game+0x1CC0)=0;
+        assert(af_diary_native_open(game,(int)owner));
+        AFDiaryScreen *s=&af_diary_native_screen;
+        assert(s->menu.viewer==4 && s->menu.owner==owner);
+        assert(af_diary_menu_input(&s->menu,&s->access,AF_DIARY_A,0,0)==1);
+        assert(s->calendar(s->access.context,&s->menu,&s->draw)==1 && !s->draw.event_attended);
+        unsigned char days[37],marks[37];
+        assert(af_diary_menu_grid(&s->menu,&live,(AFDiaryDates){0,0,0},days,marks)==1);
+        for(unsigned i=0;i<37;i++)assert(marks[i]==0);
+        assert(af_diary_menu_input(&s->menu,&s->access,AF_DIARY_A,0,0)==1);
+        assert(s->menu.state==AF_DIARY_READ && s->menu.draft.readonly);
+        assert(s->menu.draft.text[0]=='A'+owner);
+        assert(af_diary_command(&s->menu.draft,8,'Z',s->access.widths)==AF_DIARY_READONLY);
+        assert(af_diary_lock(&live,4,owner,1)==AF_DIARY_READONLY);
+        assert(af_diary_commit(&live,&s->menu.draft,&af_diary_native_candidate,
+            s->access.widths,s->access.capacity,s->access.context)==AF_DIARY_READONLY);
+        assert(af_diary_menu_input(&s->menu,&s->access,AF_DIARY_START,0,0)==1);
+        assert(s->menu.state==AF_DIARY_DAY);
+        assert(!memcmp(&live,&before,sizeof(live)) && saves==0);
+        assert(af_diary_lock(&live,owner,owner,1)==1);
+        *(unsigned int *)(game+0x1CC0)=0;
+        assert(af_diary_native_open(game,(int)owner));
+        assert(af_diary_menu_input(&s->menu,&s->access,AF_DIARY_A,0,0)==1);
+        assert(af_diary_menu_input(&s->menu,&s->access,AF_DIARY_A,0,0)==1);
+        assert(s->menu.state==AF_DIARY_WARNING && s->menu.error==AF_DIARY_LOCKED);
+        assert(af_diary_lock(&live,owner,owner,0)==1);
+    }
+    assert(!af_diary_native_open(game,4));
+    assert(!memcmp(&live,&before,sizeof(live)) && saves==0);
+    puts("Visiting player opens all four unlocked diaries, reads without editing, respects locks, suppresses foreign calendar marks, and preserves all saved pages");
+}
 int main(void) {
+    if(af_diary_native_player==4) {visitor_checks();return 0;}
     calendar_checks();af_diary_reset(&live);
     assert(af_diary_native_selected()==65535);
     live_player_result=0;assert(af_diary_native_live_player(0)==0);

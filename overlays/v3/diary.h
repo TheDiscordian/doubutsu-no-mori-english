@@ -4,7 +4,7 @@
 /* GAFE01 has one 992-byte page per month/player, shared by all sixteen covers.
  * The serialized bytes are independent of host alignment and endianness. */
 enum {
-    AF_DIARY_PLAYERS=4, AF_DIARY_MONTHS=12, AF_DIARY_PAGE=992,
+    AF_DIARY_PLAYERS=4, AF_DIARY_VIEWERS=5, AF_DIARY_MONTHS=12, AF_DIARY_PAGE=992,
     AF_DIARY_CALENDAR=104, AF_DIARY_HEADER=16,
     AF_DIARY_PLAYER=AF_DIARY_CALENDAR+AF_DIARY_MONTHS*AF_DIARY_PAGE,
     AF_DIARY_BYTES=AF_DIARY_HEADER+AF_DIARY_PLAYERS*AF_DIARY_PLAYER,
@@ -40,7 +40,8 @@ int af_diary_upgrade(AFDiary *);
 #endif
 int af_diary_player_clear(AFDiary *,unsigned int player);
 int af_diary_lock(AFDiary *,unsigned int viewer,unsigned int owner,int locked);
-/* Months are zero-based, matching the donor's actual page consumer. */
+/* Months are zero-based. Viewer four is the visiting player: read-only access
+ * to an unlocked resident diary, never a fifth page/calendar owner. */
 const af_diary_u8 *af_diary_page(const AFDiary *,unsigned int viewer,
     unsigned int owner,unsigned int month);
 int af_diary_begin(AFDiaryDraft *,const AFDiary *,unsigned int viewer,

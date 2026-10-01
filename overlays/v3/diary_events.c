@@ -98,7 +98,7 @@ int af_diary_events_draw(const AFDiaryEventMonth *c,const AFDiaryMenu *m,
         const AFDiaryEventLabel *label=af_diary_event_labels+event;
         if(!label->text || !label->size || label->size>48)return AF_DIARY_ARGUMENT;
         draw->event_label=label->text;draw->event_length=label->size;
-        int mark=af_diary_calendar_mark(live,m->owner,m->today,m->selected,(AFDiaryDates){0,0,0});
+        int mark=m->viewer==4?0:af_diary_calendar_mark(live,m->owner,m->today,m->selected,(AFDiaryDates){0,0,0});
         if(mark<0)return mark;
         /* The donor also treats being present on one's birthday as attendance.
          * Other events need a real participation mark, never mere occurrence. */

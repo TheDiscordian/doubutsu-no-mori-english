@@ -64,6 +64,13 @@ static void collection_init(void) {
 }
 static void collection_acquire(void) {
     collection_init();
+    for(unsigned i=0;i<4;i++) {
+        const u8 *invalid=af_collection_players+i*0xBD0+1;
+        for(unsigned j=0;j<7;j++) {
+            const unsigned added[]={0x3224,0x34BF,0x2649,0x2749,0x2244,AF_DIARY_ITEM_FIRST,0x2040};
+            assert(af_carried_owned(invalid,added[j])==0);
+        }
+    }
     assert(!af_carried_owned(active,0x3224) && !af_carried_owned(active,0x34BF));
     assert(!af_carried_owned(active,0x2649) && !af_carried_owned(active,0x2749));
     assert(!af_carried_owned(active,0x2244) && !af_carried_owned(active,AF_DIARY_ITEM_FIRST));

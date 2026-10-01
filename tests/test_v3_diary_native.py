@@ -15,6 +15,12 @@ from v3_diary_events import prepare,RULES
 
 class DiaryNativeTests(unittest.TestCase):
     def test_native_calendar_and_entry_under_sanitizers(self):
+        self.native_check(False)
+
+    def test_visiting_player_reading_privacy_and_calendar_under_sanitizers(self):
+        self.native_check(True)
+
+    def native_check(self,visitor):
         base,_=inputs(ROOT/'build/v3-native-variants-work-01/connected-02/cartridge/build-lock.json')
         data,report=prepare(base)
         self.assertEqual(len(report['rules']),19)
@@ -43,6 +49,7 @@ class DiaryNativeTests(unittest.TestCase):
             compile=subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
                 '-fno-pie','-no-pie','-fsanitize=address,undefined','-fno-omit-frame-pointer',
                 '-ffunction-sections','-fdata-sections','-Wl,--gc-sections',
+                *(['-DAF_TEST_DIARY_VISITOR=1'] if visitor else []),
                 '-Ioverlays/v3','-I'+str(tmp),*sources,str(tmp/'events.c'),str(tmp/'native-data.c'),
                 '-o',str(tmp/'check')],cwd=ROOT,capture_output=True,text=True,timeout=30)
             self.assertEqual(compile.returncode,0,compile.stdout+compile.stderr)

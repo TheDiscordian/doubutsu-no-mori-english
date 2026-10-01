@@ -64,13 +64,13 @@ int af_diary_player_clear(AFDiary *d,u32 p) {
     return AF_DIARY_OK;
 }
 int af_diary_lock(AFDiary *d,u32 viewer,u32 owner,int locked) {
-    if(viewer>=AF_DIARY_PLAYERS || owner>=AF_DIARY_PLAYERS || (locked!=0 && locked!=1) ||
+    if(viewer>=AF_DIARY_VIEWERS || owner>=AF_DIARY_PLAYERS || (locked!=0 && locked!=1) ||
        !af_diary_valid(d))return AF_DIARY_ARGUMENT;
     if(viewer!=owner)return AF_DIARY_READONLY;
     calendar(d,owner)[98]=(u8)locked;return AF_DIARY_OK;
 }
 const u8 *af_diary_page(const AFDiary *d,u32 viewer,u32 owner,u32 month) {
-    if(viewer>=AF_DIARY_PLAYERS || owner>=AF_DIARY_PLAYERS || month>=AF_DIARY_MONTHS ||
+    if(viewer>=AF_DIARY_VIEWERS || owner>=AF_DIARY_PLAYERS || month>=AF_DIARY_MONTHS ||
        !af_diary_valid(d) || (viewer!=owner && cal(d,owner)[98]))return 0;
     return cal(d,owner)+AF_DIARY_CALENDAR+month*AF_DIARY_PAGE;
 }
@@ -115,7 +115,7 @@ int af_diary_begin(AFDiaryDraft *d,const AFDiary *data,u32 viewer,u32 owner,u32 
     AFDiaryDraft result;AFDiaryLayout layout;
     if(!d || !data || !widths || !separate(d,sizeof(*d),data,sizeof(*data)))return AF_DIARY_ARGUMENT;
     const u8 *p=af_diary_page(data,viewer,owner,month);
-    if(!p)return viewer<4 && owner<4 && month<12 && af_diary_valid(data)?AF_DIARY_LOCKED:AF_DIARY_ARGUMENT;
+    if(!p)return viewer<AF_DIARY_VIEWERS && owner<4 && month<12 && af_diary_valid(data)?AF_DIARY_LOCKED:AF_DIARY_ARGUMENT;
     fill(&result,0,sizeof(result));copy(result.text,p,AF_DIARY_PAGE);copy(result.original,p,AF_DIARY_PAGE);
     result.length=result.cursor=length(p);result.player=owner;result.month=month;result.readonly=viewer!=owner;
     int status=af_diary_layout(result.text,result.length,result.cursor,widths,&layout);

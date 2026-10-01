@@ -1950,12 +1950,19 @@ def main():
                     raise ValueError('V3 NPC clothing probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
-            if action.get('test_v3_diary'):
+            if action.get('test_v3_native_dma'):
+                from v3_diary_smoke import exercise_dma
+                if not (out/'test.bs1').is_file() or args.seed_save or args.allow_test_flash_write:
+                    raise ValueError('Native DMA probe requires a checkpoint and isolated blank storage')
+                needs_checkpoint_restore = True
+                results.append(exercise_dma(debug, args.rom, record))
+            if action.get('test_v3_diary') or action.get('test_v3_diary_visitor'):
                 from v3_diary_smoke import exercise
                 if not (out/'test.bs1').is_file() or args.seed_save or args.allow_test_flash_write:
                     raise ValueError('Diary probe requires a checkpoint and isolated blank storage')
                 needs_checkpoint_restore = True
-                results.append(exercise(debug, args.rom, record))
+                results.append(exercise(debug, args.rom, record,
+                    visitor=bool(action.get('test_v3_diary_visitor'))))
             if action.get('test_v3_clothing'):
                 from v3_clothing_smoke import exercise
                 if not (out/'test.bs1').is_file():

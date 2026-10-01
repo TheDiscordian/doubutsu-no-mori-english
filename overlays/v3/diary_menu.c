@@ -3,7 +3,7 @@
  * Animation/drawing is deliberately outside this controller. */
 #include "diary_menu.h"
 static int valid(const AFDiaryMenu *m,const AFDiaryMenuAccess *a) {
-    return m && a && a->live && a->widths && m->viewer<4 && m->owner<4 &&
+    return m && a && a->live && a->widths && m->viewer<AF_DIARY_VIEWERS && m->owner<4 &&
         m->state<=AF_DIARY_ERROR && m->month_delta>=-11 && m->month_delta<=11 &&
         m->selected.day && m->selected.day<=af_diary_days(m->selected.year,m->selected.month);
 }
@@ -13,11 +13,14 @@ static void events(AFDiaryMenu *m,const AFDiaryMenuAccess *a) {
 }
 int af_diary_menu_open(AFDiaryMenu *m,const AFDiaryMenuAccess *a,unsigned int viewer,
     unsigned int owner,AFDiaryDate today,AFDiaryDates dates) {
-    if(!m || !a || !a->live || !a->widths || viewer>=4 || owner>=4)return AF_DIARY_ARGUMENT;
+    if(!m || !a || !a->live || !a->widths || viewer>=AF_DIARY_VIEWERS || owner>=4)return AF_DIARY_ARGUMENT;
     int result=af_diary_calendar_refresh(a->live,owner,today,dates);
     if(result<0)return result;
-    result=af_diary_calendar_visit(a->live,viewer,today,dates);
-    if(result<0)return result;
+    /* Donor mCD_calendar_wellcome_on does not mark visiting players. */
+    if(viewer<AF_DIARY_PLAYERS) {
+        result=af_diary_calendar_visit(a->live,viewer,today,dates);
+        if(result<0)return result;
+    }
     /* Do not construct a 2 KiB temporary menu on the native thread stack. */
     volatile unsigned char *p=(volatile unsigned char *)m;
     for(unsigned int i=0;i<sizeof(*m);i++)p[i]=0;
@@ -122,7 +125,9 @@ int af_diary_menu_grid(const AFDiaryMenu *m,const AFDiary *data,AFDiaryDates dat
     for(int i=0;i<37;i++)days[i]=marks[i]=0;
     for(int day=1;day<=count;day++) {
         d.day=day;
-        int mark=af_diary_calendar_mark(data,m->owner,m->today,d,dates);
+        /* Donor mCD_visiter_chk/mCD_soncho_chk suppress these marks when the
+         * current viewer is a foreign player, even for a resident's calendar. */
+        int mark=m->viewer==4?0:af_diary_calendar_mark(data,m->owner,m->today,d,dates);
         if(mark<0)return mark;
         days[first+day-1]=day;marks[first+day-1]=mark;
     }

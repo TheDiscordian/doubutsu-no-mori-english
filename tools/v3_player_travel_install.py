@@ -13,7 +13,7 @@ import struct
 import subprocess
 import zlib
 
-from aflib import CODE_RAM, sha256, u32
+from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 from apply_translation import write_new
 from toolchain import IMAGE
 from v3_asset_loader import BLOB, ROOT
@@ -29,21 +29,29 @@ STATE, STATE_BYTES, RECORD_BYTES = 0x8062C020, 14240, 14204
 IO, IO_END, LIFE, LIFE_END = 0x806A4800, 0x806A7FF0, 0x807F7B50, 0x807FC000
 PARTS=('pak_native','pak_codec','pak_workspace','console_storage',
        'travel_native','travel_player','travel_context','collection','surface_save',
-       'held_collection','carried_collection','diary_items')
+       'held_collection','carried_collection','diary_items','diary','diary_menu',
+       'diary_native','diary_screen','diary_events','holiday_diary')
 CONSUMERS=('af_v3_catalogue_record','af_v3_catalogue_owned',
     'af_v3_surface_record','af_v3_surface_owned',
     'af_v3_held_catalogue_record','af_v3_held_catalogue_owned',
     'af_carried_record','af_carried_owned','af_diary_item_record','af_diary_item_owned')
+DIARY_CORE=('af_diary_page','af_diary_begin','af_diary_lock')
+DIARY_MENU=('af_diary_menu_open','af_diary_menu_input','af_diary_menu_edit','af_diary_menu_grid')
+DIARY_UI=('af_diary_native_open','af_diary_screen_open','af_diary_events_draw')
 ROOTS=('af_v3_pak_native_read','af_v3_pak_native_write','af_v3_pak_native_status',
        'af_v3_travel_passport_clear','af_v3_travel_passport_save',
        'af_v3_travel_passport_load','af_v3_travel_private_copy',
        'af_v3_travel_visitor_collect','af_v3_travel_visitor_paper',
-       'af_v3_travel_creature_collect',*CONSUMERS)
+       'af_v3_travel_creature_collect',*CONSUMERS,*DIARY_CORE,*DIARY_MENU,*DIARY_UI,
+       'af_holiday_diary_draw')
 SOURCES=tuple(dict.fromkeys((*PLAYER_SOURCES,'tools/v3_player_travel_install.py',
     'tools/v3_room_goods.py','tools/v3_furniture_install.py','overlays/v3/surface_bootstrap.c',
     'overlays/v3/travel_link.ld','overlays/v3/travel_native.c','overlays/v3/travel_native.h',
     'overlays/v3/travel_context.c','tests/v3_travel_native_test.c',
-    'overlays/v3/travel_collection.h',*[f'overlays/v3/{p}.c' for p in PARTS])))
+    'overlays/v3/travel_collection.h',*[f'overlays/v3/{p}.c' for p in PARTS],
+    'overlays/v3/diary_menu.h','overlays/v3/diary_native.h','overlays/v3/diary_screen.h',
+    'overlays/v3/diary_events.h','overlays/v3/diary_draw.h','overlays/v3/holiday_calendar.h',
+    'tests/test_v3_diary_native.py','tests/v3_diary_native_test.c')))
 NATIVE={
     'af_pi_lock':'padmgr_LockSerialMesgQ','af_pi_unlock':'padmgr_UnlockSerialMesgQ',
     'af_pi_open':'mCPk_NoteOpen','af_pi_make':'mCPk_NoteMake',
@@ -135,9 +143,13 @@ def compile_connected(prior, output):
     providers['af_diary_native_selected']=prior['equipment_resources']['diaries']['ui_compiled']['symbols']['af_diary_native_selected']
     owners=(prior['collection']['code'],prior['room_surfaces']['save']['helpers'],
         prior['equipment_resources']['collection']['code'],
-        prior['equipment_resources']['diary_items']['code'])
+        prior['equipment_resources']['diary_items']['code'],
+        prior['equipment_resources']['diaries']['compiled'],
+        prior['equipment_resources']['diaries']['ui_compiled'],
+        prior['equipment_resources']['holiday_state']['code'],
+        prior['equipment_resources']['npc_extra']['events']['calendar']['code'])
     for owner in owners:
-        providers.update(owner.get('link_symbols',{}))
+        providers.update(owner.get('link_symbols',{}));providers.update(owner.get('bindings',{}))
         providers.update(owner['symbols'])
     providers.update(prior['save_codec']['code']['symbols'])
     providers['af_v3_require_save_state']=prior['save_runtime']['diary_runtime_code']['symbols']['af_v3_require_save_state']
@@ -147,13 +159,23 @@ def compile_connected(prior, output):
     for part in PARTS:
         flags=storage_flags if part in ('console_storage','travel_context') else list(FLAGS)+['-D'+d+'=1' for d in DEFINES]
         flags=[*flags,f'-DAF_TRAVEL_STATE_RAM=0x{STATE:X}u','-DAF_V3_PLAYER_TRAVEL=1']
+        if part=='diary_native':flags.append('-DAF_DIARY_HOLIDAYS=1')
         obj=part+'.o';objects.append(obj)
         run('gcc',*flags,'/source/overlays/v3/'+part+'.c','-o',obj)
+        # Reuse authenticated unchanged editors and date builders. Localising
+        # their duplicate definitions lets other objects bind the existing
+        # exports, and section collection discards the uncalled copies. This
+        # does not override locally defined changed readers or save ownership.
+        reused={'diary':('af_diary_command','af_diary_scroll','af_diary_commit_locked'),
+            'diary_events':('af_diary_events_month',),
+            'holiday_diary':('af_holiday_diary_month','af_holiday_diary_dates')}.get(part,())
+        if reused:run('objcopy',*['--localize-symbol='+n for n in reused],obj)
         defined.update(line.split()[-1] for line in run('nm','--defined-only','--extern-only',obj).splitlines())
         refs={line.split()[-1] for line in run('nm','--undefined-only',obj).splitlines()}
         undefined.update(refs)
         compiled[part]=dict(flags=flags,sha256=sha256((output/obj).read_bytes()),
-            stack_usage=(output/(part+'.su')).read_text(),undefined=sorted(refs))
+            stack_usage=(output/(part+'.su')).read_text(),undefined=sorted(refs),
+            reused_existing_exports=list(reused))
     external=undefined-defined
     if external-providers.keys():raise ValueError('Unbound connected dependencies: '+str(sorted(external-providers.keys())))
     bindings={n:providers[n] for n in sorted(external)}
@@ -184,7 +206,13 @@ def connect_consumers(base,prior,live,blob,rows,writes,compiled,hooks,records):
         ('room_surfaces/save/helpers',0x804BC900,CONSUMERS[2:4]),
         ('equipment_resources/collection/code',0x804AFA00,CONSUMERS[4:6]),
         ('save_codec/active_storage_code',prior['save_codec']['active_storage_code']['ram'],CONSUMERS[6:8]),
-        ('equipment_resources/diary_items/code',0x806E0000,CONSUMERS[8:10]))
+        ('equipment_resources/diary_items/code',0x806E0000,CONSUMERS[8:10]),
+        ('equipment_resources/holiday_state/code',0x806F4000,DIARY_CORE),
+        ('equipment_resources/diaries/compiled',prior['equipment_resources']['diaries']['compiled']['ram'],(*DIARY_CORE,*DIARY_MENU)),
+        ('equipment_resources/diaries/ui_compiled',0x806A0000,DIARY_UI),
+        ('equipment_resources/npc_extra/events/calendar/code',
+            prior['equipment_resources']['npc_extra']['events']['calendar']['ram'],
+            ('af_holiday_diary_draw','af_diary_native_open')))
     def node(report,path):
         for key in path.split('/'):report=report[key]
         return report
@@ -230,6 +258,15 @@ def connect_consumers(base,prior,live,blob,rows,writes,compiled,hooks,records):
             if not 0<=at<at+8<=len(raw):raise ValueError('Collection entry outside loaded packet')
             previous=bytes(raw[at:at+8]);after=struct.pack('>2I',jump(compiled['symbols'][name]),0)
             raw[at:at+8]=after
+            def refresh_redirect(value):
+                if isinstance(value,dict):
+                    if value.get('address')==address and value.get('after')==previous.hex():
+                        value.update(previous_after=value['after'],after=after.hex(),
+                            target=compiled['symbols'][name],current_visitor_reader=name)
+                    for child in value.values():refresh_redirect(child)
+                elif isinstance(value,list):
+                    for child in value:refresh_redirect(child)
+            refresh_redirect(live)
             hooks.append(dict(address=address,symbol=name,target=compiled['symbols'][name],
                 before=previous.hex(),after=after.hex(),owner=path,
                 storage='physical-ROM' if packet and packet['source']&0x80000000 else 'blob',
@@ -325,7 +362,16 @@ def install(base, prior, blob, core, module, output):
     hooks.append(dict(address=0x806558DC,symbol='retained_creature_visitor_collect',target=target,before=old.hex(),after=after.hex()))
     writes.append((next(r for r in records if r['id']==packet['id']),bytes(state)))
     connect_consumers(base,prior,live,blob,rows,writes,compiled,hooks,records)
-    for key in ('collection','room_surfaces','save_codec','clothing','catalogue'):
+    menu_changes,virtual_moves=connect_native_dma(base,live,core)
+    updates['native_dma_virtual_moves']=virtual_moves
+    # Code entry uses the same installed keyboard. Its current resource aliases
+    # must follow the move; recipe verification must not look up retired VROMs.
+    editor=copy.deepcopy(prior['password_editor'])
+    destinations={r['old_vrom']:r['vrom'] for r in virtual_moves}
+    for key in ('vrom','reloc'):editor[key]=destinations[editor[key]]
+    for owner in editor['owner_resizes']:owner['vrom']=destinations[owner['vrom']]
+    updates['password_editor']=editor
+    for key in ('collection','room_surfaces','save_codec','clothing','catalogue','shop_floor','shop_actors'):
         if live[key]!=prior[key]:updates[key]=live[key]
     report=dict(format='AFV3-PLAYER-TRAVEL-INSTALLED-1',installed=True,
         state_packet=packet,record_bytes=RECORD_BYTES,compiled=compiled,hooks=hooks,
@@ -336,10 +382,110 @@ def install(base, prior, blob, core, module, output):
         saved_format_changed=False,original_pak_notes_retained=True,
         startup_descriptor_growth=1,native_execution_verified=False,ordinary_visiting_verified=False,
         collection_consumers_connected=True,
-        pending=['visitor diary interaction','visitor console sessions',
+        visitor_diary_reading_connected=True,
+        diary_menu_virtual_moves=virtual_moves[:4],
+        native_dma_virtual_moves=virtual_moves,
+        pending=['visitor console sessions',
             'native execution and actual card path verification'],
         sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
     e['player_travel']=report;updates['physical_resources']=records
     write_new(directory/'state.bin',state)
     write_new(directory/'installed.json',(json.dumps(report,indent=2)+'\n').encode())
-    return e,{},updates,writes
+    return e,menu_changes,updates,writes
+
+
+def connect_native_dma(base,live,core):
+    """Keep installed menu/actor loads inside the original DMA request limit.
+
+    The existing relocated menu/relocation pairs occupy synthetic addresses
+    beyond that limit. Move their directory identities and owner descriptors
+    into a checked empty virtual gap; retain every physical byte and the native
+    loader's validation. These are code addresses, not item/player identities.
+    """
+    e=live['equipment_resources'];files=by_vrom(base);parent=0x7749C0
+    owner=bytearray(files[parent].extract(base));moves=[]
+    def move_pair(originals,targets):
+        if files[originals[1]].index!=files[originals[0]].index+1:
+            raise ValueError('Native relocation loses adjacent directory index')
+        for original,target in zip(originals,targets,strict=True):
+            entry=files[original]
+            if (entry.pend or target&15 or target+entry.size>0x03000000 or
+                    any(f.vstart<target+entry.size and target<f.vend for f in files.values()) or
+                    any(r['vrom']<target+entry.size and target<r['vrom']+r['bytes'] for r in moves)):
+                raise ValueError('Native virtual destination overlaps a live resource')
+            moves.append(dict(old_vrom=original,vrom=target,bytes=entry.size,
+                previous_bytes=entry.size,directory_index=entry.index,
+                physical=entry.pstart,physical_end=entry.pend,
+                sha256=sha256(entry.extract(base))))
+    def descriptor(data,at,original,target,ram):
+        before=list(struct.unpack_from('>4I',data,at))
+        if before!=(expected:=[original,original+files[original].size,ram,ram+files[original].size]):
+            raise ValueError('Changed complete native DMA descriptor: '+str(expected))
+        after=[target,target+files[original].size,*before[2:]]
+        struct.pack_into('>4I',data,at,*after)
+        return before,after
+    for index,name in enumerate(('hboard','keyboard')):
+        receipt=e['diaries']['hooks']['menus'][name]
+        before=receipt['owner_after'];at=receipt['owner_at']
+        if list(struct.unpack_from('>7I',owner,at))!=before:
+            raise ValueError('Changed native diary menu descriptor')
+        new_pair=(0x02E10000+index*0x20000,0x02E20000+index*0x20000)
+        old_pair=(receipt['target_vrom'],receipt['target_reloc'])
+        move_pair(old_pair,new_pair)
+        after=[*before];after[:2]=[new_pair[0],new_pair[0]+files[old_pair[0]].size]
+        struct.pack_into('>7I',owner,at,*after)
+        receipt.update(previous_target_vrom=old_pair[0],previous_target_reloc=old_pair[1],
+            target_vrom=new_pair[0],target_reloc=new_pair[1],owner_after=after)
+    # These retained native shop consumers were appended for item imports.
+    # Only their DMA identities/descriptors change; their code and behaviour do
+    # not. Use current owner hashes, including subsequent Nook-code repairs.
+    shop_rows=e['carried_items']['paper']['quantities']['native_consumers']
+    for row in shop_rows:
+        if not row['name'].startswith('shop-'):continue
+        old_pair=(row['installed_vrom'],row['installed_reloc'])
+        new_pair=tuple(0x02E50000+v-0x04640000 for v in old_pair)
+        alias=live['shop_floor'] if row['name']=='shop-floor' else live['shop_actors']['owners'][row['name'][5:]]
+        if (alias['vrom']!=old_pair[0] or alias['reloc']!=old_pair[1] or
+                sha256(files[old_pair[0]].extract(base))!=alias['output_sha256'] or
+                sha256(files[old_pair[1]].extract(base))!=alias['relocation_sha256']):
+            raise ValueError('Changed current native shop resource')
+        move_pair(old_pair,new_pair)
+        descriptor(core,row['descriptor']-CODE_RAM,old_pair[0],new_pair[0],row['ram'])
+        row.update(installed_vrom=new_pair[0],installed_reloc=new_pair[1])
+        alias.update(vrom=new_pair[0],reloc=new_pair[1])
+        if 'nook_code_entry' in alias:alias['nook_code_entry']['installed_reloc_vrom']=new_pair[1]
+    # Preserve the already-installed native menu/actor adapters without adding
+    # or finishing their unrelated features. They use the same bounded loader.
+    bank=e['bank'];plan=bank['resources']
+    for index,pair in enumerate(plan['pairs']):
+        old_pair=(pair['target_vrom'],pair['target_relocation_vrom'])
+        new_pair=tuple(0x02E50000+v-0x04640000 for v in old_pair)
+        if (sha256(files[old_pair[0]].extract(base))!=pair['sha256'] or
+                sha256(files[old_pair[1]].extract(base))!=pair['relocation_sha256']):
+            raise ValueError('Changed retained native menu/actor resource')
+        move_pair(old_pair,new_pair)
+        receipt=plan['submenu_descriptor'] if index==0 else plan['pelly_descriptor']
+        data,at=(owner,receipt['offset']) if index==0 else (core,receipt['address']-CODE_RAM)
+        if data[at:at+32].hex()!=receipt['after']:
+            raise ValueError('Changed retained native menu/actor descriptor')
+        descriptor(data,at,old_pair[0],new_pair[0],pair['ram'])
+        receipt['after']=data[at:at+32].hex()
+        pair.update(target_vrom=new_pair[0],target_relocation_vrom=new_pair[1])
+        if index==0:bank['menu_allocation']['after']=receipt['after']
+    # Current Nook descriptors and relocation readers follow their actual
+    # resources. Keep historical before/previous receipts untouched.
+    destinations={r['old_vrom']:r['vrom'] for r in moves}
+    nook=e['passwords']['nook']['native']
+    for row in nook['descriptors']:
+        old=row['after'][0];target=destinations[old]
+        row['after'][:2]=[target,target+row['after'][1]-old]
+    for row in nook['owners'].values():
+        row['installed_reloc_vrom']=destinations[row['installed_reloc_vrom']]
+    known={r['old_vrom'] for r in moves}
+    if any(0x04600000<=v<0x04800000 and v not in known for v in files):
+        raise ValueError('Unmapped native resource beyond original DMA limit')
+    # The icon receipt retains its own installation generation. Record this
+    # current complete parent separately rather than rewriting that history.
+    e['diaries']['native_menu_owner_sha256']=sha256(owner)
+    plan['submenu_descriptor']['owner_sha256']=sha256(owner)
+    return {parent:bytes(owner)},moves

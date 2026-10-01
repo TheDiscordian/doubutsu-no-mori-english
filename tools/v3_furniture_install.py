@@ -832,6 +832,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_player_travel_install as equipment
         equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
             base,prior,blob,core,module,output)
+        text_moves=report_updates.pop('native_dma_virtual_moves',[])
         display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
     elif nook_font_repair:
         import v3_nook_font as equipment

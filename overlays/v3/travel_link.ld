@@ -6,6 +6,9 @@ SECTIONS {
    pak_codec.o(.text .text.* .rodata .rodata.* .data .data.*)
    pak_workspace.o(.text .text.* .rodata .rodata.* .data .data.*)
    console_storage.o(.text .text.* .rodata .rodata.* .data .data.*)
+   diary_menu.o(.text .text.* .rodata .rodata.* .data .data.*)
+   diary_screen.o(.text .text.* .rodata .rodata.* .data .data.*)
+   diary_events.o(.text .text.* .rodata .rodata.* .data .data.*)
    . = ALIGN(16);
    af_travel_harvest_crc = .; LONG(0);
    af_travel_record_crc = .; LONG(0);
@@ -26,6 +29,9 @@ SECTIONS {
    held_collection.o(.text .text.* .rodata .rodata.* .data .data.*)
    carried_collection.o(.text .text.* .rodata .rodata.* .data .data.*)
    diary_items.o(.text .text.* .rodata .rodata.* .data .data.*)
+   diary.o(.text .text.* .rodata .rodata.* .data .data.*)
+   diary_native.o(.text .text.* .rodata .rodata.* .data .data.*)
+   holiday_diary.o(.text .text.* .rodata .rodata.* .data .data.*)
    . = ALIGN(16);
    /* Explicit loaded zero data, not an uninitialised heap/BSS allocation. */
    BYTE(0); . = ALIGN(16);

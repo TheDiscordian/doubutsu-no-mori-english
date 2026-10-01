@@ -5,11 +5,25 @@
  * Invalid transport state is an error, never a resident-slot fallback. */
 static inline int af_travel_collection(const af_save_u8 *private,
                                       unsigned item,unsigned mark) {
+#ifdef __mips__
+    const af_save_u8 *foreign=(const af_save_u8 *)0x801439A0u;
+#else
+    extern af_save_u8 af_travel_test_foreign[0xBD0];
+    const af_save_u8 *foreign=af_travel_test_foreign;
+#endif
+    if(!mark && private!=foreign)return 0;
     int result=af_v3_travel_visitor_collect((af_save_u8 *)private,item,mark);
     if(result<0)af_v3_save_halt(result);
     return result;
 }
 static inline int af_travel_paper(const af_save_u8 *private,unsigned mark) {
+#ifdef __mips__
+    const af_save_u8 *foreign=(const af_save_u8 *)0x801439A0u;
+#else
+    extern af_save_u8 af_travel_test_foreign[0xBD0];
+    const af_save_u8 *foreign=af_travel_test_foreign;
+#endif
+    if(!mark && private!=foreign)return 0;
     int result=af_v3_travel_visitor_paper((af_save_u8 *)private,mark);
     if(result<0)af_v3_save_halt(result);
     return result;

@@ -27,7 +27,9 @@ lock or publish experimental V3.
 
 V3 is not complete. The installed transport and shared item/paper collection
 handlers carry and update the visitor's added player records.
-Imported diary opening and additional console play also reject visitors. The
+Imported diaries now permit unlocked read-only access for visitors, preserving
+the original owner-only editing and locked refusal. Additional console play
+still rejects visitors. The
 house/manor models have installed art/room behaviour but no connected HRA
 acquisition, scoring, or catalogue policy. Four added villager instruments retain
 unresolved playback evidence. Ordinary Save & Quit/restart is not established
@@ -39,8 +41,8 @@ checks and resident-only behaviour do not establish completion.
 
 ### Installed player-record transport
 
-The checked cartridge is `build/v3-travel-consumers-installed-04/build-lock.json`,
-ABI 392, with full selection in `build/v3-travel-consumers-profile-02`.
+The checked cartridge is `build/v3-travel-native-dma-installed-02/build-lock.json`,
+ABI 392, with full selection in `build/v3-travel-native-dma-profile-02`.
 Native Pak read/write/status and departure/arrival/private-copy entries carry one
 complete identity-bound player's added records. Full diary pages, console progress,
 category ownership, and player rewards are retained; other residents and shared
@@ -51,7 +53,9 @@ startup packets; code uses authenticated unused padding, preserving existing BSS
 UI state, guards, and the startup loader's size limit.
 
 Six transport/collection checks, retained full-storage workspace checks, and four
-current installed cartridge/patch checks pass. The silent
+retained transport cartridge/patch checks pass. Six current installed
+cartridge/patch checks also verify all corrected native resource addresses and
+retained descriptors. The silent
 `build/v3-travel-consumers-native-02/results.json` fixture executes installed native
 departure, arrival, return, and status with actual emulated Pak reads/writes and
 controlled resident identities. Imported acquisition through the actual native
@@ -64,7 +68,23 @@ Converted legacy notes preserve unknown editable-record provenance, retaining
 home diary, console, card, and account data which the old note never carried.
 The connected host fixture covers conversion, departure, and return.
 
-The next connected consumers are visitor diary UI and visitor console sessions.
+The native diary check in `build/v3-travel-diary-native-09/results.json` passes
+353 calls and 19 assertions in both calendar modes. Visitors read unlocked host
+pages, cannot edit, receive the locked warning, dismiss it, and close cleanly.
+All saved pages remain unchanged, foreign calendar marks are suppressed, and
+graphics/stack bounds and fault checks pass. Two focused diary sanitizer checks
+also pass. Its diary/travel linked fragments match the current full selection.
+This is isolated native menu execution, not ordinary room entry or device saving.
+
+The current build repairs native loading for ten retained menu/actor resource
+pairs whose previous VROM addresses exceeded the original loader's limit.
+Physical code/resources, directory ordering, and original loader validation are
+unchanged; only DMA identities and their checked descriptors move into unused
+virtual space. `build/v3-travel-native-dma-native-02/results.json` passes all ten
+native loads against independently relocated complete images, guarded bounds,
+and checkpoint restoration. No new systems or gameplay rules are introduced.
+
+The next connected consumer is visitor console sessions.
 The five shared item/paper record/query handlers use the same visitor record,
 preserving native delegation, display/parent aliases, selection gates, and resident
 ownership. Retained inner collection bridges are replaced without bypassing the

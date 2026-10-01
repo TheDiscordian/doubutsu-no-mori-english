@@ -61,7 +61,7 @@ int af_diary_screen_open(AFDiaryScreen *s,void *sub,const AFDiaryMenuAccess *a,
     unsigned int viewer,unsigned int owner,AFDiaryDate today,AFDiaryDates dates,
     const void *art,int (*calendar)(void *,const AFDiaryMenu *,AFDiaryDraw *)) {
     if(!s || !sub || !a || !a->live || !a->scratch || !a->widths || !a->capacity ||
-        !a->event_count || !art || !calendar || viewer>=4 || owner>=4 || W(sub,4))return 0;
+        !a->event_count || !art || !calendar || viewer>=AF_DIARY_VIEWERS || owner>=4 || W(sub,4))return 0;
     /* Only a closed native submenu can acquire this resident draft. */
     volatile unsigned char *p=(volatile unsigned char *)s;
     for(unsigned int i=0;i<sizeof(*s);i++)p[i]=0;
