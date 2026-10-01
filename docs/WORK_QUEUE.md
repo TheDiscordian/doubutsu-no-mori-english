@@ -12,8 +12,8 @@ complete the import pipeline. Keep this as one connected implementation task:
    Furniture/clothing, surfaces, equipment, stationery, and diary covers use
    the visitor's actual records. Diary reading retains the donor's privacy rules:
    only owners write, other players read unlocked pages, and locked pages refuse
-   access. Additional console play still rejects visitors. Connect those sessions
-   to the visitor's actual progress, and retain the completed collection paths.
+   access. Additional console play still rejects visitors. Finish those sessions
+   with the original game's save rules, and retain the completed collection paths.
 2. Connect the house/manor models to their genuine existing HRA reward route,
    scoring, catalogue policy, and independent selection. Review other remaining
    exclusions against actual existing or already-built acquisition systems.
@@ -110,10 +110,16 @@ behaviour; this repair adds no unrelated features. Resource loading does not pro
 ordinary actor interactions. Every top-level test reopening uses the actual
 parent unlink/reload, preserving the native child lifetime and destructor path.
 
-The next consumer is console sessions using the visitor's actual progress row,
-not a fabricated fifth resident or another resident's storage. The donor recipes
-span the complete 1,632-byte player row, not equal per-game slots. Preserve
-original console IDs and source save operations. Verify both native
+The next consumer is console sessions. Verify the complete donor entry and
+storage selection before choosing a visitor save row. GameCube
+`local/ac-decomp/src/static/Famicom/famicom.cpp:1623` selects the supplied resident
+index when valid and zero otherwise; `:1661` uses that index for the shared NES
+save area. An independent visiting-player NES session row is not established by
+the import specification and should not be invented as a faithful source rule.
+Check the pinned executable entry and surrounding save/visit lifecycle to resolve
+the actual player-facing behaviour. The donor recipes span the complete
+1,632-byte player row, not equal per-game slots. Preserve original console IDs
+and source save operations. Verify both native
 note kinds together and the actual station path as part of the connected visiting
 batch. Continue HRA rewards, instruments, current save/restart, and website repairs
 under this same active task; the installed transport alone is not V3 completion.
