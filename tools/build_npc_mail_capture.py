@@ -15,7 +15,9 @@ from npc_mail_capture import RAM,IMAGE_BYTES_MAX,DESIGN_WORD_HASH,source_hashes,
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
-def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False,item_articles=None,notice_owner=False,notice_seasonal=False):
+def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False,item_articles=None,notice_owner=False,notice_seasonal=False,hra_rewards=False):
+    if type(hra_rewards) is not bool or (hra_rewards and not academy_scores):
+        raise ValueError('HRA model rewards require the complete score creator')
     if type(mail_glyphs) is not bool: raise ValueError('Invalid mail-glyph creator option')
     if type(post_office) is not bool: raise ValueError('Invalid post-office creator option')
     if type(museum) is not bool: raise ValueError('Invalid museum creator option')
@@ -72,6 +74,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
              '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector','-fno-merge-constants',
              '-mno-explicit-relocs','-mno-split-addresses','-fstack-usage','-Wall','-Wextra','-Werror']
     if mail_glyphs: flags.append('-DAF_MAIL_CREATOR_CATALOG=4')
+    if hra_rewards: flags.append('-DAF_V3_HRA_REWARDS=1')
     if sha256(words) == DESIGN_WORD_HASH: flags.append('-DAF_NPC_WORD_PROFILE=2')
     if notice_seasonal: flags.append('-I/out')
     names = ('digest','npc_capture','generate','npc_creator')+(('mother_creator',) if mother_letters else ())
@@ -198,6 +201,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
         report['academy_scores'] = True;report['academy_series_sha256'] = sha256(series)
         at = symbols['af_academy_series_data']-RAM
         if data[at:at+len(series)] != series: raise ValueError('Linked academy series resource differs')
+    if hra_rewards: report['hra_rewards'] = True
     from npc_mail_capture import validate
     validate(data,reloc,report,module)
     (out/'overlay.asm').write_text(run('objdump','-d','overlay.elf'))
@@ -217,6 +221,7 @@ def main():
     parser.add_argument('--villager-events',action='store_true',help='Add complete villager-event letters; requires --departed-letters')
     parser.add_argument('--academy-letters',action='store_true',help='Add complete HRA welcome/advice letters; requires --villager-events')
     parser.add_argument('--academy-scores',action='store_true',help='Add complete HRA score capture; requires --academy-letters')
+    parser.add_argument('--hra-rewards',action='store_true',help='Accept original HRA model presents; requires --academy-scores')
     parser.add_argument('--post-office',action='store_true',help='Add complete catalogue-order and raffle-ticket letters; requires --academy-scores')
     parser.add_argument('--museum',action='store_true',help='Add complete museum notices and fossil letters; requires --post-office')
     parser.add_argument('--shop-notices',action='store_true',help='Add complete spotlight/reopening notices; requires --museum')
@@ -231,6 +236,7 @@ def main():
     if args.villager_events and not args.departed_letters: parser.error('--villager-events requires --departed-letters')
     if args.academy_letters and not args.villager_events: parser.error('--academy-letters requires --villager-events')
     if args.academy_scores and not args.academy_letters: parser.error('--academy-scores requires --academy-letters')
+    if args.hra_rewards and not args.academy_scores: parser.error('--hra-rewards requires --academy-scores')
     if args.post_office and not args.academy_scores: parser.error('--post-office requires --academy-scores')
     if args.museum and not args.post_office: parser.error('--museum requires --post-office')
     if args.shop_notices and not args.museum: parser.error('--shop-notices requires --museum')
@@ -246,7 +252,8 @@ def main():
                            villager_events=args.villager_events,academy_letters=args.academy_letters,
                            academy_scores=args.academy_scores,mail_glyphs=args.mail_glyphs,post_office=args.post_office,museum=args.museum,shop_notices=args.shop_notices,quest_replies=args.quest_replies,notice_treasure=args.notice_treasure,
                            item_articles=args.item_articles.read_bytes() if args.item_articles else None,
-                           notice_owner=args.notice_owner,notice_seasonal=args.notice_seasonal),indent=2))
+                           notice_owner=args.notice_owner,notice_seasonal=args.notice_seasonal,
+                           hra_rewards=args.hra_rewards),indent=2))
 
 
 if __name__ == '__main__': main()

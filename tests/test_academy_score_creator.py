@@ -14,6 +14,7 @@ from pathlib import Path
 
 
 class AcademyScoreCreatorTests(academy_tests.AcademyCreatorTests):
+    series_rows = 55
     extra_sources = (*academy_tests.AcademyCreatorTests.extra_sources,
                      'overlays/mail_generation/academy_score_creator.c','runtime/dateformat.c',
                      'tests/academy_score_creator_mock.c')
@@ -31,7 +32,7 @@ class AcademyScoreCreatorTests(academy_tests.AcademyCreatorTests):
 
     def setUp(self):
         super().setUp()
-        self.series_memory = (C.c_ubyte*1440).in_dll(self.lib,'af_academy_series_data')
+        self.series_memory = (C.c_ubyte*len(self.series_data)).in_dll(self.lib,'af_academy_series_data')
         self.series_memory[:] = self.series_data
 
     def score_fixture(self,number=0x34,capital=0,series=0,points=123456,year=2000,month=9,day=17,item=0x11FC):
@@ -58,7 +59,7 @@ class AcademyScoreCreatorTests(academy_tests.AcademyCreatorTests):
                   4:Field(months[month-1].ljust(9).encode()),5:Field(f'{day}{suffix}'.ljust(4).encode())}
         if number == 0x37: values[1] = Field(bytes(self.item_name))
         if number in (0x3A,0x3B):
-            i = next(i for i in range(55) if self.series_data[i*26:i*26+10] == series.raw[:10])
+            i = next(i for i in range(self.series_rows) if self.series_data[i*26:i*26+10] == series.raw[:10])
             values[2] = Field(self.series_data[i*26+10:i*26+26])
         record = Record(self.catalog_id,0,(number,),tuple(sorted(values.items())),bool(before[1]))
         expected = bytearray(164);expected[:16] = player.raw;expected[18:30] = b' '*12;expected[30:35] = b'\xff'*5

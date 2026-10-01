@@ -18,6 +18,9 @@ WORD_PROFILES = frozenset((WORD_HASH, DESIGN_WORD_HASH))
 CAPTURE_SOURCE = 'overlays/mail_generation/npc_capture.c'
 LEGACY_CAPTURE_SOURCE_HASH = '68d4bf2c1624ec1df86f4a779dd820243dbb833e0012cf8dee31af4791bd8180'
 PROFILE_CAPTURE_SOURCE_HASH = '43208dfee76a7a811dab70b3dbd103b79033c8badfc3be3da3258801f4830169'
+SCORE_SOURCE = 'overlays/mail_generation/academy_score_creator.c'
+LEGACY_SCORE_SOURCE_HASH = '1f3d55f1ae9d559a25602d343c0921fdd9d74abc29ba0e226d226f00132c4ce2'
+REWARD_SCORE_SOURCE_HASH = '557b2edc6b7743de60ddad7d974480cdd325dec00ea09355a9aeae7636e1de8f'
 ALIAS_HASH = 'a79b6bc3c5b36c7ce2bcea55932ccdf4ce694608e5dcfb896226a24d368bf5d6'
 ACADEMY_SERIES_HASH = 'be1258e1806e2a5e38a64cad52863c632d45b4610685ec9590dd264bb1569a38'
 IMPORTS = ('af_mail_record_pack','af_mail_restore','af_mail_catalog_header_valid')
@@ -113,13 +116,17 @@ def catalog_id(report):
     return 4 if report.get('mail_glyphs') is True else 2
 
 
-def source_report_matches(actual, expected, *, article_names=None, word_hash=None):
+def source_report_matches(actual, expected, *, article_names=None, word_hash=None, hra_rewards=False):
     versions = [expected]
     # The default-profile recompilation must reproduce the retained image.
     # Only this exact conditional-digest source change permits its predecessor;
     # future C edits do not inherit an exemption, nor does the corrected profile.
     if word_hash == WORD_HASH and expected.get(CAPTURE_SOURCE) == PROFILE_CAPTURE_SOURCE_HASH:
         versions.append({**expected, CAPTURE_SOURCE: LEGACY_CAPTURE_SOURCE_HASH})
+    # Without the explicit V3 reward define the compiler input remains identical
+    # to this exact predecessor. A reward-enabled creator cannot claim it.
+    if not hra_rewards and expected.get(SCORE_SOURCE) == REWARD_SCORE_SOURCE_HASH:
+        versions += [{**version, SCORE_SOURCE: LEGACY_SCORE_SOURCE_HASH} for version in tuple(versions)]
     # Each retained immutable article profile also accepts its pinned original
     # generator provenance. Every compiled source and resource remains checked;
     # this does not let new name profiles claim the old generator.
@@ -172,6 +179,11 @@ def validate(data,reloc,report,module):
     if 'academy_letters' in report and not academy: raise ValueError('Unknown academy creator variant')
     scores = report.get('academy_scores') is True
     if 'academy_scores' in report and not scores: raise ValueError('Unknown academy score creator variant')
+    hra_rewards = report.get('hra_rewards') is True
+    if ('hra_rewards' in report and not hra_rewards) or (hra_rewards and not scores):
+        raise ValueError('Unknown or incomplete HRA reward creator variant')
+    if hra_rewards != ('-DAF_V3_HRA_REWARDS=1' in report.get('flags', [])):
+        raise ValueError('HRA reward creator differs from its compiled option')
     postal = report.get('post_office') is True
     if 'post_office' in report and not postal: raise ValueError('Unknown post-office creator variant')
     museum = report.get('museum') is True
@@ -192,7 +204,7 @@ def validate(data,reloc,report,module):
             or report.get('relocation_sha256') != sha256(reloc) or not source_report_matches(
                 report.get('sources'), source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop,quest_replies=quest,notice_treasure=treasure,notice_owner=owner,notice_seasonal=seasonal),
                 article_names=report.get('item_names_sha256') if treasure else None,
-                word_hash=report.get('word_sha256'))
+                word_hash=report.get('word_sha256'), hra_rewards=hra_rewards)
             or report.get('module_sha256') != module['module_sha256']
             or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events,academy_scores=scores,notice_treasure=treasure)}
             or not isinstance(report.get('word_sha256'), str)

@@ -28,6 +28,18 @@ complete the import pipeline. Keep this as one connected implementation task:
    saved reward flags against compiled native home consumers before assigning
    storage. Imported reward mail, each model's independent selection, and
    catalogue non-orderability need real connections, not preparation flags.
+   The V3-only reward-letter creator accepts official templates `0221`/`0222`,
+   matching presents `3024`/`3028`, and the original score thresholds. Failed
+   generation leaves the destination unchanged. The current 60-row theme table
+   is supported, including all five added names. The default MIPS object remains
+   identical to the retained translation creator; existing source/profile
+   validation remains strict. Component compilation evidence is
+   `build/v3-hra-reward-mail-02/verification.json`, and focused host checks are in
+   `tests/test_v3_hra_reward_mail.py`. This code is not yet installed in the
+   cartridge or preview. The next HRA connection is the checked on-demand creator
+   extension, retaining its complete accent/classic adapters and expanded names,
+   followed by the selector/success flags and shared furniture admission. Do not
+   replace the complete current creator with an earlier unextended build.
 3. Classify the unresolved four-instrument villager playback results and fix
    confirmed defects. Verify silently. Preserve the passing ordinary Save & Quit
    and fresh-process reload for the current full import selection; rerun only
