@@ -12,6 +12,27 @@ from build_portal import DOWNLOAD_NAME, SAVE_NOTE
 
 
 class PortalCopyTests(unittest.TestCase):
+    def test_build_and_save_copy_uses_player_choices_not_versions(self):
+        html = (ROOT/'experimental/imports/index.html').read_text()
+        script = (ROOT/'experimental/imports/app.mjs').read_text()
+        for old in ('unchanged V2 English translation', 'original V2 English translation',
+                    'Don’t use a V3 save with V2', 'Don’t load a V3 save in V2',
+                    'selected V3 behaviour settings'):
+            self.assertNotIn(old, html+script)
+        self.assertIn('Your build includes the English translation, with no added items or villagers.', script)
+        for removed in ('save-warning', 'save-ack', 'save-detail', 'baseline-note', 'behaviour-note',
+                        'Review the save warning', 'review your imports and the save warning'):
+            self.assertNotIn(removed, html+script)
+
+    def test_visiting_guidance_has_no_version_restriction(self):
+        html = (ROOT/'experimental/imports/index.html').read_text()
+        visiting = re.search(r'<section class="visiting".*?</section>', html, re.S).group()
+        self.assertNotIn('V2', visiting)
+        self.assertNotIn('V3', visiting)
+        self.assertNotIn('patcher version', visiting)
+        self.assertIn('Share a settings file before building', visiting)
+        self.assertIn('Everyone keeps their own village save.', visiting)
+
     def test_no_unrequested_file_privacy_copy(self):
         for path in ('web/index.html', 'experimental/imports/index.html'):
             with self.subTest(path=path):

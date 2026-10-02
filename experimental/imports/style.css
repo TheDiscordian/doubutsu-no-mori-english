@@ -113,6 +113,8 @@ input::placeholder { color:#71816e; }
 .behaviour-option dl { display:grid; grid-template-columns:74px 1fr; gap:10px; }
 .behaviour-option dt { color:var(--ink); font-size:12px; font-weight:700; }
 .behaviour-option dd { margin:0; }
+.feature-setting { grid-column:1 / -1; }
+.feature-setting input { flex-shrink:0; width:20px; height:20px; accent-color:#588043; }
 .decoration-settings { grid-column:1 / -1; }
 #behaviour-controls .decoration-settings legend { float:left; width:100%; font-family:inherit; font-size:16px; font-weight:700; letter-spacing:normal; }
 .decoration-settings > p { clear:both; padding-top:12px; margin:0; }
@@ -122,7 +124,6 @@ input::placeholder { color:#71816e; }
 .decoration-grid input { flex-shrink:0; width:18px; height:18px; accent-color:#588043; }
 .decoration-grid strong,.decoration-grid small { display:block; }
 .decoration-grid small { font-size:11px; font-weight:400; color:var(--muted); }
-.behaviour-note { margin-top:14px; font-size:12px; color:var(--muted); }
 #build-review { margin-top:28px; padding-top:24px; border-top:1px solid var(--line); scroll-margin-top:24px; }
 .selection-summary { margin-bottom:18px; }
 .selection-title { display:flex; justify-content:space-between; align-items:center; gap:12px; }
@@ -130,15 +131,8 @@ input::placeholder { color:#71816e; }
 .selection-title a { flex-shrink:0; font-size:13px; text-underline-offset:4px; }
 .selection-summary p { margin-top:7px; color:var(--muted); font-size:13px; }
 .selection-summary details { margin-top:12px; font-size:13px; }
-.selection-summary summary,.save-details summary { cursor:pointer; }
+.selection-summary summary { cursor:pointer; }
 .selection-summary ul { max-height:140px; overflow:auto; padding-left:18px; line-height:1.7; }
-.warning { margin:18px 0; padding:20px; border:1px solid #e6d8af; border-radius:13px; background:#fcf7e7; }
-.warning h3 { font-size:16px; }
-.warning p { margin-top:8px; font-size:13px; color:#75643f; }
-.save-details { margin-top:12px; font-size:12px; color:#75643f; }
-.ack { display:flex; align-items:flex-start; gap:10px; margin-top:15px; font-size:13px; line-height:1.6; }
-.ack input { flex-shrink:0; width:18px; height:18px; margin:2px 0 0; accent-color:#588043; }
-.baseline-note { font-size:13px; color:var(--muted); margin-bottom:18px; }
 .primary { min-height:54px; padding:15px 20px; border-radius:11px; font-size:16px; justify-content:center; }
 .status,.error { font-size:13px; }
 .success h3 { font-size:26px; }

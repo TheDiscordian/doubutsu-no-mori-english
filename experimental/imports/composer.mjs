@@ -75,6 +75,20 @@ export function validatePlan(plan) {
     }
     options.set(option.id, option);
   }
+  const features = new Map(), featureItems = new Set();
+  if (plan.features !== undefined) array(plan.features, 1, 32);
+  for (const row of plan.features || []) {
+    require(pipeline && typeof row.id === 'string' && /^feature\/[a-z][a-z0-9-]{0,63}$/.test(row.id) &&
+      !features.has(row.id), 'Invalid or repeated feature choice.');
+    for (const key of ['name', 'description']) require(typeof row[key] === 'string' && row[key].length > 0 && row[key].length <= 1024,
+      'Invalid feature description.');
+    array(row.required_imports, 1, 2048);
+    for (const id of row.required_imports) {
+      require(options.has(id) && !options.get(id).dependency_only && !featureItems.has(id), 'Missing or repeated feature item.');
+      featureItems.add(id);
+    }
+    features.set(row.id, row);
+  }
   const pending = new Set();
   const pendingRows = new Map();
   if (plan.pending_options !== undefined) {
@@ -233,7 +247,10 @@ export function validatePlan(plan) {
       (group.forced_disabled || ['diary-holidays', 'carried-quest'].includes(group.id)) : group.forced_disabled === undefined,
       'Invalid feature activation scope.');
     array(group.any_imports, 0, 2048); array(group.any_behaviours, 0, 32); array(group.fields, 1, 64);
-    require(group.any_imports.length + group.any_behaviours.length > 0 &&
+    if (group.any_features !== undefined) array(group.any_features, 1, 32);
+    require((group.any_features || []).every(id => features.has(id)) &&
+      new Set(group.any_features || []).size === (group.any_features || []).length, 'Unknown or repeated runtime feature.');
+    require(group.any_imports.length + group.any_behaviours.length + (group.any_features || []).length > 0 &&
       new Set(group.any_imports).size === group.any_imports.length &&
       group.any_imports.every(id => options.has(id) || pending.has(id)),
       'Unknown or repeated runtime dependency.');
@@ -269,9 +286,16 @@ export function resolveSelection(plan, requested, behaviours = {}) {
   const options = validatePlan(plan);
   require(behaviours !== null && typeof behaviours === 'object' && !Array.isArray(behaviours), 'Invalid behaviour settings.');
   array(requested, 0, 4096);
-  require(requested.every(id => typeof id === 'string' && options.has(id) && !options.get(id).dependency_only),
+  const features = new Map((plan.features || []).map(row => [row.id, row]));
+  const featureItems = new Map((plan.features || []).flatMap(row => row.required_imports.map(id => [id, row.id])));
+  require(requested.every(id => typeof id === 'string' && (features.has(id) ||
+    options.has(id) && !options.get(id).dependency_only && !featureItems.has(id))),
     'Unknown or unimplemented standalone import.');
-  const chosen = [...new Set(requested)].sort(), enabled = new Set(chosen), reasons = new Map(), pending = [...chosen];
+  const chosen = [...new Set(requested)].sort(), enabled = new Set(chosen.filter(id => !features.has(id))), reasons = new Map(), pending = [...enabled];
+  for (const key of chosen) if (features.has(key)) for (const id of features.get(key).required_imports) {
+    if (!reasons.has(id)) reasons.set(id, new Set()); reasons.get(id).add(key);
+    if (!enabled.has(id)) { enabled.add(id); pending.push(id); }
+  }
   for (const row of plan.behaviours || []) if ((behaviours[row.id] || row.default) === 'GameCube') {
     for (const id of row.required_imports || []) {
       if (!reasons.has(id)) reasons.set(id, new Set()); reasons.get(id).add(row.id);
@@ -289,6 +313,7 @@ export function resolveSelection(plan, requested, behaviours = {}) {
       if (!enabled.has(dependency)) { enabled.add(dependency); pending.push(dependency); }
     }
   }
+  require([...enabled].every(id => !featureItems.has(id) || chosen.includes(featureItems.get(id))), 'An item requires a disabled feature.');
   const profile = new Uint8Array(192);
   const surfaceProfile = new Uint8Array(64);
   const creatureProfile = new Uint8Array(4);
@@ -387,7 +412,8 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     }
     for (const group of plan.runtime_groups || []) {
       const active = !group.forced_disabled && (group.any_imports.some(id => enabled.has(id)) ||
-        group.any_behaviours.some(row => selection.behaviours?.[row.id] === row.value));
+        group.any_behaviours.some(row => selection.behaviours?.[row.id] === row.value) ||
+        (group.any_features || []).some(id => selection.requested.includes(id)));
       for (const row of group.fields) {
         const value = new Uint8Array(4); view(value).setUint32(0, active ? row.enabled : row.disabled);
         write(row, value);
@@ -419,7 +445,8 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     write(plan.header, n64Checksum(output));
   }
   const outputHash = await sha256(output);
-  if (selection.requested.length === plan.options.filter(row => !row.dependency_only).length && !selection.behaviours_changed)
+  const controlledItems = new Set((plan.features || []).flatMap(row => row.required_imports));
+  if (selection.requested.length === plan.options.filter(row => !row.dependency_only && !controlledItems.has(row.id)).length + (plan.features || []).length && !selection.behaviours_changed)
     require(outputHash === (plan.all_selected_sha256 || plan.base_sha256),
       'All-selected output differs from the pinned supported selection.');
   return { output, receipt: { format: 'AFV3-BROWSER-SELECTION-1', ...selection,

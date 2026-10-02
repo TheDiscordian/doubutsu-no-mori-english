@@ -16,9 +16,11 @@ PROBE = b'<!doctype html><meta charset="utf-8"><title>Private worker check</titl
 
 
 def check_interface(page, origin, out, expected, catalog, *, scope='development', extra_item=None,
-                    behaviour_case=None, import_groups=()):
+                    behaviour_case=None, import_groups=(), features=()):
     """Exercise the actual UI; keep native gameplay checks out of this batch."""
     results = {}
+    owned={key:row['id'] for row in features for key in row['required_imports']}
+    cards={key:row for key,row in catalog.items() if key not in owned}
     page.add_init_script('''(() => {
       const state = window.__lifecycle = {created: [], revoked: [], workers: [], terminations: 0};
       const create = URL.createObjectURL.bind(URL), revoke = URL.revokeObjectURL.bind(URL);
@@ -33,7 +35,7 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     page.goto(origin+'/preview/')
     page.wait_for_function("() => !document.querySelector('#selection-controls').disabled || !document.querySelector('#error').hidden")
     assert page.locator('#error').is_hidden(), page.locator('#error').inner_text()
-    assert page.locator('.option').count() == len(catalog)
+    assert page.locator('.option').count() == len(cards)
     assert page.locator('.option input:checked').count() == 0
     assert page.locator('#build').is_disabled()
     assert 'No imports selected' in page.locator('#selection-heading').inner_text()
@@ -41,16 +43,16 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     results['optional_by_default'] = True
 
     page.locator('#select-all').click()
-    assert page.locator('.option input:checked').count() == len(catalog)
+    assert page.locator('.option input:checked').count() == len(cards)
     page.locator('#clear-all').click()
     page.locator('#open-items').click()
     page.locator('#kind').select_option('clothing')
     page.locator('#select-visible').click()
     assert page.locator('.option input:checked').count() == sum(
-        r['kind'] == 'clothing' and not r.get('dependency_only') for r in catalog.values())
+        r['kind'] == 'clothing' and not r.get('dependency_only') for r in cards.values())
     page.locator('#clear-visible').click()
     assert page.locator('.option input:checked').count() == 0
-    equipment=[key for key,row in catalog.items() if row['kind']=='equipment']
+    equipment=[key for key,row in cards.items() if row['kind']=='equipment']
     if equipment:
         page.locator('#kind').select_option('equipment')
         assert page.locator('#options .option:visible').count()==len(equipment)
@@ -101,21 +103,21 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
 
     # Shared settings work before selecting game files, and restore both kinds
     # of choices. A failed import must leave the current choices untouched.
-    coast = page.locator('select[aria-describedby="behaviour-description-coastal-fish-movement"]')
+    coast = page.locator('select[aria-describedby="behaviour-description-fish-movement"]')
     coast.select_option('GameCube')
     with page.expect_download() as event:
         page.locator('#settings-export').click()
     settings_path = out/'shared-settings.json'; event.value.save_as(settings_path)
     shared = json.loads(settings_path.read_bytes())
     assert shared['requested'] == sorted(['GAFE01-r0/villager/00EB', extra_item])
-    assert shared['behaviours']['coastal-fish-movement'] == 'GameCube'
+    assert shared['behaviours']['fish-movement'] == 'GameCube'
     assert set(shared) == {'format','donor','scope','runtime_abi','base_sha256','plan_sha256','requested','behaviours'}
     page.locator('#clear-all').click(); coast.select_option('N64')
     page.locator('#settings-import').set_input_files(str(settings_path))
     page.wait_for_function("() => document.querySelector('#settings-status').textContent.startsWith('Settings imported.')")
     assert coast.input_value() == 'GameCube'
     assert punchy.is_checked() and page.locator('.option input:checked').count() == 4
-    assert not page.locator('#save-ack').is_checked()
+    assert page.locator('#save-ack').count()==0
     bad = dict(shared, plan_sha256='0'*64)
     page.locator('#settings-import').set_input_files({'name':'other.json','mimeType':'application/json','buffer':json.dumps(bad).encode()})
     page.wait_for_function("() => document.querySelector('#settings-status').textContent.includes('different V3 catalogue')")
@@ -128,8 +130,6 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     disc = ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso'
     page.locator('#n64').set_input_files(str(native))
     page.locator('#gamecube').set_input_files(str(disc))
-    assert page.locator('#build').is_disabled()
-    page.locator('#save-ack').check()
     assert page.locator('#build').is_enabled()
     page.locator('#build').click()
     page.wait_for_function("() => document.querySelector('#progress').value >= 4 || !document.querySelector('#error').hidden")
@@ -166,14 +166,13 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     page.locator('#settings-import').set_input_files(str(out/(('villager-and-regular-subset' if scope == 'v3-pipeline' else 'villager-and-seasonal-subset')+'.json')))
     page.wait_for_function("() => document.querySelector('#success').hidden")
     assert punchy.is_checked() and page.locator('.option input:checked').count() == 4
-    assert not page.locator('#save-ack').is_checked()
-    page.locator('#save-ack').check()
+    assert page.locator('#build').is_enabled()
     results['downloaded_receipt_import_and_download_invalidation'] = True
     old_urls = page.evaluate('window.__lifecycle.created.slice()')
     page.locator('#clear-all').click()
     assert page.locator('#success').is_hidden() and not page.locator('#download').get_attribute('href')
     assert set(old_urls) <= set(page.evaluate('window.__lifecycle.revoked'))
-    assert page.locator('#save-warning').is_hidden()
+    assert page.locator('#save-warning').count()==0
     results['selection_change_revokes_downloads'] = True
     if equipment:
         page.locator('#open-items').click()
@@ -185,10 +184,17 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
         assert page.locator('#dependencies').is_hidden()
         page.locator('#kind').select_option('all')
         page.locator('#close-items').click()
-        page.locator('#save-ack').check()
         build_and_download('equipment-subset')
         page.locator('#clear-all').click()
     for group in import_groups:
+        feature=owned.get(group['members'][0])
+        if feature:
+            page.locator('#enable-'+feature.split('/')[1]).check()
+            selection=build_and_download('linked-group-'+group['id'])
+            assert selection['requested']==[feature]
+            assert set(group['members'])<=set(selection['required'])
+            page.locator('#clear-all').click()
+            continue
         page.locator('#open-items').click()
         page.locator('#search').fill('')
         for chosen in group['members']:
@@ -204,7 +210,6 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
         chosen=group['members'][0]
         page.locator(f'[data-id="{chosen}"] input').check()
         page.locator('#close-items').click()
-        page.locator('#save-ack').check()
         selection=build_and_download('linked-group-'+group['id'])
         assert selection['requested']==[chosen]
         assert selection['required']==sorted(set(group['members'])-{chosen})
@@ -218,8 +223,7 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
         control = page.locator(f'select[aria-describedby="behaviour-description-{behaviour_case["id"]}"]')
         assert control.input_value() == 'N64'
         control.select_option('GameCube')
-        assert not page.locator('#save-ack').is_checked() and page.locator('#build').is_disabled()
-        page.locator('#save-ack').check()
+        assert page.locator('#build').is_enabled()
         selection = build_and_download(behaviour_case['label'])
         assert selection['behaviours'][behaviour_case['id']] == 'GameCube'
         assert selection['requested'] == sorted(behaviour_case['requested'])
@@ -234,8 +238,7 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
         for key in ('2B00','30F8'):
             checkbox = page.locator(f'[data-id="GAFE01-r0/item/{key}"] input')
             assert checkbox.is_checked() and checkbox.is_disabled()
-        page.locator('#save-ack').check()
-        selection = build_and_download('starting-house-and-ocean-GameCube')
+        selection = build_and_download('starting-house-and-fish-GameCube')
         assert selection['requested'] == []
         assert selection['required'] == ['GAFE01-r0/item/2B00','GAFE01-r0/item/30F8']
         starter.select_option('N64'); coast.select_option('N64')
@@ -251,13 +254,12 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     results['file_change_revokes_downloads'] = True
     page.locator('#gamecube').set_input_files(str(disc))
 
-    page.locator('#search').fill('')
     page.locator('#build').click()
     page.wait_for_function("() => document.querySelector('#progress').value >= 4 || !document.querySelector('#error').hidden")
     assert page.locator('#error').is_hidden(), page.locator('#error').inner_text()
     page.locator('#select-all').click()
     assert page.locator('#working').is_hidden() and page.locator('#success').is_hidden()
-    assert page.locator('#build').is_disabled() and not page.locator('#save-ack').is_checked()
+    assert page.locator('#build').is_enabled() and page.locator('#save-ack').count()==0
     page.evaluate("window.__lifecycle.workers.at(-1).onmessage({data: {type: 'done'}})")
     assert page.locator('#error').is_hidden()
     results['selection_change_cancels_active_build'] = True
@@ -265,7 +267,6 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     page.locator('#n64').set_input_files({'name': 'rom.7z', 'mimeType': 'application/octet-stream', 'buffer': b'archive'})
     assert page.locator('#error').is_visible() and 'Extract archives' in page.locator('#error').inner_text()
     page.locator('#gamecube').set_input_files(str(disc))
-    page.locator('#save-ack').check()
     assert page.locator('#build').is_disabled()
     assert page.locator('#error').is_visible()
     results['invalid_either_input_blocks_build'] = True
@@ -366,8 +367,10 @@ def check(export, output, *, interface=False, selected=None, focused_behaviours=
     plan = json.loads(resources['data/composition.json'])
     scope = plan.get('scope', 'development')
     menu = {r['id']:r for r in plan['options']}
-    available = [key for key,row in menu.items() if not row.get('dependency_only')]
-    extra_item = next(key for key in available if menu[key]['kind'] == 'furniture'
+    features = {row['id']:row for row in plan.get('features',[])}
+    owned = {key:row['id'] for row in features.values() for key in row['required_imports']}
+    available = [key for key,row in menu.items() if not row.get('dependency_only') and key not in owned]+list(features)
+    extra_item = next(key for key in available if key in menu and menu[key]['kind'] == 'furniture'
                       and key not in catalog['GAFE01-r0/villager/00EB']['dependencies'])
     subset_name = 'villager-and-regular-subset' if scope == 'v3-pipeline' else 'villager-and-seasonal-subset'
     if scope != 'v3-pipeline':extra_item = 'GAFE01-r0/item/31D4'
@@ -379,11 +382,12 @@ def check(export, output, *, interface=False, selected=None, focused_behaviours=
             behaviour_options=choices if behaviours else None, behaviours=behaviours)
     profiles = [('no-imports', []), ('all-installed', available),
                 (subset_name, ['GAFE01-r0/villager/00EB', extra_item])]
-    equipment=[key for key,row in menu.items() if row['kind']=='equipment']
+    equipment=[key for key,row in menu.items() if row['kind']=='equipment' and key not in owned]
     if equipment:profiles.append(('equipment-subset',[equipment[1],equipment[-1]]))
     import_groups=plan.get('import_groups',[])
     for group in import_groups:
-        profiles.append(('linked-group-'+group['id'],[group['members'][0]]))
+        first=group['members'][0]
+        profiles.append(('linked-group-'+group['id'],[owned.get(first,first)]))
     if focused:
         if interface:raise ValueError('Choose a focused worker profile or the complete interface check')
         resolve(selected)
@@ -395,9 +399,9 @@ def check(export, output, *, interface=False, selected=None, focused_behaviours=
         expected[name] = sha256(result)
     behaviour_case = None
     if interface and any(row['id']=='starting-diary' for row in choices):
-        selected = resolve([], {'starting-diary':'GameCube','coastal-fish-movement':'GameCube'})
+        selected = resolve([], {'starting-diary':'GameCube','fish-movement':'GameCube'})
         result, _, _ = composer.compose(base, report, catalog, selected)
-        expected['starting-house-and-ocean-GameCube'] = sha256(result)
+        expected['starting-house-and-fish-GameCube'] = sha256(result)
     seasonal = report.get('equipment_resources', {}).get('seasonal_stock')
     if interface and seasonal and seasonal['choice']['id']=='late-december-stock':
         behaviour_case = dict(id=seasonal['choice']['id'], label='seasonal-stock-GameCube',
@@ -442,12 +446,12 @@ def check(export, output, *, interface=False, selected=None, focused_behaviours=
                       };
                       worker.postMessage({requested: selected, behaviours, plan_sha256, n64: document.querySelector('#n64').files[0],
                         gamecube: document.querySelector('#disc').files[0]});
-                    })''', {'selected': selected, 'cancel': cancel, 'plan_sha256': manifest['plan']['sha256'], 'behaviours': focused_behaviours})
+                    })''', {'selected': selected, 'cancel': cancel, 'plan_sha256': manifest['plan']['sha256'], 'behaviours': focused_behaviours or {}})
 
                 if interface:
                     results['interface'] = check_interface(page, origin, out, expected, menu,
                         scope=scope, extra_item=extra_item,
-                        behaviour_case=behaviour_case, import_groups=import_groups)
+                        behaviour_case=behaviour_case, import_groups=import_groups, features=list(features.values()))
                 else:
                     if not focused:
                         cancelled = worker(profiles[-1][1], cancel=True)
@@ -474,8 +478,8 @@ def check(export, output, *, interface=False, selected=None, focused_behaviours=
                         ui.wait_for_function("() => !document.querySelector('#selection-controls').disabled")
                         ui.locator('#open-items').click()
                         counts={}
-                        for kind in sorted({catalog[k]['kind'] for k in profiles[0][1]}):
-                            count=sum(r['kind']==kind and not r.get('dependency_only') for r in menu.values())
+                        for kind in sorted({catalog[k]['kind'] for k in profiles[0][1] if k in catalog}):
+                            count=sum(r['kind']==kind and not r.get('dependency_only') and r['id'] not in owned for r in menu.values())
                             ui.locator('#kind').select_option(kind)
                             assert ui.locator('.option:visible').count()==count
                             ui.locator('#select-visible').click()

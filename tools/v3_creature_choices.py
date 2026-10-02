@@ -99,9 +99,10 @@ def options(image,report):
                 0x38420001,0x2C420001,0x03E00008,0)
             if image[helper:helper+36]!=expected:
                 raise ValueError('Changed complete coastal movement origin/mode guard')
-            result[-1].update(name='Ocean fish swimming',scope='All original and imported ocean fish',
-                description='N64 uses its original swimming routines. GameCube uses its swimming patterns, pauses, and shoreline avoidance for all ocean fish. River and pond fish are unchanged.',
-                patches=[dict(offset=helper+4,before='10600005',after='00000000')])
+            result[-1].update(id='fish-movement',name='Fish swimming',scope='All original and imported river, pond, and ocean fish',
+                description='N64 uses its original swimming routines. GameCube uses wider freshwater turns and its ocean swimming patterns, pauses, and shoreline avoidance.',
+                patches=[dict(offset=helper+4,before='10600005',after='00000000'),
+                         freshwater_patch(image,report)])
     reward=report.get('equipment_resources',{}).get('carried_items',{}).get('quest',{}).get('rewards')
     if reward and reward.get('birthday_choice'):
         row=reward['birthday_choice'];p=reward['packet'];code=reward['code'];start=p['physical']
@@ -171,6 +172,32 @@ def options(image,report):
     return result
 
 
+def freshwater_patch(image,report):
+    """Adapt the donor's two 60-Hz heading additions to one native 30-Hz tick.
+
+    Both games divide the target heading by target/step. GameCube advances
+    the phase by step/2, so it adds that increment twice per native tick.
+    The N64 speed/phase advance already matches the elapsed GameCube time.
+    Preserve N64 mode, callbacks, actor layout, and all native relocations.
+    """
+    from v3_npc_clothing import guard_incoming
+    from v3_npc_draw import relocation_offsets
+    files=by_vrom(image)
+    owner=next(r for r in report['equipment_resources']['creature_fish']['owners'] if r['name']=='river')
+    data=files[owner['vrom']].extract(image);reloc=files[owner['reloc']].extract(image)
+    at=0x80932090-owner['ram']
+    before='84ef00de84f8022c01f8c8211000001ca4f900de'
+    after='84ef00de84f8022c0018c04001f8c821a4f900de'
+    if (owner['vrom']!=0x828C50 or owner['ram']!=0x809317D0 or files[owner['vrom']].pend or
+            sha256(data)!=owner['sha256'] or sha256(reloc)!=owner['reloc_sha256'] or
+            data[at:at+20].hex()!=before or data[at+20:at+32].hex()!='46006032c7aa002445020019'):
+        raise ValueError('Changed complete freshwater swimming owner or turning path')
+    guard_incoming(data,u32(reloc,0),owner['ram'],[(at,20)])
+    if set(range(at,at+20,4)) & relocation_offsets(reloc,len(data)):
+        raise ValueError('Freshwater turning patch overlaps a native relocation')
+    return dict(offset=files[owner['vrom']].pstart+at,before=before,after=after)
+
+
 def resolve(options,requested=None):
     requested={} if requested is None else requested
     if not isinstance(requested,dict) or set(requested)-{r['id'] for r in options}:
@@ -232,9 +259,17 @@ def update_report(image,blob,report,resolved):
     world['compiled']['sha256']=sha256(packet[:world['compiled']['bytes']])
     world['behaviour_choices']['resolved']=resolved
     for row in world['behaviour_choices']['options']:
-        value=row['values'][resolved[row['id']]]
+        key='fish-movement' if row['id']=='coastal-fish-movement' else row['id']
+        value=row['values'][resolved[key]]
         if u32(packet,row['ram']-p['ram'])!=value:raise ValueError('Lost composed behaviour setting')
         world[row['binding']]['value']=value
+    river=next(r for r in report['equipment_resources']['creature_fish']['owners'] if r['name']=='river')
+    data=by_vrom(image)[river['vrom']].extract(image)
+    at=0x80932090-river['ram'];gc=resolved['fish-movement']=='GameCube'
+    expected='84ef00de84f8022c0018c04001f8c821a4f900de' if gc else '84ef00de84f8022c01f8c8211000001ca4f900de'
+    if data[at:at+20].hex()!=expected:raise ValueError('Lost freshwater movement choice')
+    river.update(sha256=sha256(data),movement_choice=resolved['fish-movement'])
+    world['patrol_mode']['scope']='all original and imported river, pond, and ocean fish'
     e=report['equipment_resources'];ep=blob[e['blob_offset']:e['blob_offset']+e['bytes']]
     insects=e.get('creature_insects')
     if insects and insects.get('behaviour_choice'):

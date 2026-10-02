@@ -32,7 +32,7 @@ def copy_interface(site):
         shutil.copyfile(ROOT/'web'/name, target)
 
 
-def refresh(source, output):
+def refresh(source, output, *, interface_only=False):
     """Reuse authenticated recipes in a fresh private export, never edit a live site."""
     source, output = source.resolve(), output.resolve()
     if not source.is_relative_to(ROOT/'build') or not output.is_relative_to(ROOT/'build') or output.exists():
@@ -47,6 +47,14 @@ def refresh(source, output):
     for name, digest in receipt['files'].items():
         if sha256((site/name).read_bytes()) != digest:
             raise ValueError('Changed export file: '+name)
+    if interface_only:
+        shutil.copytree(site, output/'site')
+        fresh = output/'site'
+        copy_interface(fresh)
+        receipt.update(served=False, refreshed_from=str(source.relative_to(ROOT)),
+            files={str(p.relative_to(fresh)):sha256(p.read_bytes()) for p in sorted(fresh.rglob('*')) if p.is_file()})
+        (output/'build.json').write_bytes(composition.canonical(receipt))
+        return receipt
     image, report = composition.inputs()
     if sha256(image) != receipt['base_sha256'] or composition.REPORT_SHA != receipt['base_report_sha256']:
         raise ValueError('Refresh must retain the exact cartridge and report')
@@ -273,7 +281,10 @@ def rules(image, report, *, scope='development'):
         for group in result.get('runtime_groups', []):
             from v3_holiday_selection import pipeline_allowed
             group['forced_disabled'] = not pipeline_allowed(group,report)
-        full = composition.resolve(catalog, requested_options(catalog, report),
+        from v3_feature_choices import options as installed_features, requests as feature_requests, runtime_groups as feature_groups
+        result['features'] = installed_features(catalog, report)
+        feature_groups(result.get('runtime_groups', []), result['features'])
+        full = composition.resolve(catalog, feature_requests(catalog, result['features'], requested_options(catalog, report)),
             behaviour_options=behaviours or None, scope=scope, report=report)
         selected, _, _ = composition.compose(image, report, catalog, full)
         result['all_selected_sha256'] = sha256(selected)
@@ -391,10 +402,13 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--recipes', action='store_true', help='Include two-game reconstruction recipes in the unserved export')
     parser.add_argument('--refresh-from', type=Path, help='Reuse checked recipes in a fresh export with the current interface and rules')
+    parser.add_argument('--interface-only', action='store_true', help='Refresh website files only, preserving checked game recipes and selection rules')
     parser.add_argument('--disc', type=Path)
     parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock; never changes the deployed patcher or local preview')
     parser.add_argument('--scope', choices=('v3-pipeline','development'), default='v3-pipeline')
     args = parser.parse_args()
+    if args.interface_only and not args.refresh_from:
+        parser.error('--interface-only requires --refresh-from')
     if args.base_lock:composition.use_build_lock(args.base_lock)
-    print(json.dumps(refresh(args.refresh_from, args.output) if args.refresh_from else
+    print(json.dumps(refresh(args.refresh_from, args.output, interface_only=args.interface_only) if args.refresh_from else
         build(args.output, recipes=args.recipes, disc=args.disc, scope=args.scope), indent=2))

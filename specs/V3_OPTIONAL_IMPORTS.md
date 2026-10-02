@@ -82,9 +82,15 @@ Verify the changed shared path in each supported mode with focused checks, reusi
 unchanged evidence. These settings follow the existing V3 playtest and deployment
 approval requirement; they do not authorise a live-patcher update.
 
-The ocean movement choice affects original and imported ocean fish together;
-river and pond movement retains its native path. Authenticate the complete shared
-helper before replacing its imported-only origin gate. The GameCube house-start
+Fish population and fish movement are separate choices. The movement choice
+affects original and imported river, pond, and ocean fish together. Authenticate
+the complete shared ocean helper before replacing its imported-only origin gate.
+For freshwater movement, authenticate the complete native owner and relocation
+data, then adapt the donor's two 60-Hz heading additions to one 30-Hz native tick;
+the N64 alternative keeps its original instructions. GameCube source
+`src/actor/ac_gyo_test.c:aGTT_swim_speed_change` and its complete donor function
+at `.text:0x233464` establish the wider turn, not an unverified timer difference.
+Population rules are unchanged by this movement choice. The GameCube house-start
 choice places the college-rule diary on the cardboard box in main/secondary room
 cell `[1][1]`, following the complete checked donor room initializer. Include both
 imports as setting requirements. Use the native house-creation path, not pockets
@@ -99,7 +105,7 @@ base hash, and runtime ABI. Include every available behaviour choice; reject
 unknown imports/values, malformed or excessive files, and mismatched builds
 without altering existing choices. Resolve dependencies from requested choices,
 never trust supplied enabled bits or profile bytes. Successful import cancels
-work, invalidates previous downloads, and resets save acknowledgement. Shared
+work and invalidates previous downloads. No save acknowledgement is required. Shared
 files contain no ROM/save bytes or local filenames.
 
 Explain that friends need the same patcher version and can export/import the

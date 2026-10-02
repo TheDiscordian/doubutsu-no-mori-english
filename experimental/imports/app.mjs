@@ -10,9 +10,9 @@ const behaviours = {};
 const kinds = { villager: 'Villager', furniture: 'Furniture', clothing: 'Clothing', equipment: 'Equipment', floor: 'Floor', wall: 'Wallpaper', fish: 'Fish', insect: 'Insect', diary: 'Diary', carried: 'Carried item' };
 const choiceCopy = {
   'fish-population': { name: 'Which fish appear', N64: 'Keep the original N64 appearance rules, with your selected added species mixed in.', GameCube: 'Use GameCube appearance rules for all fish, including how the season, time, weather, and town environment affect their chances.' },
-  'coastal-fish-movement': { name: 'Ocean fish swimming', N64: 'Use the original N64 swimming, waiting, and fleeing routines.', GameCube: 'Use GameCube swimming patterns, pauses, and shoreline avoidance.', note: 'Applies to every ocean fish, original and imported. River and pond fish are not changed by this setting.' },
-  'insect-population': { name: 'How many insects appear', N64: 'Up to two wild insects at once, using the original N64 appearance rules.', GameCube: 'Up to eight wild insects at once. Species are chosen using GameCube rules for the season, time, and location, and insects can appear in groups.', note: 'Applies to original and imported insects. Releasing an insect still works in either mode.' },
-  'holiday-calendar': { name: 'Holiday dates', N64: 'Shared celebrations follow the Japanese N64 dates.', GameCube: 'Shared celebrations follow the English GameCube dates.', note: 'This changes dates, not which holidays you import. Celebrations exclusive to either game keep their own dates.' },
+  'fish-movement': { name: 'Fish swimming', N64: 'Use the original N64 swimming routines for river, pond, and ocean fish.', GameCube: 'River and pond fish make wider turns. Ocean fish use GameCube swimming patterns, pauses, and shoreline avoidance.' },
+  'insect-population': { name: 'How many insects appear', N64: 'Up to two wild insects at once, using the original N64 appearance rules.', GameCube: 'Up to eight wild insects at once. Species are chosen using GameCube rules for the season, time, and location, and insects can appear in groups.' },
+  'holiday-calendar': { name: 'Holiday dates', N64: 'Shared celebrations follow the Japanese N64 dates.', GameCube: 'Shared celebrations follow the English GameCube dates.', note: 'Celebrations exclusive to either game keep their own dates.' },
   'paper-quantities': { name: 'Stationery', N64: 'Buy and receive one sheet at a time.', GameCube: 'Buy and receive packs of four sheets. Packs can be split or combined; writing a letter uses one sheet.' },
   'starting-diary': { name: 'Start with a diary', N64: 'Keep the original N64 starting house, without a diary.', GameCube: 'Place a college-rule diary on the orange box inside each starting house.', note: 'Only affects newly created houses. Existing houses are unchanged.' },
 };
@@ -20,6 +20,7 @@ let loaded, selection, worker, generation = 0, romURL, receiptURL;
 const status = message => { $('status').textContent = message; };
 const behaviourControls = new Map();
 const decorationControls = new Map();
+const featureControls = new Map(), featureImports = new Set();
 function fileError() {
   try { for (const input of inputs) if (input.files[0]) rejectArchive(input.files[0]); }
   catch (error) { return error.message; }
@@ -27,7 +28,7 @@ function fileError() {
 }
 function ready() {
   $('build').disabled = !loaded || Boolean(worker) || !inputs.every(input => input.files[0]) ||
-    Boolean(fileError()) || (Boolean(selection?.enabled.length || selection?.behaviours_changed) && !$('save-ack').checked);
+    Boolean(fileError());
 }
 function clearDownloads() {
   for (const url of [romURL, receiptURL]) if (url) URL.revokeObjectURL(url);
@@ -39,9 +40,8 @@ function stop() {
   generation++; worker?.terminate(); worker = null;
   $('working').hidden = true; $('patcher').setAttribute('aria-busy', 'false'); ready();
 }
-function invalidate(message, resetAcknowledgement = false) {
+function invalidate(message) {
   stop(); clearDownloads(); $('error').hidden = true;
-  if (resetAcknowledgement) $('save-ack').checked = false;
   ready(); status(message);
   const invalid = fileError();
   if (invalid) { $('error').textContent = invalid; $('error').hidden = false; }
@@ -69,10 +69,14 @@ function filter() {
   $('select-villagers').disabled = !neighbours; $('clear-villagers').disabled = !neighbours;
 }
 function renderSelection() {
-  const reasonName = key => cards.get(key)?.row.name || choiceCopy[key]?.name || key;
+  const reasonName = key => loaded.plan.features?.find(row => row.id === key)?.name ||
+    loaded.plan.options.find(row => row.id === key)?.name || choiceCopy[key]?.name || key;
   selection = resolveSelection(loaded.plan, [...requested], behaviours);
   const custom = Boolean(selection.enabled.length || selection.behaviours_changed);
   const enabled = new Set(selection.enabled), required = new Set(selection.required);
+  for (const [id, { checkbox }] of featureControls) {
+    checkbox.checked = requested.has(id);
+  }
   const stockMode = loaded.plan.behaviours?.find(row => row.id === 'new-year-stock')?.values[behaviours['new-year-stock']];
   for (const [key, { checkbox, bit, importId }] of decorationControls) {
     checkbox.checked = importId ? enabled.has(importId) : !(stockMode & bit);
@@ -92,22 +96,21 @@ function renderSelection() {
   $('selection-heading').textContent = selection.enabled.length ? `${selection.enabled.length} imports included` : 'No imports selected';
   $('selection-summary').textContent = selection.enabled.length ?
     `${selection.requested.length} chosen by you · ${selection.required.length} added as requirements` :
-    selection.behaviours_changed ? 'No added items or villagers. Your build uses the selected V3 behaviour settings.' :
-    'Your build will be the unchanged V2 English translation.';
+    selection.behaviours_changed ? 'No added items or villagers. Your build uses your chosen town settings.' :
+    'Your build includes the English translation, with no added items or villagers.';
   $('dependencies').hidden = !selection.required.length;
   $('dependency-list').replaceChildren(...selection.required.map(id => {
     const li = document.createElement('li');
-    li.textContent = `${cards.get(id).row.name} — required by ${selection.dependency_reasons[id].map(reasonName).join(', ')}`;
+    li.textContent = `${reasonName(id)} — required by ${selection.dependency_reasons[id].map(reasonName).join(', ')}`;
     return li;
   }));
-  $('save-warning').hidden = !custom; $('baseline-note').hidden = custom;
   $('build').textContent = custom ? 'Build with selected options' : 'Build translation only';
   ready();
 }
 function changeSelection(change) {
   const before = [...requested].sort().join('\n'); change();
   if (before !== [...requested].sort().join('\n')) {
-    invalidate('Selections changed. Review the included requirements before building.', true); renderSelection();
+    invalidate('Selections changed. Review the included requirements before building.'); renderSelection();
   }
 }
 function addChoices(plan) {
@@ -132,7 +135,7 @@ function addChoices(plan) {
     behaviourControls.set(row.id, select);
     select.addEventListener('change', () => {
       behaviours[row.id] = select.value;
-      invalidate('Behaviour settings changed. Review the save warning before building.', true); renderSelection();
+      invalidate('Town settings changed. Build again to apply your choices.'); renderSelection();
     });
     const card = document.createElement('div'); card.className = 'behaviour-option';
     label.append(caption, select); card.append(label);
@@ -147,10 +150,12 @@ function addChoices(plan) {
     } else card.append(description);
     $('behaviour-options').append(card);
   }
+  addFeatureChoices(plan);
   if (decorationChoice) addDecorationChoices(decorationChoice);
   $('behaviour-controls').hidden = !plan.behaviours?.length;
-  $('behaviour-note').textContent = 'Keep your behaviour settings with your save. A save made with four-sheet stationery packs needs the same setting when you load it again. Back up your save before changing settings.';
   for (const row of [...plan.options].sort((a, b) => a.kind.localeCompare(b.kind) || a.name.localeCompare(b.name))) {
+    // Quest items are controlled by their town setting, not catalogue cards.
+    if (featureImports.has(row.id)) continue;
     const card = document.createElement('label'), checkbox = document.createElement('input');
     const text = document.createElement('span'), name = document.createElement('strong'), detail = document.createElement('small');
     const note = document.createElement('small');
@@ -173,12 +178,31 @@ function addChoices(plan) {
   }
 }
 
+function addFeatureChoices(plan) {
+  for (const row of plan.features || []) {
+    for (const id of row.required_imports) featureImports.add(id);
+    const card = document.createElement('div'); card.className = 'behaviour-option feature-setting';
+    const label = document.createElement('label'), checkbox = document.createElement('input');
+    checkbox.id = 'enable-'+row.id.slice('feature/'.length); checkbox.type = 'checkbox';
+    const title = document.createElement('strong'); title.textContent = 'Enable '+row.name;
+    const description = document.createElement('p'); description.id = checkbox.id+'-description';
+    description.textContent = row.description;
+    checkbox.setAttribute('aria-describedby', description.id);
+    label.append(title, checkbox); card.append(label, description);
+    $('behaviour-options').append(card);
+    featureControls.set(row.id, { checkbox });
+    checkbox.addEventListener('change', () => changeSelection(() => {
+      if (checkbox.checked) requested.add(row.id); else requested.delete(row.id);
+    }));
+  }
+}
+
 function addDecorationChoices(row) {
   const card = document.createElement('fieldset'); card.className = 'behaviour-option decoration-settings';
   card.id = 'new-year-stock';
   const title = document.createElement('legend'); title.textContent = 'New Year decorations';
   const explanation = document.createElement('p');
-  explanation.textContent = 'Choose the decorations Nook can sell from December 26–31. The shop uses its existing furniture spaces; other dates are unchanged.';
+  explanation.textContent = 'Nook’s shop sells New Year items from December 26–31. He normally stocks two items, but those items differ between the original N64 game and the English GameCube release. Choose which items are available below; two are randomly selected each day during that period.';
   const value = document.createElement('input'); value.type = 'hidden'; value.value = row.default;
   behaviours[row.id] = row.default; behaviourControls.set(row.id, value);
   const actions = document.createElement('div'); actions.className = 'actions';
@@ -195,7 +219,7 @@ function addDecorationChoices(row) {
     value.value = Object.keys(row.values).find(key => row.values[key] === mask);
     behaviours[row.id] = value.value;
     if (before !== [...requested].sort().join('\n') + behaviours[row.id]) {
-      invalidate('New Year decorations changed.', true); renderSelection();
+      invalidate('New Year decorations changed.'); renderSelection();
     }
   };
   for (const selected of [true, false]) {
@@ -239,16 +263,18 @@ for (const input of inputs) input.addEventListener('change', () => {
   const native = input.id === 'n64';
   $(native ? 'n64-name' : 'gc-name').textContent = input.files[0]?.name || 'No file chosen';
   $(native ? 'n64-field' : 'gc-field').classList.toggle('selected', Boolean(input.files[0]));
-  invalidate('Game files changed. Build again to verify this pair of inputs.', true);
+  invalidate('Game files changed. Build again to verify this pair of inputs.');
   if (fileError()) error(fileError());
 });
-$('save-ack').addEventListener('change', () => invalidate('Save handling updated. Your selections have not changed.'));
 $('search').addEventListener('input', filter); $('villager-search').addEventListener('input', filter); $('kind').addEventListener('change', filter);
 for (const [button, include, visible, kind] of [['select-visible', true, true, 'items'], ['clear-visible', false, true, 'items'],
   ['select-villagers', true, true, 'villager'], ['clear-villagers', false, true, 'villager'],
   ['select-items', true, false, 'items'], ['clear-items', false, false, 'items'],
   ['select-all', true, false, 'all'], ['clear-all', false, false, 'all']]) {
   $(button).addEventListener('click', () => changeSelection(() => {
+    if (kind === 'all') for (const id of featureControls.keys()) {
+      if (include) requested.add(id); else requested.delete(id);
+    }
     for (const [id, { row }] of cards) if (!row.dependency_only &&
       (kind === 'all' || (kind === 'villager' ? row.kind === 'villager' : row.kind !== 'villager')) &&
       (!visible || matches(row))) {
@@ -278,7 +304,7 @@ $('settings-import').addEventListener('change', async event => {
     for (const [id, value] of Object.entries(incoming.behaviours)) {
       behaviours[id] = value; behaviourControls.get(id).value = value;
     }
-    invalidate('Shared settings loaded. Review your imports and the save warning before building.', true);
+    invalidate('Shared settings loaded. Review your choices before building.');
     renderSelection();
     $('settings-status').textContent = 'Settings imported. Included requirements have been recalculated; your game files have not changed.';
   } catch (problem) {

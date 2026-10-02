@@ -277,16 +277,29 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None,
     if not isinstance(selected, (list, tuple)) or any(type(key) is not str for key in selected):
         raise ValueError('Selections must be a list of fixed source identities')
     requested = sorted(set(selected))
-    if set(requested)-catalog.keys():
-        raise ValueError('Unknown or unimplemented import: '+', '.join(sorted(set(requested)-catalog.keys())))
+    feature_options = []
+    if scope == PIPELINE and report is not None:
+        from v3_feature_choices import options as installed_features
+        feature_options = installed_features(catalog, report)
+    features = {row['id']:row for row in feature_options}
+    owned = {item:row['id'] for row in feature_options for item in row['required_imports']}
+    if set(requested) & owned.keys():
+        raise ValueError('Select the feature, not its automatic item: '+', '.join(sorted(set(requested) & owned.keys())))
+    if set(requested)-catalog.keys()-features.keys():
+        raise ValueError('Unknown or unimplemented import: '+', '.join(sorted(set(requested)-catalog.keys()-features.keys())))
     if scope == PIPELINE:
         if report is None:
             raise ValueError('V3 pipeline selection requires the checked installed report')
-        check_requests(catalog, report, requested, behaviours)
-    enabled, reasons = set(requested), {}
+        check_requests(catalog, report, [key for key in requested if key not in features], behaviours)
+    enabled, reasons = set(requested)-features.keys(), {}
     peers={key:[child for child in g['members'] if child!=key]
            for g in selection_groups(catalog) for key in g['members']}
-    pending = list(requested)
+    pending = list(enabled)
+    for key in requested:
+        if key not in features: continue
+        for child in features[key]['required_imports']:
+            reasons.setdefault(child,set()).add(key)
+            if child not in enabled: enabled.add(child); pending.append(child)
     if behaviour_options is not None:
         from v3_creature_choices import resolve as resolve_behaviours
         chosen_behaviours=resolve_behaviours(behaviour_options,behaviours)
@@ -305,6 +318,8 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None,
             if child not in enabled:
                 enabled.add(child)
                 pending.append(child)
+    if any(key in owned and owned[key] not in requested for key in enabled):
+        raise ValueError('An item requires a disabled feature')
     villagers = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='villager']
     furniture = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='furniture']
     shirts = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='clothing']
@@ -535,7 +550,11 @@ def compose(image, report, catalog, selection):
     enabled = set(selection['enabled'])
     from v3_holiday_selection import groups as event_groups, active as event_active, checksum_fields as event_checksums
     for group in event_groups(image, report):
-        on = event_active(group, enabled, values, scope=scope, report=report)
+        if scope == 'v3-pipeline':
+            feature = {'carried-quest':'feature/wisp', 'diary-holidays':'feature/gamecube-events'}.get(group['id'])
+            on = feature in selection['requested'] if feature else event_active(group, enabled, values, scope=scope, report=report)
+        else:
+            on = event_active(group, enabled, values, scope=scope, report=report)
         for field in group['fields']:
             change(field['offset'], struct.pack('>I', field['enabled'] if on else field['disabled']), group['id'])
     from v3_carried_selection import masks as carried_masks, checksum_fields as carried_checksums
@@ -627,6 +646,9 @@ def build(output, selected=(), *, select_all=False, behaviours=None, scope='v3-p
     from v3_import_scope import PIPELINE, requested_options, check_scope
     check_scope(scope)
     all_options = requested_options(catalog, report) if scope == PIPELINE else list(catalog)
+    if scope == PIPELINE:
+        from v3_feature_choices import options as installed_features, requests as feature_requests
+        all_options = feature_requests(catalog, installed_features(catalog,report), all_options)
     selection = resolve(catalog, all_options if select_all else list(selected),
         behaviours=behaviours,behaviour_options=choices if choices or behaviours else None,
         scope=scope, report=report)

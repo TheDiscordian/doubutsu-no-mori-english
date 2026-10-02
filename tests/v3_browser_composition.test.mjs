@@ -36,6 +36,31 @@ async function behaviourFixture() {
   return result;
 }
 
+test('feature choices enable required items, never the other way around', async () => {
+  const { source, plan } = await fixture();
+  plan.scope = 'v3-pipeline';
+  plan.features = [{id:'feature/wisp', name:'Wisp', description:'Enable Wisp and his quest items.', required_imports:[A]},
+    {id:'feature/cedar-trees', name:'Cedar trees', description:'Enable cedar trees and saplings.', required_imports:[B]}];
+  const wisp = resolveSelection(plan, ['feature/wisp']);
+  assert.deepEqual(wisp.requested, ['feature/wisp']);
+  assert.deepEqual(wisp.enabled, [A]);
+  assert.deepEqual(wisp.required, [A]);
+  assert.deepEqual(wisp.dependency_reasons[A], ['feature/wisp']);
+  assert.deepEqual(resolveSelection(plan, []).enabled, []);
+  assert.throws(() => resolveSelection(plan, [A]), /standalone/);
+  assert.throws(() => resolveSelection(plan, [C]), /disabled feature/);
+  assert.deepEqual(resolveSelection(plan, [C,'feature/cedar-trees']).enabled, [B,C]);
+  const settings = exportSettings(plan, 'a'.repeat(64), ['feature/wisp'], {});
+  assert.deepEqual(importSettings(plan, 'a'.repeat(64), settings).requested, ['feature/wisp']);
+  const built = await composeSelection(source, plan, ['feature/wisp']);
+  assert.deepEqual(built.receipt.required, [A]);
+  for (const mutate of [p=>p.features[0].required_imports.push(A),
+    p=>p.features[1].required_imports.push(A), p=>p.features[0].required_imports.push('unknown'),
+    p=>p.features[0].id='not-a-feature']) {
+    const bad=clone(plan); mutate(bad); assert.throws(()=>validatePlan(bad));
+  }
+});
+
 test('native New Year decorations are independent checked stock flags, not platform modes', async () => {
   const { source, plan } = await behaviourFixture();
   const row = plan.behaviours[0];

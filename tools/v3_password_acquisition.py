@@ -105,6 +105,21 @@ def catalogue_source(source,item,index,row):
         acquisition.get('native_delivery_installed') is True)
 
 
+def carried_items(report):
+    """Use authenticated source permissions and installed bit-gated destinations."""
+    p=report.get('equipment_resources',{}).get('passwords',{})
+    if not (p.get('acquisition_installed') and p.get('keyboard_installed') and
+            p.get('name_conversion_installed') and p.get('nook',{}).get('installed') and
+            p.get('conversation',{}).get('native_bindings_installed')):
+        return set()
+    matrix=(ROOT/'build/v3-password-policy-prepared-03/donor-permissions.bin').read_bytes()
+    if sha256(matrix)!=p['source']['donor_matrix_sha256']:
+        raise ValueError('Changed carried-item password permissions')
+    return {row['id'] for row in p['source']['destinations']['rows']
+            if row.get('kind')=='carried' and row.get('enable_mask') and
+            row.get('enable_bytes')==4 and matrix[row['source_item']]}
+
+
 def installed_items(report):
     """Admit complete source password categories, never replacement shop stock."""
     e=report.get('equipment_resources',{});p=e.get('passwords',{});n=p.get('nook',{})

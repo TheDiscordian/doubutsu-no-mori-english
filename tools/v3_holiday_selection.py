@@ -135,6 +135,9 @@ def update_report(image, blob, report, selection):
     enabled = set(selection['enabled'])
     states = {g['id']: active(g, enabled, selection.get('behaviours', {}),
                              scope=selection.get('scope', 'development'),report=report) for g in contract['groups']}
+    if selection.get('scope') == 'v3-pipeline':
+        for group, feature in (('carried-quest','feature/wisp'), ('diary-holidays','feature/gamecube-events')):
+            if group in states: states[group] = feature in selection['requested']
     contract['resolved_groups'] = states
     on = states['diary-holidays']
     n['record']['selected'] = n['lifecycle']['active'] = on

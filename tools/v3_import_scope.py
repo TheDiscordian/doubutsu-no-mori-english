@@ -33,8 +33,9 @@ def availability(catalog, report):
     shops.update(installed_items(report))
     from v3_hra_rewards import installed_items as hra_items
     shops.update(hra_items(report))
-    from v3_password_acquisition import installed_items as password_items
+    from v3_password_acquisition import installed_items as password_items, carried_items as password_carried
     password_ids=password_items(report)
+    carried_codes=password_carried(report)
     from v3_holiday_acquisition import exercise_items
     exercise=exercise_items(report)
     from v3_harvest_acquisition import installed_items as harvest_items
@@ -82,9 +83,11 @@ def availability(catalog, report):
         elif kind == 'equipment':
             ready = key in equipment
         elif kind == 'carried':
-            # Installed native categories: saplings, stationery, and fruit.
-            # Event cards, cutlery, and spirit quests are not regular pools.
-            ready = carried[key]['native_category'] in (48, 49, 50) or key in exercise or key in harvest or key in spirits
+            # A fruit/sapling category proves behaviour, not acquisition.
+            # These imported plants have source-permitted Nook item codes.
+            ready = carried[key]['native_category']==49 or (
+                carried[key]['native_category'] in (48,50) and key in carried_codes
+            ) or key in exercise or key in harvest or key in spirits
         elif kind in ('villager', 'fish', 'insect', 'diary'):
             ready = True
         else:

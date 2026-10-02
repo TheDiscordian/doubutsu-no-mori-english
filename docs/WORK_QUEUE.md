@@ -67,9 +67,9 @@ Preserve the completed paths and verified original rules:
    or internal wording, and plain version/settings guidance for friends without
    requiring checksum knowledge. Settings export/import belongs at the top of
    the choices, immediately after ROM inputs. Preserve verified house-start diary
-   placement and shared ocean movement. Four individual New Year decoration
+   placement and shared fish movement, separate from population. Four individual New Year decoration
    checkboxes control Nook's actual December 26–31 stock.
-5. The mapped consumer checks and current selection review pass. Twenty current
+5. The mapped consumer checks and current selection review pass. Retained
    scope checks cover regular stock, genuine existing reward providers, independent
    selection, preserved unavailable-feature resources, and browser/offline
    agreement. The full profile's UPS reconstructs the checked ROM; ROM, profile,
@@ -81,12 +81,31 @@ Preserve the completed paths and verified original rules:
 The retained full-import handoff uses ABI 396 at
 `build/v3-travel-console-visitors-installed-01/build-lock.json`, with 20 villagers
 and 277 requested items in `build/v3-travel-console-visitors-profile-01`.
-The current local preview serves `build/v3-website-design-03/site`, built from
+The current local preview serves `build/v3-website-fish-movement-01/site`, built from
 ABI 397 at `build/v3-new-year-checkboxes-installed-03/build-lock.json`.
-Only the seasonal stock wrapper changes; saved format 21 and import identities
-are unchanged. The matching selector windows, control order, responsive layouts,
+The seasonal stock wrapper and selected GameCube freshwater turns are the native
+changes; saved format 21 and import identities are unchanged. Population remains
+separate from movement. The movement choice covers all original/imported river,
+pond, and ocean fish. The complete donor freshwater function authenticates the
+two 60-Hz heading increments adapted to one native 30-Hz update; phase/speed and
+the N64 instructions are preserved. Current source/composition checks cover all
+four independent combinations. `build/v3-fish-movement-native-01/results.json`
+passes 12 actual native freshwater actor cases, four ocean origin/mode cases,
+complete loaded-owner preservation, guards, checkpoint restoration, and fault
+checks. `build/v3-fish-movement-browser-01/results.json` matches offline output.
+The matching selector windows, control order, responsive layouts,
 direct copy, all sixteen decoration selections, and settings round trips pass
-`tests/test_v3_builder_ui.py`. An actual two-festive-item UI download with both
+`tests/test_v3_builder_ui.py` (13 tests, including three actual ROM downloads,
+cancellation/late results, invalid archives, and stale-worker-plan rejection).
+Five feature controls live outside the item selector; enabling a feature supplies
+its required items, never the reverse. Their 69 items are not independent item
+choices, leaving 208 ordinary item choices and 20 villagers. Feature dependencies,
+sharing, isolated item bulk selection, and the real cedar/coconut item-code
+permission/destination gates pass. Coconuts remain item-code-only; no island
+acquisition or beach spawn is implemented. All 16 served preview files match the
+current export receipt, with the live rendered controls and copy checked.
+The interface has no save-warning box, supplementary behaviour warning, or compulsory
+acknowledgement. An actual two-festive-item UI download with both
 original decorations disabled matches the offline/browser result at
 `build/v3-new-year-stock-browser-02/results.json`. Stock checks retain 52 passing
 native cases before the first run's watchdog and pass the remaining 54 at

@@ -2022,6 +2022,12 @@ def main():
                     raise ValueError('Optional selection checks require a matching checkpoint')
                 needs_checkpoint_restore = True
                 record(exercise(debug, args.rom, record))
+            if action.get('test_v3_fish_movement'):
+                from v3_fish_movement_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native fish movement requires a matching checkpoint')
+                needs_checkpoint_restore = True
+                record(exercise(debug, args.rom, record))
             if action.get('test_v3_preview_options'):
                 from v3_preview_options_smoke import exercise
                 if not (out/'test.bs1').is_file():

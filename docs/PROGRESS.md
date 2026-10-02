@@ -54,21 +54,44 @@ passport/stored-letter notes coexist without replacing imported records.
 Rewarded-model persistence also passes actual delivery to the loaded player's
 matching house, both complete device writers, and a fresh-process load retaining
 the original letters, presents, and earned flags.
-The local preview serves `build/v3-website-design-03/site` from ABI 397 at
+The local preview serves `build/v3-website-fish-movement-01/site` from ABI 397 at
 `build/v3-new-year-checkboxes-installed-03/build-lock.json`. Villagers and items
 have matching selector windows, Select/Clear above the choices, and settings
 export/import immediately after the ROM inputs. Four individual decoration
 checkboxes control Nook's December 26–31 stock. Responsive layout, keyboard
 controls, all sixteen decoration combinations, and settings round trips pass
-browser checks. A real-file UI download matches offline composition at
+browser checks. Five feature controls outside the item selector enable Wisp,
+cedar trees, coconut palms, golden trees, and the existing GameCube events;
+their 69 required items are included automatically and are not independent
+item checkboxes. The item window has 208 ordinary choices, and the villager
+window has 20 choices. Coconuts and cedar saplings retain their authenticated,
+selection-gated Nook item-code acquisition; coconut island acquisition remains
+outside this task. No beach spawn or substitute reward is added.
+Fish appearance and swimming remain separate settings. Swimming covers all
+river, pond, and ocean fish, including original species. GameCube freshwater
+turns adapt the donor's two 60-Hz additions to one native 30-Hz tick; N64 mode
+retains its original instructions. Two source/current-composition tests pass,
+including all four independent population/movement combinations and the complete
+donor function. `build/v3-fish-movement-native-01/results.json` passes 12 native
+freshwater actor cases, four ocean origin/mode cases, complete DMA/relocation,
+guards, checkpoint restoration, and native fault checks. Browser/offline
+composition agrees at `build/v3-fish-movement-browser-01/results.json`.
+All 13 interface tests pass, including three real-file UI downloads (Wisp,
+decorations, and fish movement), cancellation/late-result handling, archive
+rejection, and stale-worker-plan rejection. The 19 browser composition tests and two
+feature/acquisition tests pass. All 16 files served at the local URL match the
+current export receipt, and the live rendered controls/copy are checked.
+Save-warning boxes, the supplementary behaviour warning, and acknowledgements are absent; building
+requires game inputs, not a save-handling pledge. A real-file UI download matches offline composition at
 `build/v3-new-year-stock-browser-02/results.json`. The stock wrapper passes
 12,800 sanitized host cases; installed native checks retain 52 passing cases
 before the first run's watchdog and pass the remaining 54 in a focused run.
-Saved format 21 and import identities are unchanged. Ordinary save/restart
+Saved format 21 and import identities are unchanged. Conditional freshwater
+turning is the only new native instruction change in this follow-up. Ordinary save/restart
 remains retained ABI-396 evidence, not a newly executed ABI-397 check.
 The [private handoff](WORK_QUEUE.md#v3-private-playtest-handoff) records the
-connected native checks and current selection review. Twenty current scope checks
-pass, including actual browser/offline agreement, regular stock, existing reward
+connected native checks and current selection review. Retained scope checks
+cover actual browser/offline agreement, regular stock, existing reward
 providers, independent choices, and preserved unavailable-feature resources.
 The full profile's UPS reconstructs the ROM, and all 16 local/live preview files
 match the export receipt. The source is committed/pushed on the experimental
