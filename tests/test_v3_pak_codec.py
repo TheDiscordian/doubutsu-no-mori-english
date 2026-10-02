@@ -1,5 +1,6 @@
 """Travel records and native I/O with device doubles; no installed visiting claim."""
 import ctypes
+import os
 from pathlib import Path
 import struct
 import subprocess
@@ -22,6 +23,87 @@ class Input(ctypes.Structure):
 
 
 class PakCodecTests(unittest.TestCase):
+    def decode_wire(self, wire):
+        """Independent, bounded decoder; never calls the imported codec."""
+        self.assertGreaterEqual(len(wire),256)
+        h=struct.unpack_from('>10I',wire)
+        self.assertEqual(h[:2],(0x4146504B,1))
+        self.assertIn(h[2],(0,1));self.assertEqual(h[3],len(wire))
+        self.assertEqual(len(wire)%256,0)
+        self.assertEqual(h[4],0x6700 if h[2] else 0x1200)
+        self.assertLessEqual(h[5],14204)
+        self.assertEqual(h[9],zlib.crc32(wire[:36]+bytes(4)+wire[40:]))
+        self.assertEqual(wire[88:96],bytes(8))
+        self.assertGreater(h[6],0);self.assertLessEqual(h[6],len(wire)-96)
+        stream=wire[96:96+h[6]];position=0;decoded=bytearray();total=h[4]+h[5]
+        while len(decoded)<total:
+            self.assertLess(position,len(stream))
+            flags=stream[position];position+=1
+            for bit in range(7,-1,-1):
+                if len(decoded)==total:
+                    self.assertEqual(flags&((1<<(bit+1))-1),0);break
+                if flags&(1<<bit):
+                    self.assertLess(position,len(stream))
+                    decoded.append(stream[position]);position+=1
+                else:
+                    self.assertLessEqual(position+2,len(stream))
+                    a,b=stream[position:position+2];position+=2
+                    count=a>>4;distance=((a&15)<<8|b)+1
+                    if count:count+=2
+                    else:
+                        self.assertLess(position,len(stream))
+                        count=stream[position]+18;position+=1
+                    self.assertLessEqual(distance,len(decoded))
+                    self.assertLessEqual(len(decoded)+count,total)
+                    for _ in range(count):decoded.append(decoded[-distance])
+        self.assertEqual(position,len(stream))
+        self.assertEqual(wire[96+h[6]:],bytes(len(wire)-96-h[6]))
+        native,records=bytes(decoded[:h[4]]),bytes(decoded[h[4]:])
+        self.assertEqual(h[7],zlib.crc32(native));self.assertEqual(h[8],zlib.crc32(records))
+        return h,native,records
+
+    @unittest.skipUnless(os.environ.get('V3_PLAYER_TRAVEL_PAK'),'requires actual native Pak export')
+    def test_actual_native_pak_preserves_both_note_kinds_and_full_import_records(self):
+        directory=ROOT/os.environ['V3_PLAYER_TRAVEL_PAK']
+        raw=(directory/'test.pak').read_bytes()
+        self.assertEqual(len(raw),0x8000);self.assertEqual(raw[0x3A],1)
+        # Nintendo __OSDir and __OSInodeUnit: 16 directory entries at page 3,
+        # bank-zero primary/mirror inode pages 1/2, EOF=1, data pages >=5.
+        self.assertEqual(raw[0x100:0x200],raw[0x200:0x300])
+        inode=struct.unpack_from('>128H',raw,0x100)
+        allocated=set();notes={0:[],1:[]}
+        for i in range(16):
+            entry=raw[0x300+i*32:0x320+i*32]
+            game,company,page=struct.unpack_from('>IHH',entry)
+            if not game and not company:continue
+            self.assertEqual((game,company),(0x4E41464A,0x3031))
+            extension=entry[12:16];kind=extension[0]-0x1A
+            self.assertIn(kind,(0,1));self.assertEqual(extension[1:3],b'\x1F\x03')
+            self.assertIn(extension[3],(1,2))
+            chunks=[]
+            while page!=1:
+                self.assertTrue(5<=page<128);self.assertNotIn(page,allocated)
+                allocated.add(page);chunks.append(raw[page*256:(page+1)*256]);page=inode[page]
+            note=b''.join(chunks);self.assertGreaterEqual(len(note),512)
+            header=struct.unpack_from('>7I',note)
+            self.assertEqual(header[:2],(0x41464A31,1));self.assertGreater(header[2],0)
+            self.assertEqual(header[3],header[2]^0xFFFFFFFF)
+            self.assertEqual(header[4:6],(kind,len(note)-256))
+            self.assertEqual(header[6],zlib.crc32(note[:24]+bytes(4)+note[28:256]))
+            self.assertEqual(note[28:256],bytes(228))
+            h,native,records=self.decode_wire(note[256:])
+            self.assertEqual(h[2],kind);self.assertEqual(h[5],14204)
+            self.assertEqual(sum(struct.unpack('>'+str(len(native)//2)+'H',native))&65535,0)
+            self.assertEqual(note[296:328],b'AFV3-PASSPORT-PLAYER-1'.ljust(32,b'\0'))
+            self.assertEqual(note[328:344],records[16:32])
+            if not kind:self.assertEqual(native[8:24],records[16:32])
+            notes[kind].append((header[2],native,records))
+        self.assertEqual(tuple(map(len,(notes[0],notes[1]))),(2,1))
+        for kind,filename in ((0,'passport.bin'),(1,'backup.bin')):
+            latest=max(notes[kind],key=lambda value:value[0])
+            self.assertEqual(latest[1],(directory/filename).read_bytes())
+            self.assertEqual(latest[2],(directory/'records.bin').read_bytes())
+
     def test_sanitized_actual_collection_consumers_acquire_and_return(self):
         with tempfile.TemporaryDirectory(prefix='af-travel-consumers-') as directory:
             binary=Path(directory)/'check'
@@ -134,24 +216,9 @@ class PakCodecTests(unittest.TestCase):
             self.assertEqual(wire[40:72],bytes(range(32)));self.assertEqual(wire[72:88],native[8:24])
             self.assertEqual(h[9],zlib.crc32(wire[:36]+bytes(4)+wire[40:]))
             self.assertEqual(h[7],zlib.crc32(native));self.assertEqual(h[8],zlib.crc32(records))
-            stream=wire[96:96+h[6]];position=0;decoded=bytearray()
-            while len(decoded)<len(native)+len(records):
-                flags=stream[position];position+=1
-                for bit in range(7,-1,-1):
-                    if len(decoded)==len(native)+len(records):
-                        self.assertEqual(flags&((1<<(bit+1))-1),0);break
-                    if flags&(1<<bit):
-                        decoded.append(stream[position]);position+=1
-                    else:
-                        a,b=stream[position:position+2];position+=2
-                        count=a>>4;distance=((a&15)<<8|b)+1
-                        if count:count+=2
-                        else:count=stream[position]+18;position+=1
-                        self.assertLessEqual(distance,len(decoded))
-                        self.assertLessEqual(len(decoded)+count,len(native)+len(records))
-                        for _ in range(count):decoded.append(decoded[-distance])
-            self.assertEqual(position,len(stream));self.assertEqual(decoded,native+records)
-            self.assertEqual(wire[96+h[6]:],bytes(size-96-h[6]))
+            checked,decoded_native,decoded_records=self.decode_wire(wire)
+            self.assertEqual(checked,h);self.assertEqual(decoded_native,native)
+            self.assertEqual(decoded_records,records)
 
 
 if __name__=='__main__':unittest.main()

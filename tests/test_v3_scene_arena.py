@@ -79,7 +79,11 @@ class OrdinarySaveChipTests(unittest.TestCase):
         self.assertEqual(results[0]['rom_sha256'],profile['output_sha256'])
         self.assertTrue(results[-1]['graceful_shutdown'])
         self.assertTrue(any(r.get('choice_count')==2 and r.get('choice_cursor')==0 for r in results))
-        self.assertTrue(any(r.get('message_id')=='2B0D' and r.get('loaded')==1 for r in results))
+        # Both original gyroid conversation branches reach Save & Quit:
+        # 2B0D follows 2B0C, while the house-entry branch uses 2B12 -> 2B13.
+        self.assertTrue(any(r.get('message_id') in ('2B0D','2B13') and r.get('loaded')==1
+            and b'Saving...' in bytes.fromhex(r['data'])
+            and b'Thanks for waiting!' in bytes.fromhex(r['data']) for r in results))
         chip=(directory/'test.flash').read_bytes()
         self.assertEqual(len(chip),131072)
         self.assertEqual(chip[:65536],chip[65536:])

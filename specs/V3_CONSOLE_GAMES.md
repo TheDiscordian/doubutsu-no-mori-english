@@ -75,6 +75,15 @@ checkpoint restoration, and zero fault state. The player is a controlled foreign
 identity on a title checkpoint; ordinary furniture interaction, a walked station
 visit, and device saving are not established by that fixture.
 
+The loaded-village check at
+`build/v3-travel-console-world-return-native-01/results.json` executes the
+original `goto_emu_game` return-door preparation, native launch/close, and the
+actual running `GAMESTATE_PLAY` return. All captured NES rows and the travelling
+record survive. The imported fan and scene/module guards remain intact. This
+checks a resident disk session, not an ordinary furniture/controller interaction,
+foreign world return, or saving played progress to the device. Keep the completed
+title-fixture visitor execution/reset/close evidence separate from these checks.
+
 ### Save recipes
 
 High-score bit fifteen preserves the loaded-score state on reset; lower eleven

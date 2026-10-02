@@ -15,8 +15,11 @@ complete the import pipeline. Keep this as one connected implementation task:
    access. Additional console play retains the original GameCube visitor rule:
    the visited town's first NES save block, not an independent travelling NES
    save or a fifth owner. Native cartridge/disk execution, reset, and close pass;
-   finish the connected station/room return and current device-save cycle while
-   retaining the completed collection paths.
+   Native arrival/return wrapper selection and both actual Pak note kinds also
+   pass on the current loaded village. Resident disk play returns through its
+   original door/state transition with all NES rows retained. Finish the connected
+   visitor-console world return/device-save cycle while retaining these completed
+   collection and transport paths.
 2. Preserve the connected house/manor model imports and review remaining
    exclusions only against actual existing or already-built acquisition systems.
    Both models use the ordinary shared importer with reused artwork, their
@@ -34,7 +37,9 @@ complete the import pipeline. Keep this as one connected implementation task:
    RNG, all four houses, failed creation, full mailboxes/queue, retained flags,
    whole-town preservation, bounds, checkpoint restoration, and fault checks.
    This is actual installed native execution, not an ordinary room-scoring or
-   rewarded-save/restart playthrough. Seventeen current-cartridge/source checks,
+   rewarded-save/restart playthrough. Complete the rewarded-record save/restart
+   check without replaying the unchanged scoring/delivery cases.
+   Seventeen current-cartridge/source checks,
    four allocation-boundary checks, and two changed selection/compatibility
    checks pass. Preserve the earlier 20 scope checks for unchanged composition
    paths. Browser reconstruction of both selected models matches offline at
@@ -103,7 +108,7 @@ diary/console record mutations. It checks returned ownership, shared aliases,
 other-resident preservation, storage guards, and
 checkpoint restoration. Diary UI, NES play, a walked station visit, physical Pak
 hardware, and ordinary Save & Quit/restart are not established by this fixture.
-The full selected profile has 20 villagers and 275 requested items, with the two
+The full selected profile has 20 villagers and 277 requested items, with the two
 existing outfit dependencies. The local preview remains unchanged.
 Converted legacy notes retain explicit unknown-editable-record provenance;
 ownership can return without overwriting diary, console, card, or account data
@@ -162,15 +167,23 @@ actual Clu Clu Land D and Wario's Woods launch/execution/reset/close as player 4
 row-zero selection, unchanged foreign identity, unchanged other three resident
 rows and travelling record, storage guards, checkpoint restoration, and no fault.
 This is a controlled title-checkpoint session, not ordinary furniture interaction,
-a walked station trip, or cartridge saving. The next connected check is the
-remaining station/room return and current save cycle, including both native
-note kinds. The instrument check is closed under this same task; no additional
+a walked station trip, or cartridge saving.
+`build/v3-travel-console-world-return-native-01/results.json` passes the resident
+Clu Clu Land D native return door, close, and running village-class transition,
+retaining all captured NES rows, the traveller record, imported fan, and guards.
+It does not establish foreign world return or saving played NES progress.
+`build/v3-travel-both-notes-native-04/results.json` passes the original
+arrival/return wrapper's private-pointer/player-index selection and both native
+Pak note kinds, with complete imported records retained beside stored letters.
+The raw chip is independently decoded before checkpoint restoration.
+The next connected check is visitor-console world return and its device-save
+cycle, followed by rewarded-model persistence. The instrument check is closed under this same task; no additional
 NES save permissions or new game systems are required.
 
 ### Completed preview repairs and verified behaviour
 
-The local preview serves `build/v3-travel-website-browser-02/site`, tied to the
-checked ABI-392 cartridge, using the original patcher's design. ROM selectors
+The local preview serves `build/v3-travel-website-browser-04/site`, tied to the
+checked ABI-396 cartridge, using the original patcher's design. ROM selectors
 come first, followed by imports/settings and the build button. Villagers have a
 separate native dialog with search, keyboard selection, Done, and Escape;
 items have a categorised card grid. No unavailable list is displayed.
@@ -205,12 +218,12 @@ Website checks do not establish completed native visiting or save/restart.
 
 ### Verified full-selection ordinary save and restart
 
-The ABI-392 full selection in `build/v3-travel-native-dma-profile-02` passes
+The ABI-396 full selection in `build/v3-travel-console-visitors-profile-01` passes
 the ordinary controller path through the gyroid's Save & Quit, writing both
 complete FlashRAM banks and returning to title. A separate fresh emulator
 process loads the written cartridge save without a checkpoint seed. Results
-are `build/v3-travel-ordinary-save-02/results.json` (40 steps, 18 assertions)
-and `build/v3-travel-ordinary-reload-01/results.json` (23 steps, 12 assertions).
+are `build/v3-travel-current-ordinary-save-01/results.json` (40 steps, 18 assertions)
+and `build/v3-travel-current-ordinary-reload-01/results.json` (23 steps, 12 assertions).
 Imported fan `2255`, pockets, clothing, and the player's loan survive; scene,
 save, resident, and workspace guards and the zero fault pointer pass. Both
 processes shut down normally with physical audio disabled.
@@ -220,10 +233,14 @@ profile paths. Two checks independently validate both whole save banks,
 additive checksums, compression and all saved-record CRCs, selected villager/item
 and creature profiles, reserved padding, imported fan, the exact restart seed,
 and matching restored inventory. This proves this full-selection town's ordinary
-save/restart, not all item interactions, station visiting, or hardware. The first
-attempt in `build/v3-travel-ordinary-save-01` is interrupted, not passed; its
-receipt preserves the missing runner and incomplete assertions. The successful
-bounded transient test unit survives turn interruptions and is now stopped.
+save/restart, not all item interactions, station visiting, or hardware.
+The current writer's FlashRAM SHA-256 is
+`b6b839db9f242b075802d1c0e9d07462c207f3a0c9485aef821a45f4523f4cda`.
+Both original gyroid saving conversations are checked with saving/completion
+text; checksums, profiles, padding, device seed, and returned inventory remain
+required. The current loaded-village checkpoint is
+`build/v3-travel-current-ordinary-reload-01/test.bs1`; use it only with its
+identical ABI-396 ROM for the remaining connected native checks.
 
 V3 imports items and villagers with working behaviours. Able Sisters (including
 its custom-design system), the Museum building, and comparable large features belong to V4. The

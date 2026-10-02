@@ -42,6 +42,36 @@ def exercise(debug,rom_path,action,state,record):
     owner=words(0x8010EF90,1)[0]
     if owner&3 or not 0x80000400<=owner<=0x80400000-0xE0:
         raise ValueError('Invalid native game-state owner')
+    def world_class():
+        # Native GAMESTATE_PLAY table entry (index two), not an inferred healthy
+        # frame or a console close breakpoint mistaken for a returned village.
+        table=words(0x80106E20+2*0x30,12)
+        base=table[0]
+        if (table[1]!=0x741FB0 or table[3]!=0x80802AE0 or base&15 or
+                not 0x80000400<=base<=0x80800000-(table[4]-table[3]) or
+                words(owner+4,2)!=(base+0x8080407C-table[3],base+0x80803210-table[3]) or
+                debug.read_memory(owner+0x9F,1)!=b'\x01'):
+            raise ValueError('Native state manager has not reached the running village class')
+        return dict(owner=f'{owner:08X}',overlay=f'{base:08X}',main=f'{words(owner+4,1)[0]:08X}')
+    if action.get('world_return'):
+        if not state.get('from_world') or not state.get('closed'):
+            raise ValueError('World-return check requires a loaded-village launch and native close')
+        world=world_class()
+        if (words(0x804FE820,1)[0] or words(0x8003CE34,1)[0] or
+                debug.read_memory(0x80136EA3,1)!=bytes((state['actor'],)) or
+                debug.read_memory(0x80136FD8,4)!=state['world_private']):
+            raise ValueError('Native console return changes the player or retains a session/fault')
+        saved=debug.read_memory(PLAYERS,4*PLAYER_BYTES)
+        if saved!=state['closed_players']:
+            raise ValueError('Native village return changes captured NES saves')
+        if 'traveller' in state:
+            at,wanted=state['traveller']
+            if debug.read_memory(at,len(wanted))!=wanted:
+                raise ValueError('Native village return changes the travelling-player record')
+        return dict(console_native_world_return='passed',game=state['game'],world=world,
+            actor=state['actor'],source_save_player=state['player'],
+            actual_native_door_and_state_transitions=True,nes_save_rows_retained=True,
+            ordinary_furniture_interaction_tested=False,device_save_tested=False)
     if action.get('launch'):
         game=action['launch']
         if type(game) is not int or not 8<=game<=19:raise ValueError('Invalid imported test game')
@@ -56,10 +86,22 @@ def exercise(debug,rom_path,action,state,record):
             if debug.read_memory(p['ram'],p['bytes'])!=blob[p['blob_offset']:p['blob_offset']+p['bytes']]:
                 raise ValueError('Complete disk startup packet differs from cartridge')
         if words(0x804DC800,1)!=(0x41464335,):raise ValueError('Console storage is not initialized')
-        debug.write_memory(0x80137898,bytes((game,0)))
-        debug.write_memory(0x80136EA3,bytes((actor,)))
+        if not action.get('from_world'):
+            debug.write_memory(0x80137898,bytes((game,0)))
+            debug.write_memory(0x80136EA3,bytes((actor,)))
         state.clear();state.update(game=game,actor=actor,player=actor if actor<4 else 0,
             players=debug.read_memory(PLAYERS,4*PLAYER_BYTES))
+        if action.get('from_world'):
+            world=world_class()
+            if debug.read_memory(0x80136EA3,1)!=bytes((actor,)):
+                raise ValueError('Loaded-village launch cannot manufacture a different player')
+            state['from_world']=world;state['world_private']=debug.read_memory(0x80136FD8,4)
+            # The real furniture path prepares its return door through this
+            # routine before the state-manager transition. A title fixture
+            # cannot supply that player/scene state and does not enter here.
+            result=core_call(0x800C6D5C,184,[owner,game])
+            if result['return_value']!=1:
+                raise ValueError('Original console transition did not prepare a native return door')
         t=report['equipment_resources'].get('player_travel')
         if t:
             p=t['state_packet']
@@ -164,14 +206,15 @@ def exercise(debug,rom_path,action,state,record):
         return dict(console_native_reset='passed',game=game,retained_bytes=sum(n for _,n in retained),
                     native_menu_request=True,ordinary_controller_input_tested=False)
     if action.get('close'):
-        # Observe cleanup before returning to a world: the title fixture has
-        # no initialized town, so loading that world would not be a valid test.
+        # Observe cleanup first. Loaded-village fixtures then resume through the
+        # real world transition; title fixtures restore their checkpoint here.
         # The real state-manager path stops/joins audio before the close hook.
         stop_at(0x8082E498,lambda:core_call(0x800C6E14,92,[owner]))
         if (words(0x804FE820,1)[0] or words(0x8003CE34,1)[0] or
                 values[1]==2 and words(0x80638088,1)[0]):
             raise ValueError('Native console close retained an active context or fault')
         check_ownership()
+        state['closed']=True;state['closed_players']=debug.read_memory(PLAYERS,4*PLAYER_BYTES)
         return dict(console_native_close='passed',game=game,audio_shutdown_path=True,
                     actor=state['actor'],source_save_player=player,
                     unrelated_resident_saves_and_traveller_unchanged=True,

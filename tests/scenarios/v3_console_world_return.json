@@ -1,0 +1,23 @@
+[
+  {"wait": 2},
+  {"save_state": true},
+  {"pause_game_thread": true},
+  {"command": "QPassSignals:10", "expect_result": "OK"},
+  {"test_v3_console_game": {"launch": 10, "player": 0, "from_world": true}},
+  {"resume": true},
+  {"wait": 10},
+  {"pause_game_thread": true},
+  {"test_v3_console_game": {"inspect": true}},
+  {"test_v3_console_game": {"close": true}},
+  {"resume": true},
+  {"wait": 14},
+  {"pause_game_thread": true},
+  {"test_v3_console_game": {"world_return": true}},
+  {"snapshot_player": true, "expect_player": {"equipment_kind": 108}},
+  {"read": ["80400000", 16], "expect": "AF53434EAF53434EAF53434EAF53434E"},
+  {"read": ["8044FFF0", 16], "expect": "AF53434EAF53434EAF53434EAF53434E"},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
+  {"load_state": true},
+  {"wait": 1},
+  {"read": ["8003CE34", 4], "expect": "00000000"}
+]

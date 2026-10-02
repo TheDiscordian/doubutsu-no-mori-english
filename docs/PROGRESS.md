@@ -31,16 +31,21 @@ Imported diaries now permit unlocked read-only access for visitors, preserving
 the original owner-only editing and locked refusal. Additional console games
 permit visitors using the original GameCube rule: the visited town's first NES
 save block, without a fifth saved owner or independent travelling NES progress.
-Native cartridge/disk launch, execution, reset, and close pass; the connected
-station/room return and current device-save cycle remain unfinished.
+Native cartridge/disk launch, execution, reset, and close pass. Resident disk
+play also returns through the native door/state transition to the running village
+with all captured NES rows retained. The connected visitor-console return and
+its device-save cycle remain unfinished.
 The house/manor models now have their original HRA
 reward delivery, scoring, catalogue previews without ordering, and independent
 selection. All four added villager instruments have confirmed native note
 selection and matching sample transfers; the earlier missing observations came
 from test tunes without held notes, not an import defect.
-Ordinary Save & Quit and a fresh-process restart pass for the ABI-392 full
-selection, with independent whole-save validation; this does not establish a
-rewarded-model or visitor-console save/restart cycle for ABI 396.
+Ordinary Save & Quit and a fresh-process restart pass for the current ABI-396
+full selection, with independent whole-save validation. The native arrival
+wrapper selects the foreign visitor and returning resident correctly, and
+passport/stored-letter notes coexist without replacing imported records.
+These checks do not establish a rewarded-model or visitor-console save/restart
+cycle.
 The requested website design, villager dialog,
 and control-order repairs pass browser checks and run in the local preview.
 The [active task](WORK_QUEUE.md#active-task-complete-the-connected-v3-itemvillager-import-paths)
@@ -119,6 +124,18 @@ clothing, surfaces, handheld parents, diary covers, and added stationery. Change
 diary/console records also survive return; other residents and guards remain intact. This is focused
 native execution, not a walked station visit, diary UI interaction, NES gameplay,
 physical Pak testing, or ordinary Save & Quit/restart.
+The current loaded-village check at
+`build/v3-travel-both-notes-native-04/results.json` passes 152 records and 39
+explicit transport/buffer assertions. It enters the original
+`mPr_LoadPak_and_SetPrivateInfo2` arrival/return wrapper, checks the actual private
+pointer and player index, executes both native Pak note kinds, and exports the
+raw device before checkpoint restoration. The independent Nintendo filesystem,
+journal/header, CRC, and compression decoder checks both complete native notes
+and their complete 14,204-byte imported records. Other residents, scene/visitor
+guards, fault checks, and shutdown pass. Letter records are controlled empty
+fixtures; no new post-office behaviour or save format is added. Failed title
+allocations and the loaded-global comparison remain recorded as test setup
+failures, not passing game checks.
 Converted legacy notes preserve unknown editable-record provenance, retaining
 home diary, console, card, and account data which the old note never carried.
 The connected host fixture covers conversion, departure, and return.
@@ -168,10 +185,10 @@ verification, not listening, an ordinary conversation, or hardware acceptance.
 
 ### Full-selection ordinary save and restart
 
-The current 295-choice profile at `build/v3-travel-native-dma-profile-02`
+The current 297-choice profile at `build/v3-travel-console-visitors-profile-01`
 passes the actual controller Save & Quit path and a fresh-process cartridge-save
-load. `build/v3-travel-ordinary-save-02/results.json` records 40 steps and
-18 passing assertions, and `build/v3-travel-ordinary-reload-01/results.json`
+load. `build/v3-travel-current-ordinary-save-01/results.json` records 40 steps and
+18 passing assertions, and `build/v3-travel-current-ordinary-reload-01/results.json`
 records 23 steps and 12 passing assertions. The gyroid offers Save & Quit,
 the native saving message appears, both whole FlashRAM banks are written, and
 the game returns to title. The reader copies those exact cartridge saves,
@@ -184,8 +201,21 @@ their checksums, decompression and all three record CRCs, the full selected
 profiles and padding, imported fan, exact fresh-process seed, and restored
 inventory. This establishes this town's ordinary current-build save/restart,
 not every item interaction, station visiting, synchronous writes, or hardware.
-Keep this passing path closed unless a subsequent change affects it. The
-interrupted first runner attempt stays recorded without a success claim.
+Keep this passing path closed unless a subsequent change affects it. Both native
+gyroid saving branches (`2B0D` and `2B13`) are accepted only with their saving and
+completion text, alongside the complete device/restart checks. The ordinary
+writer's FlashRAM SHA-256 is
+`b6b839db9f242b075802d1c0e9d07462c207f3a0c9485aef821a45f4523f4cda`.
+
+`build/v3-travel-console-world-return-native-01/results.json` passes 28 records
+for Clu Clu Land D launched from this loaded village. The original
+`goto_emu_game` supplies its player position/return door; native close and the
+state manager return to the actual running `GAMESTATE_PLAY` class. The captured
+four NES rows, traveller record, imported fan, scene/module guards, and zero
+fault state survive. This is a resident developer transition, not ordinary
+furniture/controller interaction, visitor world return, or saving the played
+NES record to the device. The unchanged visitor launch/reset/close evidence
+remains retained.
 
 V3 is only the import pipeline for items and villagers. Regular items should be
 importable and obtainable through the regular item pool. Rewards that fit existing
