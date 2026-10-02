@@ -15,6 +15,8 @@ from playwright.sync_api import sync_playwright
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
 from serve_portal import StaticPortal, validate_export
+import v3_optional_composition as composer
+from v3_creature_choices import options as behaviour_options
 
 
 class BuilderInterfaceTests(unittest.TestCase):
@@ -52,6 +54,25 @@ class BuilderInterfaceTests(unittest.TestCase):
 
     def tearDown(self):
         self.assertEqual(self.errors, [])
+
+    def offline_sha256(self, requested, behaviours=None):
+        """Compare the actual download with this export's checked offline build."""
+        saved = composer.BASE, composer.BASE_SHA, composer.REPORT_SHA, composer.ABI
+        try:
+            composer.use_build_lock(ROOT/os.environ.get('V3_BUILDER_UI_LOCK',
+                'build/v3-freshwater-patrol-installed-06/build-lock.json'))
+            plan = json.loads((self.site/'data/composition.json').read_text())
+            self.assertEqual(plan['base_sha256'], composer.BASE_SHA)
+            self.assertEqual(plan['base_report_sha256'], composer.REPORT_SHA)
+            image, report = composer.inputs()
+            catalog = composer.catalogue(image, report)
+            selection = composer.resolve(catalog, requested, scope='v3-pipeline',
+                report=report, behaviour_options=behaviour_options(image, report),
+                behaviours=behaviours)
+            output, _, _ = composer.compose(image, report, catalog, selection)
+            return hashlib.sha256(output).hexdigest()
+        finally:
+            composer.BASE, composer.BASE_SHA, composer.REPORT_SHA, composer.ABI = saved
 
     def test_consistent_windows_order_bounds_and_keyboard(self):
         page = self.page
@@ -201,7 +222,7 @@ class BuilderInterfaceTests(unittest.TestCase):
         population=page.locator('select[aria-describedby="behaviour-description-fish-population"]')
         movement=page.locator('select[aria-describedby="behaviour-description-fish-movement"]')
         self.assertEqual(page.locator('select[aria-describedby="behaviour-description-coastal-fish-movement"]').count(),0)
-        self.assertIn('River and pond fish make wider turns.',page.locator('#behaviour-description-fish-movement').inner_text())
+        self.assertIn('GameCube swimming, waiting, and escape behaviour for river, pond, and ocean fish.',page.locator('#behaviour-description-fish-movement').inner_text())
         for first,second in (('N64','GameCube'),('GameCube','N64')):
             population.select_option(first);movement.select_option(second)
             with page.expect_download() as event:page.locator('#settings-export').click()
@@ -321,10 +342,7 @@ class BuilderInterfaceTests(unittest.TestCase):
         page.locator('#select-all').click();self.assertTrue(control.is_checked())
 
     def test_actual_rom_download_uses_the_wisp_setting(self):
-        evidence = ROOT/'build/v3-feature-wisp-browser-02/results.json'
-        if not evidence.exists():
-            self.skipTest('Checked current Wisp offline comparison required')
-        expected = json.loads(evidence.read_text())['focused-selection']['sha256']
+        expected = self.offline_sha256(['feature/wisp'])
         plan = json.loads((self.site/'data/composition.json').read_text())
         group = next(row for row in plan['runtime_groups'] if row['id']=='carried-quest')
         page = self.page
@@ -353,9 +371,7 @@ class BuilderInterfaceTests(unittest.TestCase):
         self.assertEqual(page.locator('#selection-heading').inner_text(), 'No imports selected')
 
     def test_actual_rom_download_uses_the_summer_camping_feature(self):
-        evidence=ROOT/'build/v3-summer-camping-feature-browser-01/results.json'
-        if not evidence.exists():self.skipTest('Current summer camping offline comparison required')
-        expected=json.loads(evidence.read_text())['focused-selection']['sha256']
+        expected=self.offline_sha256(['feature/summer-camping'])
         plan=json.loads((self.site/'data/composition.json').read_text())
         feature=next(row for row in plan['features'] if row['id']=='feature/summer-camping')
         page=self.page
@@ -383,12 +399,12 @@ class BuilderInterfaceTests(unittest.TestCase):
         self.assertIsNone(page.locator('#download').get_attribute('href'))
 
     def test_actual_rom_download_uses_all_fish_movement(self):
-        evidence=ROOT/'build/v3-fish-movement-browser-01/results.json'
+        evidence=ROOT/'build/v3-freshwater-patrol-browser-01/results.json'
         if not evidence.exists():self.skipTest('Current fish offline comparison required')
         expected=json.loads(evidence.read_text())['focused-selection']['sha256']
         page=self.page
         page.locator('#open-items').click();page.locator('#kind').select_option('fish')
-        for identity in ('2301','2324'):
+        for identity in ('2320',):
             page.locator(f'[data-id="GAFE01-r0/item/{identity}"] input').check()
         page.locator('#close-items').click()
         page.locator('select[aria-describedby="behaviour-description-fish-movement"]').select_option('GameCube')
@@ -448,12 +464,8 @@ class BuilderInterfaceTests(unittest.TestCase):
         self.assertEqual(stale['type'],'error');self.assertIn('catalogue changed',stale['message'])
 
     def test_actual_rom_download_uses_the_four_checkboxes(self):
-        evidence = ROOT/'build/v3-new-year-stock-browser-02/results.json'
-        if not evidence.exists():
-            self.skipTest('Checked current offline comparison required')
-        expected = json.loads(evidence.read_text())['focused-selection']
-        manifest = json.loads((self.site/'data/composition.json').read_text())
-        self.assertEqual(manifest['base_sha256'], json.loads(evidence.read_text())['base_sha256'])
+        expected = self.offline_sha256(['GAFE01-r0/item/327C','GAFE01-r0/item/3298'],
+            {'new-year-stock':'neither'})
         page = self.page
         page.locator('#stock-kadomatsu').uncheck(); page.locator('#stock-kagamimochi').uncheck()
         page.locator('#stock-festive-candle').check(); page.locator('#stock-festive-flag').check()
@@ -467,13 +479,13 @@ class BuilderInterfaceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='v3-ui-rom-') as temp:
             rom = Path(temp)/'decorations.z64'; event.value.save_as(rom)
             with rom.open('rb') as stream:
-                self.assertEqual(hashlib.file_digest(stream, 'sha256').hexdigest(), expected['sha256'])
+                self.assertEqual(hashlib.file_digest(stream, 'sha256').hexdigest(), expected)
         with page.expect_download() as event:
             page.locator('#receipt').click()
         with tempfile.TemporaryDirectory(prefix='v3-ui-profile-') as temp:
             profile = Path(temp)/'profile.json'; event.value.save_as(profile)
             result = json.loads(profile.read_text())
-            self.assertEqual(result['output_sha256'], expected['sha256'])
+            self.assertEqual(result['output_sha256'], expected)
             self.assertEqual(result['behaviours']['new-year-stock'], 'neither')
             self.assertEqual(result['requested'], ['GAFE01-r0/item/327C','GAFE01-r0/item/3298'])
 

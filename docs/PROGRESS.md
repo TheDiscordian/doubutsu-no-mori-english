@@ -51,15 +51,15 @@ reward delivery, scoring, catalogue previews without ordering, and independent
 selection. All four added villager instruments have confirmed native note
 selection and matching sample transfers; the earlier missing observations came
 from test tunes without held notes, not an import defect.
-Ordinary Save & Quit and a fresh-process restart pass for the current ABI-396
+Ordinary Save & Quit and a fresh-process restart pass for the retained ABI-396
 full selection, with independent whole-save validation. The native arrival
 wrapper selects the foreign visitor and returning resident correctly, and
 passport/stored-letter notes coexist without replacing imported records.
 Rewarded-model persistence also passes actual delivery to the loaded player's
 matching house, both complete device writers, and a fresh-process load retaining
 the original letters, presents, and earned flags.
-The local preview serves `build/v3-website-golden-copy-01/site` from ABI 397 at
-`build/v3-new-year-checkboxes-installed-03/build-lock.json`. Villagers and items
+The local preview serves `build/v3-website-golden-copy-01/site` from ABI 398 at
+`build/v3-freshwater-patrol-installed-06/build-lock.json`. Villagers and items
 have matching selector windows, Select/Clear above the choices, and settings
 export/import immediately after the ROM inputs. Four individual decoration
 checkboxes control Nook's December 26–31 stock. Responsive layout, keyboard
@@ -75,20 +75,32 @@ Feature checkbox cards share two columns above 640 px and stack on narrower
 screens. Focused geometry and responsive/keyboard checks pass, including long
 labels and checkbox placement. Layout is CSS-only; runtime selection rules and
 recipes are unchanged. The golden-tools description omits acquisition spoilers.
-Fish appearance and swimming remain separate settings. Swimming covers all
+Fish appearance and movement remain separate settings. Movement covers all
 river, pond, and ocean fish, including original species. GameCube freshwater
-turns adapt the donor's two 60-Hz additions to one native 30-Hz tick; N64 mode
-retains its original instructions. Two source/current-composition tests pass,
-including all four independent population/movement combinations and the complete
-donor function. `build/v3-fish-movement-native-01/results.json` passes 12 native
-freshwater actor cases, four ocean origin/mode cases, complete DMA/relocation,
-guards, checkpoint restoration, and native fault checks. Browser/offline
-composition agrees at `build/v3-fish-movement-browser-01/results.json`.
-All 13 interface tests pass, including three real-file UI downloads (Wisp,
-decorations, and fish movement), cancellation/late-result handling, archive
-rejection, and stale-worker-plan rejection. The 19 browser composition tests and two
-feature/acquisition tests pass. All 16 files served at the local URL match the
-current export receipt, and the live rendered controls/copy are checked.
+movement ports all six swimming, waiting, and escape callbacks and initializers,
+with source player/float checks, random selection, and branch order. Phase,
+heading increments, timers, and escape deceleration adapt the donor's 60-Hz
+updates to native 30 Hz. Native collision/current/player/float services retain
+checked platform layouts and the installed import/golden-rod adaptations.
+The port uses two authenticated padding fragments without increasing allocation
+sizes. N64 mode retains the entire original owner and relocation data.
+Nineteen complete donor functions are authenticated; 99 sanitized comparisons
+against the actual donor source pass. Three current composition tests pass,
+including all four independent population/movement combinations, mutation
+rejection, and the unchanged empty-selection V2-14 baseline.
+`build/v3-freshwater-patrol-native-03/results.json` passes 25 freshwater callback
+cases and four ocean origin/mode cases, actual startup/DMA/relocation, complete
+actor/RNG comparisons, guards, checkpoint restoration, and native fault checks.
+Browser/offline composition and the actual interface fish download agree at
+`build/v3-freshwater-patrol-browser-01/results.json`. All 16 actual HTTP files
+match the ABI-398 export, and the live rendered copy and independent controls
+are checked. Retain the ABI-397 browser composition and feature/acquisition
+results for unchanged components; they are not fresh ABI-398 execution.
+All 17 current interface tests pass, including four actual ROM downloads
+(fish movement, Wisp, camping, and decorations), settings round trips,
+responsive/keyboard controls, cancellation/late-result handling, archive
+rejection, and stale-worker-plan rejection. The download checks bind their
+offline comparison to the current export's exact ROM/report identities.
 The Golden tools checkbox supplies the shovel, net, rod, and axe together;
 all four runtime selection fields pass enabled/disabled composition checks.
 `build/v3-golden-tools-feature-browser-01/results.json` matches offline output.
@@ -97,20 +109,31 @@ website has no provisional warnings, preview labels, or developer testing status
 Summer camping derives its ten items from the installed reward category. Its
 enabled/disabled composition checks cover all three unchanged native activation
 predicates. Current provider admission and resource-mutation checks pass;
-Gulliver and winter camping retain independent item selections. The real Worker
-matches offline output at `build/v3-summer-camping-feature-browser-01/results.json`;
-the actual interface download matches it with all ten required fields enabled.
+Gulliver and winter camping retain independent item selections. The retained
+ABI-397 Worker and interface-download checks match offline output at
+`build/v3-summer-camping-feature-browser-01/results.json`. The current ABI-398
+interface download also matches its checked offline build, with all ten required
+fields enabled.
 Five focused interface checks pass for camping, feature sharing, bulk isolation,
 responsive layout, direct copy, and download. Native code/resources and saved
 formats are unchanged; retained native evidence is not a fresh camping playthrough.
 Save-warning boxes, the supplementary behaviour warning, and acknowledgements are absent; building
-requires game inputs, not a save-handling pledge. A real-file UI download matches offline composition at
-`build/v3-new-year-stock-browser-02/results.json`. The stock wrapper passes
+requires game inputs, not a save-handling pledge. The retained ABI-397 real-file
+download matches offline composition at `build/v3-new-year-stock-browser-02/results.json`;
+the current ABI-398 decoration download also matches its checked offline build.
+The stock wrapper passes
 12,800 sanitized host cases; installed native checks retain 52 passing cases
 before the first run's watchdog and pass the remaining 54 in a focused run.
-Saved format 21 and import identities are unchanged. Conditional freshwater
-turning is the only new native instruction change in this follow-up. Ordinary save/restart
-remains retained ABI-396 evidence, not a newly executed ABI-397 check.
+Saved format 21 and import identities are unchanged. The complete freshwater
+patrol is the connected native change in this follow-up. The ABI-398 full profile
+loads the existing isolated full-import town used for native verification.
+Ordinary save/restart remains retained ABI-396 evidence, not a newly executed
+ABI-398 save cycle. Native setup attempts in
+`build/v3-freshwater-patrol-native-01` and `build/v3-freshwater-patrol-native-02`
+are retained: title-screen fixture allocation failed before fish execution;
+the loaded-town allocation then exposed the fixture's four-MiB relocation limit.
+The passing check uses the verified exclusively borrowed scene workspace and
+the matching current-ROM checkpoint; ownership, bounds, and guards stay checked.
 The [private handoff](WORK_QUEUE.md#v3-private-playtest-handoff) records the
 connected native checks and current selection review. Retained scope checks
 cover actual browser/offline agreement, regular stock, existing reward

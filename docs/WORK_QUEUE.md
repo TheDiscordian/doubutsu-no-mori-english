@@ -2,6 +2,12 @@
 
 ## V3 private playtest handoff
 
+The complete GameCube freshwater movement alternative is implemented and
+verified. All six connected swimming, waiting, and escape callbacks and
+initializers are ported together; source comparisons, native execution,
+current composition, and actual browser downloads pass. The running preview
+serves the checked ABI-398 export from its existing directory.
+
 The connected V3 items-and-villagers import pipeline is ready for private
 playtesting. The current handoff is
 `build/v3-travel-console-visitors-profile-01/handoff.json`; the running local
@@ -10,8 +16,7 @@ focused developer verification cover the connected visiting/save consumers
 below. Feature-first configuration includes summer camping: its control supplies
 the ten camper rewards, excludes standalone requests for those items, and
 controls the existing calendar, manager, and exterior activation flags together.
-No known implementation work is queued for this scope. Preserve the already-built
-runtime and acquisition routes.
+Preserve the completed movement, import runtime, and acquisition routes.
 Broad human gameplay and original-hardware acceptance are separate and unclaimed.
 Preserve the completed paths and verified original rules:
 
@@ -86,20 +91,29 @@ The retained full-import handoff uses ABI 396 at
 `build/v3-travel-console-visitors-installed-01/build-lock.json`, with 20 villagers
 and 277 requested items in `build/v3-travel-console-visitors-profile-01`.
 The current local preview serves `build/v3-website-golden-copy-01/site`, built from
-ABI 397 at `build/v3-new-year-checkboxes-installed-03/build-lock.json`.
-The seasonal stock wrapper and selected GameCube freshwater turns are the native
-changes; saved format 21 and import identities are unchanged. Population remains
-separate from movement. The movement choice covers all original/imported river,
-pond, and ocean fish. The complete donor freshwater function authenticates the
-two 60-Hz heading increments adapted to one native 30-Hz update; phase/speed and
-the N64 instructions are preserved. Current source/composition checks cover all
-four independent combinations. `build/v3-fish-movement-native-01/results.json`
-passes 12 actual native freshwater actor cases, four ocean origin/mode cases,
-complete loaded-owner preservation, guards, checkpoint restoration, and fault
-checks. `build/v3-fish-movement-browser-01/results.json` matches offline output.
+ABI 398 at `build/v3-freshwater-patrol-installed-06/build-lock.json`.
+The full freshwater patrol uses checked padding after pocket artwork and
+collection UI code, without expanding allocations or changing saved format 21
+or import identities. Population remains separate from movement. The movement
+choice covers all original/imported river, pond, and ocean fish. GameCube mode
+ports all six freshwater callbacks and initializers, adapting phase/heading,
+timers, and deceleration to native 30 Hz. N64 mode preserves its entire owner
+and relocation table. Nineteen complete donor functions and 99 sanitized
+comparisons against the actual donor source pass. Three current composition
+tests cover all four independent combinations, mutation rejection, and the
+unchanged empty-selection baseline.
+`build/v3-freshwater-patrol-native-03/results.json` passes 25 actual freshwater
+callback cases, four ocean origin/mode cases, startup-loaded code, full
+DMA/relocation, actor/RNG comparisons, guards, checkpoint restoration, and fault
+checks. The current full profile loads the existing isolated full-import town.
+Native setup failures are retained in `build/v3-freshwater-patrol-native-01`
+and `build/v3-freshwater-patrol-native-02`; the passing fixture checks the actual
+exclusively borrowed scene workspace and matching current-ROM checkpoint.
+`build/v3-freshwater-patrol-browser-01/results.json` matches offline output and
+the actual interface fish download.
 The matching selector windows, control order, responsive layouts,
 direct copy, all sixteen decoration selections, and settings round trips pass
-`tests/test_v3_builder_ui.py` (13 tests, including three actual ROM downloads,
+`tests/test_v3_builder_ui.py` (17 tests, including four actual ROM downloads,
 cancellation/late results, invalid archives, and stale-worker-plan rejection).
 Six feature controls live outside the item selector; enabling a feature supplies
 its required items, never the reverse. Their 82 items are not independent item
@@ -113,8 +127,9 @@ Summer camping derives its ten required items from the installed summer reward
 category. Enabled/disabled composition checks cover every activation flag read
 by the unchanged calendar, manager, and exterior. Actual provider admission and
 resource-mutation checks pass on ABI 397; Gulliver and winter camping retain their
-independent selections. `build/v3-summer-camping-feature-browser-01/results.json`
-matches offline output, and the actual interface download matches that ROM with
+independent selections. The retained ABI-397 Worker and interface-download checks
+match offline output at `build/v3-summer-camping-feature-browser-01/results.json`.
+The current ABI-398 interface download matches its checked offline build with
 all ten item fields retained. Five focused interface checks pass for camping,
 feature sharing, bulk selection isolation, responsive layout, copy, and download.
 All 16 live file hashes and the rendered camping control/items match the export.
@@ -128,13 +143,14 @@ permission/destination gates pass. Coconuts remain item-code-only; no island
 acquisition or beach spawn is implemented. All 16 served preview files match the
 current export receipt, with the live rendered controls and copy checked.
 The interface has no save-warning box, supplementary behaviour warning, or compulsory
-acknowledgement. An actual two-festive-item UI download with both
-original decorations disabled matches the offline/browser result at
-`build/v3-new-year-stock-browser-02/results.json`. Stock checks retain 52 passing
+acknowledgement. The current ABI-398 two-festive-item UI download with both
+original decorations disabled matches its checked offline build. Retained
+ABI-397 download evidence is at `build/v3-new-year-stock-browser-02/results.json`.
+Stock checks retain 52 passing
 native cases before the first run's watchdog and pass the remaining 54 at
 `build/v3-new-year-checkboxes-native-02/results.json`; sanitized host checks pass
 12,800 cases. Ordinary save/restart is retained ABI-396 evidence, not a newly
-executed ABI-397 check. Public V2 remains unchanged.
+executed ABI-398 save cycle. Public V2 remains unchanged.
 No incomplete
 visitor behaviour or unresolved possible game defect is waived by a private
 playtest label. Broad human gameplay and original-hardware testing remain

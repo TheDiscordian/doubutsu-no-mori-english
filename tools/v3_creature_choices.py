@@ -100,9 +100,9 @@ def options(image,report):
             if image[helper:helper+36]!=expected:
                 raise ValueError('Changed complete coastal movement origin/mode guard')
             result[-1].update(id='fish-movement',name='Fish swimming',scope='All original and imported river, pond, and ocean fish',
-                description='N64 uses its original swimming routines. GameCube uses wider freshwater turns and its ocean swimming patterns, pauses, and shoreline avoidance.',
+                description='Choose N64 or GameCube swimming, waiting, and escape behaviour for all fish.',
                 patches=[dict(offset=helper+4,before='10600005',after='00000000'),
-                         freshwater_patch(image,report)])
+                         *freshwater_patches(image,report)])
     reward=report.get('equipment_resources',{}).get('carried_items',{}).get('quest',{}).get('rewards')
     if reward and reward.get('birthday_choice'):
         row=reward['birthday_choice'];p=reward['packet'];code=reward['code'];start=p['physical']
@@ -198,6 +198,39 @@ def freshwater_patch(image,report):
     return dict(offset=files[owner['vrom']].pstart+at,before=before,after=after)
 
 
+def freshwater_patches(image,report):
+    world=report['equipment_resources']['creature_fish']['world']
+    fresh=world.get('freshwater')
+    if fresh is None:return [freshwater_patch(image,report)]
+    from v3_freshwater_movement import RAM,END,TAIL,TAIL_END,GUARD,BINDINGS
+    files=by_vrom(image);p=world['packet'];packet=files[BLOB].pstart+p['blob_offset']
+    code=fresh['code'];row=next(r for r in report['equipment_resources']['creature_fish']['owners'] if r['name']=='river')
+    data=files[row['vrom']].extract(image);rel=files[row['reloc']].extract(image)
+    if (fresh['format']!='AFV3-FRESHWATER-PATROL-1' or not fresh['installed'] or
+            code['ram']!=RAM or code['symbols']['af_fresh_main_end']>END-16 or
+            code['symbols']['af_fresh_tail_start']!=TAIL or code['symbols']['af_fresh_tail_end']>TAIL_END-16 or
+            files[row['vrom']].pend or files[row['reloc']].pend or
+            sha256(data)!=fresh['original_owner_sha256'] or sha256(rel)!=fresh['original_reloc_sha256'] or
+            rel.hex()!=fresh['relocation']['before'] or len(fresh['callbacks'])!=6):
+        raise ValueError('Changed complete freshwater movement choice or native alternative')
+    for fragment in code['fragments']:
+        at=packet+fragment['ram']-p['ram']
+        if sha256(image[at:at+fragment['bytes']])!=fragment['sha256']:
+            raise ValueError('Changed complete freshwater movement code')
+    for end in (END,TAIL_END):
+        if image[packet+end-p['ram']-16:packet+end-p['ram']]!=struct.pack('>4I',*([GUARD]*4)):
+            raise ValueError('Changed freshwater movement guard')
+    patches=[]
+    for callback,(address,before,name) in zip(fresh['callbacks'],BINDINGS,strict=True):
+        target=code['symbols']['af_v3_freshwater_'+name];at=address-row['ram']
+        if callback!=dict(address=address,before=before,after=target) or u32(data,at)!=before:
+            raise ValueError('Changed complete freshwater callback binding')
+        patches.append(dict(offset=files[row['vrom']].pstart+at,
+            before=struct.pack('>I',before).hex(),after=struct.pack('>I',target).hex()))
+    patches.append(dict(offset=files[row['reloc']].pstart,**fresh['relocation']))
+    return patches
+
+
 def resolve(options,requested=None):
     requested={} if requested is None else requested
     if not isinstance(requested,dict) or set(requested)-{r['id'] for r in options}:
@@ -265,9 +298,20 @@ def update_report(image,blob,report,resolved):
         world[row['binding']]['value']=value
     river=next(r for r in report['equipment_resources']['creature_fish']['owners'] if r['name']=='river')
     data=by_vrom(image)[river['vrom']].extract(image)
-    at=0x80932090-river['ram'];gc=resolved['fish-movement']=='GameCube'
-    expected='84ef00de84f8022c0018c04001f8c821a4f900de' if gc else '84ef00de84f8022c01f8c8211000001ca4f900de'
-    if data[at:at+20].hex()!=expected:raise ValueError('Lost freshwater movement choice')
+    fresh=world.get('freshwater');gc=resolved['fish-movement']=='GameCube'
+    if fresh:
+        reloc=by_vrom(image)[river['reloc']].extract(image)
+        for row in fresh['callbacks']:
+            if u32(data,row['address']-river['ram'])!=row['after' if gc else 'before']:
+                raise ValueError('Lost complete freshwater movement callback')
+        if reloc.hex()!=fresh['relocation']['after' if gc else 'before']:
+            raise ValueError('Lost freshwater movement relocation choice')
+        river.update(reloc_sha256=sha256(reloc))
+        fresh['resolved']=resolved['fish-movement']
+    else:
+        at=0x80932090-river['ram']
+        expected='84ef00de84f8022c0018c04001f8c821a4f900de' if gc else '84ef00de84f8022c01f8c8211000001ca4f900de'
+        if data[at:at+20].hex()!=expected:raise ValueError('Lost freshwater movement choice')
     river.update(sha256=sha256(data),movement_choice=resolved['fish-movement'])
     world['patrol_mode']['scope']='all original and imported river, pond, and ocean fish'
     e=report['equipment_resources'];ep=blob[e['blob_offset']:e['blob_offset']+e['bytes']]

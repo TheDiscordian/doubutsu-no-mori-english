@@ -134,6 +134,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
                        'creature_codec': ('af_v3_save_check_extended', 0x8064E000),
                        'creature_storage': ('af_v3_save_reset', 0x80650000),
                        'creature_world': ('af_v3_patrol_swim', 0x8064A000),
+                       'creature_freshwater': ('af_v3_freshwater_swim', 0x80653920),
                        'creature_spawns': ('af_v3_spawn_plan', 0),
                        'creature_fish': ('af_v3_fish_position', 0x80647400),
                        'console_disk_native': ('af_v3_qd_native_bind', 0x80630000),

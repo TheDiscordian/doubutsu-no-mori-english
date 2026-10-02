@@ -9,7 +9,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import by_vrom,sha256,u32
 import v3_optional_composition as composer
-from v3_creature_choices import options,freshwater_patch,update_report
+from v3_creature_choices import options,freshwater_patches,update_report
 from v3_furniture_pipeline import Source
 
 
@@ -17,7 +17,7 @@ class FishMovementTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.saved=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
-        composer.use_build_lock(ROOT/'build/v3-new-year-checkboxes-installed-03/build-lock.json')
+        composer.use_build_lock(ROOT/'build/v3-freshwater-patrol-installed-06/build-lock.json')
         cls.image,cls.report=composer.inputs()
         cls.catalog=composer.catalogue(cls.image,cls.report)
         cls.options=options(cls.image,cls.report)
@@ -30,7 +30,10 @@ class FishMovementTests(unittest.TestCase):
         self.assertIn('fish-population',[r['id'] for r in self.options])
         self.assertNotIn('coastal-fish-movement',[r['id'] for r in self.options])
         movement=next(r for r in self.options if r['id']=='fish-movement')
-        patch=freshwater_patch(self.image,self.report)
+        patches=freshwater_patches(self.image,self.report)
+        self.assertEqual(len(patches),7)
+        original=next(r for r in self.report['equipment_resources']['creature_fish']['owners'] if r['name']=='river')
+        files=by_vrom(self.image)
         for population in ('N64','GameCube'):
             for swimming in ('N64','GameCube'):
                 values={'fish-population':population,'fish-movement':swimming}
@@ -38,17 +41,27 @@ class FishMovementTests(unittest.TestCase):
                     report=self.report,behaviour_options=self.options,behaviours=values)
                 image,writes,blob=composer.compose(self.image,self.report,self.catalog,selected)
                 self.assertEqual(u32(image,movement['offset']),int(swimming=='GameCube'))
-                expected=patch['after'] if swimming=='GameCube' else patch['before']
-                self.assertEqual(image[patch['offset']:patch['offset']+20].hex(),expected)
+                for patch in patches:
+                    expected=patch['after'] if swimming=='GameCube' else patch['before']
+                    self.assertEqual(image[patch['offset']:patch['offset']+len(bytes.fromhex(expected))].hex(),expected)
+                current=by_vrom(image)
+                # Both choices retain every native instruction. The donor mode
+                # replaces only six table pointers and their relocation records.
+                size=original['sections'][0]
+                self.assertEqual(current[original['vrom']].extract(image)[:size],files[original['vrom']].extract(self.image)[:size])
+                if swimming=='N64':
+                    for vrom in (original['vrom'],original['reloc']):
+                        self.assertEqual(current[vrom].extract(image),files[vrom].extract(self.image))
                 report=copy.deepcopy(self.report);update_report(image,blob,report,selected['behaviours'])
                 world=report['equipment_resources']['creature_fish']['world']
                 self.assertEqual(world['spawn_mode']['value'],int(population=='GameCube'))
                 self.assertEqual(world['patrol_mode']['value'],int(swimming=='GameCube'))
                 river=next(r for r in report['equipment_resources']['creature_fish']['owners'] if r['name']=='river')
                 self.assertEqual(river['sha256'],sha256(by_vrom(image)[river['vrom']].extract(image)))
-        corrupt=bytearray(self.image);corrupt[patch['offset']]^=1
-        with self.assertRaisesRegex(ValueError,'freshwater swimming'):
-            freshwater_patch(corrupt,self.report)
+        for patch in patches:
+            corrupt=bytearray(self.image);corrupt[patch['offset']]^=1
+            with self.assertRaisesRegex(ValueError,'freshwater movement'):
+                freshwater_patches(corrupt,self.report)
 
     def test_complete_donor_function_and_equal_elapsed_turns(self):
         source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
@@ -68,6 +81,14 @@ class FishMovementTests(unittest.TestCase):
                     self.assertEqual(native,gc)
                 # The original native path makes 35 additions, not 70.
                 if increment:self.assertNotEqual(native,wrap(heading+35*increment))
+
+    def test_empty_default_choices_keep_the_translation_baseline(self):
+        selection=composer.resolve(self.catalog,[],scope='v3-pipeline',report=self.report,
+            behaviour_options=self.options)
+        image,_,_=composer.compose(self.image,self.report,self.catalog,selection)
+        path,digest,_=composer.stable_reference(self.report)
+        self.assertEqual(sha256(image),digest)
+        self.assertEqual(image,path.read_bytes())
 
 
 if __name__=='__main__':unittest.main()

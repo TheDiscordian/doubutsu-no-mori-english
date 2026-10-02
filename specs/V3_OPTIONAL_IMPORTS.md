@@ -89,11 +89,19 @@ approval requirement; they do not authorise a live-patcher update.
 Fish population and fish movement are separate choices. The movement choice
 affects original and imported river, pond, and ocean fish together. Authenticate
 the complete shared ocean helper before replacing its imported-only origin gate.
-For freshwater movement, authenticate the complete native owner and relocation
-data, then adapt the donor's two 60-Hz heading additions to one 30-Hz native tick;
-the N64 alternative keeps its original instructions. GameCube source
-`src/actor/ac_gyo_test.c:aGTT_swim_speed_change` and its complete donor function
-at `.text:0x233464` establish the wider turn, not an unverified timer difference.
+For freshwater movement, authenticate all six donor patrol callbacks and
+initializers plus their helper dependencies. GameCube mode uses the complete
+swimming, waiting, and escape path, including player/float checks, source random
+selection and branch order, and elapsed-time adaptation to 30 Hz. Bind native
+collision, current, player, and fishing-float services to their complete checked
+functions and retained platform layouts. Switch all six native callback-table
+pointers and their relocation records together. N64 mode retains its entire
+native owner and relocation data, not only an unmodified turning instruction.
+The resident port occupies authenticated unused padding after pocket artwork
+and collection UI code, without moving retained code, calendars, or save state.
+Compare all ported callbacks against the actual donor source with the explicit
+frame-rate adapters, then verify installed native execution and actual browser
+reconstruction. A turning-helper comparison alone is not complete movement.
 Population rules are unchanged by this movement choice. The GameCube house-start
 choice places the college-rule diary on the cardboard box in main/secondary room
 cell `[1][1]`, following the complete checked donor room initializer. Include both

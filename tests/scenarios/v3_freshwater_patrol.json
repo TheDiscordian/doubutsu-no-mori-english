@@ -1,0 +1,16 @@
+[
+  {"wait":16},
+  {"key":"Return","duration":0.15},
+  {"wait":8},
+  {"repeat":16,"actions":[{"key":"a","duration":0.12},{"wait":3}]},
+  {"wait":14},
+  {"read":["80400000",16],"expect":"AF53434EAF53434EAF53434EAF53434E"},
+  {"read":["8044FFF0",16],"expect":"AF53434EAF53434EAF53434EAF53434E"},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"save_state":true},
+  {"pause_game_thread":true},
+  {"test_v3_fish_movement":true},
+  {"load_state":true},
+  {"wait":2},
+  {"read":["8003CE34",4],"expect":"00000000"}
+]
