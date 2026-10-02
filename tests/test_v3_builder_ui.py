@@ -20,7 +20,7 @@ from serve_portal import StaticPortal, validate_export
 class BuilderInterfaceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.site = ROOT/os.environ.get('V3_BUILDER_UI_SITE', 'build/v3-website-summer-camping-01/site')
+        cls.site = ROOT/os.environ.get('V3_BUILDER_UI_SITE', 'build/v3-website-compact-checkboxes-02/site')
         if not cls.site.exists():
             raise unittest.SkipTest('Current private interface export required')
         validate_export(cls.site)
@@ -88,6 +88,40 @@ class BuilderInterfaceTests(unittest.TestCase):
                 self.assertTrue(page.locator('#open-'+name).evaluate('(button) => button === document.activeElement'))
                 page.locator('#open-'+name).click(); page.locator('#close-'+name).click()
                 self.assertTrue(page.locator('#'+dialog).is_hidden())
+
+    def test_feature_checkbox_cards_share_rows_and_stack_on_mobile(self):
+        page=self.page
+        for width,columns in ((320,1),(375,1),(768,2),(1440,2)):
+            page.set_viewport_size(dict(width=width,height=950))
+            geometry=page.locator('#behaviour-options').evaluate('''grid => {
+                const rect = element => {
+                    const r=element.getBoundingClientRect();
+                    return {left:r.left,right:r.right,top:r.top,width:r.width};
+                };
+                return {
+                    grid:rect(grid),
+                    cards:[...grid.querySelectorAll('.feature-setting')].map(card => ({
+                        ...rect(card),label:rect(card.querySelector('strong')),
+                        checkbox:rect(card.querySelector('input')),
+                        overflow:card.scrollWidth>card.clientWidth
+                    }))
+                };
+            }''')
+            self.assertEqual(len(geometry['cards']),6)
+            first,second=geometry['cards'][:2]
+            if columns==2:
+                self.assertAlmostEqual(first['top'],second['top'],delta=1)
+                self.assertLessEqual(first['right'],second['left'])
+                self.assertLess(first['width'],geometry['grid']['width']*.55)
+            else:
+                self.assertGreater(second['top'],first['top'])
+                self.assertAlmostEqual(first['width'],geometry['grid']['width'],delta=1)
+            for card in geometry['cards']:
+                self.assertFalse(card['overflow'])
+                self.assertGreaterEqual(card['label']['left'],card['left'])
+                self.assertLessEqual(card['label']['right'],card['checkbox']['left'])
+                self.assertLessEqual(card['checkbox']['right'],card['right'])
+                self.assertAlmostEqual(card['label']['top'],card['checkbox']['top'],delta=4)
 
     def test_item_categories_bulk_selection_and_dependencies(self):
         page = self.page

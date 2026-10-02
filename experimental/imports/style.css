@@ -110,7 +110,7 @@ input::placeholder { color:#71816e; }
 .behaviour-option dl { display:grid; grid-template-columns:74px 1fr; gap:10px; }
 .behaviour-option dt { color:var(--ink); font-size:12px; font-weight:700; }
 .behaviour-option dd { margin:0; }
-.feature-setting { grid-column:1 / -1; }
+.behaviour-option.feature-setting label { flex-wrap:nowrap; align-items:flex-start; }
 .feature-setting input { flex-shrink:0; width:20px; height:20px; accent-color:#588043; }
 .decoration-settings { grid-column:1 / -1; }
 #behaviour-controls .decoration-settings legend { float:left; width:100%; font-family:inherit; font-size:16px; font-weight:700; letter-spacing:normal; }

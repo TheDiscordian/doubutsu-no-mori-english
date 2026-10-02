@@ -58,7 +58,7 @@ passport/stored-letter notes coexist without replacing imported records.
 Rewarded-model persistence also passes actual delivery to the loaded player's
 matching house, both complete device writers, and a fresh-process load retaining
 the original letters, presents, and earned flags.
-The local preview serves `build/v3-website-summer-camping-01/site` from ABI 397 at
+The local preview serves `build/v3-website-compact-checkboxes-02/site` from ABI 397 at
 `build/v3-new-year-checkboxes-installed-03/build-lock.json`. Villagers and items
 have matching selector windows, Select/Clear above the choices, and settings
 export/import immediately after the ROM inputs. Four individual decoration
@@ -71,6 +71,10 @@ independent item checkboxes. The item window has 195 ordinary choices, and the v
 window has 20 choices. Coconuts and cedar saplings retain their authenticated,
 selection-gated Nook item-code acquisition; coconut island acquisition remains
 outside this task. No beach spawn or substitute reward is added.
+Feature checkbox cards share two columns above 640 px and stack on narrower
+screens. Focused geometry and responsive/keyboard checks pass, including long
+labels and checkbox placement. This is CSS-only; composition and recipes are
+unchanged from the verified summer-camping export.
 Fish appearance and swimming remain separate settings. Swimming covers all
 river, pond, and ocean fish, including original species. GameCube freshwater
 turns adapt the donor's two 60-Hz additions to one native 30-Hz tick; N64 mode

@@ -85,7 +85,7 @@ Preserve the completed paths and verified original rules:
 The retained full-import handoff uses ABI 396 at
 `build/v3-travel-console-visitors-installed-01/build-lock.json`, with 20 villagers
 and 277 requested items in `build/v3-travel-console-visitors-profile-01`.
-The current local preview serves `build/v3-website-summer-camping-01/site`, built from
+The current local preview serves `build/v3-website-compact-checkboxes-02/site`, built from
 ABI 397 at `build/v3-new-year-checkboxes-installed-03/build-lock.json`.
 The seasonal stock wrapper and selected GameCube freshwater turns are the native
 changes; saved format 21 and import identities are unchanged. Population remains
@@ -118,6 +118,10 @@ matches offline output, and the actual interface download matches that ROM with
 all ten item fields retained. Five focused interface checks pass for camping,
 feature sharing, bulk selection isolation, responsive layout, copy, and download.
 All 16 live file hashes and the rendered camping control/items match the export.
+The checkbox cards use two columns above 640 px, with one column on mobile;
+long labels retain adjacent checkboxes. Focused geometry and responsive/keyboard
+checks pass. CSS is the only changed site file; recipes and composition retain
+the checked summer-camping identities.
 Feature dependencies,
 sharing, isolated item bulk selection, and the real cedar/coconut item-code
 permission/destination gates pass. Coconuts remain item-code-only; no island
