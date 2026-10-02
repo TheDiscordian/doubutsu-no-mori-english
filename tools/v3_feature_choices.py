@@ -17,6 +17,12 @@ def options(catalog, report):
     add('golden-tools', 'Golden tools',
         'Add the golden shovel, net, rod, and axe, with their original acquisition routes. The shovel comes from a golden tree, the net and rod are rewards for completing their collections, and Farley awards the axe for maintaining a perfect town.',
         ['GAFE01-r0/item/'+item for item in ('2239','223A','223B','223C')])
+    from v3_furniture_rewards import summer_installed
+    if summer_installed(report):
+        add('summer-camping', 'Summer camping',
+            'A visiting camper can set up a tent in your town during June, July, and August. Talk and play games with the camper to obtain camping furniture.',
+            ['GAFE01-r0/item/'+row['item_id'] for row in report['furniture']['imports']
+             if row.get('reward_route')==23])
     quest = next((group for group in groups if group['id']=='carried-quest'), None)
     if quest:
         add('wisp', 'Wisp', 'Wisp can visit your town, and you can catch spirits for his quest. Spirits are not sold in shops.', quest['any_imports'])

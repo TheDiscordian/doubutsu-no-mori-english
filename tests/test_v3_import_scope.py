@@ -152,7 +152,7 @@ class ImportScopeTests(unittest.TestCase):
                       for route in (12,19,23)}
         self.assertEqual({route:len(keys) for route,keys in categories.items()}, {12:20,19:8,23:10})
         self.assertTrue(all(self.states[key]['selectable'] for keys in categories.values() for key in keys))
-        for route in (12,19,23):
+        for route in (12,19):
             for key in (categories[route][0], categories[route][-1]):
                 selection = self.select([key])
                 self.assertEqual(selection['enabled'],[key])
@@ -160,6 +160,16 @@ class ImportScopeTests(unittest.TestCase):
                 for group in groups(self.image,self.report):
                     for field in group['fields']:
                         self.assertEqual(struct.unpack_from('>I',result,field['offset'])[0],field['disabled'])
+        selection=self.select(['feature/summer-camping'])
+        self.assertEqual(set(selection['enabled']),set(categories[23]))
+        self.assertEqual(selection['requested'],['feature/summer-camping'])
+        for key in categories[23]:
+            with self.assertRaisesRegex(ValueError,'Select the feature'):
+                self.select([key])
+        result,_,_=composer.compose(self.image,self.report,self.catalog,selection)
+        for group in groups(self.image,self.report):
+            for field in group['fields']:
+                self.assertEqual(struct.unpack_from('>I',result,field['offset'])[0],field['disabled'])
         bad = copy.deepcopy(self.report); bad['furniture_rewards']['selected_profile_aware'] = False
         self.assertEqual(existing_system_items(bad),set())
         self.assertTrue(all(not availability(self.catalog,bad)[key]['selectable']

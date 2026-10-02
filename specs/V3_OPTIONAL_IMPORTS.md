@@ -8,6 +8,10 @@ individual selections, category selection, select all, and clear all. Imports
 are off by default. Existing N64 villagers, items, locations, and the translation
 remain available; importing means adding content, not silently replacing an
 existing villager or painting a new name onto an unrelated item.
+Items that enable a separate town feature belong to that feature's control,
+outside the item selector. Enabling the feature includes its required items;
+selecting an item does not enable the feature. Browser and offline selections
+use the same feature definitions and reject direct requests for those items.
 
 V3 is only the import pipeline: extraction/conversion, additive stable identities,
 bulk asset/data installation, working item/villager runtime behaviour and
@@ -421,7 +425,10 @@ are ready. Their independent selections enable no unrelated event features.
 Ten summer-camping rewards use the complete already-built calendar, tent scene,
 masked camper, official conversations, and selected native trade route. Admission
 authenticates those actual providers, including current shared-hook forwarding;
-it builds no new feature and adds no shop stock. Ordinary summer gameplay and
+the Summer camping control includes all ten rewards and controls the existing
+calendar, manager, and exterior activation flags together. These rewards are
+not independent item choices. This configuration change builds no new runtime
+and adds no shop stock. Ordinary summer gameplay and
 current-profile save/reload remain unverified. Fifty installed
 Mayor gifts are independently admitted through the retained gift/diary provider,
 with the existing calendar choice, no diary dependency, and source catalogue

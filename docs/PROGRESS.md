@@ -25,11 +25,11 @@ lock or publish experimental V3.
 
 ## V3 import pipeline: ready for private playtesting
 
-The items-and-villagers import runtime has focused developer checks. The
-feature-control review has an outstanding summer-camping mapping: selecting any
-of ten camping furniture items activates the campsite and visiting camper, but
-these remain standalone item choices. The existing runtime stays installed;
-configuration needs the same feature-first treatment as Wisp and trees.
+The items-and-villagers import runtime has focused developer checks. Feature-first
+configuration includes summer camping: its control supplies all ten camper
+rewards and controls the existing campsite and visiting camper together. These
+items are not standalone choices. The existing runtime and acquisition routes
+remain installed.
 The private handoff is
 `build/v3-travel-console-visitors-profile-01/handoff.json`; use the running
 [local preview](http://127.0.0.1:8073/) to choose imports and build a test ROM.
@@ -58,16 +58,16 @@ passport/stored-letter notes coexist without replacing imported records.
 Rewarded-model persistence also passes actual delivery to the loaded player's
 matching house, both complete device writers, and a fresh-process load retaining
 the original letters, presents, and earned flags.
-The local preview serves `build/v3-website-release-copy-01/site` from ABI 397 at
+The local preview serves `build/v3-website-summer-camping-01/site` from ABI 397 at
 `build/v3-new-year-checkboxes-installed-03/build-lock.json`. Villagers and items
 have matching selector windows, Select/Clear above the choices, and settings
 export/import immediately after the ROM inputs. Four individual decoration
 checkboxes control Nook's December 26–31 stock. Responsive layout, keyboard
 controls, all sixteen decoration combinations, and settings round trips pass
-browser checks. Five feature controls outside the item selector enable Wisp,
-cedar trees, coconut palms, all four golden tools, and the existing GameCube events;
-their 72 required items are included automatically and are not independent
-item checkboxes. The item window has 205 ordinary choices, and the villager
+browser checks. Six feature controls outside the item selector enable Wisp,
+cedar trees, coconut palms, all four golden tools, summer camping, and the existing
+GameCube events; their 82 required items are included automatically and are not
+independent item checkboxes. The item window has 195 ordinary choices, and the villager
 window has 20 choices. Coconuts and cedar saplings retain their authenticated,
 selection-gated Nook item-code acquisition; coconut island acquisition remains
 outside this task. No beach spawn or substitute reward is added.
@@ -90,6 +90,15 @@ all four runtime selection fields pass enabled/disabled composition checks.
 `build/v3-golden-tools-feature-browser-01/results.json` matches offline output.
 The changed golden-control, sharing, layout, and release-copy checks pass. The
 website has no provisional warnings, preview labels, or developer testing status.
+Summer camping derives its ten items from the installed reward category. Its
+enabled/disabled composition checks cover all three unchanged native activation
+predicates. Current provider admission and resource-mutation checks pass;
+Gulliver and winter camping retain independent item selections. The real Worker
+matches offline output at `build/v3-summer-camping-feature-browser-01/results.json`;
+the actual interface download matches it with all ten required fields enabled.
+Five focused interface checks pass for camping, feature sharing, bulk isolation,
+responsive layout, direct copy, and download. Native code/resources and saved
+formats are unchanged; retained native evidence is not a fresh camping playthrough.
 Save-warning boxes, the supplementary behaviour warning, and acknowledgements are absent; building
 requires game inputs, not a save-handling pledge. A real-file UI download matches offline composition at
 `build/v3-new-year-stock-browser-02/results.json`. The stock wrapper passes
@@ -437,8 +446,9 @@ rewards enables no unrelated event provider and adds no runtime or artwork.
 Ten summer-camping rewards also use the complete already-built route. Actual
 calendar/scene/art/visitor/quest/greeting/trade providers authenticate, including
 the current 64-day directory, manager callbacks, shared-hook forwarding, all 253
-official messages and 49 choices, and retained lamp controller. Independent
-selection uses the actual furniture flags; no unrelated event provider activates.
+official messages and 49 choices, and retained lamp controller. The Summer camping
+feature includes all ten rewards and controls the actual furniture activation
+flags together; no unrelated event provider activates.
 No game code, artwork, allocation, stock route, or saved field changes. Ordinary
 summer entry, appearance, conversations, and save/reload remain unverified.
 The postal mailbox stays unavailable: its reward helper has no game-side caller

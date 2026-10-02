@@ -2,6 +2,7 @@
 import copy
 import ctypes
 import json
+import re
 from pathlib import Path
 import struct
 import subprocess
@@ -96,6 +97,31 @@ class FeatureChoicesTests(unittest.TestCase):
                 self.assertEqual(int.from_bytes(image[at:at+row['enable_bytes']],'big'),int(enabled))
                 self.assertEqual(key in selected['required'],enabled)
                 if enabled:self.assertIn(feature['id'],selected['dependency_reasons'][key])
+
+    def test_summer_camping_supplies_its_rewards_and_controls_all_native_triggers(self):
+        feature=next(row for row in self.features if row['id']=='feature/summer-camping')
+        items={row['item_id'] for row in self.report['furniture']['imports']
+               if row.get('reward_route')==23}
+        self.assertEqual(len(items),10)
+        keys={'GAFE01-r0/item/'+item for item in items}
+        self.assertEqual(set(feature['required_imports']),keys)
+        for source in ('campsite_calendar.c','campsite_manager.c','campsite_exterior.c'):
+            text=(ROOT/'overlays/v3'/source).read_text()
+            trigger=re.search(r'static const \w+ items\[\] = \{([^}]+)\}',text)
+            self.assertIsNotNone(trigger,source)
+            self.assertEqual({f'{int(item,16):04X}' for item in trigger[1].split(',')},items)
+        for enabled in (False,True):
+            requested=['GAFE01-r0/item/2301']+([feature['id']] if enabled else [])
+            selection=composer.resolve(self.catalog,requested,scope='v3-pipeline',report=self.report)
+            image,_,_=composer.compose(self.image,self.report,self.catalog,selection)
+            blob=by_vrom(image)[BLOB].pstart
+            for key in keys:
+                row=self.catalog[key];at=blob+row['enable_offset']
+                self.assertEqual(int.from_bytes(image[at:at+row['enable_bytes']],'big'),int(enabled))
+                self.assertEqual(key in selection['required'],enabled)
+        missing=copy.deepcopy(self.report)
+        missing['campsite_calendar']['manager_installed']=False
+        self.assertNotIn(feature['id'],{row['id'] for row in options(self.catalog,missing)})
 
 
 if __name__=='__main__':unittest.main()

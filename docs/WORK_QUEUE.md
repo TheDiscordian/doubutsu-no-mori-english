@@ -7,12 +7,11 @@ playtesting. The current handoff is
 `build/v3-travel-console-visitors-profile-01/handoff.json`; the running local
 preview is [http://127.0.0.1:8073/](http://127.0.0.1:8073/). Implementation and
 focused developer verification cover the connected visiting/save consumers
-below. Summer-camping configuration remains incomplete: ten standalone camping
-item choices activate the campsite and visiting camper through
-`overlays/v3/campsite_calendar.c`, `campsite_manager.c`, and `campsite_exterior.c`.
-The feature-first control pass must cover this activation, rather than treating
-those ten choices as independent furniture imports. Preserve the already-built
-camping runtime and acquisition routes.
+below. Feature-first configuration includes summer camping: its control supplies
+the ten camper rewards, excludes standalone requests for those items, and
+controls the existing calendar, manager, and exterior activation flags together.
+No known implementation work is queued for this scope. Preserve the already-built
+runtime and acquisition routes.
 Broad human gameplay and original-hardware acceptance are separate and unclaimed.
 Preserve the completed paths and verified original rules:
 
@@ -86,7 +85,7 @@ Preserve the completed paths and verified original rules:
 The retained full-import handoff uses ABI 396 at
 `build/v3-travel-console-visitors-installed-01/build-lock.json`, with 20 villagers
 and 277 requested items in `build/v3-travel-console-visitors-profile-01`.
-The current local preview serves `build/v3-website-release-copy-01/site`, built from
+The current local preview serves `build/v3-website-summer-camping-01/site`, built from
 ABI 397 at `build/v3-new-year-checkboxes-installed-03/build-lock.json`.
 The seasonal stock wrapper and selected GameCube freshwater turns are the native
 changes; saved format 21 and import identities are unchanged. Population remains
@@ -102,14 +101,23 @@ The matching selector windows, control order, responsive layouts,
 direct copy, all sixteen decoration selections, and settings round trips pass
 `tests/test_v3_builder_ui.py` (13 tests, including three actual ROM downloads,
 cancellation/late results, invalid archives, and stale-worker-plan rejection).
-Five feature controls live outside the item selector; enabling a feature supplies
-its required items, never the reverse. Their 72 items are not independent item
-choices, leaving 205 ordinary item choices and 20 villagers. Golden tools has one
+Six feature controls live outside the item selector; enabling a feature supplies
+its required items, never the reverse. Their 82 items are not independent item
+choices, leaving 195 ordinary item choices and 20 villagers. Golden tools has one
 control for the shovel, net, rod, and axe, including their acquisition routes.
 Its four runtime selection fields pass enabled/disabled composition checks, and
 `build/v3-golden-tools-feature-browser-01/results.json` matches offline output.
 The changed golden-control, sharing, layout, and release-copy checks pass; the
 page has no provisional warnings, preview labels, or developer testing status.
+Summer camping derives its ten required items from the installed summer reward
+category. Enabled/disabled composition checks cover every activation flag read
+by the unchanged calendar, manager, and exterior. Actual provider admission and
+resource-mutation checks pass on ABI 397; Gulliver and winter camping retain their
+independent selections. `build/v3-summer-camping-feature-browser-01/results.json`
+matches offline output, and the actual interface download matches that ROM with
+all ten item fields retained. Five focused interface checks pass for camping,
+feature sharing, bulk selection isolation, responsive layout, copy, and download.
+All 16 live file hashes and the rendered camping control/items match the export.
 Feature dependencies,
 sharing, isolated item bulk selection, and the real cedar/coconut item-code
 permission/destination gates pass. Coconuts remain item-code-only; no island

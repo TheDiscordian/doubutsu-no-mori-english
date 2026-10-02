@@ -20,7 +20,7 @@ from serve_portal import StaticPortal, validate_export
 class BuilderInterfaceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.site = ROOT/os.environ.get('V3_BUILDER_UI_SITE', 'build/v3-website-release-copy-01/site')
+        cls.site = ROOT/os.environ.get('V3_BUILDER_UI_SITE', 'build/v3-website-summer-camping-01/site')
         if not cls.site.exists():
             raise unittest.SkipTest('Current private interface export required')
         validate_export(cls.site)
@@ -263,6 +263,27 @@ class BuilderInterfaceTests(unittest.TestCase):
         page.locator('#open-items').click();page.locator('#clear-items').click();page.locator('#close-items').click()
         self.assertTrue(control.is_checked())
 
+    def test_summer_camping_is_a_feature_not_an_item_selection(self):
+        page=self.page
+        plan=json.loads((self.site/'data/composition.json').read_text())
+        feature=next(row for row in plan['features'] if row['id']=='feature/summer-camping')
+        control=page.get_by_role('checkbox',name='Enable Summer camping',exact=True)
+        self.assertEqual(page.locator('#behaviour-controls #enable-summer-camping').count(),1)
+        self.assertEqual(page.locator('#item-dialog #enable-summer-camping').count(),0)
+        self.assertFalse(control.is_checked())
+        for identity in feature['required_imports']:
+            self.assertEqual(page.locator(f'#options [data-id="{identity}"]').count(),0)
+        page.locator('#open-items').click();page.locator('#select-items').click();page.locator('#close-items').click()
+        self.assertFalse(control.is_checked())
+        page.locator('#clear-all').click();control.check()
+        for identity in feature['required_imports']:
+            name=next(row['name'] for row in plan['options'] if row['id']==identity)
+            self.assertIn(name,page.locator('#dependency-list').text_content())
+        page.locator('#open-items').click();page.locator('#clear-items').click();page.locator('#close-items').click()
+        self.assertTrue(control.is_checked())
+        page.locator('#clear-all').click();self.assertFalse(control.is_checked())
+        page.locator('#select-all').click();self.assertTrue(control.is_checked())
+
     def test_actual_rom_download_uses_the_wisp_setting(self):
         evidence = ROOT/'build/v3-feature-wisp-browser-02/results.json'
         if not evidence.exists():
@@ -294,6 +315,36 @@ class BuilderInterfaceTests(unittest.TestCase):
         self.assertTrue(page.locator('#success').is_hidden())
         self.assertIsNone(page.locator('#download').get_attribute('href'))
         self.assertEqual(page.locator('#selection-heading').inner_text(), 'No imports selected')
+
+    def test_actual_rom_download_uses_the_summer_camping_feature(self):
+        evidence=ROOT/'build/v3-summer-camping-feature-browser-01/results.json'
+        if not evidence.exists():self.skipTest('Current summer camping offline comparison required')
+        expected=json.loads(evidence.read_text())['focused-selection']['sha256']
+        plan=json.loads((self.site/'data/composition.json').read_text())
+        feature=next(row for row in plan['features'] if row['id']=='feature/summer-camping')
+        page=self.page
+        page.locator('#enable-summer-camping').check()
+        page.locator('#n64').set_input_files(str(ROOT/'local/rom/Doubutsu no Mori (Japan).z64'))
+        page.locator('#gamecube').set_input_files(str(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso'))
+        page.locator('#build').click()
+        page.wait_for_function("() => !document.querySelector('#success').hidden || !document.querySelector('#error').hidden",timeout=90000)
+        self.assertTrue(page.locator('#error').is_hidden(),page.locator('#error').text_content())
+        with page.expect_download() as event:page.locator('#download').click()
+        with tempfile.TemporaryDirectory(prefix='v3-camping-rom-') as temp:
+            rom=Path(temp)/'camping.z64';event.value.save_as(rom)
+            with rom.open('rb') as stream:
+                self.assertEqual(hashlib.file_digest(stream,'sha256').hexdigest(),expected)
+                for identity in feature['required_imports']:
+                    row=next(row for row in plan['options'] if row['id']==identity)
+                    for field in row['disable']:
+                        stream.seek(field['offset'])
+                        self.assertEqual(stream.read(len(bytes.fromhex(field['before']))).hex(),field['before'])
+            with page.expect_download() as event:page.locator('#receipt').click()
+            profile=Path(temp)/'profile.json';event.value.save_as(profile)
+            self.assertEqual(json.loads(profile.read_text())['requested'],[feature['id']])
+        page.locator('#enable-summer-camping').uncheck()
+        self.assertTrue(page.locator('#success').is_hidden())
+        self.assertIsNone(page.locator('#download').get_attribute('href'))
 
     def test_actual_rom_download_uses_all_fish_movement(self):
         evidence=ROOT/'build/v3-fish-movement-browser-01/results.json'
