@@ -14,7 +14,9 @@ def options(catalog, report):
 
     add('cedar-trees', 'Cedar trees', 'Plant and grow cedar trees. Cedar saplings can be obtained using Animal Crossing item codes at Nook’s shop.', ['GAFE01-r0/item/2901'])
     add('coconut-palms', 'Coconut palms', 'Obtain coconuts using Animal Crossing item codes at Nook’s shop, then plant them to grow fruit-bearing palm trees near the coast. Coconuts do not wash ashore.', ['GAFE01-r0/item/2807'])
-    add('golden-trees', 'Golden trees', 'Enable golden-tree planting and the golden shovel.', ['GAFE01-r0/item/223B'])
+    add('golden-tools', 'Golden tools',
+        'Add the golden shovel, net, rod, and axe, with their original acquisition routes. The shovel comes from a golden tree, the net and rod are rewards for completing their collections, and Farley awards the axe for maintaining a perfect town.',
+        ['GAFE01-r0/item/'+item for item in ('2239','223A','223B','223C')])
     quest = next((group for group in groups if group['id']=='carried-quest'), None)
     if quest:
         add('wisp', 'Wisp', 'Wisp can visit your town, and you can catch spirits for his quest. Spirits are not sold in shops.', quest['any_imports'])

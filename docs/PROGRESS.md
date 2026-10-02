@@ -25,8 +25,12 @@ lock or publish experimental V3.
 
 ## V3 import pipeline: ready for private playtesting
 
-The items-and-villagers import pipeline and its focused developer checks are
-complete for the V3 scope. The private handoff is
+The items-and-villagers import runtime has focused developer checks. The
+feature-control review has an outstanding summer-camping mapping: selecting any
+of ten camping furniture items activates the campsite and visiting camper, but
+these remain standalone item choices. The existing runtime stays installed;
+configuration needs the same feature-first treatment as Wisp and trees.
+The private handoff is
 `build/v3-travel-console-visitors-profile-01/handoff.json`; use the running
 [local preview](http://127.0.0.1:8073/) to choose imports and build a test ROM.
 Broad human gameplay, walked station trips, and original-hardware acceptance
@@ -54,16 +58,16 @@ passport/stored-letter notes coexist without replacing imported records.
 Rewarded-model persistence also passes actual delivery to the loaded player's
 matching house, both complete device writers, and a fresh-process load retaining
 the original letters, presents, and earned flags.
-The local preview serves `build/v3-website-fish-movement-01/site` from ABI 397 at
+The local preview serves `build/v3-website-release-copy-01/site` from ABI 397 at
 `build/v3-new-year-checkboxes-installed-03/build-lock.json`. Villagers and items
 have matching selector windows, Select/Clear above the choices, and settings
 export/import immediately after the ROM inputs. Four individual decoration
 checkboxes control Nook's December 26–31 stock. Responsive layout, keyboard
 controls, all sixteen decoration combinations, and settings round trips pass
 browser checks. Five feature controls outside the item selector enable Wisp,
-cedar trees, coconut palms, golden trees, and the existing GameCube events;
-their 69 required items are included automatically and are not independent
-item checkboxes. The item window has 208 ordinary choices, and the villager
+cedar trees, coconut palms, all four golden tools, and the existing GameCube events;
+their 72 required items are included automatically and are not independent
+item checkboxes. The item window has 205 ordinary choices, and the villager
 window has 20 choices. Coconuts and cedar saplings retain their authenticated,
 selection-gated Nook item-code acquisition; coconut island acquisition remains
 outside this task. No beach spawn or substitute reward is added.
@@ -81,6 +85,11 @@ decorations, and fish movement), cancellation/late-result handling, archive
 rejection, and stale-worker-plan rejection. The 19 browser composition tests and two
 feature/acquisition tests pass. All 16 files served at the local URL match the
 current export receipt, and the live rendered controls/copy are checked.
+The Golden tools checkbox supplies the shovel, net, rod, and axe together;
+all four runtime selection fields pass enabled/disabled composition checks.
+`build/v3-golden-tools-feature-browser-01/results.json` matches offline output.
+The changed golden-control, sharing, layout, and release-copy checks pass. The
+website has no provisional warnings, preview labels, or developer testing status.
 Save-warning boxes, the supplementary behaviour warning, and acknowledgements are absent; building
 requires game inputs, not a save-handling pledge. A real-file UI download matches offline composition at
 `build/v3-new-year-stock-browser-02/results.json`. The stock wrapper passes

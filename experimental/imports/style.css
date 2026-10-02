@@ -10,7 +10,6 @@ button:disabled { cursor:not-allowed; opacity:.65; }
 .site-header { height:100px; }
 .brand { font-size:24px; }
 .brand small { font-size:10px; letter-spacing:1.7px; }
-.preview-badge { font-size:11px; letter-spacing:1px; background:#edf2e5; }
 .hero { grid-template-columns:1.25fr 1fr; align-items:center; gap:56px; padding-block:42px 50px; }
 .hero > *, .section-heading > * { min-width:0; }
 .welcome { padding:0; }
@@ -21,7 +20,6 @@ h1 em { color:#799443; }
 .postcard { width:100%; max-width:370px; margin:0 0 0 auto; padding:9px 9px 0; transform:rotate(2deg); background:white; border:1px solid #dce3d2; border-radius:12px; box-shadow:0 12px 32px #244c3b12; }
 .postcard img { border-radius:6px; }
 .postcard figcaption { font-size:15px; padding:14px 9px; }
-.preview-note { margin-top:17px; font-size:12px; color:var(--muted); }
 .workflow { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin-bottom:24px; }
 .workflow a { display:flex; align-items:center; gap:12px; padding:15px 18px; text-decoration:none; font-size:14px; font-weight:650; }
 .workflow a + a { border-left:1px solid var(--line); }
@@ -33,7 +31,6 @@ h1 em { color:#799443; }
 .ticket-top { padding:18px 32px; background:var(--ink); color:#f4efd1; font-size:11px; letter-spacing:1.5px; }
 .ticket-body { padding:32px; }
 .card-heading h2 { font-size:32px; }
-.version { font-size:11px; padding:6px 10px; border-radius:20px; }
 .card-intro { margin-top:10px; font-size:14px; color:var(--muted); }
 .game-inputs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:24px; scroll-margin-top:24px; }
 .game-inputs .file-field { min-width:0; margin:0; padding:20px; border-radius:13px; background:#fafbf5; }
@@ -161,7 +158,6 @@ input::placeholder { color:#71816e; }
   .brand { font-size:18px; gap:9px; }
   .brand img { width:34px; height:34px; }
   .brand small { font-size:8px; letter-spacing:1px; }
-  .preview-badge { font-size:9px; letter-spacing:.2px; padding:7px 9px; }
   .hero { grid-template-columns:1fr; padding-block:30px; }
   h1 { font-size:46px; }
   .intro { font-size:15px; }

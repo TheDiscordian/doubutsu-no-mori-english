@@ -81,5 +81,21 @@ class FeatureChoicesTests(unittest.TestCase):
         missing['equipment_resources']['passwords']['conversation']['native_bindings_installed']=False
         self.assertEqual(carried_items(missing),set())
 
+    def test_golden_tools_are_one_feature_with_all_four_runtime_gates(self):
+        feature=next(row for row in self.features if row['id']=='feature/golden-tools')
+        keys={'GAFE01-r0/item/'+item for item in ('2239','223A','223B','223C')}
+        self.assertEqual(set(feature['required_imports']),keys)
+        self.assertNotIn('feature/golden-trees',{row['id'] for row in self.features})
+        for enabled in (False,True):
+            # A regular added fish retains the integrated ROM in the disabled case.
+            requests=['GAFE01-r0/item/2301']+([feature['id']] if enabled else [])
+            selected=composer.resolve(self.catalog,requests,scope='v3-pipeline',report=self.report)
+            image,_,_=composer.compose(self.image,self.report,self.catalog,selected)
+            for key in keys:
+                row=self.catalog[key];at=by_vrom(image)[BLOB].pstart+row['enable_offset']
+                self.assertEqual(int.from_bytes(image[at:at+row['enable_bytes']],'big'),int(enabled))
+                self.assertEqual(key in selected['required'],enabled)
+                if enabled:self.assertIn(feature['id'],selected['dependency_reasons'][key])
+
 
 if __name__=='__main__':unittest.main()

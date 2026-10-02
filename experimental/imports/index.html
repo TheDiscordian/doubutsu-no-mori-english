@@ -7,7 +7,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="theme-color" content="#254d3f">
-  <title>Animal Crossing N64 · English Translation · V3 Preview</title>
+  <title>Animal Crossing N64 · English Translation</title>
   <link rel="icon" href="./web/mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./web/style.css">
   <link rel="stylesheet" href="./experimental/imports/style.css">
@@ -17,7 +17,6 @@
   <a class="skip" href="#patcher">Skip to patcher</a>
   <header class="site-header wrap">
     <a class="brand" href="./" aria-label="Animal Crossing N64 English translation home"><img src="./web/mark.svg" width="46" height="46" alt=""><span>Animal Crossing N64<small>ENGLISH TRANSLATION</small></span></a>
-    <span class="preview-badge">V3 preview</span>
   </header>
   <main class="wrap">
     <section class="hero" aria-labelledby="welcome-heading">
@@ -25,7 +24,6 @@
         <p class="eyebrow">ANIMAL CROSSING · NINTENDO 64</p>
         <h1 id="welcome-heading">A little more<br><em>Animal Crossing.</em></h1>
         <p class="intro">The original N64 game, in English.<br>With your favourite GameCube villagers and items.</p>
-        <p class="preview-note">Experimental V3 preview. Use a separate test save.</p>
       </div>
       <figure class="postcard"><img src="./web/media/town.webp" width="800" height="600" alt="The English Animal Crossing title screen on Nintendo 64"><figcaption>Your next little adventure.</figcaption></figure>
     </section>
@@ -39,7 +37,7 @@
     <section class="patch-card" id="patcher" aria-labelledby="build-heading" aria-busy="false">
       <div class="ticket-top"><span>MAKE YOUR GAME</span><span>N64 + GAMECUBE</span></div>
       <div class="ticket-body">
-        <div class="card-heading"><h2 id="build-heading">Start with your game files.</h2><span class="version">V3 preview</span></div>
+        <div class="card-heading"><h2 id="build-heading">Start with your game files.</h2></div>
         <p class="card-intro">Choose your original games, customise your imports and settings, then build.</p>
         <div class="game-inputs" id="game-inputs">
           <div class="file-field" id="n64-field"><div class="file-title"><label for="n64">Doubutsu no Mori</label><span class="platform">NINTENDO 64</span></div><p>Japan · Original, unpatched ROM · 16 MiB</p><input id="n64" type="file" accept=".z64,.v64,.n64" aria-describedby="n64-hint n64-name"><span class="file-name" id="n64-name">No file chosen</span><small id="n64-hint">.z64, .v64, or .n64</small></div>
@@ -97,14 +95,14 @@
             <button class="primary" id="build" type="button" disabled>Build translation only</button>
             <div id="working" hidden><progress id="progress" max="100" value="0" aria-label="Build progress"></progress><button class="text-button" id="cancel" type="button">Cancel</button></div>
             <p class="status" id="status" role="status" aria-live="polite">Loading your choices…</p><p class="error" id="error" role="alert" hidden></p>
-            <section class="success" id="success" hidden aria-labelledby="success-heading"><h3 id="success-heading" tabindex="-1">Welcome to the neighbourhood.</h3><p>Your ROM is ready and has passed verification. Keep its selection profile with your test save.</p><a class="primary" id="download">Download ROM <span aria-hidden="true">↓</span></a><a class="receipt" id="receipt" download="Animal Crossing N64 - Import profile.json">Download selection profile</a><details class="checksum"><summary>Finished ROM SHA-256</summary><code id="output-sha"></code></details></section>
+            <section class="success" id="success" hidden aria-labelledby="success-heading"><h3 id="success-heading" tabindex="-1">Welcome to the neighbourhood.</h3><p>Your ROM is ready and has passed verification.</p><a class="primary" id="download">Download ROM <span aria-hidden="true">↓</span></a><a class="receipt" id="receipt" download="Animal Crossing N64 - Import profile.json">Download selection profile</a><details class="checksum"><summary>Finished ROM SHA-256</summary><code id="output-sha"></code></details></section>
           </div>
         <noscript><p class="error">Enable JavaScript to verify your files and build the ROM locally.</p></noscript>
       </div>
     </section>
 
-    <section class="visiting" aria-labelledby="visiting-heading"><div><p class="eyebrow">A TRAIN RIDE AWAY</p><h2 id="visiting-heading">Visiting a friend’s village.</h2><p>Share a settings file before building so everyone uses matching items, features, and town settings. One player exports their settings, then everyone imports that file before building their own game. Everyone keeps their own village save.</p></div><p class="preview-note">Full village visits are still being checked in this preview. Keep your main saves separate and back up your test save before travelling.</p></section>
-    <section class="hardware" aria-labelledby="hardware-heading"><div class="section-label"><h2 id="hardware-heading">Taking it to your N64?</h2><p>Original-hardware compatibility remains unverified.</p></div><div class="hardware-grid"><article><span class="hardware-icon" aria-hidden="true">8</span><div><h3>Expansion Pak</h3><p>8 MiB of memory required.</p></div></article><article><span class="hardware-icon small-icon" aria-hidden="true">SAVE</span><div><h3>FlashRAM · 128 KiB</h3><p>Select this save type on your flashcart.</p></div></article><article><span class="hardware-icon" aria-hidden="true">◷</span><div><h3>Real-time clock</h3><p>Your flashcart needs RTC support.</p></div></article></div></section>
+    <section class="visiting" aria-labelledby="visiting-heading"><div><p class="eyebrow">A TRAIN RIDE AWAY</p><h2 id="visiting-heading">Visiting a friend’s village.</h2><p>Share a settings file before building so everyone uses matching items, features, and town settings. One player exports their settings, then everyone imports that file before building their own game. Everyone keeps their own village save.</p></div></section>
+    <section class="hardware" aria-labelledby="hardware-heading"><div class="section-label"><h2 id="hardware-heading">Taking it to your N64?</h2></div><div class="hardware-grid"><article><span class="hardware-icon" aria-hidden="true">8</span><div><h3>Expansion Pak</h3><p>8 MiB of memory required.</p></div></article><article><span class="hardware-icon small-icon" aria-hidden="true">SAVE</span><div><h3>FlashRAM · 128 KiB</h3><p>Select this save type on your flashcart.</p></div></article><article><span class="hardware-icon" aria-hidden="true">◷</span><div><h3>Real-time clock</h3><p>Your flashcart needs RTC support.</p></div></article></div></section>
   </main>
   <footer class="wrap site-footer"><p>A fan translation. Not affiliated with Nintendo.</p><nav aria-label="Project links"><a href="https://github.com/TheDiscordian/doubutsu-no-mori-english">Source code</a><a href="https://github.com/TheDiscordian/doubutsu-no-mori-english/issues">Report a bug</a></nav></footer>
 </body>

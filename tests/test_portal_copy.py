@@ -40,6 +40,15 @@ class PortalCopyTests(unittest.TestCase):
                 self.assertNotIn('stay on your device', html)
                 self.assertNotIn('Nothing is uploaded', html)
 
+    def test_import_page_has_release_copy_not_development_status(self):
+        html=(ROOT/'experimental/imports/index.html').read_text()
+        for removed in ('V3 preview','V3 Preview','Experimental V3','test save',
+                        'still being checked','unverified','preview-note','preview-badge'):
+            self.assertNotIn(removed,html)
+        self.assertIn('<title>Animal Crossing N64 · English Translation</title>',html)
+        self.assertIn('Share a settings file before building',html)
+        self.assertIn('8 MiB of memory required.',html)
+
     def test_visitor_copy_and_branding(self):
         html = (ROOT/'web/index.html').read_text()
         script = (ROOT/'web/app.mjs').read_text()

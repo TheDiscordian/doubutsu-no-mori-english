@@ -20,7 +20,7 @@ from serve_portal import StaticPortal, validate_export
 class BuilderInterfaceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.site = ROOT/os.environ.get('V3_BUILDER_UI_SITE', 'build/v3-website-fish-movement-01/site')
+        cls.site = ROOT/os.environ.get('V3_BUILDER_UI_SITE', 'build/v3-website-release-copy-01/site')
         if not cls.site.exists():
             raise unittest.SkipTest('Current private interface export required')
         validate_export(cls.site)
@@ -146,6 +146,9 @@ class BuilderInterfaceTests(unittest.TestCase):
         self.assertIn('two are randomly selected each day during that period.', text)
         self.assertNotIn('other dates are unchanged', text)
         self.assertNotIn('existing furniture spaces', text)
+        for unwanted in ('V3 preview','Experimental V3','test save','still being checked','unverified'):
+            self.assertNotIn(unwanted,text)
+        self.assertEqual(self.page.title(),'Animal Crossing N64 · English Translation')
 
     def test_build_has_no_save_warning_or_acknowledgement(self):
         page = self.page
@@ -236,6 +239,29 @@ class BuilderInterfaceTests(unittest.TestCase):
         self.assertEqual(page.locator('#options .option:visible').count(), 9)
         for name in ('brook trout', 'arapaima', 'crawfish', 'frog', 'killifish'):
             self.assertTrue(page.get_by_role('checkbox', name=name, exact=True).is_visible())
+
+    def test_golden_tools_have_one_checkbox_and_no_individual_item_choices(self):
+        page=self.page
+        control=page.get_by_role('checkbox',name='Enable Golden tools',exact=True)
+        self.assertEqual(page.locator('#behaviour-controls #enable-golden-tools').count(),1)
+        self.assertEqual(page.locator('#enable-golden-trees').count(),0)
+        self.assertFalse(control.is_checked())
+        for identity in ('2239','223A','223B','223C'):
+            self.assertEqual(page.locator(f'#options [data-id="GAFE01-r0/item/{identity}"]').count(),0)
+        control.check()
+        for name in ('golden shovel','golden net','golden rod','golden axe'):
+            self.assertIn(name,page.locator('#dependency-list').text_content())
+        with page.expect_download() as event:page.locator('#settings-export').click()
+        with tempfile.TemporaryDirectory(prefix='v3-golden-settings-') as temp:
+            path=Path(temp)/'settings.json';event.value.save_as(path)
+            self.assertEqual(json.loads(path.read_text())['requested'],['feature/golden-tools'])
+            control.uncheck()
+            self.assertEqual(page.locator('#selection-heading').inner_text(),'No imports selected')
+            page.locator('#settings-import').set_input_files(str(path))
+            page.wait_for_function("() => document.querySelector('#settings-status').textContent.startsWith('Settings imported.')")
+            self.assertTrue(control.is_checked())
+        page.locator('#open-items').click();page.locator('#clear-items').click();page.locator('#close-items').click()
+        self.assertTrue(control.is_checked())
 
     def test_actual_rom_download_uses_the_wisp_setting(self):
         evidence = ROOT/'build/v3-feature-wisp-browser-02/results.json'
