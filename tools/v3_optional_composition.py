@@ -779,7 +779,7 @@ if __name__ == '__main__':
     parser.add_argument('--scope', choices=('v3-pipeline','development'), default='v3-pipeline',
         help='V3 regular pools by default; development retains preserved feature experiments')
     parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock; leave the main development lock unchanged')
-    parser.add_argument('--behaviour',action='append',default=[],metavar='SETTING=N64|GameCube',
+    parser.add_argument('--behaviour',action='append',default=[],metavar='SETTING=VALUE',
         help='Shared installed behaviour setting; repeat for distinct mechanics')
     args = parser.parse_args()
     if args.base_lock:use_build_lock(args.base_lock)

@@ -14,12 +14,12 @@ const choiceCopy = {
   'insect-population': { name: 'How many insects appear', N64: 'Up to two wild insects at once, using the original N64 appearance rules.', GameCube: 'Up to eight wild insects at once. Species are chosen using GameCube rules for the season, time, and location, and insects can appear in groups.', note: 'Applies to original and imported insects. Releasing an insect still works in either mode.' },
   'holiday-calendar': { name: 'Holiday dates', N64: 'Shared celebrations follow the Japanese N64 dates.', GameCube: 'Shared celebrations follow the English GameCube dates.', note: 'This changes dates, not which holidays you import. Celebrations exclusive to either game keep their own dates.' },
   'paper-quantities': { name: 'Stationery', N64: 'Buy and receive one sheet at a time.', GameCube: 'Buy and receive packs of four sheets. Packs can be split or combined; writing a letter uses one sheet.' },
-  'late-december-stock': { name: 'Nook’s December 26–31 stock', N64: 'Offer both the original New Year items and your selected festive candle and flag. Each seasonal selection has an equal chance of using either pair.', GameCube: 'Use your selected festive candle and flag instead of the original pair. If you leave either import off, its original N64 item stays available.', note: 'Only December 26–31 stock changes. This setting does nothing if neither festive item is selected.' },
-  'starting-diary': { name: 'Start with a diary', N64: 'Keep the original N64 starting house, without a diary.', GameCube: 'Place a college-rule diary on the orange box (the cardboard box) inside each starting house. Both imports are included automatically.', note: 'Applies when starting houses are created. Existing houses and player inventories are not changed.' },
+  'starting-diary': { name: 'Start with a diary', N64: 'Keep the original N64 starting house, without a diary.', GameCube: 'Place a college-rule diary on the orange box inside each starting house.', note: 'Only affects newly created houses. Existing houses are unchanged.' },
 };
 let loaded, selection, worker, generation = 0, romURL, receiptURL;
 const status = message => { $('status').textContent = message; };
 const behaviourControls = new Map();
+const decorationControls = new Map();
 function fileError() {
   try { for (const input of inputs) if (input.files[0]) rejectArchive(input.files[0]); }
   catch (error) { return error.message; }
@@ -73,8 +73,15 @@ function renderSelection() {
   selection = resolveSelection(loaded.plan, [...requested], behaviours);
   const custom = Boolean(selection.enabled.length || selection.behaviours_changed);
   const enabled = new Set(selection.enabled), required = new Set(selection.required);
+  const stockMode = loaded.plan.behaviours?.find(row => row.id === 'new-year-stock')?.values[behaviours['new-year-stock']];
+  for (const [key, { checkbox, bit, importId }] of decorationControls) {
+    checkbox.checked = importId ? enabled.has(importId) : !(stockMode & bit);
+    checkbox.disabled = importId ? required.has(importId) : false;
+  }
   const residents = [...cards.values()].filter(({ row }) => row.kind === 'villager');
   $('villager-count').textContent = `${residents.filter(({ row }) => enabled.has(row.id)).length} selected · ${residents.length} available`;
+  const items = [...cards.values()].filter(({ row }) => row.kind !== 'villager' && !row.dependency_only);
+  $('item-count').textContent = `${items.filter(({ row }) => enabled.has(row.id)).length} selected · ${items.length} available`;
   for (const [id, { checkbox, card, note }] of cards) {
     checkbox.checked = enabled.has(id); checkbox.disabled = required.has(id) || cards.get(id).row.dependency_only === true;
     card.dataset.selected = String(enabled.has(id)); card.dataset.required = String(required.has(id));
@@ -105,8 +112,13 @@ function changeSelection(change) {
 }
 function addChoices(plan) {
   // Keep the full technical save-format record in profiles, not page copy.
+  let decorationChoice;
   for (const row of plan.behaviours || []) {
     if (row.pipeline_unavailable) continue;
+    if (row.id === 'new-year-stock') {
+      decorationChoice = row;
+      continue;
+    }
     const label = document.createElement('label'), select = document.createElement('select');
     const caption = document.createElement('strong'), description = document.createElement('p');
     const copy = choiceCopy[row.id];
@@ -135,6 +147,7 @@ function addChoices(plan) {
     } else card.append(description);
     $('behaviour-options').append(card);
   }
+  if (decorationChoice) addDecorationChoices(decorationChoice);
   $('behaviour-controls').hidden = !plan.behaviours?.length;
   $('behaviour-note').textContent = 'Keep your behaviour settings with your save. A save made with four-sheet stationery packs needs the same setting when you load it again. Back up your save before changing settings.';
   for (const row of [...plan.options].sort((a, b) => a.kind.localeCompare(b.kind) || a.name.localeCompare(b.name))) {
@@ -159,13 +172,69 @@ function addChoices(plan) {
     }));
   }
 }
-$('open-villagers').addEventListener('click', () => $('villager-dialog').showModal());
-$('close-villagers').addEventListener('click', () => $('villager-dialog').close());
-$('villager-dialog').addEventListener('click', event => {
-  if (event.target !== $('villager-dialog')) return;
-  const box = event.target.getBoundingClientRect();
-  if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) event.target.close();
-});
+
+function addDecorationChoices(row) {
+  const card = document.createElement('fieldset'); card.className = 'behaviour-option decoration-settings';
+  card.id = 'new-year-stock';
+  const title = document.createElement('legend'); title.textContent = 'New Year decorations';
+  const explanation = document.createElement('p');
+  explanation.textContent = 'Choose the decorations Nook can sell from December 26–31. The shop uses its existing furniture spaces; other dates are unchanged.';
+  const value = document.createElement('input'); value.type = 'hidden'; value.value = row.default;
+  behaviours[row.id] = row.default; behaviourControls.set(row.id, value);
+  const actions = document.createElement('div'); actions.className = 'actions';
+  const grid = document.createElement('div'); grid.className = 'decoration-grid';
+  const definitions = [
+    { key: 'kadomatsu', name: 'Kadomatsu', bit: 1, detail: 'N64' },
+    { key: 'kagamimochi', name: 'Kagamimochi', bit: 2, detail: 'N64' },
+    { key: 'festive-candle', name: 'Festive candle', importId: 'GAFE01-r0/item/3298', detail: 'GameCube import' },
+    { key: 'festive-flag', name: 'Festive flag', importId: 'GAFE01-r0/item/327C', detail: 'GameCube import' },
+  ];
+  const commit = (mask, changeImports) => {
+    const before = [...requested].sort().join('\n') + behaviours[row.id];
+    changeImports();
+    value.value = Object.keys(row.values).find(key => row.values[key] === mask);
+    behaviours[row.id] = value.value;
+    if (before !== [...requested].sort().join('\n') + behaviours[row.id]) {
+      invalidate('New Year decorations changed.', true); renderSelection();
+    }
+  };
+  for (const selected of [true, false]) {
+    const button = document.createElement('button'); button.type = 'button';
+    button.id = selected ? 'select-decorations' : 'clear-decorations';
+    button.textContent = selected ? 'Select all four' : 'Clear all four';
+    button.addEventListener('click', () => commit(selected ? 0 : 3, () => {
+      for (const entry of definitions) if (entry.importId) {
+        if (selected) requested.add(entry.importId); else requested.delete(entry.importId);
+      }
+    }));
+    actions.append(button);
+  }
+  for (const entry of definitions) {
+    const label = document.createElement('label'), checkbox = document.createElement('input');
+    checkbox.type = 'checkbox'; checkbox.id = `stock-${entry.key}`;
+    const text = document.createElement('span'), name = document.createElement('strong'), detail = document.createElement('small');
+    name.textContent = entry.name; detail.textContent = entry.detail; text.append(name, detail); label.append(checkbox, text);
+    decorationControls.set(entry.key, { ...entry, checkbox }); grid.append(label);
+    checkbox.addEventListener('change', () => {
+      const mask = row.values[behaviours[row.id]];
+      commit(entry.importId ? mask : checkbox.checked ? mask & ~entry.bit : mask | entry.bit, () => {
+        if (entry.importId) { if (checkbox.checked) requested.add(entry.importId); else requested.delete(entry.importId); }
+      });
+    });
+  }
+  card.append(title, explanation, actions, grid, value); $('behaviour-options').append(card);
+}
+for (const [name, dialogId] of [['villagers', 'villager-dialog'], ['items', 'item-dialog']]) {
+  const dialog = $(dialogId);
+  $(`open-${name}`).addEventListener('click', () => dialog.showModal());
+  $(`close-${name}`).addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => $(`open-${name}`).focus());
+  dialog.addEventListener('click', event => {
+    if (event.target !== dialog) return;
+    const box = dialog.getBoundingClientRect();
+    if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) dialog.close();
+  });
+}
 for (const input of inputs) input.addEventListener('change', () => {
   const native = input.id === 'n64';
   $(native ? 'n64-name' : 'gc-name').textContent = input.files[0]?.name || 'No file chosen';

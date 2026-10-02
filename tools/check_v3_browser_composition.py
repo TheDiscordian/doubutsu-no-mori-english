@@ -43,6 +43,7 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     page.locator('#select-all').click()
     assert page.locator('.option input:checked').count() == len(catalog)
     page.locator('#clear-all').click()
+    page.locator('#open-items').click()
     page.locator('#kind').select_option('clothing')
     page.locator('#select-visible').click()
     assert page.locator('.option input:checked').count() == sum(
@@ -64,6 +65,7 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     assert page.locator('#no-results').is_visible()
     assert page.locator('#review, .unavailable').count() == 0
     results['search_category_all_clear_without_unavailable_list'] = True
+    page.locator('#close-items').click()
 
     assert page.locator('#villager-dialog').is_hidden()
     page.locator('#open-villagers').click()
@@ -90,10 +92,12 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     assert page.locator('#villager-dialog').is_hidden()
     results['separate_villager_dialog_keyboard_selection_and_close'] = True
     extra_item = extra_item or 'GAFE01-r0/item/31D4'
+    page.locator('#open-items').click()
     page.locator('#search').fill(extra_item)
     page.locator(f'[data-id="{extra_item}"] input').check()
     assert page.locator('.option input:checked').count() == 4
     results['keyboard_selection_dependencies_and_removal'] = True
+    page.locator('#close-items').click()
 
     # Shared settings work before selecting game files, and restore both kinds
     # of choices. A failed import must leave the current choices untouched.
@@ -172,17 +176,20 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     assert page.locator('#save-warning').is_hidden()
     results['selection_change_revokes_downloads'] = True
     if equipment:
+        page.locator('#open-items').click()
         page.locator('#search').fill('')
         page.locator('#kind').select_option('equipment')
         for key in (equipment[1],equipment[-1]):
             page.locator(f'[data-id="{key}"] input').check()
         assert page.locator('.option input:checked').count()==2
         assert page.locator('#dependencies').is_hidden()
+        page.locator('#kind').select_option('all')
+        page.locator('#close-items').click()
         page.locator('#save-ack').check()
         build_and_download('equipment-subset')
         page.locator('#clear-all').click()
-        page.locator('#kind').select_option('all')
     for group in import_groups:
+        page.locator('#open-items').click()
         page.locator('#search').fill('')
         for chosen in group['members']:
             page.locator(f'[data-id="{chosen}"] input').check()
@@ -192,19 +199,22 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
                 assert checkbox.is_checked() and checkbox.is_disabled()==(peer!=chosen)
                 if peer!=chosen:
                     assert catalog[peer]['name'] in page.locator('#dependency-list').text_content()
-            page.locator('#clear-all').click()
+            page.locator('#clear-items').click()
             assert page.locator('.option input:checked').count()==0
         chosen=group['members'][0]
         page.locator(f'[data-id="{chosen}"] input').check()
+        page.locator('#close-items').click()
         page.locator('#save-ack').check()
         selection=build_and_download('linked-group-'+group['id'])
         assert selection['requested']==[chosen]
         assert selection['required']==sorted(set(group['members'])-{chosen})
         page.locator('#clear-all').click()
     if behaviour_case:
+        page.locator('#open-items').click()
         page.locator('#search').fill('')
         for key in behaviour_case['requested']:
             page.locator(f'[data-id="{key}"] input').check()
+        page.locator('#close-items').click()
         control = page.locator(f'select[aria-describedby="behaviour-description-{behaviour_case["id"]}"]')
         assert control.input_value() == 'N64'
         control.select_option('GameCube')
@@ -299,7 +309,7 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     return results
 
 
-def check(export, output, *, interface=False, selected=None):
+def check(export, output, *, interface=False, selected=None, focused_behaviours=None):
     focused=selected is not None
     export, out = export.resolve(), output.resolve()
     if (not export.is_relative_to(ROOT/'build') or not out.is_relative_to(ROOT/'build') or out.exists()):
@@ -364,6 +374,7 @@ def check(export, output, *, interface=False, selected=None):
     from v3_creature_choices import options as behaviour_options
     choices = behaviour_options(base, report)
     def resolve(selected, behaviours=None):
+        if behaviours is None:behaviours=focused_behaviours
         return composer.resolve(catalog, selected, scope=scope, report=report,
             behaviour_options=choices if behaviours else None, behaviours=behaviours)
     profiles = [('no-imports', []), ('all-installed', available),
@@ -388,7 +399,7 @@ def check(export, output, *, interface=False, selected=None):
         result, _, _ = composer.compose(base, report, catalog, selected)
         expected['starting-house-and-ocean-GameCube'] = sha256(result)
     seasonal = report.get('equipment_resources', {}).get('seasonal_stock')
-    if interface and seasonal:
+    if interface and seasonal and seasonal['choice']['id']=='late-december-stock':
         behaviour_case = dict(id=seasonal['choice']['id'], label='seasonal-stock-GameCube',
                               requested=[row['id'] for row in seasonal['source']['imports']])
         selection = resolve(behaviour_case['requested'], {behaviour_case['id']:'GameCube'})
@@ -415,7 +426,7 @@ def check(export, output, *, interface=False, selected=None):
                 def worker(selected, cancel=False):
                     # A real module Worker reads File objects and disc slices.
                     # No private game input is fetched from or uploaded to HTTP.
-                    return page.evaluate('''({selected, cancel, plan_sha256}) => new Promise((resolve, reject) => {
+                    return page.evaluate('''({selected, cancel, plan_sha256, behaviours}) => new Promise((resolve, reject) => {
                       const worker = new Worker('/preview/experimental/imports/worker.mjs', {type: 'module'});
                       const timer = setTimeout(() => { worker.terminate(); reject(Error('Worker check timed out')); }, 90000);
                       const finish = result => { clearTimeout(timer); worker.terminate(); resolve(result); };
@@ -429,9 +440,9 @@ def check(export, output, *, interface=False, selected=None):
                           finish({type: 'done', sha256: hash, bytes: data.buffer.byteLength, receipt: data.receipt});
                         }
                       };
-                      worker.postMessage({requested: selected, plan_sha256, n64: document.querySelector('#n64').files[0],
+                      worker.postMessage({requested: selected, behaviours, plan_sha256, n64: document.querySelector('#n64').files[0],
                         gamecube: document.querySelector('#disc').files[0]});
-                    })''', {'selected': selected, 'cancel': cancel, 'plan_sha256': manifest['plan']['sha256']})
+                    })''', {'selected': selected, 'cancel': cancel, 'plan_sha256': manifest['plan']['sha256'], 'behaviours': focused_behaviours})
 
                 if interface:
                     results['interface'] = check_interface(page, origin, out, expected, menu,
@@ -449,6 +460,8 @@ def check(export, output, *, interface=False, selected=None):
                         for key in ('enabled', 'required', 'profile_hex'):
                             assert result['receipt'][key] == resolve(selected)[key], (name, key)
                         selection=resolve(selected)
+                        if focused_behaviours:
+                            assert result['receipt']['behaviours']==selection['behaviours']
                         if 'surface_profile_hex' in selection:
                             for key in ('surface_profile_hex','surface_profile_sha256'):
                                 assert result['receipt'][key]==selection[key],(name,key)
@@ -459,6 +472,7 @@ def check(export, output, *, interface=False, selected=None):
                         ui=context.new_page();ui.on('pageerror',lambda error:errors.append(str(error)))
                         ui.goto(origin+'/preview/')
                         ui.wait_for_function("() => !document.querySelector('#selection-controls').disabled")
+                        ui.locator('#open-items').click()
                         counts={}
                         for kind in sorted({catalog[k]['kind'] for k in profiles[0][1]}):
                             count=sum(r['kind']==kind and not r.get('dependency_only') for r in menu.values())
@@ -466,7 +480,7 @@ def check(export, output, *, interface=False, selected=None):
                             assert ui.locator('.option:visible').count()==count
                             ui.locator('#select-visible').click()
                             assert ui.locator('.option:visible input:checked').count()==count
-                            ui.locator('#clear-all').click();counts[kind]=count
+                            ui.locator('#clear-visible').click();counts[kind]=count
                         results['focused_category_controls']=counts;ui.close()
                     else:
                         unknown = worker(['GAFE01-r0/item/0000'])
@@ -497,6 +511,14 @@ if __name__ == '__main__':
     parser.add_argument('--interface', action='store_true', help='Check the real selection page and downloads instead of the worker probe')
     parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock for this isolated test')
     parser.add_argument('--select',action='append',help='Check only this current profile and its category controls; repeat for more identities')
+    parser.add_argument('--behaviour',action='append',default=[],help='Focused SETTING=VALUE; repeat for distinct settings')
     args = parser.parse_args()
     if args.base_lock:composer.use_build_lock(args.base_lock)
-    print(json.dumps(check(args.export, args.output, interface=args.interface,selected=args.select), indent=2))
+    behaviours={}
+    for argument in args.behaviour:
+        key,separator,value=argument.partition('=')
+        if not separator or not key or key in behaviours:parser.error('Use distinct SETTING=VALUE choices')
+        behaviours[key]=value
+    if behaviours and args.select is None:parser.error('--behaviour requires a focused --select profile')
+    print(json.dumps(check(args.export, args.output, interface=args.interface,selected=args.select,
+        focused_behaviours=behaviours or None), indent=2))

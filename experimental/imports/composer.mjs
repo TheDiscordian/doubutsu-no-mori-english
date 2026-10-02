@@ -187,8 +187,11 @@ export function validatePlan(plan) {
       'Invalid unavailable behaviour setting.');
     for (const key of ['name', 'scope', 'description']) require(typeof row[key] === 'string' &&
       row[key].length > 0 && row[key].length < 1024, 'Invalid behaviour description.');
-    require(row.values && Object.keys(row.values).length === 2 && row.values.N64 === 0 && row.values.GameCube === 1 &&
-      row.default === 'N64', 'Unsupported behaviour choices.');
+    const decorationChoice = row.id === 'new-year-stock' && row.default === 'both' && row.values &&
+      Object.keys(row.values).length === 4 && row.values.both === 0 && row.values.kadomatsu === 2 &&
+      row.values.kagamimochi === 1 && row.values.neither === 3;
+    require(row.id === 'new-year-stock' ? decorationChoice : (row.values && Object.keys(row.values).length === 2 && row.values.N64 === 0 && row.values.GameCube === 1 &&
+      row.default === 'N64'), 'Unsupported behaviour choices.');
     field(row, 4, 4); require(row.before === '00000000', 'Changed behaviour default.');
     if (row.patches !== undefined) {
       array(row.patches, 1, 16);

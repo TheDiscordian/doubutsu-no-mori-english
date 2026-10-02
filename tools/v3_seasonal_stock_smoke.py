@@ -13,11 +13,13 @@ from v3_asset_loader import BLOB
 from v3_seasonal_stock import END, FORMAT, GUARD, RAM
 
 
-def exercise(debug, rom_path, record):
+def exercise(debug, rom_path, record, *, modes=(0,1,2,3)):
+    if not modes or len(set(modes))!=len(modes) or any(type(mode)!=int or mode not in range(4) for mode in modes):
+        raise ValueError('Choose distinct native decoration masks from zero to three')
     path = Path(rom_path); image = path.read_bytes()
     report = json.loads((path.parent/'build.json').read_bytes())
     owner = report['equipment_resources']['seasonal_stock']; packet = owner['packet']
-    if sha256(image) != report['output_sha256'] or owner['format'] != FORMAT or not owner['installed']:
+    if sha256(image) != report['output_sha256'] or owner['format'] != 'AFV3-SEASONAL-STOCK-2' or not owner['installed']:
         raise ValueError('Seasonal probe requires the exact installed cartridge')
     source = image[packet['physical']:packet['physical']+packet['bytes']]
     code = bytearray(source[RAM-packet['ram']:RAM-packet['ram']+owner['code']['bytes']])
@@ -60,14 +62,21 @@ def exercise(debug, rom_path, record):
         original = [0xF001,0xF002,0xF003,0xF004]; expected = original.copy()
         debug.write_memory(scratch+16,struct.pack('>4H',*original))
         seasonal = month == 12 and 26 <= day <= 31
-        imported = seasonal and mask and mode < 2
-        if imported and mode == 0:
-            seed = advance(seed); imported = seed < 0x80000000
         pair = None
         if count > 0:
-            if seasonal:
-                pair = [int(r['item_id'],16) if imported and mask&(1<<i) else owner['source']['native_fallback'][i]
-                        for i,r in enumerate(rows)]
+            if seasonal and (mode or mask):
+                candidates = [item for bit,item in enumerate(owner['source']['native_fallback']) if not mode&(1<<bit)]
+                candidates += [int(row['item_id'],16) for bit,row in enumerate(rows) if mask&(1<<bit)]
+                for slot in range(min(2,count,len(candidates))):
+                    pick = 0
+                    if len(candidates)>1:
+                        seed = advance(seed)
+                        value = (seed>>9)/(1<<23)
+                        product = struct.unpack('>f',struct.pack('>f',value*len(candidates)))[0]
+                        pick = min(int(product),len(candidates)-1)
+                    expected[slot] = candidates[pick]
+                    candidates[pick] = candidates[-1]; candidates.pop()
+            elif seasonal: pair = owner['source']['native_fallback']
             elif month == 12 and day <= 24: pair = [0x1E0C,0x1DD8]
             elif (month == 2 and day >= 20) or (month == 3 and day <= 3): expected[0] = 0x10E4
             elif (month == 4 and day >= 20) or (month == 5 and day <= 5): expected[0] = 0x1DCC
@@ -86,9 +95,9 @@ def exercise(debug, rom_path, record):
         cases += 1
 
     try:
-        for mode in (0,1):
+        for mode in modes:
             for mask in range(4):
-                for count in (1,2):
+                for count in (0,1,2):
                     for seed in (0x10000000,0xE0000000): run(mode,mask,count,12,26,seed)
         for month,day in ((12,24),(12,25),(12,31),(2,20),(5,5),(1,26)):
             run(1,3,2,month,day,0x10000000)
@@ -96,6 +105,6 @@ def exercise(debug, rom_path, record):
         for at,data in saved.items(): debug.write_memory(at,data)
     for at,data in saved.items(): check('original native state restored',at,data)
     check('seasonal reservation guard',END-16,struct.pack('>4I',*([GUARD]*4)))
-    return dict(seasonal_stock_native='passed',cases=cases,
+    return dict(seasonal_stock_native='passed',cases=cases,modes=list(modes),
                 ordinary_purchase_verified=False,save_restart_verified=False,hardware_verified=False,
                 requires_checkpoint_restore=True)

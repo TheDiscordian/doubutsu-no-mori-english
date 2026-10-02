@@ -30,7 +30,7 @@ class SeasonalStockHostTests(unittest.TestCase):
                 str(ROOT/'tests/fixtures/v3_seasonal_stock_host.c'),'-o',str(exe)],
                 check=True,capture_output=True,timeout=30)
             result = subprocess.run([str(exe)],check=True,capture_output=True,text=True,timeout=10)
-            self.assertIn('7680 cases pass',result.stdout)
+            self.assertIn('12800 cases pass',result.stdout)
 
 
 class SeasonalStockCartridgeTests(unittest.TestCase):

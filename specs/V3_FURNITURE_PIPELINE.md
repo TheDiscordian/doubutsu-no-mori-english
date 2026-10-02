@@ -89,27 +89,30 @@ the source list's train name does not require a new train feature. Nook's native
 stock builder calls its fixed-ID seasonal replacement, so merely appending
 these items to the stock list does not make them obtainable.
 
-`tools/v3_seasonal_stock.py` binds one additive wrapper to the existing seasonal
-call. Independent profile selections determine each member; an unchecked member
-uses its corresponding native New Year item. No-selection and unrelated dates
-delegate to the complete native routine. The native pair helper retains the
-donor's two-slot and one-slot/RNG algorithms. Original spring and Christmas
-branches, stock allocations, artwork, and saved fields remain unchanged.
+`tools/v3_seasonal_stock.py` binds one wrapper to the existing seasonal call.
+Four WebUI checkboxes choose kadomatsu, kagamimochi, festive candle, and festive
+flag for sale December 26–31. The internal `new-year-stock` setting disables
+either original item through two bits; the festive choices use the independent
+import profiles. The wrapper chooses without replacement from enabled items,
+using at most the original two seasonal furniture spaces. One enabled item uses
+one space; no enabled items leave ordinary furniture unchanged. The default
+original pair without imports and all unrelated dates delegate to the native
+routine. Original spring and Christmas branches, stock allocations, artwork,
+and saved fields remain unchanged.
 
-One `late-december-stock` WebUI/offline setting describes the actual integration.
-N64 mode mixes original and selected donor pairs equally to keep both obtainable;
-this is an explicit additive platform adaptation, not the original distribution.
-GameCube mode prioritises selected donor stock. The checked startup packet
-carries the wrapper and setting in an unused gap. Composition refreshes the
-packet CRC, bootstrap CRC word, packet aliases, and complete resource hashes.
+The checked startup packet carries the wrapper and setting in its existing
+reservation. Composition refreshes the packet CRC, bootstrap CRC word, packet
+aliases, and complete resource hashes.
 
-Shared host checks use the actual wrapper under sanitizers with native APIs
-doubled. The bounded native category probe verifies installed code/call targets,
-real profile/RNG/RTC reads, both modes, independent selections, native date
-fallbacks, full result buffers, and guards, then restores its checkpoint.
-Browser differential checks cover each selection in each mode; a real-file UI
-download verifies the actual GameCube setting and setting-change invalidation.
-These checks do not establish ordinary purchases, save/restart, or hardware.
+Shared host checks exercise 12,800 cases under sanitizers with native APIs
+doubled. The bounded installed native probe checks actual profile/RNG/RTC reads,
+all sixteen item combinations, date fallbacks, complete buffers, and guards,
+then restores its checkpoint. The first run's watchdog ended the probe after
+52 passing cases; a focused second run passes the remaining 54 cases.
+Browser checks cover all sixteen checkbox combinations and settings round trips.
+A real-file UI download with both festive imports and both originals disabled
+matches offline composition. These checks do not establish ordinary purchases,
+save/restart, or hardware.
 
 ### Built-in native profile staging
 

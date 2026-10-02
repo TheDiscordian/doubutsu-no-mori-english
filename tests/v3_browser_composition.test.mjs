@@ -36,6 +36,25 @@ async function behaviourFixture() {
   return result;
 }
 
+test('native New Year decorations are independent checked stock flags, not platform modes', async () => {
+  const { source, plan } = await behaviourFixture();
+  const row = plan.behaviours[0];
+  delete row.required_imports; delete row.patches;
+  Object.assign(row, { id: 'new-year-stock', name: 'New Year decorations',
+    default: 'both', values: { both: 0, kadomatsu: 2, kagamimochi: 1, neither: 3 } });
+  for (const [setting, bits] of Object.entries(row.values)) {
+    const choices = { 'new-year-stock': setting };
+    const built = await composeSelection(source, plan, [A], choices);
+    assert.equal(new DataView(built.output.buffer).getUint32(row.offset), bits);
+    assert.equal(built.receipt.behaviours['new-year-stock'], setting);
+    const shared = exportSettings(plan, '3'.repeat(64), [A], choices);
+    assert.deepEqual(importSettings(plan, '3'.repeat(64), shared).behaviours, choices);
+  }
+  assert.throws(() => resolveSelection(plan, [], { 'new-year-stock': 'GameCube' }), /Unsupported behaviour value/);
+  const bad = clone(plan); bad.behaviours[0].values.kadomatsu = 1;
+  assert.throws(() => validatePlan(bad), /Unsupported behaviour choices/);
+});
+
 test('behaviour dependencies and checked conditional patches change only the selected alternative', async () => {
   const { source, plan } = await behaviourFixture();
   const n64 = await composeSelection(source, plan, [A]);

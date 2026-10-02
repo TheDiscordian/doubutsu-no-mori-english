@@ -12,6 +12,13 @@ from build_portal import DOWNLOAD_NAME, SAVE_NOTE
 
 
 class PortalCopyTests(unittest.TestCase):
+    def test_no_unrequested_file_privacy_copy(self):
+        for path in ('web/index.html', 'experimental/imports/index.html'):
+            with self.subTest(path=path):
+                html = (ROOT/path).read_text()
+                self.assertNotIn('stay on your device', html)
+                self.assertNotIn('Nothing is uploaded', html)
+
     def test_visitor_copy_and_branding(self):
         html = (ROOT/'web/index.html').read_text()
         script = (ROOT/'web/app.mjs').read_text()

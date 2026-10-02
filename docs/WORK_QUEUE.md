@@ -62,11 +62,13 @@ Preserve the completed paths and verified original rules:
    and fresh-process reload for the current full import selection; rerun only
    when a later connected change affects that path.
 4. Preserve the verified website repairs: ROM selectors before settings/import
-   choices, and the patch button after those choices; the original visual design,
-   separate villager window and categorised item selection, no unavailable lists
+   choices, and the patch button after those choices; matching villager and item
+   windows, categorised item cards, Select/Clear above options, no unavailable lists
    or internal wording, and plain version/settings guidance for friends without
-   requiring checksum knowledge. Keep settings export/import, verified house-start
-   diary placement, and shared ocean movement working as remaining imports land.
+   requiring checksum knowledge. Settings export/import belongs at the top of
+   the choices, immediately after ROM inputs. Preserve verified house-start diary
+   placement and shared ocean movement. Four individual New Year decoration
+   checkboxes control Nook's actual December 26–31 stock.
 5. The mapped consumer checks and current selection review pass. Twenty current
    scope checks cover regular stock, genuine existing reward providers, independent
    selection, preserved unavailable-feature resources, and browser/offline
@@ -76,15 +78,21 @@ Preserve the completed paths and verified original rules:
    branch; the private handoff records artifact identities, compatibility, and
    verification limits. The public V2 patcher remains unchanged.
 
-The current proposal is `build/v3-travel-console-visitors-installed-01/build-lock.json`,
-ABI 396, retaining the checked transport with 20 villagers and 277 requested
-items. Its full selection is `build/v3-travel-console-visitors-profile-01`.
-The repaired local preview serves `build/v3-travel-website-browser-04/site`.
-Its fresh ABI-396 two-game recipes have 16 authenticated live static files;
-the focused Clu Clu Land D browser selection matches offline at
-`build/v3-travel-console-visitors-browser-02/results.json`, with passing category
-controls and no page errors, uploads, or off-origin requests. The existing
-unchanged layout/settings checks remain retained.
+The retained full-import handoff uses ABI 396 at
+`build/v3-travel-console-visitors-installed-01/build-lock.json`, with 20 villagers
+and 277 requested items in `build/v3-travel-console-visitors-profile-01`.
+The current local preview serves `build/v3-website-design-03/site`, built from
+ABI 397 at `build/v3-new-year-checkboxes-installed-03/build-lock.json`.
+Only the seasonal stock wrapper changes; saved format 21 and import identities
+are unchanged. The matching selector windows, control order, responsive layouts,
+direct copy, all sixteen decoration selections, and settings round trips pass
+`tests/test_v3_builder_ui.py`. An actual two-festive-item UI download with both
+original decorations disabled matches the offline/browser result at
+`build/v3-new-year-stock-browser-02/results.json`. Stock checks retain 52 passing
+native cases before the first run's watchdog and pass the remaining 54 at
+`build/v3-new-year-checkboxes-native-02/results.json`; sanitized host checks pass
+12,800 cases. Ordinary save/restart is retained ABI-396 evidence, not a newly
+executed ABI-397 check. Public V2 remains unchanged.
 No incomplete
 visitor behaviour or unresolved possible game defect is waived by a private
 playtest label. Broad human gameplay and original-hardware testing remain

@@ -36,7 +36,7 @@ int main(void) {
     const int dates[][2] = {{12,25},{12,26},{12,31},{12,32},{1,26},{2,20},{3,3},{5,5}};
     const float rolls[] = {0.0f, 0.49f, 0.5f, 0.99f};
     int cases = 0;
-    for (u32 mode = 0; mode < 3; ++mode)
+    for (u32 mode = 0; mode < 5; ++mode)
     for (selected = 0; selected < 4; ++selected)
     for (unsigned date = 0; date < sizeof(dates)/sizeof(*dates); ++date)
     for (int count = -1; count <= 3; ++count)
@@ -50,24 +50,36 @@ int main(void) {
         random_values[0] = rolls[roll]; random_values[1] = rolls[second];
         profile_calls = original_calls = pair_calls = draws = 0;
         int seasonal = dates[date][0] == 12 && dates[date][1] >= 26 && dates[date][1] <= 31;
-        int mixed_draw = count > 0 && seasonal && selected && mode == 0;
-        int imported = count > 0 && seasonal && selected && mode < 2 &&
-            (mode == 1 || rolls[roll] < 0.5f);
-        int original = count > 0 && !imported;
-        int paired = count > 0 && (imported || (dates[date][0] == 12 && dates[date][1] >= 26));
-        if (paired) {
-            u16 a = imported && (selected & 1) ? 0x3298 : 0x1220;
-            u16 b = imported && (selected & 2) ? 0x327C : 0x1224;
-            if (count > 1) { expected[0] = a; expected[1] = b; }
-            else expected[0] = (mixed_draw ? rolls[second] : rolls[roll]) < 0.5f ? a : b;
-        } else if (original) expected[0] = 0x0BAD;
+        int original = count > 0 && (!seasonal || mode > 3 || (!selected && mode == 0));
+        unsigned expected_draws = 0, total = 0;
+        u16 pool[4];
+        if (count > 0 && !original) {
+            if (!(mode & 1)) pool[total++] = 0x1220;
+            if (!(mode & 2)) pool[total++] = 0x1224;
+            if (selected & 1) pool[total++] = 0x3298;
+            if (selected & 2) pool[total++] = 0x327C;
+            for (unsigned slot = 0; slot < 2 && slot < (unsigned)count && total; ++slot) {
+                unsigned pick = 0;
+                if (total > 1) pick = (unsigned)(random_values[expected_draws++] * total);
+                expected[slot] = pool[pick];
+                pool[pick] = pool[--total];
+            }
+        } else if (original) {
+            if (dates[date][0] == 12 && dates[date][1] >= 26) {
+                expected[0] = 0x1220;
+                if (count > 1) expected[1] = 0x1224;
+                else {
+                    expected[0] = random_values[expected_draws++] < 0.5f ? 0x1220 : 0x1224;
+                }
+            } else expected[0] = 0x0BAD;
+        }
         af_v3_seasonal_stock(buffer.items, count);
         assert(memcmp(expected, buffer.items, sizeof expected) == 0);
         assert(buffer.before == 0xAF53544B && buffer.after == 0xAF53544B);
-        assert(profile_calls == (count > 0 && seasonal ? 2 : 0));
+        assert(profile_calls == (count > 0 && seasonal && mode < 4 ? 2 : 0));
         assert(original_calls == original);
-        assert(pair_calls == paired);
-        assert(draws == mixed_draw + (paired && count == 1));
+        assert(pair_calls == (original && dates[date][0] == 12 && dates[date][1] >= 26));
+        assert(draws == (int)expected_draws);
         ++cases;
     }
     profile_calls = original_calls = pair_calls = draws = 0;

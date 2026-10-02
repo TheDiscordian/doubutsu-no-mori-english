@@ -402,10 +402,11 @@ and ordinary groups, including clothing, stationery, walls/floors, tools, songs,
 fish/insects, and miscellaneous items. Do not mistake stack states, rotations,
 or alternate representations for independent imports.
 
-Festive candle and flag use Nook's existing late-December stock replacement,
-with independent selections and native fallback. The shared N64/GameCube stock
-setting describes its additive native/imported mixture versus donor-priority
-pair. Neither alternative requires a new feature or building. See the
+Four independent checkboxes choose the decorations Nook can sell December
+26–31: kadomatsu, kagamimochi, festive candle, and festive flag. The first two
+control original items; the last two also select their imports. The existing
+shop has at most two seasonal furniture spaces, so four enabled decorations
+do not all appear simultaneously. Other dates are unchanged. See the
 [shared seasonal-stock contract](V3_FURNITURE_PIPELINE.md#shared-fixed-id-seasonal-stock).
 
 Gulliver souvenirs and winter-igloo rewards extend existing native handovers and

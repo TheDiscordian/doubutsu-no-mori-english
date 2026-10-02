@@ -54,8 +54,18 @@ passport/stored-letter notes coexist without replacing imported records.
 Rewarded-model persistence also passes actual delivery to the loaded player's
 matching house, both complete device writers, and a fresh-process load retaining
 the original letters, presents, and earned flags.
-The requested website design, villager dialog,
-and control-order repairs pass browser checks and run in the local preview.
+The local preview serves `build/v3-website-design-03/site` from ABI 397 at
+`build/v3-new-year-checkboxes-installed-03/build-lock.json`. Villagers and items
+have matching selector windows, Select/Clear above the choices, and settings
+export/import immediately after the ROM inputs. Four individual decoration
+checkboxes control Nook's December 26–31 stock. Responsive layout, keyboard
+controls, all sixteen decoration combinations, and settings round trips pass
+browser checks. A real-file UI download matches offline composition at
+`build/v3-new-year-stock-browser-02/results.json`. The stock wrapper passes
+12,800 sanitized host cases; installed native checks retain 52 passing cases
+before the first run's watchdog and pass the remaining 54 in a focused run.
+Saved format 21 and import identities are unchanged. Ordinary save/restart
+remains retained ABI-396 evidence, not a newly executed ABI-397 check.
 The [private handoff](WORK_QUEUE.md#v3-private-playtest-handoff) records the
 connected native checks and current selection review. Twenty current scope checks
 pass, including actual browser/offline agreement, regular stock, existing reward

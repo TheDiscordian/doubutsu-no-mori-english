@@ -16,6 +16,10 @@ FORMAT = 'AFV3-SEASONAL-STOCK-1'
 CHOICE = dict(id='late-december-stock', name='Late-December seasonal stock', binding='stock_mode',
     symbol='af_v3_seasonal_stock_mode', scope='Nook seasonal furniture from December 26 to 31',
     description='N64 mixes selected festive imports with the original New Year pair, keeping both obtainable. GameCube prioritises the selected festive candle and flag. Unselected replacements use native items. Other seasonal dates are unchanged.')
+ITEM_CHOICE = dict(id='new-year-stock', name='New Year decorations for sale', binding='stock_mode',
+    symbol='af_v3_seasonal_stock_mode', scope='Nook seasonal furniture from December 26 to 31',
+    description='Choose which decorations Nook can sell from December 26 to 31. Kadomatsu and kagamimochi are original items; festive candle and festive flag follow their import selections.')
+ITEM_VALUES = dict(both=0, kadomatsu=2, kagamimochi=1, neither=3)
 SOURCES = ('tools/v3_seasonal_stock.py', 'overlays/v3/seasonal_stock.c',
     'overlays/v3/seasonal_stock.ld', 'tools/v3_asset_loader.py',
     'tools/v3_furniture_install.py', 'tools/v3_creature_choices.py', 'tools/v3_import_scope.py')
@@ -72,7 +76,9 @@ def source_contract(source, prior, core):
 
 
 def install(base, prior, blob, core, module, output):
-    del blob, module
+    del module
+    if prior.get('equipment_resources',{}).get('seasonal_stock'):
+        return refresh_items(base, prior, blob, output)
     e = copy.deepcopy(prior['equipment_resources'])
     if e.get('seasonal_stock') or not e.get('scene_arena',{}).get('installed'):
         raise ValueError('Seasonal stock requires the checked complete scene/startup owner')
@@ -112,10 +118,10 @@ def install(base, prior, blob, core, module, output):
         raise ValueError('Changed native seasonal call')
     after = jump(compiled['symbols']['af_v3_seasonal_stock'],link=True)
     struct.pack_into('>I',core,at,after)
-    e['seasonal_stock']=dict(format=FORMAT,installed=True,source=contract,
+    e['seasonal_stock']=dict(format='AFV3-SEASONAL-STOCK-2',installed=True,source=contract,
         code=dict(compiled,ram=RAM),packet=replacement,
         reservation=dict(ram=RAM,bytes=END-RAM,guard=END-16,guard_value=GUARD),
-        choice=dict(CHOICE,ram=compiled['symbols'][CHOICE['symbol']],default='N64',values=dict(N64=0,GameCube=1)),
+        choice=dict(ITEM_CHOICE,ram=compiled['symbols'][ITEM_CHOICE['symbol']],default='both',values=ITEM_VALUES),
         hook=dict(address=address,before=before,after=after,delay_slot=u32(core,at+4)),
         native_consumers=[dict(start=a,end=b,sha256=h) for a,b,h in CONTRACTS],
         artwork_changed=False,saved_format_changed=False,native_execution_verified=False,
@@ -127,12 +133,55 @@ def option(image, report):
     owner=report.get('equipment_resources',{}).get('seasonal_stock')
     if not owner:return None
     row=owner['choice'];p=owner['packet'];at=p['physical']+row['ram']-p['ram']
-    if (owner.get('format') != FORMAT or not owner['installed']
-            or any(row.get(k)!=v for k,v in CHOICE.items()) or row['default']!='N64'
-            or row['values']!=dict(N64=0,GameCube=1) or u32(image,at)!=0
+    explicit = owner.get('format') == 'AFV3-SEASONAL-STOCK-2'
+    definition = ITEM_CHOICE if explicit else CHOICE
+    if (owner.get('format') not in (FORMAT, 'AFV3-SEASONAL-STOCK-2') or not owner['installed']
+            or any(row.get(k)!=v for k,v in definition.items()) or row['default']!=('both' if explicit else 'N64')
+            or row['values']!=(ITEM_VALUES if explicit else dict(N64=0,GameCube=1)) or u32(image,at)!=0
             or sha256(image[p['physical']:p['physical']+p['bytes']])!=p['sha256']):
         raise ValueError('Changed complete installed seasonal stock choice')
     return dict(row,offset=at,before=image[at:at+4].hex())
+
+
+def refresh_items(base, prior, blob, output):
+    """Replace only the checked seasonal reservation in the current cartridge."""
+    option(base, prior)
+    e = copy.deepcopy(prior['equipment_resources'])
+    old = e['seasonal_stock']; packet = copy.deepcopy(old['packet'])
+    raw = bytearray(base[packet['physical']:packet['physical']+packet['bytes']])
+    before = bytes(raw[RAM-packet['ram']:END-packet['ram']])
+    if (prior['runtime_abi'] != 396 or old['format'] != FORMAT or
+            old['reservation'] != dict(ram=RAM,bytes=END-RAM,guard=END-16,guard_value=GUARD) or
+            sha256(before[:old['code']['bytes']]) != old['code']['sha256'] or
+            before[-16:] != struct.pack('>4I',*([GUARD]*4))):
+        raise ValueError('Changed current complete seasonal reservation')
+    generated = output/'seasonal_records.S'
+    ids = [int(r['item_id'],16) for r in old['source']['imports']] + old['source']['native_fallback']
+    write_new(generated, ('.section .rodata.seasonal_records,"a",@progbits\n.balign 4\n'
+        '.globl af_seasonal_items\naf_seasonal_items:\n.half '+','.join(hex(x) for x in ids)+'\n').encode())
+    code, compiled = compile_part('seasonal_stock',output/'seasonal_stock',
+        extra_sources=(str(generated.relative_to(ROOT)),), link_symbols=dict(
+            af_seasonal_rtc=0x80136FBC,af_seasonal_random=0x8002C9AC,
+            af_seasonal_original=0x800BF7EC,af_seasonal_pair=0x800BF770,
+            af_v3_furniture_import_profile=prior['furniture']['code']['symbols']['af_v3_furniture_import_profile']))
+    if len(code)>END-RAM-16 or compiled['symbols'][ITEM_CHOICE['symbol']] != 0x804F37F0:
+        raise ValueError('Seasonal checkboxes exceed the retained reservation')
+    raw[RAM-packet['ram']:END-16-packet['ram']] = code+bytes(END-RAM-16-len(code))
+    replacement = dict(packet,sha256=sha256(raw),crc32=zlib.crc32(raw))
+    refresh_aliases(e,packet,replacement)
+    boot=e['surface_bootstrap']['code']
+    at=e['blob_offset']+boot['symbols']['storage_crc']-e['ram']
+    if u32(blob,at)!=packet['crc32']:raise ValueError('Changed seasonal startup CRC')
+    # The shared installer republishes startup from the new packet receipt.
+    # Leave the authenticated equipment module intact until that rebuild.
+    old.update(format='AFV3-SEASONAL-STOCK-2',code=dict(compiled,ram=RAM),packet=replacement,
+        choice=dict(ITEM_CHOICE,ram=compiled['symbols'][ITEM_CHOICE['symbol']],default='both',values=ITEM_VALUES),
+        selection='Four independently enabled decorations; native toggles plus import profiles',
+        saved_format_changed=False,native_execution_verified=False,
+        sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
+    records=copy.deepcopy(prior['physical_resources'])
+    record=next(r for r in records if r['id']==packet['id']);record['sha256']=replacement['sha256']
+    return e,{},dict(physical_resources=records),[(dict(record,previous_sha256=packet['sha256']),bytes(raw))]
 
 
 def checksum_field(image, report):

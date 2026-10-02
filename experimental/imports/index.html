@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Choose GameCube villagers and items, set your town rules, and build Animal Crossing N64 in English. Your game files stay on your device.">
+  <meta name="description" content="Choose GameCube villagers and items, set your town rules, and build Animal Crossing N64 in English.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="theme-color" content="#254d3f">
@@ -17,14 +17,14 @@
   <a class="skip" href="#patcher">Skip to patcher</a>
   <header class="site-header wrap">
     <a class="brand" href="./" aria-label="Animal Crossing N64 English translation home"><img src="./web/mark.svg" width="46" height="46" alt=""><span>Animal Crossing N64<small>ENGLISH TRANSLATION</small></span></a>
-    <span class="preview-badge">V3 · PLAYTEST PREVIEW</span>
+    <span class="preview-badge">V3 preview</span>
   </header>
   <main class="wrap">
     <section class="hero" aria-labelledby="welcome-heading">
       <div class="welcome">
-        <p class="eyebrow">YOUR TOWN, YOUR WAY</p>
-        <h1 id="welcome-heading">A familiar town.<br><em>A few new favourites.</em></h1>
-        <p class="intro">Animal Crossing’s N64 hometown, in English.<br>Bring along the GameCube villagers and items you love.</p>
+        <p class="eyebrow">ANIMAL CROSSING · NINTENDO 64</p>
+        <h1 id="welcome-heading">A little more<br><em>Animal Crossing.</em></h1>
+        <p class="intro">The original N64 game, in English.<br>With your favourite GameCube villagers and items.</p>
         <p class="preview-note">Experimental V3 preview. Use a separate test save.</p>
       </div>
       <figure class="postcard"><img src="./web/media/town.webp" width="800" height="600" alt="The English Animal Crossing title screen on Nintendo 64"><figcaption>Your next little adventure.</figcaption></figure>
@@ -37,49 +37,58 @@
     </nav>
 
     <section class="patch-card" id="patcher" aria-labelledby="build-heading" aria-busy="false">
-      <div class="ticket-top"><span>YOUR TICKET TO TOWN</span><span>BUILT ON YOUR DEVICE</span></div>
+      <div class="ticket-top"><span>MAKE YOUR GAME</span><span>N64 + GAMECUBE</span></div>
       <div class="ticket-body">
-        <div class="card-heading"><h2 id="build-heading">Let’s get you settled.</h2><span class="version">V3 preview</span></div>
+        <div class="card-heading"><h2 id="build-heading">Start with your game files.</h2><span class="version">V3 preview</span></div>
         <p class="card-intro">Choose your original games, customise your imports and settings, then build.</p>
         <div class="game-inputs" id="game-inputs">
           <div class="file-field" id="n64-field"><div class="file-title"><label for="n64">Doubutsu no Mori</label><span class="platform">NINTENDO 64</span></div><p>Japan · Original, unpatched ROM · 16 MiB</p><input id="n64" type="file" accept=".z64,.v64,.n64" aria-describedby="n64-hint n64-name"><span class="file-name" id="n64-name">No file chosen</span><small id="n64-hint">.z64, .v64, or .n64</small></div>
           <div class="file-field" id="gc-field"><div class="file-title"><label for="gamecube">Animal Crossing</label><span class="platform">GAMECUBE</span></div><p>USA / Canada · GAFE01, revision 0</p><input id="gamecube" type="file" accept=".iso,.gcm,.ciso" aria-describedby="gc-hint gc-name"><span class="file-name" id="gc-name">No file chosen</span><small id="gc-hint">.iso, .gcm, or .ciso</small></div>
         </div>
         <p class="archive-hint">Extract .7z or .zip first. Convert RVZ, GCZ, or NKit to ISO in Dolphin.</p>
-        <p class="privacy"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 10V7a6 6 0 0 1 12 0v3m-13 0h14v11H5zm7 4v3"/></svg> Your games stay on your device. Nothing is uploaded.</p>
 
     <section class="choices" id="additions" aria-labelledby="choices-heading">
-      <div class="section-heading"><div><p class="eyebrow">IMPORTS &amp; SETTINGS</p><h2 id="choices-heading">Make it your town.</h2></div><p>Pick a few favourites, bring everything, or keep the original game. Required outfits and furnishings are included automatically.</p></div>
       <fieldset id="selection-controls" disabled>
         <legend class="sr-only">Choose your villagers and items</legend>
+        <section class="share-settings" aria-labelledby="share-heading"><div><h3 id="share-heading">Your settings</h3><p>Save your choices, or load settings shared by a friend.</p></div><div class="settings-actions"><button id="settings-export" type="button">Export settings <span aria-hidden="true">↓</span></button><label class="settings-import" for="settings-import">Import settings <span aria-hidden="true">↑</span><input id="settings-import" type="file" accept=".json,application/json"></label></div><p id="settings-status" role="status" aria-live="polite"></p></section>
+        <div class="section-heading"><div><p class="eyebrow">IMPORTS</p><h2 id="choices-heading">Choose what comes along.</h2></div><p>Browse villagers and items separately, or select everything. Required outfits and furnishings are included automatically.</p></div>
+        <div class="all-actions"><p>All imports</p><div class="actions"><button id="select-all" type="button">Select everything</button><button id="clear-all" type="button">Clear everything</button></div></div>
         <div class="catalogues">
           <section class="catalogue neighbours" aria-labelledby="neighbours-heading">
+            <span class="catalogue-symbol" aria-hidden="true">♧</span>
             <div class="panel-heading"><h3 id="neighbours-heading">Villagers</h3><span class="count" id="villager-count" role="status"></span></div>
             <p>Choose which GameCube villagers can move into your town.</p>
             <button id="open-villagers" class="secondary" type="button" aria-haspopup="dialog">Choose villagers <span aria-hidden="true">→</span></button>
             <dialog id="villager-dialog" aria-labelledby="villager-dialog-heading">
-              <div class="dialog-heading"><h3 id="villager-dialog-heading">Choose your neighbours.</h3><button id="close-villagers" type="button">Done</button></div>
+              <div class="dialog-heading"><div><p class="eyebrow">GAMECUBE IMPORTS</p><h3 id="villager-dialog-heading">Choose villagers</h3></div><button id="close-villagers" type="button">Done</button></div>
             <div class="villager-toolbar"><label class="sr-only" for="villager-search">Search villagers</label><input id="villager-search" type="search" placeholder="Find a villager…" autocomplete="off"><div class="actions"><button id="select-villagers" type="button">Select visible</button><button id="clear-villagers" type="button">Clear visible</button></div></div>
             <div id="villager-options" class="villager-grid" role="group" aria-label="Optional villagers"></div><p class="empty-state" id="no-villagers" hidden>No villagers match that name.</p>
             <p class="panel-note">Selected villagers join your town’s possible residents.</p>
             </dialog>
           </section>
           <section class="catalogue items" aria-labelledby="items-heading">
-            <div class="panel-heading"><h3 id="items-heading">Items</h3><span class="count" id="visible-count" role="status"></span></div>
+            <span class="catalogue-symbol" aria-hidden="true">◇</span>
+            <div class="panel-heading"><h3 id="items-heading">Items</h3><span class="count" id="item-count" role="status"></span></div>
+            <p>Browse furniture, clothing, creatures, and more by category.</p>
+            <button id="open-items" class="secondary" type="button" aria-haspopup="dialog">Choose items <span aria-hidden="true">→</span></button>
+            <dialog id="item-dialog" aria-labelledby="item-dialog-heading">
+            <div class="dialog-heading"><div><p class="eyebrow">GAMECUBE IMPORTS</p><h3 id="item-dialog-heading">Choose items</h3></div><button id="close-items" type="button">Done</button></div>
+            <div class="item-toolbar">
             <div class="filters"><label class="sr-only" for="search">Find an item</label><input id="search" type="search" placeholder="Find an item…" autocomplete="off"><label class="sr-only" for="kind">Browse a category</label><select id="kind"><option value="all">All categories</option><option value="furniture">Furniture</option><option value="clothing">Clothing</option><option value="equipment">Equipment</option><option value="floor">Floors</option><option value="wall">Wallpapers</option><option value="fish">Fish</option><option value="insect">Insects</option><option value="diary">Diaries</option><option value="carried">Carried items</option></select></div>
             <div class="actions"><div><button id="select-visible" type="button">Select visible</button><button id="clear-visible" type="button">Clear visible</button></div><div><button id="select-items" type="button">All items</button><button id="clear-items" type="button">No items</button></div></div>
+            <p class="count" id="visible-count" role="status"></p>
+            </div>
             <div id="options" class="option-grid" role="group" aria-label="Optional items"></div><p class="empty-state" id="no-results" hidden>No matches. Try another name or category.</p>
             <p class="panel-note">Selected items use their existing shops, gifts, or other acquisition routes.</p>
+            </dialog>
           </section>
         </div>
-        <div class="all-actions"><p>Prefer the whole available collection?</p><div class="actions"><button id="select-all" type="button">Select everything</button><button id="clear-all" type="button">Clear everything</button></div></div>
-        <section class="share-settings" aria-labelledby="share-heading"><div><h3 id="share-heading">Playing with friends?</h3><p>Share your imports and town rules. You can also import a downloaded selection profile.</p></div><div class="settings-actions"><button id="settings-export" type="button">Export settings <span aria-hidden="true">↓</span></button><label class="settings-import" for="settings-import">Import settings <span aria-hidden="true">↑</span><input id="settings-import" type="file" accept=".json,application/json"></label></div><p id="settings-status" role="status" aria-live="polite"></p></section>
       </fieldset>
     </section>
 
     <fieldset id="behaviour-controls" hidden>
-      <legend><span class="rules-heading">N64 or GameCube?</span></legend>
-      <p class="settings-intro">Choose how your town plays. Everything starts with N64 rules.</p>
+      <legend><span class="rules-heading">Town settings</span></legend>
+      <p class="settings-intro">Choose how your town plays.</p>
       <div id="behaviour-options"></div><p class="behaviour-note" id="behaviour-note"></p>
     </fieldset>
 
@@ -103,6 +112,6 @@
     <section class="visiting" aria-labelledby="visiting-heading"><div><p class="eyebrow">A TRAIN RIDE AWAY</p><h2 id="visiting-heading">Visiting a friend’s village.</h2><p>Start from the same V3 patcher version. One player exports their settings, then everyone imports that file before building. The patcher checks the version and loads matching imports and settings for you. Everyone uses their own original games and keeps a separate village save.</p></div><p class="preview-note">Full village visits are still being checked in this preview. Keep your main saves separate and back up your test save before travelling.</p></section>
     <section class="hardware" aria-labelledby="hardware-heading"><div class="section-label"><h2 id="hardware-heading">Taking it to your N64?</h2><p>Original-hardware compatibility remains unverified.</p></div><div class="hardware-grid"><article><span class="hardware-icon" aria-hidden="true">8</span><div><h3>Expansion Pak</h3><p>8 MiB of memory required.</p></div></article><article><span class="hardware-icon small-icon" aria-hidden="true">SAVE</span><div><h3>FlashRAM · 128 KiB</h3><p>Select this save type on your flashcart.</p></div></article><article><span class="hardware-icon" aria-hidden="true">◷</span><div><h3>Real-time clock</h3><p>Your flashcart needs RTC support.</p></div></article></div></section>
   </main>
-  <footer class="wrap site-footer"><p>A fan translation. Not affiliated with Nintendo.<br>Your original games and saves stay untouched.</p><nav aria-label="Project links"><a href="https://github.com/TheDiscordian/doubutsu-no-mori-english">Source code</a><a href="https://github.com/TheDiscordian/doubutsu-no-mori-english/issues">Report a bug</a></nav></footer>
+  <footer class="wrap site-footer"><p>A fan translation. Not affiliated with Nintendo.</p><nav aria-label="Project links"><a href="https://github.com/TheDiscordian/doubutsu-no-mori-english">Source code</a><a href="https://github.com/TheDiscordian/doubutsu-no-mori-english/issues">Report a bug</a></nav></footer>
 </body>
 </html>
