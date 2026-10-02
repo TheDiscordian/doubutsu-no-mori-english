@@ -33,8 +33,9 @@ permit visitors using the original GameCube rule: the visited town's first NES
 save block, without a fifth saved owner or independent travelling NES progress.
 Native cartridge/disk launch, execution, reset, and close pass. Resident disk
 play also returns through the native door/state transition to the running village
-with all captured NES rows retained. The connected visitor-console return and
-its device-save cycle remain unfinished.
+with all captured NES rows retained. Visitor disk play now passes that same
+native return, both synchronous device writers, and a fresh-process cartridge
+load retaining the complete captured records.
 The house/manor models now have their original HRA
 reward delivery, scoring, catalogue previews without ordering, and independent
 selection. All four added villager instruments have confirmed native note
@@ -44,8 +45,9 @@ Ordinary Save & Quit and a fresh-process restart pass for the current ABI-396
 full selection, with independent whole-save validation. The native arrival
 wrapper selects the foreign visitor and returning resident correctly, and
 passport/stored-letter notes coexist without replacing imported records.
-These checks do not establish a rewarded-model or visitor-console save/restart
-cycle.
+Rewarded-model persistence also passes actual delivery to the loaded player's
+matching house, both complete device writers, and a fresh-process load retaining
+the original letters, presents, and earned flags.
 The requested website design, villager dialog,
 and control-order repairs pass browser checks and run in the local preview.
 The [active task](WORK_QUEUE.md#active-task-complete-the-connected-v3-itemvillager-import-paths)
@@ -156,16 +158,18 @@ virtual space. `build/v3-travel-native-dma-native-02/results.json` passes all te
 native loads against independently relocated complete images, guarded bounds,
 and checkpoint restoration. No new systems or gameplay rules are introduced.
 
-The next connected consumer is the remaining station/room return and current
-save cycle, with the original console save rule retained.
+The connected native return and current save cycles pass, with the original
+console save rule retained. The remaining task is the assembled handoff review,
+current artifact/compatibility notes, and accurate playtest limits.
 The five shared item/paper record/query handlers use the same visitor record,
 preserving native delegation, display/parent aliases, selection gates, and resident
 ownership. Retained inner collection bridges are replaced without bypassing the
 outer diary/surface/display/paper chain. Creature acquisition
 already reaches the complete visitor record through both retained exports. Both
-native note kinds together and the actual station path still require connected
-verification. The model/visitor-console current save cycle remains part of the
-same unfinished V3 task. The local preview serves the
+native note kinds and the original arrival/return wrapper pass; a walked station
+trip remains broad playtesting, not an unimplemented import consumer. The
+model/visitor-console current save cycle is verified under the same V3 task.
+The local preview serves the
 repaired interface and ABI-396 recipes; the deployed public V2 patcher is unchanged.
 
 ### Imported villager instruments
@@ -214,8 +218,46 @@ state manager return to the actual running `GAMESTATE_PLAY` class. The captured
 four NES rows, traveller record, imported fan, scene/module guards, and zero
 fault state survive. This is a resident developer transition, not ordinary
 furniture/controller interaction, visitor world return, or saving the played
-NES record to the device. The unchanged visitor launch/reset/close evidence
-remains retained.
+NES record to the device. The separate connected visitor/device checks below
+complete those focused consumers; unchanged launch/reset/close evidence remains
+retained.
+
+### Connected visitor-console and rewarded-model persistence
+
+The ABI-396 ROM is unchanged. The actual native visitor arrival, Clu Clu Land D
+execution, original return door/state transition, and both full synchronous
+device writers pass in
+`build/v3-travel-console-visitor-save-native-02/results.json` (249 records).
+`build/v3-travel-console-visitor-readback-native-02/results.json` loads the actual
+exported cartridge save in a fresh process without a checkpoint seed. All four
+NES rows and extended records survive, with the original visited-town row-zero
+rule, unchanged other residents, and no new visitor permissions.
+
+The original HRA sender delivers both models to the loaded player's actual house
+in `build/v3-travel-hra-reward-save-native-01/results.json` (205 records).
+Supplied threshold scores are controlled; house identity, mailbox contents, time,
+RNG, selected imports, and prior earned flags are not fabricated. Only the two
+accepted letters and their original house flags change. Both native synchronous
+APIs save the complete rewarded town; the actual fresh controller load in
+`build/v3-travel-hra-reward-readback-native-01/results.json` retains presents
+`3024`/`3028`, English snapshots `0221`/`0222`, and both earned flags.
+Independent whole-chip decoding checks both writers and restarted records.
+
+Both readers verify the complete native town, 6,528 NES bytes, 48,336 extended
+bytes, 1,232 working-state bytes, and 47,090 protected native record bytes.
+Native loader success, guards, zero fault state, checkpoint restoration, and
+graceful shutdown pass. These checks do not claim ordinary HRA room scoring,
+ordinary console furniture interactions, walked station trips, or hardware.
+The controlled host identity is renewed through the unchanged original
+`mNpc_RenewalAnimalMemory` before saving: the first reader's native cleanup of
+stale local acquaintances is a classified fixture failure, not lost imported
+records. The original complete renewal function matches the retail cartridge.
+
+Twenty-six focused current save/HRA checks and independent connected-export
+checks pass. Installation-delta assertions against an already-installed baseline
+and stale source-test hashes do not establish gameplay defects; the original
+installation evidence remains retained. Finish the assembled handoff review
+without changing game rules, replaying historical cartridges, or opening V4 work.
 
 V3 is only the import pipeline for items and villagers. Regular items should be
 importable and obtainable through the regular item pool. Rewards that fit existing

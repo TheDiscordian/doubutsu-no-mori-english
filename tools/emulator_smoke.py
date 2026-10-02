@@ -1663,7 +1663,10 @@ def main():
                 if not (out/'test.bs1').is_file():
                     raise ValueError('HRA model reward probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
-                results.append(exercise(debug,args.rom,record))
+                mode=action['test_v3_hra_rewards']
+                if mode not in (True,'deliver-for-save'):
+                    raise ValueError('Unknown HRA reward check mode')
+                results.append(exercise(debug,args.rom,record,deliver_for_save=mode=='deliver-for-save'))
             if action.get('test_v3_furniture_icon'):
                 from v3_furniture_icon_smoke import exercise
                 if not (out/'test.bs1').is_file():

@@ -16,10 +16,10 @@ complete the import pipeline. Keep this as one connected implementation task:
    the visited town's first NES save block, not an independent travelling NES
    save or a fifth owner. Native cartridge/disk execution, reset, and close pass;
    Native arrival/return wrapper selection and both actual Pak note kinds also
-   pass on the current loaded village. Resident disk play returns through its
-   original door/state transition with all NES rows retained. Finish the connected
-   visitor-console world return/device-save cycle while retaining these completed
-   collection and transport paths.
+   pass on the current loaded village. Resident and visitor disk play return
+   through the original door/state transition with all NES rows retained. Both
+   actual synchronous device writers and a fresh-process visitor-console reload
+   pass. Preserve these completed collection, transport, and persistence paths.
 2. Preserve the connected house/manor model imports and review remaining
    exclusions only against actual existing or already-built acquisition systems.
    Both models use the ordinary shared importer with reused artwork, their
@@ -36,9 +36,12 @@ complete the import pipeline. Keep this as one connected implementation task:
    score/delivery cases, 28 native calls, and 62 assertions, including original
    RNG, all four houses, failed creation, full mailboxes/queue, retained flags,
    whole-town preservation, bounds, checkpoint restoration, and fault checks.
-   This is actual installed native execution, not an ordinary room-scoring or
-   rewarded-save/restart playthrough. Complete the rewarded-record save/restart
-   check without replaying the unchanged scoring/delivery cases.
+   This is actual installed native execution, not an ordinary room-scoring
+   playthrough. The actual player's matching house now
+   receives both original reward letters, and both complete synchronous writers
+   and a fresh-process load preserve their presents, snapshots, and earned flags.
+   Preserve this rewarded-record persistence check without replaying the
+   unchanged scoring/delivery cases.
    Seventeen current-cartridge/source checks,
    four allocation-boundary checks, and two changed selection/compatibility
    checks pass. Preserve the earlier 20 scope checks for unchanged composition
@@ -176,9 +179,48 @@ It does not establish foreign world return or saving played NES progress.
 arrival/return wrapper's private-pointer/player-index selection and both native
 Pak note kinds, with complete imported records retained beside stored letters.
 The raw chip is independently decoded before checkpoint restoration.
-The next connected check is visitor-console world return and its device-save
-cycle, followed by rewarded-model persistence. The instrument check is closed under this same task; no additional
-NES save permissions or new game systems are required.
+The connected visitor-console and rewarded-model persistence checks are closed.
+The remaining work is the assembled handoff review and current artifact/compatibility
+notes, preserving the mapped consumer checks rather than starting another feature
+audit. No additional NES save permissions or new game systems are required.
+
+### Connected console and HRA save/restart verification
+
+`build/v3-travel-console-visitor-save-native-02/results.json` passes 249 records:
+the original native arrival selects foreign player four, Clu Clu Land D executes,
+native close returns to the running village, and both synchronous APIs write the
+complete captured town and all four NES rows. The visitor's imported record and
+the other three NES rows remain unchanged. The actual original startup acquaintance
+renewal routine prepares the controlled host identity before arrival; no game
+code changes. `build/v3-travel-console-visitor-readback-native-02/results.json`
+loads that device export in a fresh process, without a checkpoint seed, and
+validates the complete consumed bank and saved import records.
+
+`build/v3-travel-hra-reward-save-native-01/results.json` passes 205 records.
+Actual original deliveries place presents `3024`/`3028`, templates `0221`/`0222`,
+and supplied 70,000/100,000 scores in the loaded player's real house. Only those
+two letters and their accepted-delivery flags change; other town bytes remain
+unchanged. Both synchronous writers preserve the complete rewarded town.
+`build/v3-travel-hra-reward-readback-native-01/results.json` passes the fresh
+controller load and complete native bank validation. Independent checks decode
+both writers' whole exports and the restarted device, including each reward
+snapshot, present, matching recipient, and house flag.
+
+Both readers retain 6,528 console bytes, 48,336 extended bytes, 1,232 working-state
+bytes, and 47,090 protected native import-record bytes. Diagnostic checkpoints
+are created only after ordinary fresh loading and restored before normal shutdown.
+These are connected developer checks, not walked station trips, ordinary console
+furniture interactions, ordinary HRA room scoring, or hardware certification.
+The first console reader remains recorded as a fixture failure: changing the host
+name without renewing its old local acquaintance records triggers the original
+startup cleanup. Its NES and extended records match; the corrected fixture uses
+that unchanged original cleanup before saving. The passing HRA reader is retained.
+
+Twenty-six focused current save/HRA checks and the new connected-export checks
+pass. An invocation of installation-delta tests against ABI 396 uses the wrong
+pre-installation baseline and stale test-file hashes; those assertions are not
+current gameplay failures. Preserve the original installation evidence instead
+of rebuilding a historical cartridge or modifying game code to satisfy it.
 
 ### Completed preview repairs and verified behaviour
 

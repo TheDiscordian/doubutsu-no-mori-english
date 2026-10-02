@@ -24,7 +24,7 @@ import v3_hra_rewards as rewards
 CAPITAL,SESSION=0x80199F64,0x80199F5C
 
 
-def exercise(debug, rom_path, record):
+def exercise(debug, rom_path, record, *, deliver_for_save=False):
     path=Path(rom_path);image=path.read_bytes()
     report=json.loads((path.parent/'build.json').read_bytes())
     if sha256(image)!=report['output_sha256']:
@@ -123,6 +123,48 @@ def exercise(debug, rom_path, record):
     guards=(allocation,series-16,empty+164,allocation+size-16,TEST_STACK-0x1000,TEST_STACK+0x40)
     for at in guards:write(at,edge)
     bits=root+0x80929628-rewards.owner.RAM;write(bits,bytes(8))
+    if deliver_for_save:
+        # The existing loaded player's real house/mailbox receives the two
+        # original rewards. Only supplied scores are controlled; no mailbox,
+        # identity, earned flag, RNG, time, or import selection is fabricated.
+        private=int.from_bytes(globals_before[PRIVATE],'big')
+        identity=read(private,16)
+        home=next((i for i in range(4)
+            if saved[0x3588+i*HOME_STRIDE:0x3598+i*HOME_STRIDE]==identity),None)
+        if home is None or globals_before[PLAYER][0]>=4:
+            raise ValueError('Reward persistence needs the actual resident and matching house')
+        flag_at=0x3588+home*HOME_STRIDE+0x1C
+        if saved[flag_at]&12 or any(read(at,4)!=struct.pack('>I',1) for at in flags):
+            raise ValueError('Reward persistence needs both selected, unearned source rewards')
+        destination=HOME_MAILBOX+home*HOME_STRIDE
+        slots=[i for i in range(10) if read(destination+i*164+38,1)==cleared[38:39]]
+        if len(slots)<2:raise ValueError('Actual home mailbox lacks two free reward slots')
+        expected=bytearray(saved)
+        try:
+            for slot,gift in zip(slots,rows):
+                points=gift['points']
+                call(sender,[home,points,0,series,0x11FC,0],proof,(1,1))
+                mail=bytearray(164);mail[:16]=identity;mail[18:30]=b' '*12
+                mail[30:35]=b'\xff'*5;mail[39:42]=bytes((128,6,51))
+                struct.pack_into('>H',mail,36,gift['item'])
+                mail[42:]=pack(Record(4,0,(gift['template'],),
+                    ((0,Field(f'{points:,}'.rjust(10).encode())),),False))
+                offset=destination-SAVE_RAM+slot*164
+                expected[offset:offset+164]=mail;expected[flag_at]|=gift['flag']
+                check('persistent source reward: complete town/mail/house flags',SAVE_RAM,expected)
+                check('persistent reward detaches mail capture',SESSION,bytes(4))
+                record(dict(hra_reward_for_save=gift,home=home,slot=slot,
+                    native_delivery=True,actual_house_identity=True,controlled_score=True))
+            for at in guards:check('persistent reward fixture boundary',at,edge)
+            for at in scene_edges:check('persistent reward scene guard',at,bytes.fromhex('AF53434E')*4)
+            for at in (PRIVATE,PLAYER,TIME,EMPLOYMENT,*flags):
+                check('persistent rewards retain original player/time/selection',at,globals_before[at])
+        finally:
+            call(0x8009C040,[allocation])
+        return dict(hra_rewards_ready_for_native_save=True,native_calls=calls,assertions=assertions,
+            home=home,mailbox_slots=slots[:2],complete_rewarded_town_sha256=sha256(expected),
+            controlled_scores=True,ordinary_room_scoring_tested=False,
+            original_source_acquisition_rules=True,requires_checkpoint_restore=True)
     cases=[('below',69999,(1,1),0,0,False,False,False,None),
         ('first threshold',70000,(1,1),0,1,False,False,False,rows[0]),
         ('first priority',100000,(1,1),0,2,False,False,False,rows[0]),

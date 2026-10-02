@@ -177,5 +177,100 @@ class SaveEntryProbeTests(unittest.TestCase):
             readback_entries(debug, rom, export, lambda value: None, native_reload=True)
 
 
+class ConnectedSaveEvidenceTests(unittest.TestCase):
+    """Check actual connected exports and their matching fresh-process loads."""
+    @classmethod
+    def setUpClass(cls):
+        if not all(os.environ.get(k) for k in
+                   ('V3_CONNECTED_SAVE_WRITER', 'V3_CONNECTED_SAVE_READER')):
+            raise unittest.SkipTest('Explicit connected writer and fresh reader required')
+        cls.writer = ROOT/os.environ['V3_CONNECTED_SAVE_WRITER']
+        cls.reader = ROOT/os.environ['V3_CONNECTED_SAVE_READER']
+        cls.export = cls.writer/'native-entry-export'
+        cls.written = json.loads((cls.writer/'results.json').read_bytes())
+        cls.loaded = json.loads((cls.reader/'results.json').read_bytes())
+        cls.receipt = json.loads((cls.export/'manifest.json').read_bytes())
+
+    def decoded(self, path):
+        bank = path.read_bytes()[:65536]
+        n, total = (int.from_bytes(bank[SAVE_BYTES+offset:SAVE_BYTES+offset+4], 'big')
+                    for offset in (16, 12))
+        raw = yaz0_decode(b'Yaz0'+struct.pack('>I', total)+bytes(8)+
+                         (bank[20:0x2F68]+bank[0x2F6A:SAVE_BYTES])[:n])
+        state = bytearray(1232)
+        canonical = raw[SAVE_BYTES:65536]
+        for source, first, last in ((0x18, 0, 160), (0xC0, 192, 704), (0x2C0, 160, 192),
+                (0x2E0, 704, 832), (0x360, 832, 880), (0x390, 880, 1200), (0x4D0, 1200, 1232)):
+            state[first:last] = canonical[source:source+last-first]
+        self.assertEqual(decode_current_bank(bank, raw[65536:72064], raw[72064:], state,
+            int.from_bytes(bank[SAVE_BYTES+8:SAVE_BYTES+12], 'big')), raw[:65536])
+        return raw
+
+    def test_actual_both_writers_and_fresh_process_preserve_complete_imports(self):
+        self.assertTrue(self.written[-1]['graceful_shutdown'])
+        self.assertTrue(self.loaded[-1]['graceful_shutdown'])
+        self.assertTrue(self.receipt['native_distinct_save_entries'])
+        self.assertEqual([r['consumer'] for r in self.receipt['complete_single_bank_writers']],
+                         ['af_v3_save_sync', 'af_cw_save_sync'])
+        images = []
+        for receipt in self.receipt['complete_single_bank_writers']:
+            path = self.export/receipt['file']
+            chip = path.read_bytes()
+            self.assertEqual(len(chip), 131072)
+            self.assertEqual(sha256(chip), receipt['sha256'])
+            self.assertEqual(chip[65536:], b'\xff'*65536)
+            raw = self.decoded(path)
+            self.assertEqual(raw[:65536],
+                (self.export/(receipt['consumer']+'-canonical.bin')).read_bytes())
+            self.assertEqual(raw[72064:], (self.export/'initial-extended.bin').read_bytes())
+            images.append(raw)
+        self.assertEqual(images[0], images[1])
+        fresh = next(r for r in self.loaded if r.get('native_save_entry_fresh_readback'))
+        self.assertEqual(fresh['rom_sha256'], self.written[0]['rom_sha256'])
+        self.assertEqual(fresh['written_chip_sha256'], self.receipt['complete_single_bank_writers'][-1]['sha256'])
+        self.assertTrue(fresh['ordinary_controller_load'])
+        self.assertTrue(fresh['complete_native_loader_called'])
+        self.assertFalse(fresh['checkpoint_seed_used'])
+        self.assertEqual((fresh['complete_console_bytes'], fresh['complete_extended_bytes']), (6528, 48336))
+        self.assertTrue(any(r.get('original_exported_import_records_preserved') for r in self.loaded))
+        seed = json.loads((self.reader/'run.json').read_bytes())['seed_files']
+        self.assertEqual(next(r['sha256'] for r in seed if r['file']=='test.flash'), fresh['written_chip_sha256'])
+        self.assertFalse(any(r['file'].endswith('.bs1') for r in seed))
+
+    def test_original_reward_letters_or_visitor_console_rows_survive_restart(self):
+        from mail_record import unpack
+        raw = self.decoded(self.export/'af_cw_save_sync.flash')
+        restarted = self.decoded(self.reader/'test.flash')
+        self.assertEqual(raw[65536:], restarted[65536:])
+        rewards = [r for r in self.written if r.get('hra_reward_for_save')]
+        if rewards:
+            self.assertEqual(len(rewards), 2)
+            self.assertEqual([(r['hra_reward_for_save']['item'], r['hra_reward_for_save']['template'])
+                              for r in rewards], [(0x3024, 0x221), (0x3028, 0x222)])
+            for delivery in rewards:
+                gift, home, slot = delivery['hra_reward_for_save'], delivery['home'], delivery['slot']
+                first = 0x3A00+home*0xB48+slot*164
+                mail = raw[first:first+164]
+                self.assertEqual(restarted[first:first+164], mail)
+                self.assertEqual(mail[:16], raw[0x3588+home*0xB48:0x3598+home*0xB48])
+                self.assertEqual(int.from_bytes(mail[36:38], 'big'), gift['item'])
+                snapshot = unpack(mail[42:], expected_catalog=4)
+                self.assertEqual(snapshot.templates, (gift['template'],))
+                self.assertEqual(snapshot.fields[0][1].text, f'{gift["points"]:,}'.rjust(10).encode())
+                flag = 0x35A4+home*0xB48
+                self.assertEqual(raw[flag] & gift['flag'], gift['flag'])
+                self.assertEqual(restarted[flag], raw[flag])
+        else:
+            initial = self.decoded(self.export/'initial.flash')
+            self.assertNotEqual(raw[65536:65536+0x660], initial[65536:65536+0x660])
+            self.assertEqual(raw[65536+0x660:72064], initial[65536+0x660:72064])
+            returned = [r for r in self.written if r.get('console_native_world_return')=='passed']
+            self.assertEqual(len(returned), 2)
+            for result in returned:
+                self.assertEqual((result['actor'], result['source_save_player']), (4, 0))
+                self.assertTrue(result['nes_save_rows_retained'])
+            self.assertTrue(any(r.get('native_host_acquaintance_renewal') for r in self.written))
+
+
 if __name__ == '__main__':
     unittest.main()

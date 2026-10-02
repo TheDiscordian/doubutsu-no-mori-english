@@ -16,9 +16,11 @@ from v3_asset_loader import BLOB
 PLAYERS, FOREIGN, PASSPORT, PAK = 0x80126EC0, 0x801439A0, 0x80137C40, 0x80137960
 
 
-def scenario(directory, *, both_note_kinds=False, loaded_world=False):
-    if both_note_kinds and not loaded_world:
-        raise ValueError('Both-note fixture requires a matching-ROM loaded-village checkpoint')
+def scenario(directory, *, both_note_kinds=False, loaded_world=False, console_visitor_only=False):
+    if (both_note_kinds or console_visitor_only) and not loaded_world:
+        raise ValueError('Both-note/console-visitor fixture requires a matching-ROM loaded-village checkpoint')
+    if both_note_kinds and console_visitor_only:
+        raise ValueError('Choose both-note transport or connected console visitor preparation')
     image=(directory/'animal-forest-v3-asset-loader.z64').read_bytes()
     report=json.loads((directory/'build.json').read_bytes())
     if sha256(image)!=report['output_sha256']:raise ValueError('Changed current cartridge')
@@ -40,6 +42,15 @@ def scenario(directory, *, both_note_kinds=False, loaded_world=False):
         checks.append(dict(read=[f'{p["ram"]:08X}',p['bytes']],
             expect=image[p['physical']:p['physical']+p['bytes']].hex()))
     core=files[CODE_VROM].extract(image)
+    if console_visitor_only:
+        # Native startup renews local acquaintance records against the actual
+        # residents. Prepare that same consistent host after its controlled ID
+        # change, so a later restart does not clean up an impossible fixture.
+        first,last=0x800A6E40,0x800A6F48
+        body=core[first-CODE_RAM:last-CODE_RAM]
+        if sha256(body)!='f238e0e3afa057b613fba69d863b1c5ec842ba49ab694d7bc74c4a038625fb2d':
+            raise ValueError('Changed original local-acquaintance renewal routine')
+        proofs.append(dict(ram=first,data=body.hex()))
     for h in t['hooks']:
         if CODE_RAM<=h['address']<0x80400000:
             if core[h['address']-CODE_RAM:h['address']-CODE_RAM+8].hex()!=h['after']:
@@ -64,10 +75,13 @@ def scenario(directory, *, both_note_kinds=False, loaded_world=False):
         proofs.append(dict(ram=0x804699C0,data=blob[0x99C0:0x99C0+n].hex()))
     request=dict(rom_sha256=sha256(image),symbols=symbols,state=t['state_packet'],proofs=proofs,
         consumers=consumers,both_note_kinds=both_note_kinds,
+        console_visitor_only=console_visitor_only,
         equipment_resources={'scene_arena':e['scene_arena']})
-    return [{'wait':2 if loaded_world else 16},*checks,{'save_state':True},{'pause_game_thread':True},
-        {'test_v3_player_travel':request},{'load_state':True},{'wait':1},
-        {'read':['8003CE34',4],'expect':'00000000'}]
+    actions=[{'wait':2 if loaded_world else 16},*checks,{'save_state':True},
+        {'pause_game_thread':True},{'test_v3_player_travel':request}]
+    if not console_visitor_only:
+        actions += [{'load_state':True},{'wait':1},{'read':['8003CE34',4],'expect':'00000000'}]
+    return actions
 
 
 def exercise(debug, request, record, out):
@@ -92,6 +106,35 @@ def exercise(debug, request, record, out):
             bytes=len(expected),expected_sha256=sha256(expected),actual_sha256=sha256(actual)))
         if actual!=expected:raise ValueError('Installed player-travel mismatch: '+label)
     call('af_v3_travel_prepare',expected=1)
+    if request.get('console_visitor_only'):
+        # Reuse the loaded town's actual player, pockets, and imported records.
+        # Only the host identity is controlled to make the native arrival
+        # wrapper choose its genuine foreign-player path; no NES/diary progress
+        # is fabricated and the final checkpoint restores the test town.
+        check('loaded native home player',0x80136FD8,struct.pack('>I',PLAYERS))
+        check('loaded native resident index',0x80136EA3,b'\x00')
+        home=read(PLAYERS,4*0xBD0)
+        call(0x800B7F78,[PLAYERS],1)
+        call(0x8007A070,expected=PAK);call(0x800790C0,[0],1)
+        call(0x800793B8,[PLAYERS,0x80130DB8,PAK],1)
+        write(PLAYERS,bytes((home[0]^1,)))
+        host=read(PLAYERS,4*0xBD0)
+        call(0x800A6E40)
+        check('native acquaintance renewal retains host player records',PLAYERS,host)
+        record(dict(native_host_acquaintance_renewal=True,
+            original_startup_routine='800A6E40',controlled_host_identity=True,
+            game_code_changed=False))
+        call(0x800B8D64,[4,PAK],1)
+        check('console visitor has the complete original private record',FOREIGN,home[:0xBD0])
+        check('console visitor selected by native arrival',0x80136FD8,struct.pack('>I',FOREIGN))
+        check('console visitor retains foreign index',0x80136EA3,b'\x04')
+        check('console arrival leaves host residents unchanged',PLAYERS,host)
+        check('console visitor cache admitted',STATE,struct.pack('>2I',0x41465431,1))
+        check('console visitor storage guard',STATE+16+RECORD_BYTES,
+            struct.pack('>4I',*([0xAF54524C]*4)))
+        return dict(native_console_visitor_prepared=True,actual_native_arrival=True,
+            original_loaded_player_records=True,controlled_host_identity=True,
+            ordinary_station_visit_tested=False,requires_checkpoint_restore=True)
     # Construct valid native identities through the real clear routine and the
     # documented PersonalID layout, not the host test's reduced validation stub.
     for slot in range(4):
@@ -225,8 +268,12 @@ if __name__=='__main__':
     p.add_argument('--build',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--both-note-kinds',action='store_true')
     p.add_argument('--loaded-world',action='store_true',help='Use a matching-ROM loaded-village checkpoint')
+    p.add_argument('--console-visitor-only',action='store_true',help='Prepare the native visitor for connected console checks')
     args=p.parse_args()
-    if args.both_note_kinds and not args.loaded_world:
-        p.error('--both-note-kinds requires --loaded-world and its matching-ROM checkpoint')
+    if (args.both_note_kinds or args.console_visitor_only) and not args.loaded_world:
+        p.error('Both-note/console-visitor fixtures require --loaded-world and its matching-ROM checkpoint')
+    if args.both_note_kinds and args.console_visitor_only:
+        p.error('Choose both-note transport or connected console visitor preparation')
     write_new(args.output,(json.dumps(scenario(args.build,
-        both_note_kinds=args.both_note_kinds,loaded_world=args.loaded_world),indent=2)+'\n').encode())
+        both_note_kinds=args.both_note_kinds,loaded_world=args.loaded_world,
+        console_visitor_only=args.console_visitor_only),indent=2)+'\n').encode())
