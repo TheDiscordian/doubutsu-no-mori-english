@@ -20,7 +20,7 @@ from serve_portal import StaticPortal, validate_export
 class BuilderInterfaceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.site = ROOT/os.environ.get('V3_BUILDER_UI_SITE', 'build/v3-website-compact-checkboxes-02/site')
+        cls.site = ROOT/os.environ.get('V3_BUILDER_UI_SITE', 'build/v3-website-golden-copy-01/site')
         if not cls.site.exists():
             raise unittest.SkipTest('Current private interface export required')
         validate_export(cls.site)
@@ -279,6 +279,8 @@ class BuilderInterfaceTests(unittest.TestCase):
         control=page.get_by_role('checkbox',name='Enable Golden tools',exact=True)
         self.assertEqual(page.locator('#behaviour-controls #enable-golden-tools').count(),1)
         self.assertEqual(page.locator('#enable-golden-trees').count(),0)
+        self.assertEqual(page.locator('#enable-golden-tools-description').inner_text(),
+                         'Add the golden shovel, net, rod, and axe, with their original acquisition routes.')
         self.assertFalse(control.is_checked())
         for identity in ('2239','223A','223B','223C'):
             self.assertEqual(page.locator(f'#options [data-id="GAFE01-r0/item/{identity}"]').count(),0)
