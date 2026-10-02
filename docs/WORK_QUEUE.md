@@ -1,14 +1,20 @@
 # Completion queue
 
-## Active task: complete the connected V3 item/villager import paths
+## V3 private playtest handoff
 
-V3 is unfinished. Resident-only imports and a warning about visiting do not
-complete the import pipeline. Keep this as one connected implementation task:
+The connected V3 items-and-villagers import pipeline is ready for private
+playtesting. The current handoff is
+`build/v3-travel-console-visitors-profile-01/handoff.json`; the running local
+preview is [http://127.0.0.1:8073/](http://127.0.0.1:8073/). Implementation and
+focused developer verification are complete for this scope, including the
+connected visiting/save consumers below. No import implementation is queued.
+Broad human gameplay and original-hardware acceptance are separate and unclaimed.
+Preserve the completed paths and verified original rules:
 
-1. Extend the existing village-visiting path to carry the imported player's
+1. The existing village-visiting path carries the imported player's
    ownership and required records through departure, arrival, acquisition while
-   visiting, and return. Implement correct visitor storage and restore it to the
-   returning player; never discard records or credit a resident instead.
+   visiting, and return. Visitor storage restores those records to the
+   returning player; records are not discarded or credited to a resident instead.
    Furniture/clothing, surfaces, equipment, stationery, and diary covers use
    the visitor's actual records. Diary reading retains the donor's privacy rules:
    only owners write, other players read unlocked pages, and locked pages refuse
@@ -20,8 +26,8 @@ complete the import pipeline. Keep this as one connected implementation task:
    through the original door/state transition with all NES rows retained. Both
    actual synchronous device writers and a fresh-process visitor-console reload
    pass. Preserve these completed collection, transport, and persistence paths.
-2. Preserve the connected house/manor model imports and review remaining
-   exclusions only against actual existing or already-built acquisition systems.
+2. The connected house/manor models use their actual existing acquisition system.
+   Exclusions are checked against actual existing or already-built systems.
    Both models use the ordinary shared importer with reused artwork, their
    original HRA scoring category, catalogue previews without ordering, and
    independent selection. The source's 70,000-point reward precedes its
@@ -61,10 +67,14 @@ complete the import pipeline. Keep this as one connected implementation task:
    or internal wording, and plain version/settings guidance for friends without
    requiring checksum knowledge. Keep settings export/import, verified house-start
    diary placement, and shared ocean movement working as remaining imports land.
-5. Verify the changed connected paths and audit other item/villager consumers for
-   actual omissions. Fix discovered in-scope defects. Commit/push original source
-   on the experimental branch, refresh the local preview, and hand over the
-   usable build with accurate compatibility and verification limits.
+5. The mapped consumer checks and current selection review pass. Twenty current
+   scope checks cover regular stock, genuine existing reward providers, independent
+   selection, preserved unavailable-feature resources, and browser/offline
+   agreement. The full profile's UPS reconstructs the checked ROM; ROM, profile,
+   and report identities agree. All 16 current local and live preview files match
+   the export receipt. Original source is committed/pushed on the experimental
+   branch; the private handoff records artifact identities, compatibility, and
+   verification limits. The public V2 patcher remains unchanged.
 
 The current proposal is `build/v3-travel-console-visitors-installed-01/build-lock.json`,
 ABI 396, retaining the checked transport with 20 villagers and 277 requested
@@ -180,9 +190,11 @@ arrival/return wrapper's private-pointer/player-index selection and both native
 Pak note kinds, with complete imported records retained beside stored letters.
 The raw chip is independently decoded before checkpoint restoration.
 The connected visitor-console and rewarded-model persistence checks are closed.
-The remaining work is the assembled handoff review and current artifact/compatibility
-notes, preserving the mapped consumer checks rather than starting another feature
-audit. No additional NES save permissions or new game systems are required.
+The assembled handoff review and current artifact/compatibility notes are complete.
+The diary's complete 18,416-byte native UI and 16,848-byte immutable transport
+lifecycle match the retained successful visitor diary execution. Current native
+Pak, instrument, and ordinary save/restart results use the exact full-selection
+ROM. No additional NES save permissions or new game systems are required.
 
 ### Connected console and HRA save/restart verification
 
@@ -338,11 +350,11 @@ Fish/insect population, shared ocean movement, and source-verified house-start
 diary placement have installed controls and runtime alternatives. Present only
 behaviour choices with real bindings; unfinished alternatives stay unavailable.
 
-V3 completion remains blocked by the active task above. Distinct save consumers,
+The current V3 handoff above completes the connected task. Distinct save consumers,
 fresh-process native readback, and current controlled creature constructor/
 capture/release/scheduler checks pass. Broad human gameplay and hardware testing
 follow the handoff; they are not claimed as completed developer checks.
-The checked current build is
+The retained acquisition-review build is
 `build/v3-nook-font-repaired-02/build-lock.json`, ABI 391. The all-available
 profile is `build/v3-import-pipeline-profile-17/profile.json`: twenty villagers,
 273 independent item choices, the linked exercise-card/radio pair, and two
@@ -1021,14 +1033,13 @@ Ordinary gameplay and persistence
 remain unverified. The concrete consumer map and limits are in
 [the clothing contract](../specs/V3_CLOTHING_IMPORTS.md).
 
-The connected seventeen-creature path remains unfinished at ordinary native
-gameplay/save verification. Installed field behaviours, spawning, selections,
-catching, room displays, and persistence consumers stay installed. The retained
-constructor timeout and sound-scheduler disconnection do not identify a faulting
-instruction or prove a harness cause. Keep both unresolved and the native
-harness budget exhausted; no old fixture replay is authorised by this clothing
-work. Fix any identified game defect. This does not defer required creature
-behaviours or classify their gameplay as verified.
+The seventeen-creature category retains its installed field behaviours,
+spawning, selection, catching, room displays, and persistence consumers.
+Controlled native constructor/capture/release/scheduler execution passes with
+the interpreter. The controlled recompiler breakpoint timeout is classified
+separately; it is not ordinary-gameplay certification. Current full-selection
+ordinary save/restart also passes. Preserve these results; ordinary catching
+and comprehensive creature gameplay remain playtesting, not reopened imports.
 
 Use the shared converter and current ABI-318 proposal:
 `build/v3-diary-category-work-01/tortimer-placement-02/build-lock.json`.
@@ -1084,11 +1095,10 @@ save/reload remains unverified.
 
 The passport adapter retains the seventeen-species profile/collection extension,
 matching-resident restoration, independent visitor records, and unchanged native
-note/player/animal/letter sizes. Host travel checks are retained; native travel
-and other imported catalogue/console transport remain unfinished. Compatible
-V3 profiles are required; V2 and older V3 readers do not understand the extension.
-Preserve Controller Pak backups. Keep the main lock and deployments unchanged
-until the private handoff and the user's subsequent approval.
+note/player/animal/letter sizes. Connected native arrival/return, both actual Pak
+note kinds, and complete imported ownership/records pass in the current handoff.
+Compatible V3 profiles are required; V2 and older V3 readers do not understand
+the extension. Preserve Controller Pak backups and the public V2 patcher.
 
 The complete console engines, image loading, persistence, and room bindings are
 installed. Native Clu Clu Land D and Wario's Woods title execution, rendering,

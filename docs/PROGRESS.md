@@ -23,9 +23,15 @@ The current imported V3 includes the dresser, credits, and museum corrections.
 Its empty-selection baseline returns V2-14. This does not change the main V3
 lock or publish experimental V3.
 
-## V3 development build: unfinished import integration
+## V3 import pipeline: ready for private playtesting
 
-V3 is not complete. The installed transport and shared item/paper collection
+The items-and-villagers import pipeline and its focused developer checks are
+complete for the V3 scope. The private handoff is
+`build/v3-travel-console-visitors-profile-01/handoff.json`; use the running
+[local preview](http://127.0.0.1:8073/) to choose imports and build a test ROM.
+Broad human gameplay, walked station trips, and original-hardware acceptance
+are not claimed. No new system, building, or e/e+ import work is included.
+The installed transport and shared item/paper collection
 handlers carry and update the visitor's added player records.
 Imported diaries now permit unlocked read-only access for visitors, preserving
 the original owner-only editing and locked refusal. Additional console games
@@ -50,10 +56,20 @@ matching house, both complete device writers, and a fresh-process load retaining
 the original letters, presents, and earned flags.
 The requested website design, villager dialog,
 and control-order repairs pass browser checks and run in the local preview.
-The [active task](WORK_QUEUE.md#active-task-complete-the-connected-v3-itemvillager-import-paths)
-owns implementation and verification of these connected paths, plus any further
-in-scope omissions found while checking the remaining consumers. Passing narrow
-checks and resident-only behaviour do not establish completion.
+The [private handoff](WORK_QUEUE.md#v3-private-playtest-handoff) records the
+connected native checks and current selection review. Twenty current scope checks
+pass, including actual browser/offline agreement, regular stock, existing reward
+providers, independent choices, and preserved unavailable-feature resources.
+The full profile's UPS reconstructs the ROM, and all 16 local/live preview files
+match the export receipt. The source is committed/pushed on the experimental
+branch. The public V2 patcher stays unchanged pending separate V3 approval.
+
+Use separate V3 saves and Controller Pak files and retain the exact ROM/settings
+profile. Do not load format-21 V3 saves in V2 or older format readers. The preceding
+ABI-395 build retains the same format and identities, so equal-profile loading
+is expected in both directions, but an ordinary cross-build reload is not newly
+verified. An ABI-392 save has loaded forward; backward loading in that build is
+unverified. Removing imports or a carried family is not migration.
 
 ### Installed player-record transport
 
@@ -159,8 +175,8 @@ native loads against independently relocated complete images, guarded bounds,
 and checkpoint restoration. No new systems or gameplay rules are introduced.
 
 The connected native return and current save cycles pass, with the original
-console save rule retained. The remaining task is the assembled handoff review,
-current artifact/compatibility notes, and accurate playtest limits.
+console save rule retained. The assembled handoff review, current artifact/
+compatibility notes, and explicit playtest limits are complete.
 The five shared item/paper record/query handlers use the same visitor record,
 preserving native delegation, display/parent aliases, selection gates, and resident
 ownership. Retained inner collection bridges are replaced without bypassing the
@@ -256,8 +272,10 @@ records. The original complete renewal function matches the retail cartridge.
 Twenty-six focused current save/HRA checks and independent connected-export
 checks pass. Installation-delta assertions against an already-installed baseline
 and stale source-test hashes do not establish gameplay defects; the original
-installation evidence remains retained. Finish the assembled handoff review
-without changing game rules, replaying historical cartridges, or opening V4 work.
+installation evidence remains retained. The complete current diary native UI
+and immutable transport lifecycle match the retained visitor diary execution;
+current Pak, instrument, and ordinary save/restart results use the exact current
+full-selection ROM. The handoff introduces no game-rule changes or V4 work.
 
 V3 is only the import pipeline for items and villagers. Regular items should be
 importable and obtainable through the regular item pool. Rewards that fit existing
@@ -274,7 +292,7 @@ existing-system reward routes individually. See the
 ### Preview controls and verified behaviour
 
 The running [local preview](http://127.0.0.1:8073/) serves
-`build/v3-travel-website-browser-02/site`, tied to the ABI-392 cartridge.
+`build/v3-travel-website-browser-04/site`, tied to the ABI-396 cartridge.
 Its original-style layout puts ROM selectors first, imports/settings next,
 and the build button last. Villagers have a separate dialog with search,
 keyboard selection, Done, and Escape; items use categorised selectable cards.
@@ -290,9 +308,9 @@ the catalogue and choices, recalculates dependencies, and updates the interface
 only after successful validation. Malformed or mismatched files preserve current
 choices. A successful import invalidates any prior download and save acknowledgement.
 Friends need the same patcher version and shared settings, with separate town
-saves. Imported collection handlers use the complete visitor record; NES visitor
-sessions and full native village-visit verification remain unfinished. Finish
-those paths before claiming V3 completion.
+saves. Imported collection handlers use the complete visitor record. Native
+arrival/return, both Pak note kinds, diary privacy, and visitor NES return/save
+pass their connected checks. Walked station trips remain broad playtesting.
 
 `build/v3-travel-website-ui-01/results.json` verifies six actual original-file
 downloads against the offline outputs, settings/receipt round trips, dependency
@@ -302,7 +320,7 @@ overflow pass at 320, 375, 768, and 1440 pixels. Seventeen JavaScript
 composition/settings checks and ten static-server/copy checks pass. Export 02
 changes only save-warning wording from that tested export; other file hashes
 match. All sixteen live served files match the export receipt. A live headless
-browser also verifies initial loading, twenty villagers, 275 visible item choices,
+browser also verifies initial loading, twenty villagers, the current item choices,
 control order, dialog opening/Escape, and four widths without page errors or uploads.
 
 The optional GameCube starting diary is the college-rule diary on the cardboard
