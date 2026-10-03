@@ -276,6 +276,7 @@ class BuilderInterfaceTests(unittest.TestCase):
             for identity in feature['required_imports']:
                 self.assertEqual(page.locator(f'#options [data-id="{identity}"]').count(),0)
             page.locator('#clear-all').click(); checkbox.check()
+            self.assertTrue(page.locator('#selection-summary').inner_text().startswith('0 chosen by you · '))
             with page.expect_download() as event:page.locator('#settings-export').click()
             with tempfile.TemporaryDirectory(prefix='v3-feature-settings-') as temp:
                 path=Path(temp)/'settings.json';event.value.save_as(path)
@@ -284,9 +285,34 @@ class BuilderInterfaceTests(unittest.TestCase):
                 page.locator('#settings-import').set_input_files(str(path))
                 page.wait_for_function("() => document.querySelector('#settings-status').textContent.startsWith('Settings imported.')")
                 self.assertTrue(checkbox.is_checked())
+                self.assertTrue(page.locator('#selection-summary').inner_text().startswith('0 chosen by you · '))
             self.assertIn(feature['name'],page.locator('#dependency-list').text_content())
             page.locator('#open-items').click();page.locator('#clear-items').click();page.locator('#close-items').click()
             self.assertTrue(checkbox.is_checked())
+
+    def test_chosen_counter_excludes_features_and_automatic_items(self):
+        page=self.page
+        plan=json.loads((self.site/'data/composition.json').read_text())
+        for feature in plan['features']:
+            page.locator('#enable-'+feature['id'].split('/')[1]).check()
+        def check_count(chosen):
+            required=page.locator('#dependency-list li').count()
+            self.assertEqual(page.locator('#selection-summary').inner_text(),
+                f'{chosen} chosen by you · {required} added as requirements')
+            self.assertEqual(page.locator('#selection-heading').inner_text(),
+                f'{chosen+required} imports included')
+        check_count(0)
+        page.locator('#open-items').click()
+        fish=page.locator('[data-id="GAFE01-r0/item/2320"] input')
+        fish.check();check_count(1)
+        page.locator('#close-items').click()
+        page.locator('#open-villagers').click()
+        villager=page.locator('#villager-options input').first
+        villager.check();check_count(2)
+        villager.uncheck();check_count(1)
+        page.locator('#close-villagers').click()
+        page.locator('#open-items').click();fish.uncheck();check_count(0)
+        page.locator('#close-items').click()
 
     def test_freshwater_fish_are_in_the_item_selector(self):
         page = self.page

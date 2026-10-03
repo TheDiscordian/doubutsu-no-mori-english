@@ -94,8 +94,9 @@ function renderSelection() {
     note.hidden = !parents.length;
   }
   $('selection-heading').textContent = selection.enabled.length ? `${selection.enabled.length} imports included` : 'No imports selected';
+  const chosenImports = selection.requested.filter(id => enabled.has(id)).length;
   $('selection-summary').textContent = selection.enabled.length ?
-    `${selection.requested.length} chosen by you · ${selection.required.length} added as requirements` :
+    `${chosenImports} chosen by you · ${selection.required.length} added as requirements` :
     selection.behaviours_changed ? 'No added items or villagers. Your build uses your chosen town settings.' :
     'Your build includes the English translation, with no added items or villagers.';
   $('dependencies').hidden = !selection.required.length;

@@ -101,6 +101,11 @@ All 17 current interface tests pass, including four actual ROM downloads
 responsive/keyboard controls, cancellation/late-result handling, archive
 rejection, and stale-worker-plan rejection. The download checks bind their
 offline comparison to the current export's exact ROM/report identities.
+The selection summary counts only directly selected item/villager identities
+as "chosen by you"; feature switches do not increment that count. Automatic
+imports remain requirements. Three focused interface checks cover feature-only
+and mixed selections, settings sharing, and decoration selection. Only the
+display changes; recipes and cartridge/report identities remain unchanged.
 The Golden tools checkbox supplies the shovel, net, rod, and axe together;
 all four runtime selection fields pass enabled/disabled composition checks.
 `build/v3-golden-tools-feature-browser-01/results.json` matches offline output.
