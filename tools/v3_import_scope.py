@@ -51,6 +51,8 @@ def availability(catalog, report):
     surfaces = {r['id'] for group in report.get('room_surfaces', {}).get('stock', {}).get('resources', [])
                 for r in group['imports']}
     e = report.get('equipment_resources', {})
+    normal=e.get('normal_acquisition',{})
+    cedar=normal.get('cedars',{})
     passive = {r['id'] for r in e.get('player_actions', {}).get('equipment_selection', {}).get('rows', [])
                if r['passive']}
     equipment = set(passive)
@@ -84,17 +86,25 @@ def availability(catalog, report):
             ready = key in equipment
         elif kind == 'carried':
             # A fruit/sapling category proves behaviour, not acquisition.
-            # These imported plants have source-permitted Nook item codes.
-            ready = carried[key]['native_category']==49 or (
-                carried[key]['native_category'] in (48,50) and key in carried_codes
+            # Cedar and stationery require their normal stock consumers.
+            # Retain the existing coconut code route; island acquisition is a
+            # separate dependency on the unavailable island system.
+            ready = (carried[key]['native_category']==49 and normal.get('paper',{}).get('installed')) or (
+                carried[key]['native_category']==48 and cedar.get('shop_installed') and cedar.get('new_town_installed')
+            ) or (
+                carried[key]['native_category']==50 and key in carried_codes
             ) or key in exercise or key in harvest or key in spirits
-        elif kind in ('villager', 'fish', 'insect', 'diary'):
+        elif kind == 'diary':
+            ready=normal.get('diaries',{}).get('installed') and key in normal['diaries']['identities']
+        elif kind in ('villager', 'fish', 'insect'):
             ready = True
         else:
             raise ValueError('Unreviewed V3 selection category: '+kind)
         result[key] = dict(selectable=ready, dependency_only=dependency_only,
             reason=('Included only as an authentic villager starting-outfit resource; not a standalone item choice.'
                     if dependency_only else '' if ready else
+                    'Original normal shop stock and its connected purchase consumers are not installed.'
+                    if kind=='diary' or kind=='carried' and carried[key]['native_category'] in (48,49) else
                     'The complete installed summer-camping acquisition providers are unavailable.'
                     if kind == 'furniture' and row['item_id'] in summer_rewards else
                     'Postal reward delivery is unbound: the retained helper has no game-side caller or native mail submission binding.'

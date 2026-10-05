@@ -23,19 +23,61 @@ The current imported V3 includes the dresser, credits, and museum corrections.
 Its empty-selection baseline returns V2-14. This does not change the main V3
 lock or publish experimental V3.
 
-## V3 import pipeline: ready for private playtesting
+## V3 import pipeline: acquisition and content verification
+
+The current proposal is ABI 399 / save format 21 at
+`build/v3-normal-acquisition-installed-07/build-lock.json`. Its normal acquisition
+includes cedar saplings in supermarket-and-larger stock, source-derived northern
+cedars in new towns, orange paper in its original A-list stock, and all sixteen
+diary styles in the larger shops. Diaries occupy the last existing paper space,
+preserving the original three/five native positions. They sell out after a
+purchase; paper remains repeat-purchasable. The five shop counters preserve
+item identity, names, prices, and quantities. Cedar purchases use the existing
+goods array, not the adjacent saved shop-information byte.
+
+`build/v3-normal-acquisition-installed-07/acquisition-audit.json` covers every
+one of the 300 catalogue entries and all 22 remaining worksheet candidates.
+Original list membership, creature calendars, rewards, and actual loaded
+consumers are checked independently of preparation/code delivery. No catalogue
+entry is uncovered and no normal acquisition omission remains in this audit.
+The coconut's island route and mailbox savings reward depend on unavailable
+new systems; their retained code routes do not establish those normal routes.
+The 22 unavailable candidates require island facilities, e-Reader support,
+savings accounts, the Museum, the lighthouse quest, or custom designs. Coconut
+island acquisition is outside V3 because the island is a V4 system, not a
+personal exception or permission to invent beach spawning.
+
+Acquisition admission rejects stationery, cedars, and diaries without their
+normal providers. Nine acquisition regressions include changed actual hooks,
+owners, and source diary tables; sanitizer checks cover all six priority
+orderings, positive/negative goods power, empty selected groups, and bounded
+generation, including 5,400 priority/rarity cases. The controlled native shop
+fixture at `build/v3-normal-acquisition-native-08/results.json` passes 118 checks
+and verifies installed selection,
+all five counters, floor identities, purchase removal/repeat rules, new-town
+counts, guards, and checkpoint restoration. These do not establish a walked
+shop visit, ordinary save/restart, a new full travel playthrough, or hardware
+acceptance. Existing passing runtime evidence remains retained. Seven feature
+regressions pass. The current focused Worker download agrees with offline at
+`build/v3-normal-acquisition-browser-03/results.json`; five actual interface
+downloads agree at `build/v3-normal-acquisition-interface-02/results.json`.
+Save format 21 and existing import identities are unchanged from ABI 398;
+matching-profile compatibility is expected in both directions without migration,
+but ordinary cross-build save/reload is not newly verified.
 
 The running preview includes Nook's independent item-code option. Enabling it
 adds no imports. Selecting any of the 18 code-only item choices automatically
-enables codes, as do cedar/coconut features whose current acquisition uses codes.
+enables codes, as does the coconut feature. Cedar trees use normal acquisition
+and do not automatically enable codes.
 The item choices remain individual; settings preserve explicit versus automatic
-feature choices. Off restores all four complete original shop prefixes and both
+feature choices. Off restores all four original item-code dispatchers and both
 menu captions, removing the added JAL relocation rather than relocating a
-restored JALR. Seven feature/acquisition tests and 20 interface checks pass,
+restored JALR, preserving the normal-stock adapters in the same owners. Seven
+feature tests and the retained 20 interface checks pass,
 including actual on, off, and item-required ROM downloads, settings sharing,
 removing requirements, and correct chosen-item counts. The real Worker matches
-offline at `build/v3-item-code-dependencies-browser-01/results.json`.
-All 16 served files match `build/v3-item-code-dependencies-website-01`, and
+offline at `build/v3-normal-acquisition-browser-03/results.json`.
+All 16 served files match `build/v3-normal-acquisition-website-02`, and
 the live interface passes the same dependency checks. Existing native gameplay
 evidence is retained; no fresh controller-driven shop conversation or save cycle
 is claimed for this composition change.
@@ -43,8 +85,8 @@ is claimed for this composition change.
 The actual donor lists exclude all 18 code/promotion choices from ordinary,
 reward, and raffle acquisition. Cedar saplings are different: GameCube supplies
 them through ordinary plant stock at supermarket size and above. The current
-cedar import does not install that normal shop route and still uses codes.
-Coconuts retain the agreed item-code route without island or beach acquisition.
+cedar import installs that normal shop route and new-town northern generation.
+Coconuts retain item codes without the V4 island acquisition system.
 
 The items-and-villagers import runtime has focused developer checks. Feature-first
 configuration includes summer camping: its control supplies all ten camper
@@ -79,8 +121,8 @@ passport/stored-letter notes coexist without replacing imported records.
 Rewarded-model persistence also passes actual delivery to the loaded player's
 matching house, both complete device writers, and a fresh-process load retaining
 the original letters, presents, and earned flags.
-The local preview serves `build/v3-website-golden-copy-01/site` from ABI 398 at
-`build/v3-freshwater-patrol-installed-06/build-lock.json`. Villagers and items
+The local preview serves `build/v3-website-golden-copy-01/site` from ABI 399 at
+`build/v3-normal-acquisition-installed-07/build-lock.json`. Villagers and items
 have matching selector windows, Select/Clear above the choices, and settings
 export/import immediately after the ROM inputs. Four individual decoration
 checkboxes control Nook's December 26–31 stock. Responsive layout, keyboard
@@ -89,9 +131,10 @@ browser checks. Six feature controls outside the item selector enable Wisp,
 cedar trees, coconut palms, all four golden tools, summer camping, and the existing
 GameCube events; their 82 required items are included automatically and are not
 independent item checkboxes. The item window has 195 ordinary choices, and the villager
-window has 20 choices. Coconuts and cedar saplings retain their authenticated,
-selection-gated Nook item-code acquisition; coconut island acquisition remains
-outside this task. No beach spawn or substitute reward is added.
+window has 20 choices. Cedar saplings use normal stock and naturally generated
+new-town cedars; coconuts retain selection-gated Nook item codes while island
+acquisition remains outside this task. No beach spawn or substitute reward is
+added.
 Feature checkbox cards share two columns above 640 px and stack on narrower
 screens. Focused geometry and responsive/keyboard checks pass, including long
 labels and checkbox placement. Layout is CSS-only; runtime selection rules and

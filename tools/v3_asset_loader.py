@@ -88,6 +88,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
     entry, expected = {'npc_mail_heap': ('af_v3_npc_mail_heap_range', 0x804F3820),
                        'hra_rewards': ('af_hra_reward_send', 0x80925E48),
                        'hra_reward_mail': ('af_academy_score_mail_create', (link_symbols or {}).get('AF_HRA_MAIL_RAM',0)),
+                       'normal_acquisition': ('af_normal_shop_plants', 0x806E3600),
                        'seasonal_stock': ('af_v3_seasonal_stock', 0x804F3500),
                        'scene_arena': ('af_v3_scene_init', 0x804F3280),
                        'private_save_bank': ('af_v3_private_bank_init', 0x804F3100),

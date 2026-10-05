@@ -25,7 +25,7 @@ class FeatureChoicesTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.saved=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
-        composer.use_build_lock(ROOT/'build/v3-freshwater-patrol-installed-06/build-lock.json')
+        composer.use_build_lock(ROOT/'build/v3-normal-acquisition-installed-07/build-lock.json')
         cls.image,cls.report=composer.inputs()
         cls.catalog=composer.catalogue(cls.image,cls.report)
         cls.features=options(cls.catalog,cls.report)
@@ -67,7 +67,8 @@ class FeatureChoicesTests(unittest.TestCase):
             for name,binding in n['native']['owners'].items():
                 owner=self.report['shop_actors']['owners'][name]
                 data=files[owner['vrom']].extract(image);rel=files[binding['installed_reloc_vrom']].extract(image)
-                if not on:self.assertEqual(sha256(data[:binding['previous_bytes']]),binding['previous_sha256'])
+                # Normal-stock adapters also modify these complete owners.
+                # Disabling codes restores the dispatch, not those adapters.
                 spec=SimpleNamespace(ram=owner['ram'],resident_bytes=len(data),sections=struct.unpack_from('>5I',rel))
                 from shop_units import SHOPS,PRICE_BIASES
                 for base in (0x80200010,0x80370010):
@@ -96,7 +97,7 @@ class FeatureChoicesTests(unittest.TestCase):
         items=installed_items(self.report)
         self.assertEqual(len(items),18)
         self.assertEqual(set(feature['required_by_imports']),items | {
-            'GAFE01-r0/item/2807','GAFE01-r0/item/2901'})
+            'GAFE01-r0/item/2807'})
         def resolve(chosen):
             return composer.resolve(self.catalog,chosen,scope='v3-pipeline',report=self.report)
         only=resolve([code])
@@ -107,10 +108,11 @@ class FeatureChoicesTests(unittest.TestCase):
             self.assertEqual(selected['requested'],[item])
             self.assertIn(code,selected['enabled_features'])
             self.assertIn(item,selected['feature_dependency_reasons'][code])
-        for plant in ('cedar-trees','coconut-palms'):
+        for plant in ('coconut-palms',):
             selected=resolve(['feature/'+plant])
             self.assertIn(code,selected['enabled_features'])
             self.assertEqual(set(selected['feature_dependency_reasons'][code]),set(selected['enabled']))
+        self.assertNotIn(code,resolve(['feature/cedar-trees'])['enabled_features'])
         self.assertNotIn(code,resolve(['GAFE01-r0/item/2320'])['enabled_features'])
         self.assertEqual(resolve([])['enabled_features'],[])
         selected=resolve(['GAFE01-r0/item/31E4'])

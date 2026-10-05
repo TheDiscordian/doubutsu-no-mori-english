@@ -738,7 +738,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,hra_rewards=False,
                     password_runtime=None,password_editor=False,password_nook=None,harvest_connected=None,bank_connected=None,private_save_bank=False,player_travel=False,scene_arena=False,seasonal_stock=False,nook_font_repair=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None,carried_items=None,freshwater_movement=False):
+                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None,carried_items=None,freshwater_movement=False,normal_acquisition=False):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -788,6 +788,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if freshwater_movement:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
+    if normal_acquisition:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if nook_font_repair:
@@ -844,6 +847,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif nook_font_repair:
         import v3_nook_font as equipment
         equipment_report,owner_changes,report_updates,physical_writes=equipment.repair(
+            base,prior,blob,core,module,output)
+        display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
+    elif normal_acquisition:
+        import v3_normal_acquisition as equipment
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
             base,prior,blob,core,module,output)
         display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
     elif freshwater_movement:
@@ -1738,6 +1746,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             additional_resident_bytes=owner['reservation']['bytes'],additional_scene_bytes=0)
         report['sources'].update(owner['sources'])
         report['native_test']='pending shared late-December stock native execution; ordinary seasonal purchases and save/restart are unverified'
+    if normal_acquisition:
+        owner=equipment_report['normal_acquisition']
+        report['shared_runtime_refresh'].update(adapters=['normal_acquisition'],
+            additional_resident_bytes=0,additional_scene_bytes=0)
+        report['sources'].update(owner['sources'])
+        report['native_test']='pending normal acquisition native stock, purchase, and new-town generation checks'
     if freshwater_movement:
         owner=equipment_report['creature_fish']['world']['freshwater']
         report['shared_runtime_refresh'].update(adapters=['freshwater_movement'],
@@ -2093,6 +2107,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, borrow exclusive title RAM for complete native gameplay allocations')
     parser.add_argument('--seasonal-stock',action='store_true',
         help='With --refresh-runtime, connect selected donor seasonal stock to the existing Nook replacement')
+    parser.add_argument('--normal-acquisition',action='store_true',
+        help='With --refresh-runtime, connect missing normal stock and natural generation')
     parser.add_argument('--nook-font-repair',action='store_true',
         help='With --refresh-runtime, repair the complete name-font/save-code RAM overlap')
     parser.add_argument('--room-effects',type=Path,
@@ -2162,6 +2178,7 @@ if __name__=='__main__':
     if args.player_travel and not args.refresh_runtime:parser.error('--player-travel requires --refresh-runtime')
     if args.scene_arena and not args.refresh_runtime:parser.error('--scene-arena requires --refresh-runtime')
     if args.seasonal_stock and not args.refresh_runtime:parser.error('--seasonal-stock requires --refresh-runtime')
+    if args.normal_acquisition and not args.refresh_runtime:parser.error('--normal-acquisition requires --refresh-runtime')
     if args.nook_font_repair and not args.refresh_runtime:parser.error('--nook-font-repair requires --refresh-runtime')
     if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
     if args.furniture_capacity and not args.refresh_runtime:parser.error('--furniture-capacity requires --refresh-runtime')
@@ -2188,7 +2205,7 @@ if __name__=='__main__':
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
                             furniture_scoring=args.furniture_scoring,hra_rewards=args.hra_rewards,password_runtime=args.password_runtime,
                             password_editor=args.password_editor,password_nook=args.password_nook,harvest_connected=args.harvest_connected,
-                            bank_connected=args.bank_connected,private_save_bank=args.private_save_bank,player_travel=args.player_travel,scene_arena=args.scene_arena,seasonal_stock=args.seasonal_stock,nook_font_repair=args.nook_font_repair,room_effects=args.room_effects,freshwater_movement=args.freshwater_movement,
+                            bank_connected=args.bank_connected,private_save_bank=args.private_save_bank,player_travel=args.player_travel,scene_arena=args.scene_arena,seasonal_stock=args.seasonal_stock,nook_font_repair=args.nook_font_repair,room_effects=args.room_effects,freshwater_movement=args.freshwater_movement,normal_acquisition=args.normal_acquisition,
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,

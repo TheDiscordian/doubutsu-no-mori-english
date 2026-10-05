@@ -1758,6 +1758,12 @@ def main():
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record,
                                         remaining=action.get('camper_trade_remaining_only',False)))
+            if action.get('test_v3_normal_acquisition'):
+                from v3_normal_acquisition_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Normal acquisition checks require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_paper_quantities'):
                 from v3_paper_smoke import exercise
                 if not (out/'test.bs1').is_file():

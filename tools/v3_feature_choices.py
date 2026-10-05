@@ -64,12 +64,13 @@ def options(catalog, report):
     admitted = {key for key, value in availability(catalog, report).items() if value['selectable']}
     groups = report.get('equipment_resources', {}).get('npc_extra', {}).get('events', {}).get('selection', {}).get('groups', [])
     definitions = []
+    cedars = report.get('equipment_resources', {}).get('normal_acquisition', {}).get('cedars', {})
+    cedar_stock = cedars.get('shop_installed') and cedars.get('new_town_installed')
     if item_codes_installed(report):
         from v3_password_acquisition import installed_items,carried_items
-        # These plants currently use the installed code route. This does not
-        # claim that GameCube cedar saplings lack ordinary shop acquisition.
-        code_items = installed_items(report) | (carried_items(report) & {
-            'GAFE01-r0/item/2807','GAFE01-r0/item/2901'})
+        plants = {'GAFE01-r0/item/2807'}
+        if not cedar_stock: plants.add('GAFE01-r0/item/2901')
+        code_items = installed_items(report) | (carried_items(report) & plants)
         definitions.append(dict(id='feature/item-codes',name='Animal Crossing item codes',
             description='Enter Animal Crossing item codes at Nook’s shop to receive items enabled in your game.',
             required_imports=[],required_by_imports=sorted(code_items & admitted)))
@@ -79,7 +80,10 @@ def options(catalog, report):
         if items and set(items) <= admitted:
             definitions.append(dict(id='feature/'+key, name=name, description=description, required_imports=items))
 
-    add('cedar-trees', 'Cedar trees', 'Plant and grow cedar trees. Cedar saplings can be obtained using Animal Crossing item codes at Nook’s shop.', ['GAFE01-r0/item/2901'])
+    add('cedar-trees', 'Cedar trees',
+        'Cedar trees grow in the northern acres of new towns. Nook sells cedar saplings at supermarket size and above.'
+        if cedar_stock else 'Plant and grow cedar trees. Cedar saplings can be obtained using Animal Crossing item codes at Nook’s shop.',
+        ['GAFE01-r0/item/2901'])
     add('coconut-palms', 'Coconut palms', 'Obtain coconuts using Animal Crossing item codes at Nook’s shop, then plant them to grow fruit-bearing palm trees near the coast. Coconuts do not wash ashore.', ['GAFE01-r0/item/2807'])
     add('golden-tools', 'Golden tools',
         'Add the golden shovel, net, rod, and axe, with their original acquisition routes.',

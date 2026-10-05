@@ -1,36 +1,76 @@
 # Completion queue
 
-## V3 private playtest handoff
+## V3 acquisition and content verification
+
+The category-wide acquisition audit covers all 300 installed catalogue entries
+and all 22 remaining source-worksheet candidates. Original stock lists, reward
+categories, creature calendars, and actual installed consumers are checked
+separately from asset preparation or code delivery. The generated evidence is
+`build/v3-normal-acquisition-installed-07/acquisition-audit.json`.
+
+The current proposal is ABI 399 / save format 21 at
+`build/v3-normal-acquisition-installed-07/build-lock.json`. Normal acquisition
+connects cedar sapling sales at supermarket size and above, original northern
+cedar generation in new towns, orange paper's original A-list stock, and all
+sixteen diary styles in the larger shops. Diaries replace the last existing
+paper space: two papers and one diary at the supermarket, four papers and one
+diary at the department store. Original rarity priorities, daily selection,
+purchase names/counts, repeat-paper sales, diary sold markers, and sapling sold
+markers use the connected native consumers. No new shelves or saved fields are
+added. Selectability requires these normal routes; a prepared item or working
+code route alone does not qualify. The local preview uses the same served
+directory, `build/v3-website-golden-copy-01/site`.
+
+The acquisition audit has no uncovered catalogue entry or unresolved normal
+route. The coconut's original island acquisition and mailbox savings reward
+depend on unavailable new systems; retained code acquisition is separate, not
+a personal exception. The 22 unavailable content candidates require island
+facilities, e-Reader support, savings accounts, the Museum, the lighthouse quest,
+or custom designs. Do not invent stock or substitute rewards for these items.
+Broad ordinary gameplay and original-hardware acceptance are not established
+by source coverage or controlled native execution.
+
+Nine acquisition regressions, seven feature regressions, 5,400 sanitized
+rarity/priority cases, and 118 controlled native checks pass. Current evidence
+is in `build/v3-normal-acquisition-native-08/results.json`,
+`build/v3-normal-acquisition-browser-03/results.json`, and
+`build/v3-normal-acquisition-interface-02/results.json`. Five complete interface
+downloads match offline composition, including the unchanged no-import V2-14
+result. The current export is `build/v3-normal-acquisition-website-02`; all sixteen
+served files are checked against that receipt. ABI 398 and ABI 399 retain save
+format 21 and import identities; equal-profile compatibility is expected in
+both directions without migration, but ordinary cross-build reload is not newly
+verified. Public V2 remains unchanged.
 
 Nook's optional item-code control and item-to-feature dependencies are complete
 in the running preview. Enabling codes adds no imports; selecting any of the
-18 code-only choices, or the cedar/coconut features with their current code
-acquisition, automatically enables codes. The 18 choices remain individual
+18 code-only choices, or the coconut feature, automatically enables codes.
+Cedar trees no longer require codes. The 18 choices remain individual
 items. Settings preserve explicit versus required feature choices, and automatic
 features do not inflate the chosen-item count. Disabling restores all four
 original dispatchers and destructors, removes the added call relocation, and
-restores both native menu captions. Seven feature/acquisition checks and
-20 interface checks pass, including actual independent, disabled, and
+restores both native menu captions while preserving normal-stock consumers.
+Seven feature checks and the retained 20 interface checks pass, including actual independent, disabled, and
 item-required ROM downloads. The checked export is
-`build/v3-item-code-dependencies-website-01`; the Worker agrees with offline at
-`build/v3-item-code-dependencies-browser-01/results.json`.
+`build/v3-normal-acquisition-website-02`; the Worker agrees with offline at
+`build/v3-normal-acquisition-browser-03/results.json`.
 
-The acquisition source check identifies a remaining distinction: GameCube
-cedar saplings use ordinary plant stock at supermarket size and above
-(`local/ac-decomp/src/game/m_shop.c`, `mSP_SelectPlant`). That stock route is
-not installed for imported cedars; their current acquisition is item codes.
+The acquisition source check verifies GameCube cedar saplings against ordinary
+plant stock at supermarket size and above
+(`local/ac-decomp/src/game/m_shop.c`, `mSP_SelectPlant`). That stock route and
+new-town northern cedar generation are installed.
 The 18 code/promotion items are absent from ordinary, reward, and raffle lists;
-do not invent stock or raffle acquisition for them. Coconuts retain the agreed
-code-only acquisition without island facilities or beach spawning.
+do not invent stock or raffle acquisition for them. Coconuts retain their
+existing code route without island facilities or invented beach spawning.
 
 The complete GameCube freshwater movement alternative is implemented and
 verified. All six connected swimming, waiting, and escape callbacks and
 initializers are ported together; source comparisons, native execution,
 current composition, and actual browser downloads pass. The running preview
-serves the checked ABI-398 export from its existing directory.
+serves the checked ABI-399 export from its existing directory.
 
-The connected V3 items-and-villagers import pipeline is ready for private
-playtesting. The current handoff is
+The connected V3 items-and-villagers runtime has a private
+playtest handoff. The current handoff is
 `build/v3-travel-console-visitors-profile-01/handoff.json`; the running local
 preview is [http://127.0.0.1:8073/](http://127.0.0.1:8073/). Implementation and
 focused developer verification cover the connected visiting/save consumers
