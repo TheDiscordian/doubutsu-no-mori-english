@@ -515,7 +515,7 @@ integration check skipped. Six actual page downloads match offline at
 `build/v3-savings-interface-04/results.json`, including the savings-only ROM and
 settings round trip. The focused Worker matches at
 `build/v3-savings-browser-03/results.json`. All sixteen files served by the
-existing preview directory match `build/v3-savings-website-03`; the live control,
+existing preview directory match `build/v3-savings-website-06`; the live control,
 item-picker exclusion, chosen-item count, and responsive card widths are checked.
 Public V2 publication remains unchanged.
 

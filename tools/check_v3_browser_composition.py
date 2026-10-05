@@ -40,6 +40,8 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
     assert page.locator('#build').is_disabled()
     assert 'No imports selected' in page.locator('#selection-heading').inner_text()
     assert page.locator('iframe, video, audio').count() == 0
+    assert page.locator('#trailer-play').count() == 1
+    assert page.locator('#trailer-link').get_attribute('href') == 'https://www.youtube.com/watch?v=UloFru4K4Q8'
     results['optional_by_default'] = True
 
     page.locator('#select-all').click()

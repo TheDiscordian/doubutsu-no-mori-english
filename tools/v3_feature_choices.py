@@ -93,7 +93,7 @@ def options(catalog, report):
     from v3_bank_mail import installed_items as savings_items
     if savings_items(report):
         add('savings-account', 'Savings account and rewards',
-            'After paying off your house, deposit and withdraw Bells at the post office. Receive the original savings rewards by mail as your balance grows.',
+            'After paying off your house, deposit and withdraw Bells at the post office.',
             ['GAFE01-r0/item/'+row['item'] for row in bank['mail']['source']['rewards']])
     from v3_furniture_rewards import summer_installed
     if summer_installed(report):

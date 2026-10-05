@@ -46,10 +46,13 @@ and verifies settings sharing and correct chosen-item counts at
 controller-driven Pelly conversation, a new Save & Quit interaction, walked
 station travel, or original-hardware acceptance.
 
-The running preview's sixteen files match `build/v3-savings-website-03` in the
+The running preview's sixteen files match `build/v3-savings-website-06` in the
 existing `build/v3-website-golden-copy-01/site` directory. Eight separate feature
 controls include 86 automatically required items; ordinary item and villager
 choices remain 195 and 20. Savings is one feature box with no reward spoilers.
+The original trailer appears at the top beside the introduction, with its poster, Play button,
+and YouTube link. Silent browser checks cover four widths and keyboard playback
+activation; no YouTube request occurs before the visitor presses Play.
 
 Normal acquisition
 includes cedar saplings in supermarket-and-larger stock, source-derived northern
@@ -104,7 +107,7 @@ including actual on, off, and item-required ROM downloads, settings sharing,
 removing requirements, and correct chosen-item counts. The real Worker matches
 offline at `build/v3-normal-acquisition-browser-03/results.json`.
 The retained acquisition-only export is `build/v3-normal-acquisition-website-02`;
-the current served files match `build/v3-savings-website-03`, and
+the current served files match `build/v3-savings-website-06`, and
 the live interface passes the same dependency checks. Existing native gameplay
 evidence is retained; no fresh controller-driven shop conversation or save cycle
 is claimed for this composition change.

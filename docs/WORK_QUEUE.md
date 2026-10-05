@@ -15,7 +15,9 @@ town at `build/v3-savings-save-native-01/results.json` and
 The six actual page downloads, combined-feature settings sharing, and correct
 counts pass at `build/v3-savings-interface-04/results.json`; the focused Worker
 matches offline at `build/v3-savings-browser-03/results.json`. The sixteen served
-files match `build/v3-savings-website-03` in the same preview directory. Ordinary
+files match `build/v3-savings-website-06` in the same preview directory. The original
+trailer is present at the top beside the introduction and passes silent responsive and keyboard
+activation checks. Ordinary
 controller-driven Pelly conversations, a new Save & Quit interaction, walked
 station travel, and original hardware are not established by these checks.
 The public V2 patcher remains unchanged. Lighthouse/Tortimer and island work
@@ -58,7 +60,7 @@ is in `build/v3-normal-acquisition-native-08/results.json`,
 `build/v3-normal-acquisition-browser-03/results.json`, and
 `build/v3-normal-acquisition-interface-02/results.json`. Five complete interface
 downloads match offline composition, including the unchanged no-import V2-14
-result. The current export is `build/v3-savings-website-03`; all sixteen
+result. The current export is `build/v3-savings-website-06`; all sixteen
 served files are checked against that receipt. ABI 398 and ABI 399 retain save
 format 21 and import identities; equal-profile compatibility is expected in
 both directions without migration, but ordinary cross-build reload is not newly

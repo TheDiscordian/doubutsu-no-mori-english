@@ -4,6 +4,16 @@ import { resolveSelection } from './composer.mjs';
 import { exportSettings, importSettings, MAX_SETTINGS_BYTES } from './settings.mjs';
 
 const $ = id => document.getElementById(id);
+$('trailer-play').addEventListener('click', () => {
+  const frame = document.createElement('iframe');
+  frame.src = 'https://www.youtube-nocookie.com/embed/UloFru4K4Q8?autoplay=1&mute=0&playsinline=1&rel=0';
+  frame.title = 'Animal Crossing N64 English translation trailer';
+  frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+  frame.allowFullscreen = true;
+  frame.referrerPolicy = 'strict-origin-when-cross-origin';
+  $('trailer-player').replaceChildren(frame);
+  frame.focus();
+}, { once: true });
 const inputs = [$('n64'), $('gamecube')];
 const requested = new Set(), cards = new Map();
 const behaviours = {};

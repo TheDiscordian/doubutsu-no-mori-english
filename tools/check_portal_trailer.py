@@ -32,6 +32,12 @@ def main():
             assert response.status == 200
             assert 'frame-src https://www.youtube-nocookie.com;' in response.headers['content-security-policy']
             page.wait_for_function("() => document.getElementById('status').textContent.includes('Choose both')")
+            experimental = page.locator('#selection-controls').count() > 0
+            if experimental:
+                assert page.locator('#selection-controls').is_enabled()
+                assert page.locator('.hero #trailer-player').count() == 1
+                assert page.locator('#trailer-player').evaluate(
+                    "element => Boolean(element.compareDocumentPosition(document.getElementById('game-inputs')) & Node.DOCUMENT_POSITION_FOLLOWING)")
             button = page.locator('#trailer-play')
             button.scroll_into_view_if_needed()
             assert button.is_visible() and page.locator('iframe, video').count() == 0
@@ -39,8 +45,9 @@ def main():
                        and not r.post_data_buffer for r in requests)
             assert not any('trailer.mp4' in r.url for r in requests)
             assert page.evaluate('() => document.documentElement.scrollWidth <= innerWidth')
-            assert page.locator('.site-footer nav a').count() == 4
-            page.locator('#input-checksums').evaluate('(element) => { element.open = true; }')
+            if not experimental:
+                assert page.locator('.site-footer nav a').count() == 4
+                page.locator('#input-checksums').evaluate('(element) => { element.open = true; }')
             assert page.evaluate('() => document.documentElement.scrollWidth <= innerWidth')
             link = page.locator('#trailer-link')
             assert link.get_attribute('href') == 'https://www.youtube.com/watch?v=UloFru4K4Q8'
@@ -61,7 +68,11 @@ def main():
             assert frame.get_attribute('referrerpolicy') == 'strict-origin-when-cross-origin'
             assert 'autoplay' in frame.get_attribute('allow')
             box = frame.bounding_box()
-            assert box['width'] >= 200 and box['height'] >= 200
+            assert box['width'] >= 200 and box['width'] <= width
+            if experimental:
+                assert abs(box['width'] / box['height'] - 16 / 9) < .02
+            else:
+                assert box['height'] >= 200
             assert all(not r.post_data_buffer for r in requests)
             assert not errors
             results[str(width)] = 'No pre-click YouTube requests; click/keyboard embed, sound parameters, origin referrer, and layout pass'

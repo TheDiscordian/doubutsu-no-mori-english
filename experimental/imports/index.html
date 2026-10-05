@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Choose GameCube villagers and items, set your town rules, and build Animal Crossing N64 in English.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'; connect-src 'self'; img-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="theme-color" content="#254d3f">
   <title>Animal Crossing N64 · English Translation</title>
@@ -25,7 +25,15 @@
         <h1 id="welcome-heading">A little more<br><em>Animal Crossing.</em></h1>
         <p class="intro">The original N64 game, in English.<br>With your favourite GameCube villagers and items.</p>
       </div>
-      <figure class="postcard"><img src="./web/media/town.webp" width="800" height="600" alt="The English Animal Crossing title screen on Nintendo 64"><figcaption>Your next little adventure.</figcaption></figure>
+      <div class="trailer-panel">
+        <div class="trailer-player" id="trailer-player">
+          <button class="trailer-play" id="trailer-play" type="button" aria-label="Play the Animal Crossing N64 trailer on YouTube">
+            <img src="./web/media/town.webp" width="800" height="600" alt="">
+            <span class="trailer-play-label"><span aria-hidden="true">▶</span> Play trailer</span>
+          </button>
+        </div>
+        <p class="trailer-link"><a id="trailer-link" href="https://www.youtube.com/watch?v=UloFru4K4Q8" target="_blank" rel="noopener noreferrer">Watch on YouTube <span aria-hidden="true">↗</span></a></p>
+      </div>
     </section>
 
     <nav class="workflow" aria-label="Build steps">
