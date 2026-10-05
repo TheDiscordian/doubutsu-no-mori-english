@@ -83,6 +83,11 @@ export function validatePlan(plan) {
     for (const key of ['name', 'description']) require(typeof row[key] === 'string' && row[key].length > 0 && row[key].length <= 1024,
       'Invalid feature description.');
     array(row.required_imports, 0, 2048);
+    if (row.required_by_imports !== undefined) {
+      array(row.required_by_imports, 1, 2048);
+      require(row.required_imports.length === 0 && new Set(row.required_by_imports).size === row.required_by_imports.length &&
+        row.required_by_imports.every(id => options.has(id)), 'Invalid item-to-feature requirements.');
+    }
     if (row.disable !== undefined) {
       array(row.disable, 1, 32);
       for (const patch of row.disable) {
@@ -321,6 +326,10 @@ export function resolveSelection(plan, requested, behaviours = {}) {
     }
   }
   require([...enabled].every(id => !featureItems.has(id) || chosen.includes(featureItems.get(id))), 'An item requires a disabled feature.');
+  const featureReasons = Object.fromEntries([...features.values()].map(row =>
+    [row.id, (row.required_by_imports || []).filter(id => enabled.has(id)).sort()])
+    .filter(([, ids]) => ids.length).sort(([a], [b]) => a < b ? -1 : 1));
+  const enabledFeatures = [...new Set([...chosen.filter(id => features.has(id)), ...Object.keys(featureReasons)])].sort();
   const profile = new Uint8Array(192);
   const surfaceProfile = new Uint8Array(64);
   const creatureProfile = new Uint8Array(4);
@@ -340,6 +349,7 @@ export function resolveSelection(plan, requested, behaviours = {}) {
     resolved[row.id] = value;
   }
   return { requested: chosen, enabled: [...enabled].sort(), required: [...enabled].filter(id => !chosen.includes(id)).sort(),
+    ...(features.size ? { enabled_features: enabledFeatures, feature_dependency_reasons: featureReasons } : {}),
     ...(plan.scope === undefined ? {} : { scope: plan.scope }),
     dependency_reasons: Object.fromEntries([...reasons].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
       .map(([key, parents]) => [key, [...parents].sort()])), profile_hex: hex(profile),
@@ -413,7 +423,7 @@ export async function composeSelection(source, plan, requested, behaviours = {})
       writes.push({ offset: field.offset, before: field.before, after: hex(after) }); output.set(after, field.offset);
     }
     write(plan.profile, bytes(selection.profile_hex));
-    for (const feature of plan.features || []) if (!selection.requested.includes(feature.id))
+    for (const feature of plan.features || []) if (!selection.enabled_features.includes(feature.id))
       for (const patch of feature.disable || []) write(patch, bytes(patch.after));
     for (const row of plan.behaviours || []) {
       const value = new Uint8Array(4); view(value).setUint32(0, row.values[selection.behaviours[row.id]]);
@@ -423,7 +433,7 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     for (const group of plan.runtime_groups || []) {
       const active = !group.forced_disabled && (group.any_imports.some(id => enabled.has(id)) ||
         group.any_behaviours.some(row => selection.behaviours?.[row.id] === row.value) ||
-        (group.any_features || []).some(id => selection.requested.includes(id)));
+        (group.any_features || []).some(id => selection.enabled_features?.includes(id)));
       for (const row of group.fields) {
         const value = new Uint8Array(4); view(value).setUint32(0, active ? row.enabled : row.disabled);
         write(row, value);

@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 import v3_optional_composition as composer
 from v3_feature_choices import options,requests,item_code_patches
-from v3_password_acquisition import checked,carried_items
+from v3_password_acquisition import checked,carried_items,installed_items
 from v3_furniture_pipeline import Source
 from v3_password_runtime import MAP,POLICY
 from v3_asset_loader import BLOB
@@ -89,6 +89,52 @@ class FeatureChoicesTests(unittest.TestCase):
         for field in fields:
             corrupt=bytearray(self.image);corrupt[field['offset']]^=1
             with self.assertRaises(ValueError):item_code_patches(corrupt,self.report)
+
+    def test_items_require_codes_without_codes_importing_items(self):
+        code='feature/item-codes'
+        feature=next(row for row in self.features if row['id']==code)
+        items=installed_items(self.report)
+        self.assertEqual(len(items),18)
+        self.assertEqual(set(feature['required_by_imports']),items | {
+            'GAFE01-r0/item/2807','GAFE01-r0/item/2901'})
+        def resolve(chosen):
+            return composer.resolve(self.catalog,chosen,scope='v3-pipeline',report=self.report)
+        only=resolve([code])
+        self.assertEqual(only['enabled'],[])
+        self.assertEqual(only['enabled_features'],[code])
+        for item in sorted(items):
+            selected=resolve([item])
+            self.assertEqual(selected['requested'],[item])
+            self.assertIn(code,selected['enabled_features'])
+            self.assertIn(item,selected['feature_dependency_reasons'][code])
+        for plant in ('cedar-trees','coconut-palms'):
+            selected=resolve(['feature/'+plant])
+            self.assertIn(code,selected['enabled_features'])
+            self.assertEqual(set(selected['feature_dependency_reasons'][code]),set(selected['enabled']))
+        self.assertNotIn(code,resolve(['GAFE01-r0/item/2320'])['enabled_features'])
+        self.assertEqual(resolve([])['enabled_features'],[])
+        selected=resolve(['GAFE01-r0/item/31E4'])
+        image,_,_=composer.compose(self.image,self.report,self.catalog,selected)
+        for field in item_code_patches(self.image,self.report):
+            value=bytes.fromhex(field['before'])
+            self.assertEqual(image[field['offset']:field['offset']+len(value)],value)
+
+    def test_code_items_are_absent_from_normal_and_raffle_source_lists(self):
+        from v3_registry import furniture_source
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                      (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        lists={name:{value for value, in struct.iter_unpack('>H',source.raw(name))}
+            for name in source.names if name.startswith(('ftr_list','carpet_list','wall_list'))
+            and len(source.names[name])==1 and name!='carpet_list_table'}
+        furniture={row['id']:row for row in self.report['furniture']['imports']}
+        for key in sorted(installed_items(self.report)):
+            donor=int(key.rsplit('/',1)[1],16)
+            if key in furniture:
+                donor,index=furniture_source(furniture[key])
+                self.assertIn(source.raw('mRmTp_birth_type')[index],(28,34))
+            memberships=[name for name,items in lists.items() if donor in items]
+            self.assertTrue(all(name.endswith('HomePage') for name in memberships),(key,memberships))
+            self.assertNotIn(donor,lists['ftr_listLottery'])
 
     def test_coconut_and_cedar_use_real_selected_password_destinations(self):
         source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),

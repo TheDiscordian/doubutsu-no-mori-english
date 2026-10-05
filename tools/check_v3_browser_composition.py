@@ -464,6 +464,9 @@ def check(export, output, *, interface=False, selected=None, focused_behaviours=
                         for key in ('enabled', 'required', 'profile_hex'):
                             assert result['receipt'][key] == resolve(selected)[key], (name, key)
                         selection=resolve(selected)
+                        if 'enabled_features' in selection:
+                            for key in ('enabled_features','feature_dependency_reasons'):
+                                assert result['receipt'][key]==selection[key],(name,key)
                         if focused_behaviours:
                             assert result['receipt']['behaviours']==selection['behaviours']
                         if 'surface_profile_hex' in selection:

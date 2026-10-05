@@ -463,14 +463,22 @@ class BuilderInterfaceTests(unittest.TestCase):
         self.assertEqual(page.locator('#item-dialog #enable-item-codes').count(),0)
         page.locator('#n64').set_input_files(str(ROOT/'local/rom/Doubutsu no Mori (Japan).z64'))
         page.locator('#gamecube').set_input_files(str(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso'))
-        for on in (True,False):
-            if on:checkbox.check()
-            else:
+        for mode in ('explicit','off','item-required'):
+            on=mode!='off'
+            if mode=='explicit':checkbox.check()
+            elif mode=='off':
                 checkbox.uncheck()
                 page.locator('#open-items').click()
                 page.locator('[data-id="GAFE01-r0/item/2320"] input').check()
                 page.locator('#close-items').click()
-            requested=['feature/item-codes'] if on else ['GAFE01-r0/item/2320']
+            else:
+                page.locator('#clear-all').click()
+                page.locator('#open-items').click()
+                page.locator('[data-id="GAFE01-r0/item/31E4"] input').check()
+                page.locator('#close-items').click()
+                self.assertTrue(checkbox.is_checked())
+                self.assertTrue(checkbox.is_disabled())
+            requested=['feature/item-codes'] if mode=='explicit' else ['GAFE01-r0/item/'+('2320' if mode=='off' else '31E4')]
             expected=self.offline_sha256(requested)
             self.assertEqual(page.locator('#build').inner_text(),'Build with selected options')
             page.locator('#build').click()
@@ -487,6 +495,29 @@ class BuilderInterfaceTests(unittest.TestCase):
                 with page.expect_download() as event:page.locator('#receipt').click()
                 profile=Path(temp)/'profile.json';event.value.save_as(profile)
                 self.assertEqual(json.loads(profile.read_text())['requested'],requested)
+
+    def test_code_requirements_clear_and_settings_round_trip(self):
+        page=self.page;checkbox=page.locator('#enable-item-codes')
+        page.locator('#enable-coconut-palms').check()
+        self.assertTrue(checkbox.is_checked());self.assertTrue(checkbox.is_disabled())
+        self.assertIn('coconut',page.locator('#enable-item-codes-requirement').inner_text())
+        self.assertIn('0 chosen by you',page.locator('#selection-summary').inner_text())
+        with page.expect_download() as event:page.locator('#settings-export').click()
+        with tempfile.TemporaryDirectory(prefix='v3-code-settings-') as temp:
+            path=Path(temp)/'settings.json';event.value.save_as(path)
+            self.assertEqual(json.loads(path.read_text())['requested'],['feature/coconut-palms'])
+            page.locator('#clear-all').click()
+            self.assertFalse(checkbox.is_checked());self.assertTrue(checkbox.is_enabled())
+            page.locator('#settings-import').set_input_files(str(path))
+            page.wait_for_function("() => document.querySelector('#settings-status').textContent.startsWith('Settings imported.')")
+            self.assertTrue(checkbox.is_checked());self.assertTrue(checkbox.is_disabled())
+        page.locator('#enable-coconut-palms').uncheck()
+        self.assertFalse(checkbox.is_checked());self.assertTrue(checkbox.is_enabled())
+        checkbox.check();page.locator('#enable-cedar-trees').check()
+        self.assertTrue(checkbox.is_disabled())
+        page.locator('#enable-cedar-trees').uncheck()
+        self.assertTrue(checkbox.is_checked());self.assertTrue(checkbox.is_enabled())
+        self.assertEqual(page.locator('#selection-heading').inner_text(),'No imports selected')
 
     def test_cancel_selection_change_archives_and_stale_worker(self):
         page=self.page

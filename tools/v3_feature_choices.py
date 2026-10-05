@@ -65,9 +65,14 @@ def options(catalog, report):
     groups = report.get('equipment_resources', {}).get('npc_extra', {}).get('events', {}).get('selection', {}).get('groups', [])
     definitions = []
     if item_codes_installed(report):
+        from v3_password_acquisition import installed_items,carried_items
+        # These plants currently use the installed code route. This does not
+        # claim that GameCube cedar saplings lack ordinary shop acquisition.
+        code_items = installed_items(report) | (carried_items(report) & {
+            'GAFE01-r0/item/2807','GAFE01-r0/item/2901'})
         definitions.append(dict(id='feature/item-codes',name='Animal Crossing item codes',
             description='Enter Animal Crossing item codes at Nook’s shop to receive items enabled in your game.',
-            required_imports=[]))
+            required_imports=[],required_by_imports=sorted(code_items & admitted)))
 
     def add(key, name, description, items):
         items = sorted(set(items))
@@ -110,7 +115,7 @@ def update_report(image, report, selection):
     from textbanks import Bank
     if not item_codes_installed(report):return
     files=by_vrom(image);n=report['equipment_resources']['passwords']['nook']
-    n['feature_enabled']='feature/item-codes' in selection['requested']
+    n['feature_enabled']='feature/item-codes' in selection.get('enabled_features',selection['requested'])
     for name,binding in n['native']['owners'].items():
         owner=report['shop_actors']['owners'][name]
         binding['overlay_sha256']=sha256(files[owner['vrom']].extract(image))

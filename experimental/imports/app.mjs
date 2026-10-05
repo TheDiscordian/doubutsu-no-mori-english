@@ -74,8 +74,12 @@ function renderSelection() {
   selection = resolveSelection(loaded.plan, [...requested], behaviours);
   const custom = Boolean(selection.requested.length || selection.enabled.length || selection.behaviours_changed);
   const enabled = new Set(selection.enabled), required = new Set(selection.required);
-  for (const [id, { checkbox }] of featureControls) {
-    checkbox.checked = requested.has(id);
+  for (const [id, { checkbox, note }] of featureControls) {
+    const parents = selection.feature_dependency_reasons?.[id] || [];
+    checkbox.checked = selection.enabled_features.includes(id);
+    checkbox.disabled = Boolean(parents.length);
+    note.textContent = parents.length ? `Required to obtain ${parents.map(reasonName).join(', ')}` : '';
+    note.hidden = !parents.length;
   }
   const stockMode = loaded.plan.behaviours?.find(row => row.id === 'new-year-stock')?.values[behaviours['new-year-stock']];
   for (const [key, { checkbox, bit, importId }] of decorationControls) {
@@ -189,9 +193,12 @@ function addFeatureChoices(plan) {
     const description = document.createElement('p'); description.id = checkbox.id+'-description';
     description.textContent = row.description;
     checkbox.setAttribute('aria-describedby', description.id);
-    label.append(title, checkbox); card.append(label, description);
+    const note = document.createElement('p'); note.className = 'dependency-note'; note.hidden = true;
+    checkbox.setAttribute('aria-describedby', description.id+' '+checkbox.id+'-requirement');
+    note.id = checkbox.id+'-requirement';
+    label.append(title, checkbox); card.append(label, description, note);
     $('behaviour-options').append(card);
-    featureControls.set(row.id, { checkbox });
+    featureControls.set(row.id, { checkbox, note });
     checkbox.addEventListener('change', () => changeSelection(() => {
       if (checkbox.checked) requested.add(row.id); else requested.delete(row.id);
     }));

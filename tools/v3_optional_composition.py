@@ -320,6 +320,9 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None,
                 pending.append(child)
     if any(key in owned and owned[key] not in requested for key in enabled):
         raise ValueError('An item requires a disabled feature')
+    feature_reasons = {row['id']:sorted(enabled & set(row.get('required_by_imports',[])))
+        for row in feature_options if enabled & set(row.get('required_by_imports',[]))}
+    enabled_features = sorted((set(requested) & features.keys()) | feature_reasons.keys())
     villagers = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='villager']
     furniture = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='furniture']
     shirts = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='clothing']
@@ -338,6 +341,8 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None,
         'experimental':True, 'web_patcher_enabled':False, 'playable_handoff':False}
     if scope == PIPELINE:
         result['scope'] = scope
+    if feature_options:
+        result.update(enabled_features=enabled_features,feature_dependency_reasons=feature_reasons)
     if any(r['kind'] in ('floor','wall') for r in catalog.values()):
         from v3_surface_selection import profile as surface_profile
         bits=surface_profile([catalog[k] for k in enabled if catalog[k]['kind'] in ('floor','wall')])
@@ -548,7 +553,7 @@ def compose(image, report, catalog, selection):
             for patch in row.get('patches',[]):
                 change(patch['offset'],bytes.fromhex(patch['after']),'behaviour runtime: '+row['id'])
     enabled = set(selection['enabled'])
-    if scope == 'v3-pipeline' and 'feature/item-codes' not in selection['requested']:
+    if scope == 'v3-pipeline' and 'feature/item-codes' not in selection.get('enabled_features',selection['requested']):
         from v3_feature_choices import item_code_patches
         for patch in item_code_patches(image,report):
             change(patch['offset'],bytes.fromhex(patch['after']),'disabled Nook item-code counter')

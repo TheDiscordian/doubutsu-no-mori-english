@@ -25,20 +25,26 @@ lock or publish experimental V3.
 
 ## V3 import pipeline: ready for private playtesting
 
-Nook's feature-control follow-up is in progress. The prepared
-`build/v3-item-code-toggle-website-02` supplies an independent item-code counter
-checkbox with browser/offline agreement. Off restores all four complete original
-shop prefixes and both menu captions, removing the added JAL relocation rather
-than relocating a restored JALR. Five feature/acquisition tests pass, including
-whole-prefix hashes, relocation at two native bases, mutation rejection, and
-counter-only composition. The 19 interface checks pass after replacing a stale
-six-feature geometry assertion; the corrected geometry and the final-export
-on/off downloads pass focused checks. The real Worker matches offline at
-`build/v3-item-code-toggle-browser-01/results.json`.
-The running preview remains unchanged while code-only import grouping and
-cedar/coconut acquisition dependencies await the user's configuration choice.
-Existing native gameplay evidence is retained; no fresh controller-driven shop
-conversation or save cycle is claimed for this composition change.
+The running preview includes Nook's independent item-code option. Enabling it
+adds no imports. Selecting any of the 18 code-only item choices automatically
+enables codes, as do cedar/coconut features whose current acquisition uses codes.
+The item choices remain individual; settings preserve explicit versus automatic
+feature choices. Off restores all four complete original shop prefixes and both
+menu captions, removing the added JAL relocation rather than relocating a
+restored JALR. Seven feature/acquisition tests and 20 interface checks pass,
+including actual on, off, and item-required ROM downloads, settings sharing,
+removing requirements, and correct chosen-item counts. The real Worker matches
+offline at `build/v3-item-code-dependencies-browser-01/results.json`.
+All 16 served files match `build/v3-item-code-dependencies-website-01`, and
+the live interface passes the same dependency checks. Existing native gameplay
+evidence is retained; no fresh controller-driven shop conversation or save cycle
+is claimed for this composition change.
+
+The actual donor lists exclude all 18 code/promotion choices from ordinary,
+reward, and raffle acquisition. Cedar saplings are different: GameCube supplies
+them through ordinary plant stock at supermarket size and above. The current
+cedar import does not install that normal shop route and still uses codes.
+Coconuts retain the agreed item-code route without island or beach acquisition.
 
 The items-and-villagers import runtime has focused developer checks. Feature-first
 configuration includes summer camping: its control supplies all ten camper

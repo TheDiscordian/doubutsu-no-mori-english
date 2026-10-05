@@ -10,7 +10,7 @@ remain available; importing means adding content, not silently replacing an
 existing villager or painting a new name onto an unrelated item.
 Items that enable a separate town feature belong to that feature's control,
 outside the item selector. Enabling the feature includes its required items;
-selecting an item does not enable the feature. Browser and offline selections
+selecting those automatic items directly is rejected. Browser and offline selections
 use the same feature definitions and reject direct requests for those items.
 Standalone added interactions also need explicit feature controls; scanning
 item records alone is insufficient. Nook's item-code control must restore the
@@ -19,6 +19,13 @@ four shop variants, including removal of the added JAL relocation. Features
 without imported-item requirements still select the integrated build rather
 than silently falling back to the translation-only cartridge. Browser/offline
 composition, settings sharing, and UI build state must agree on that choice.
+Enabling Nook's item-code option imports no items. Items whose current acquisition
+requires item codes remain individually selectable and automatically enable that
+option. The same rule covers required items supplied by the cedar-tree and
+coconut-palm controls. Effective feature requirements are resolved from enabled
+items, not copied into the user's explicit choices or counted as chosen items.
+Removing the last requiring item turns off an automatically enabled option;
+an explicitly enabled option stays on. Settings sharing preserves that distinction.
 
 V3 is only the import pipeline: extraction/conversion, additive stable identities,
 bulk asset/data installation, working item/villager runtime behaviour and

@@ -2,17 +2,26 @@
 
 ## V3 private playtest handoff
 
-The active follow-up is Nook's optional item-code counter. Its independent
-feature control and browser/offline patches are implemented. Disabling restores
-all four original dispatchers and destructors, removes the added call relocation,
-and restores both native menu captions. Complete original owner-prefix hashes
-and relocated dispatchers pass at two native bases; actual browser downloads
-agree in both modes. The prepared export is
-`build/v3-item-code-toggle-website-02`; the running preview is not updated yet.
-The remaining configuration choice is whether the 18 code-only imports belong
-to the feature or remain individual choices available only with the counter.
-Connect that choice and the cedar/coconut acquisition dependencies before
-updating the preview. Do not introduce alternative acquisition or new systems.
+Nook's optional item-code control and item-to-feature dependencies are complete
+in the running preview. Enabling codes adds no imports; selecting any of the
+18 code-only choices, or the cedar/coconut features with their current code
+acquisition, automatically enables codes. The 18 choices remain individual
+items. Settings preserve explicit versus required feature choices, and automatic
+features do not inflate the chosen-item count. Disabling restores all four
+original dispatchers and destructors, removes the added call relocation, and
+restores both native menu captions. Seven feature/acquisition checks and
+20 interface checks pass, including actual independent, disabled, and
+item-required ROM downloads. The checked export is
+`build/v3-item-code-dependencies-website-01`; the Worker agrees with offline at
+`build/v3-item-code-dependencies-browser-01/results.json`.
+
+The acquisition source check identifies a remaining distinction: GameCube
+cedar saplings use ordinary plant stock at supermarket size and above
+(`local/ac-decomp/src/game/m_shop.c`, `mSP_SelectPlant`). That stock route is
+not installed for imported cedars; their current acquisition is item codes.
+The 18 code/promotion items are absent from ordinary, reward, and raffle lists;
+do not invent stock or raffle acquisition for them. Coconuts retain the agreed
+code-only acquisition without island facilities or beach spawning.
 
 The complete GameCube freshwater movement alternative is implemented and
 verified. All six connected swimming, waiting, and escape callbacks and
