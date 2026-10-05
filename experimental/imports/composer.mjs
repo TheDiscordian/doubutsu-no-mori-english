@@ -82,7 +82,14 @@ export function validatePlan(plan) {
       !features.has(row.id), 'Invalid or repeated feature choice.');
     for (const key of ['name', 'description']) require(typeof row[key] === 'string' && row[key].length > 0 && row[key].length <= 1024,
       'Invalid feature description.');
-    array(row.required_imports, 1, 2048);
+    array(row.required_imports, 0, 2048);
+    if (row.disable !== undefined) {
+      array(row.disable, 1, 32);
+      for (const patch of row.disable) {
+        const size = field(patch, 4, 65536); hexSize(patch.after, size, size);
+      }
+    }
+    require(row.required_imports.length > 0 || row.disable?.length > 0, 'Feature has no items or runtime controls.');
     for (const id of row.required_imports) {
       require(options.has(id) && !options.get(id).dependency_only && !featureItems.has(id), 'Missing or repeated feature item.');
       featureItems.add(id);
@@ -379,7 +386,7 @@ export async function composeSelection(source, plan, requested, behaviours = {})
   plan = structuredClone(plan);
   const selection = resolveSelection(plan, [...requested], structuredClone(behaviours));
   require(source instanceof Uint8Array, 'Invalid composition source.');
-  const empty = !selection.enabled.length && !selection.behaviours_changed;
+  const empty = !selection.requested.length && !selection.enabled.length && !selection.behaviours_changed;
   require(source.length === (empty ? plan.stable_size : plan.base_size), 'Wrong composition cartridge size.');
   const output = source.slice();
   require(await sha256(output) === (empty ? plan.stable_sha256 : plan.base_sha256), 'Composition base checksum mismatch.');
@@ -388,6 +395,7 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     // Check every declared field, including selected records that remain
     // untouched, before applying the first write to this private copy.
     const fields = [plan.profile, plan.header, ...plan.options.flatMap(row => row.disable),
+      ...(plan.features || []).flatMap(row => row.disable || []),
       ...(plan.pending_options || []).flatMap(row => row.disable),
       ...(plan.runtime_groups || []).flatMap(row => row.fields),
       ...(plan.selection_masks || []),
@@ -405,6 +413,8 @@ export async function composeSelection(source, plan, requested, behaviours = {})
       writes.push({ offset: field.offset, before: field.before, after: hex(after) }); output.set(after, field.offset);
     }
     write(plan.profile, bytes(selection.profile_hex));
+    for (const feature of plan.features || []) if (!selection.requested.includes(feature.id))
+      for (const patch of feature.disable || []) write(patch, bytes(patch.after));
     for (const row of plan.behaviours || []) {
       const value = new Uint8Array(4); view(value).setUint32(0, row.values[selection.behaviours[row.id]]);
       write(row, value);

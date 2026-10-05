@@ -128,7 +128,8 @@ class BuilderInterfaceTests(unittest.TestCase):
                     }))
                 };
             }''')
-            self.assertEqual(len(geometry['cards']),6)
+            plan=json.loads((self.site/'data/composition.json').read_text())
+            self.assertEqual(len(geometry['cards']),len(plan['features']))
             first,second=geometry['cards'][:2]
             if columns==2:
                 self.assertAlmostEqual(first['top'],second['top'],delta=1)
@@ -276,7 +277,11 @@ class BuilderInterfaceTests(unittest.TestCase):
             for identity in feature['required_imports']:
                 self.assertEqual(page.locator(f'#options [data-id="{identity}"]').count(),0)
             page.locator('#clear-all').click(); checkbox.check()
-            self.assertTrue(page.locator('#selection-summary').inner_text().startswith('0 chosen by you · '))
+            if feature['required_imports']:
+                self.assertTrue(page.locator('#selection-summary').inner_text().startswith('0 chosen by you · '))
+            else:
+                self.assertEqual(page.locator('#selection-summary').inner_text(),
+                    'No added items or villagers. Your build uses your chosen town settings.')
             with page.expect_download() as event:page.locator('#settings-export').click()
             with tempfile.TemporaryDirectory(prefix='v3-feature-settings-') as temp:
                 path=Path(temp)/'settings.json';event.value.save_as(path)
@@ -285,8 +290,10 @@ class BuilderInterfaceTests(unittest.TestCase):
                 page.locator('#settings-import').set_input_files(str(path))
                 page.wait_for_function("() => document.querySelector('#settings-status').textContent.startsWith('Settings imported.')")
                 self.assertTrue(checkbox.is_checked())
-                self.assertTrue(page.locator('#selection-summary').inner_text().startswith('0 chosen by you · '))
-            self.assertIn(feature['name'],page.locator('#dependency-list').text_content())
+                if feature['required_imports']:
+                    self.assertTrue(page.locator('#selection-summary').inner_text().startswith('0 chosen by you · '))
+            if feature['required_imports']:
+                self.assertIn(feature['name'],page.locator('#dependency-list').text_content())
             page.locator('#open-items').click();page.locator('#clear-items').click();page.locator('#close-items').click()
             self.assertTrue(checkbox.is_checked())
 
@@ -425,9 +432,7 @@ class BuilderInterfaceTests(unittest.TestCase):
         self.assertIsNone(page.locator('#download').get_attribute('href'))
 
     def test_actual_rom_download_uses_all_fish_movement(self):
-        evidence=ROOT/'build/v3-freshwater-patrol-browser-01/results.json'
-        if not evidence.exists():self.skipTest('Current fish offline comparison required')
-        expected=json.loads(evidence.read_text())['focused-selection']['sha256']
+        expected=self.offline_sha256(['GAFE01-r0/item/2320'],{'fish-movement':'GameCube'})
         page=self.page
         page.locator('#open-items').click();page.locator('#kind').select_option('fish')
         for identity in ('2320',):
@@ -448,6 +453,40 @@ class BuilderInterfaceTests(unittest.TestCase):
             values=json.loads(profile.read_text())['behaviours']
             self.assertEqual(values['fish-movement'],'GameCube')
             self.assertEqual(values['fish-population'],'N64')
+
+    def test_item_codes_have_an_independent_toggle_and_real_download(self):
+        page=self.page
+        plan=json.loads((self.site/'data/composition.json').read_text())
+        feature=next(row for row in plan['features'] if row['id']=='feature/item-codes')
+        checkbox=page.locator('#enable-item-codes')
+        self.assertFalse(checkbox.is_checked())
+        self.assertEqual(page.locator('#item-dialog #enable-item-codes').count(),0)
+        page.locator('#n64').set_input_files(str(ROOT/'local/rom/Doubutsu no Mori (Japan).z64'))
+        page.locator('#gamecube').set_input_files(str(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso'))
+        for on in (True,False):
+            if on:checkbox.check()
+            else:
+                checkbox.uncheck()
+                page.locator('#open-items').click()
+                page.locator('[data-id="GAFE01-r0/item/2320"] input').check()
+                page.locator('#close-items').click()
+            requested=['feature/item-codes'] if on else ['GAFE01-r0/item/2320']
+            expected=self.offline_sha256(requested)
+            self.assertEqual(page.locator('#build').inner_text(),'Build with selected options')
+            page.locator('#build').click()
+            page.wait_for_function("() => !document.querySelector('#success').hidden || !document.querySelector('#error').hidden",timeout=90000)
+            self.assertTrue(page.locator('#error').is_hidden(),page.locator('#error').inner_text())
+            with page.expect_download() as event:page.locator('#download').click()
+            with tempfile.TemporaryDirectory(prefix='v3-item-code-rom-') as temp:
+                rom=Path(temp)/'codes.z64';event.value.save_as(rom)
+                with rom.open('rb') as stream:
+                    self.assertEqual(hashlib.file_digest(stream,'sha256').hexdigest(),expected)
+                    for field in feature['disable']:
+                        value=bytes.fromhex(field['before' if on else 'after'])
+                        stream.seek(field['offset']);self.assertEqual(stream.read(len(value)),value)
+                with page.expect_download() as event:page.locator('#receipt').click()
+                profile=Path(temp)/'profile.json';event.value.save_as(profile)
+                self.assertEqual(json.loads(profile.read_text())['requested'],requested)
 
     def test_cancel_selection_change_archives_and_stale_worker(self):
         page=self.page

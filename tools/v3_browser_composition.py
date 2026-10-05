@@ -283,6 +283,9 @@ def rules(image, report, *, scope='development'):
             group['forced_disabled'] = not pipeline_allowed(group,report)
         from v3_feature_choices import options as installed_features, requests as feature_requests, runtime_groups as feature_groups
         result['features'] = installed_features(catalog, report)
+        from v3_feature_choices import item_code_patches
+        for feature in result['features']:
+            if feature['id']=='feature/item-codes':feature['disable']=item_code_patches(image,report)
         feature_groups(result.get('runtime_groups', []), result['features'])
         full = composition.resolve(catalog, feature_requests(catalog, result['features'], requested_options(catalog, report)),
             behaviour_options=behaviours or None, scope=scope, report=report)

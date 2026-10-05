@@ -25,6 +25,21 @@ lock or publish experimental V3.
 
 ## V3 import pipeline: ready for private playtesting
 
+Nook's feature-control follow-up is in progress. The prepared
+`build/v3-item-code-toggle-website-02` supplies an independent item-code counter
+checkbox with browser/offline agreement. Off restores all four complete original
+shop prefixes and both menu captions, removing the added JAL relocation rather
+than relocating a restored JALR. Five feature/acquisition tests pass, including
+whole-prefix hashes, relocation at two native bases, mutation rejection, and
+counter-only composition. The 19 interface checks pass after replacing a stale
+six-feature geometry assertion; the corrected geometry and the final-export
+on/off downloads pass focused checks. The real Worker matches offline at
+`build/v3-item-code-toggle-browser-01/results.json`.
+The running preview remains unchanged while code-only import grouping and
+cedar/coconut acquisition dependencies await the user's configuration choice.
+Existing native gameplay evidence is retained; no fresh controller-driven shop
+conversation or save cycle is claimed for this composition change.
+
 The items-and-villagers import runtime has focused developer checks. Feature-first
 configuration includes summer camping: its control supplies all ten camper
 rewards and controls the existing campsite and visiting camper together. These

@@ -13,19 +13,19 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 import v3_optional_composition as composer
-from v3_feature_choices import options,requests
+from v3_feature_choices import options,requests,item_code_patches
 from v3_password_acquisition import checked,carried_items
 from v3_furniture_pipeline import Source
 from v3_password_runtime import MAP,POLICY
 from v3_asset_loader import BLOB
-from aflib import by_vrom
+from aflib import by_vrom,sha256
 
 
 class FeatureChoicesTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.saved=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
-        composer.use_build_lock(ROOT/'build/v3-new-year-checkboxes-installed-03/build-lock.json')
+        composer.use_build_lock(ROOT/'build/v3-freshwater-patrol-installed-06/build-lock.json')
         cls.image,cls.report=composer.inputs()
         cls.catalog=composer.catalogue(cls.image,cls.report)
         cls.features=options(cls.catalog,cls.report)
@@ -47,6 +47,48 @@ class FeatureChoicesTests(unittest.TestCase):
         for feature in self.features:
             self.assertIn(feature['id'],full)
             self.assertFalse(set(feature['required_imports'])&set(full))
+
+    def test_item_code_toggle_restores_every_original_counter_and_menu(self):
+        from types import SimpleNamespace
+        from npc_mail_show import relocate_verified_data
+        from v3_event_text import MESSAGE,TABLE
+        from textbanks import Bank
+        fields=item_code_patches(self.image,self.report)
+        self.assertEqual(len(fields),18)
+        n=self.report['equipment_resources']['passwords']['nook']
+        for on in (False,True):
+            selection=composer.resolve(self.catalog,['GAFE01-r0/item/2320']+
+                (['feature/item-codes'] if on else []),scope='v3-pipeline',report=self.report)
+            image,_,_=composer.compose(self.image,self.report,self.catalog,selection)
+            for field in fields:
+                value=bytes.fromhex(field['before' if on else 'after'])
+                self.assertEqual(image[field['offset']:field['offset']+len(value)],value)
+            files=by_vrom(image)
+            for name,binding in n['native']['owners'].items():
+                owner=self.report['shop_actors']['owners'][name]
+                data=files[owner['vrom']].extract(image);rel=files[binding['installed_reloc_vrom']].extract(image)
+                if not on:self.assertEqual(sha256(data[:binding['previous_bytes']]),binding['previous_sha256'])
+                spec=SimpleNamespace(ram=owner['ram'],resident_bytes=len(data),sections=struct.unpack_from('>5I',rel))
+                from shop_units import SHOPS,PRICE_BIASES
+                for base in (0x80200010,0x80370010):
+                    loaded=relocate_verified_data(spec,data,rel,base,address_constants=(PRICE_BIASES[SHOPS[name].vrom],))
+                    at=binding['frame']-owner['ram']
+                    if not on:
+                        self.assertEqual(loaded[at:at+20],bytes.fromhex('8e19094002002025022028250320f80900000000'))
+            entries=Bank('messages',0,0,files[MESSAGE].extract(image),files[TABLE].extract(image)).entries()
+            for row in n['dialogue']['root_edits']:
+                self.assertEqual(sha256(entries[row['id']]),row['sha256' if on else 'before_sha256'])
+        # The counter itself is useful without selecting any imported content.
+        selected=composer.resolve(self.catalog,['feature/item-codes'],scope='v3-pipeline',report=self.report)
+        image,_,blob=composer.compose(self.image,self.report,self.catalog,selected)
+        self.assertIsNotNone(blob)
+        self.assertEqual(len(image),len(self.image))
+        for field in fields:
+            value=bytes.fromhex(field['before'])
+            self.assertEqual(image[field['offset']:field['offset']+len(value)],value)
+        for field in fields:
+            corrupt=bytearray(self.image);corrupt[field['offset']]^=1
+            with self.assertRaises(ValueError):item_code_patches(corrupt,self.report)
 
     def test_coconut_and_cedar_use_real_selected_password_destinations(self):
         source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),

@@ -2,6 +2,18 @@
 
 ## V3 private playtest handoff
 
+The active follow-up is Nook's optional item-code counter. Its independent
+feature control and browser/offline patches are implemented. Disabling restores
+all four original dispatchers and destructors, removes the added call relocation,
+and restores both native menu captions. Complete original owner-prefix hashes
+and relocated dispatchers pass at two native bases; actual browser downloads
+agree in both modes. The prepared export is
+`build/v3-item-code-toggle-website-02`; the running preview is not updated yet.
+The remaining configuration choice is whether the 18 code-only imports belong
+to the feature or remain individual choices available only with the counter.
+Connect that choice and the cedar/coconut acquisition dependencies before
+updating the preview. Do not introduce alternative acquisition or new systems.
+
 The complete GameCube freshwater movement alternative is implemented and
 verified. All six connected swimming, waiting, and escape callbacks and
 initializers are ported together; source comparisons, native execution,

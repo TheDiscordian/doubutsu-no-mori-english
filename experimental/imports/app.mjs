@@ -72,7 +72,7 @@ function renderSelection() {
   const reasonName = key => loaded.plan.features?.find(row => row.id === key)?.name ||
     loaded.plan.options.find(row => row.id === key)?.name || choiceCopy[key]?.name || key;
   selection = resolveSelection(loaded.plan, [...requested], behaviours);
-  const custom = Boolean(selection.enabled.length || selection.behaviours_changed);
+  const custom = Boolean(selection.requested.length || selection.enabled.length || selection.behaviours_changed);
   const enabled = new Set(selection.enabled), required = new Set(selection.required);
   for (const [id, { checkbox }] of featureControls) {
     checkbox.checked = requested.has(id);
@@ -97,7 +97,7 @@ function renderSelection() {
   const chosenImports = selection.requested.filter(id => enabled.has(id)).length;
   $('selection-summary').textContent = selection.enabled.length ?
     `${chosenImports} chosen by you · ${selection.required.length} added as requirements` :
-    selection.behaviours_changed ? 'No added items or villagers. Your build uses your chosen town settings.' :
+    custom ? 'No added items or villagers. Your build uses your chosen town settings.' :
     'Your build includes the English translation, with no added items or villagers.';
   $('dependencies').hidden = !selection.required.length;
   $('dependency-list').replaceChildren(...selection.required.map(id => {
@@ -320,7 +320,7 @@ $('build').addEventListener('click', () => {
   // Resolved receipts include frozen V4 defaults, but those are not user
   // settings. Send only the visible controls and compare the full receipt below.
   const chosenSettings = { ...behaviours };
-  const custom = Boolean(selection.enabled.length || selection.behaviours_changed);
+  const custom = Boolean(selection.requested.length || selection.enabled.length || selection.behaviours_changed);
   try { worker = new Worker(new URL('./worker.mjs', import.meta.url), { type: 'module' }); }
   catch { error('This browser could not start the patcher. Use a current browser over localhost or HTTPS.'); return; }
   $('working').hidden = false; $('progress').value = 0; $('patcher').setAttribute('aria-busy', 'true');

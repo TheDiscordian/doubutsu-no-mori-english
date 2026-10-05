@@ -512,7 +512,7 @@ def compose(image, report, catalog, selection):
         behaviour_options=choices if 'behaviours' in selection else None, scope=scope, report=report)
     if selection != expected:
         raise ValueError('Selection receipt does not match its dependency resolution')
-    if not selection['enabled'] and not selection.get('behaviours_changed',False):
+    if not selection['requested'] and not selection['enabled'] and not selection.get('behaviours_changed',False):
         path, checksum, _ = stable_reference(report)
         stable = path.read_bytes()
         if sha256(stable) != checksum:
@@ -548,6 +548,10 @@ def compose(image, report, catalog, selection):
             for patch in row.get('patches',[]):
                 change(patch['offset'],bytes.fromhex(patch['after']),'behaviour runtime: '+row['id'])
     enabled = set(selection['enabled'])
+    if scope == 'v3-pipeline' and 'feature/item-codes' not in selection['requested']:
+        from v3_feature_choices import item_code_patches
+        for patch in item_code_patches(image,report):
+            change(patch['offset'],bytes.fromhex(patch['after']),'disabled Nook item-code counter')
     from v3_holiday_selection import groups as event_groups, active as event_active, checksum_fields as event_checksums
     for group in event_groups(image, report):
         if scope == 'v3-pipeline':
@@ -780,6 +784,9 @@ def build(output, selected=(), *, select_all=False, behaviours=None, scope='v3-p
             update_behaviours(result,blob,current,selection['behaviours'])
         from v3_holiday_selection import update_report as update_events
         update_events(result,blob,current,selection)
+        if scope=='v3-pipeline':
+            from v3_feature_choices import update_report as update_features
+            update_features(result,current,selection)
         from v3_carried_selection import update_report as update_carried
         update_carried(result,current,selection['enabled'])
         if 'creature_profile_hex' in selection:

@@ -12,6 +12,13 @@ Items that enable a separate town feature belong to that feature's control,
 outside the item selector. Enabling the feature includes its required items;
 selecting an item does not enable the feature. Browser and offline selections
 use the same feature definitions and reject direct requests for those items.
+Standalone added interactions also need explicit feature controls; scanning
+item records alone is insufficient. Nook's item-code control must restore the
+original front-counter dispatch and menu captions when disabled across all
+four shop variants, including removal of the added JAL relocation. Features
+without imported-item requirements still select the integrated build rather
+than silently falling back to the translation-only cartridge. Browser/offline
+composition, settings sharing, and UI build state must agree on that choice.
 
 V3 is only the import pipeline: extraction/conversion, additive stable identities,
 bulk asset/data installation, working item/villager runtime behaviour and
