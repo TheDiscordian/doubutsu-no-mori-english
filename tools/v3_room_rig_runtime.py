@@ -443,6 +443,8 @@ def bind_profiles(source,base,report):
     source.holiday_acquisition=checked_holiday_acquisition(source,base,report)
     from v3_hra_rewards import checked as checked_hra_acquisition
     source.hra_acquisition=checked_hra_acquisition(source,base,report)
+    from v3_bank_mail import checked as checked_bank_acquisition
+    source.bank_acquisition=checked_bank_acquisition(source,base,report)
     source.creature_runtime_bindings=None
     if report.get('equipment_resources',{}).get('creature_items'):
         from v3_creature_items import checked as checked_creatures

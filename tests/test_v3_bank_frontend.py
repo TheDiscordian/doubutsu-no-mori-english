@@ -77,7 +77,12 @@ class BankFrontendTests(unittest.TestCase):
                 for line in prepared['object']['unbound_services']))
             from v3_furniture_install import inputs
             _,prior=inputs(ROOT/'build/v3-holiday-card-prize-imports-01/password-destinations/build-lock.json')
-            self.assertEqual(prepared['saved_owner_memory'],layout(prior))
+            # This retained preparation predates the complete title-buffer
+            # reservation. Its old account address is not a valid new install.
+            with self.assertRaisesRegex(ValueError,'overlaps retained resident memory'):
+                layout(prior)
+            self.assertEqual(prepared['saved_owner_memory']['account'],
+                dict(ram=0x807E9080,record_bytes=48,guard_bytes=16,bytes=64))
         p=artwork(self.source);actual=prepared['artwork'];data=(PREPARED/'bank-art.bin').read_bytes()
         self.assertEqual(reuse_artwork(self.source,p,PREPARED)[0],data)
         self.assertEqual(sha256(data),actual['sha256']);self.assertEqual(len(data),actual['bytes'])

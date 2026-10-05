@@ -33,6 +33,8 @@ def availability(catalog, report):
     shops.update(installed_items(report))
     from v3_hra_rewards import installed_items as hra_items
     shops.update(hra_items(report))
+    from v3_bank_mail import installed_items as savings_items
+    shops.update(savings_items(report))
     from v3_password_acquisition import installed_items as password_items, carried_items as password_carried
     password_ids=password_items(report)
     carried_codes=password_carried(report)

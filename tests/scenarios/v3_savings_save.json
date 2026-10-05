@@ -1,0 +1,11 @@
+[
+  {"wait":2},
+  {"save_state":true},
+  {"pause_game_thread":true},
+  {"command":"QPassSignals:10","expect_result":"OK"},
+  {"test_v3_savings":"deliver-for-save"},
+  {"test_v3_save_entries":true},
+  {"load_state":true},
+  {"wait":1},
+  {"read":["8003CE34",4],"expect":"00000000"}
+]

@@ -25,8 +25,33 @@ lock or publish experimental V3.
 
 ## V3 import pipeline: acquisition and content verification
 
-The current proposal is ABI 399 / save format 21 at
-`build/v3-normal-acquisition-installed-07/build-lock.json`. Its normal acquisition
+The current proposal is ABI 401 / save format 21 at
+`build/v3-savings-reward-imports-03/cartridge/build-lock.json`. One savings-account
+feature includes the original tissue, piggy bank, mailbox, and post model rewards.
+The four items are absent from the individual picker and do not require item
+codes. Native initial-mail scheduling, complete official letters, attached gifts,
+full-queue retry, success-only saved receipts, and selected-profile gates are
+connected. Original repayment remains available when the feature is disabled.
+
+The controlled native batch passes 95 checks at
+`build/v3-savings-native-01/results.json`. Both actual complete save writers
+preserve a maximum account balance and four earned rewards in the loaded
+resident's real mailbox at `build/v3-savings-save-native-01/results.json`.
+A fresh process loads the saved town, account, earned flags, and reward letters
+at `build/v3-savings-reload-native-01/results.json`. The actual browser page
+downloads six matching offline ROMs, including the combined savings feature,
+and verifies settings sharing and correct chosen-item counts at
+`build/v3-savings-interface-04/results.json`. The focused Worker matches at
+`build/v3-savings-browser-03/results.json`. These checks do not claim an ordinary
+controller-driven Pelly conversation, a new Save & Quit interaction, walked
+station travel, or original-hardware acceptance.
+
+The running preview's sixteen files match `build/v3-savings-website-03` in the
+existing `build/v3-website-golden-copy-01/site` directory. Eight separate feature
+controls include 86 automatically required items; ordinary item and villager
+choices remain 195 and 20. Savings is one feature box with no reward spoilers.
+
+Normal acquisition
 includes cedar saplings in supermarket-and-larger stock, source-derived northern
 cedars in new towns, orange paper in its original A-list stock, and all sixteen
 diary styles in the larger shops. Diaries occupy the last existing paper space,
@@ -35,15 +60,16 @@ purchase; paper remains repeat-purchasable. The five shop counters preserve
 item identity, names, prices, and quantities. Cedar purchases use the existing
 goods array, not the adjacent saved shop-information byte.
 
-`build/v3-normal-acquisition-installed-07/acquisition-audit.json` covers every
-one of the 300 catalogue entries and all 22 remaining worksheet candidates.
+`build/v3-savings-acquisition-01` covers every
+one of the 303 catalogue entries and all 19 remaining worksheet candidates.
 Original list membership, creature calendars, rewards, and actual loaded
 consumers are checked independently of preparation/code delivery. No catalogue
 entry is uncovered and no normal acquisition omission remains in this audit.
-The coconut's island route and mailbox savings reward depend on unavailable
-new systems; their retained code routes do not establish those normal routes.
-The 22 unavailable candidates require island facilities, e-Reader support,
-savings accounts, the Museum, the lighthouse quest, or custom designs. Coconut
+All four savings rewards have their original installed account/mail route.
+The coconut's island route depends on unavailable island facilities; its
+retained code route does not establish that normal route.
+The 19 unavailable candidates require island facilities, e-Reader support,
+the Museum, the lighthouse quest, or custom designs. Coconut
 island acquisition is outside V3 because the island is a V4 system, not a
 personal exception or permission to invent beach spawning.
 
@@ -77,7 +103,8 @@ feature tests and the retained 20 interface checks pass,
 including actual on, off, and item-required ROM downloads, settings sharing,
 removing requirements, and correct chosen-item counts. The real Worker matches
 offline at `build/v3-normal-acquisition-browser-03/results.json`.
-All 16 served files match `build/v3-normal-acquisition-website-02`, and
+The retained acquisition-only export is `build/v3-normal-acquisition-website-02`;
+the current served files match `build/v3-savings-website-03`, and
 the live interface passes the same dependency checks. Existing native gameplay
 evidence is retained; no fresh controller-driven shop conversation or save cycle
 is claimed for this composition change.

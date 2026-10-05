@@ -240,7 +240,7 @@ test('V3 retains independent built gift and spirit providers while unknown group
   const invalid = clone(plan);
   invalid.runtime_groups[0].id = 'unreviewed-provider';
   assert.throws(() => validatePlan(invalid), /feature activation scope/);
-  for (const groupId of ['diary-holidays', 'carried-quest']) {
+  for (const groupId of ['diary-holidays', 'carried-quest', 'savings-account']) {
     plan.runtime_groups[0].id = groupId;
     validatePlan(plan);
     const { output } = await composeSelection(source, plan, [A]);

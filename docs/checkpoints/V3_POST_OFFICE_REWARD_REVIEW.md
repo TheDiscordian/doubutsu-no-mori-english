@@ -1,19 +1,19 @@
 # Post-office reward: source review
 
-This is a preserved V4 feature experiment, not an active V3 task. Do not resume
-banking, mail scheduling, milestone rewards, or Museum/island acquisition policies
-to complete V3. V3 completes the import pipeline for items and villagers, with
-regular item-pool integration. Special items should not be importable until their
-acquisition exists in V4.
-The resources and continuations below remain available for V4 without requiring
-further feature work, policy choices, or native feature tests during V3.
+The GameCube savings account and all four milestone rewards form one V3 feature.
+Native mail delivery, original initial-mail scheduling, and saved receipts are
+connected. One combined savings checkbox outside the item selector includes all
+four required reward items. Museum, island, and
+Tortimer/lighthouse acquisition remain outside this task. Prepared resources
+alone do not establish obtainable rewards.
 
-The current cartridge is ABI 387 / format 21 at
-`build/v3-post-office-bank-installed-05/build-lock.json`. Startup, complete
+The current cartridge is ABI 401 / format 21 at
+`build/v3-savings-reward-imports-03/cartridge/build-lock.json`. Startup, complete
 repayment/Pelly resources and allocation, April native hooks, official dialogue,
-and the full saved-account owner are installed. Banking remains disabled by
-default. Real mail delivery/scheduling and independent mechanic/reward controls
-remain unfinished; the 23 staged acquisition gates stay closed. See
+and the full saved-account owner are installed. Browser and offline profiles
+disable banking unless the combined feature is selected. The four rewards use
+their original thresholds and are not standalone choices or code requirements.
+See [the current connected checks](#connected-native-mail-and-persistence-checks) and
 [the installed ownership evidence](#installed-cartridge-ownership).
 
 ## Verified donor
@@ -216,8 +216,9 @@ accounts while retaining their existing data. Account-support requirements
 survive deletion of all residents. Removing banking rejects a required-account
 save before caller state, live accounts, or device writes change.
 
-`tools/v3_bank_storage.py` checks a separate 64-byte account/guard reservation at
-`807E9080..807E90BF` against all retained owners. Save scratch at `80682000`
+The current separate 64-byte account/guard reservation is
+`806A9080..806A90BF`. The older `807E9080` reservation overlaps Nook's complete
+title buffer and is rejected by current checks. Save scratch at `80682000`
 requires 120,416 bytes including its existing sixteen-byte guard, an increase
 of exactly 48 bytes. The enclosing cartridge installs these reservations.
 MIPS compilation requires an explicit account reservation; the existing
@@ -452,12 +453,13 @@ sanitized saved-owner checks pass with native I/O doubled; ordinary native banki
 physical save/restart, and original hardware remain unverified. No native bank
 harness starts; spent holiday/Harvest/Nook harness budgets remain unchanged.
 
-Bank mode retains its owned zero/N64 default. No bank/reward choice is published
-before actual mail submission and acknowledgement are connected. Format-21 saves
-cannot be loaded by format-20-or-earlier V3 or V2, even with banking disabled.
+The retained ABI-387 packet keeps its zero/N64 default. Current selection uses
+the combined savings feature and the connected mail extension. Format-21 saves
+cannot be loaded by format-20-or-earlier V3 or V2.
 Supported older towns migrate forward with empty accounts; required-account saves
 reject a banking-disabled profile before mutation or device writes. Keep separate
-builds, saves, and backups. Both patcher deployments remain stable V2-14.
+builds and saves. The one deployed public patcher remains stable V2-14; the local
+service serves the experimental preview.
 <!-- Installation work record: 01 rejects an over-strict import-blob minimum;
 02 reaches text-capacity validation without the choice-bound connection;
 03 has the final ROM bytes but lacks the complete retained-menu allocation receipt;
@@ -465,35 +467,57 @@ builds, saves, and backups. Both patcher deployments remain stable V2-14.
 allocation chain and current receipts. Earlier artifacts remain ignored and are
 not current proposals. No artwork is rebuilt. -->
 
-## Remaining connected consumers
+## Connected native mail and persistence checks
 
-The complete deposit/withdrawal route and reviewed per-player saved owner are
-installed with banking disabled by default. Connect reward acknowledgement and
-ordinary scheduling before enabling savings milestones. Preserve original
-repayment and the donor's reviewed account eligibility. Unknown saved fields
-are not available storage without review.
+`overlays/v3/bank_mail.c` connects the complete original milestone driver to the
+native mailbox and post-office queue. Catalogue 4 supplies all twelve official
+template parts for `0246..0249`. Recipient, town/player snapshots, attached gift,
+paper mapping, and native received/system-sender metadata are retained. Only an
+exact successful submission sets the saved earned bit. A failed full mailbox and
+queue remain retryable; only the first eligible milestone is attempted per
+resident per invocation. The ordinary initial mail hook sends milestones before
+native mail delivery. The catalogue-order/ticket wrapper in
+`POST_OFFICE_LETTERS.md` is a separate mechanism.
 
-Extract and integrate all four complete official templates `0246..0249`, preserving
-town/player fields, genuine senders, paper mappings, and every attached source gift.
-Template `0248` attaches the existing mailbox `3294`.
-Keep selected-profile gating, successful-delivery-only acknowledgement, full
-queue retry, and one-time persistence. The existing catalogue-order/ticket
-wrapper in `POST_OFFICE_LETTERS.md` is not this savings-reward mechanism.
+The mail extension owns `807E8040..807E8FFF`, including its terminal guard.
+`tools/v3_bank_mail.py` authenticates the complete donor table/function, official
+provenance, native scheduler, startup packet, compiled code, and letter parts.
+The tissue and piggy bank retain canonical destination IDs `3C90` and `3C40`.
+The existing mailbox and post model use `3294` and `3020`. The three additional
+models are installed through the shared furniture importer; piggy bank and post
+model reuse prepared artwork, while tissue artwork is compiled. None enter
+ordinary stock or catalogue ordering.
 
-The next consumer is genuine native player/mail creation and submission, followed
-by ordinary scheduling of the complete four-row milestone driver. Retain selected
-gift filtering, one attempt per non-null resident, exact-success-only receipts,
-full-queue retry, and re-entrancy protection. Connect the other complete source
-mail owners in the same category without rebuilding installed artwork. Publish
-real mechanic controls and independent milestone selections only after the mail
-delivery/acknowledgement path is installed. Retain the source April lifecycle,
-full town/card/golden/console data, migration, and older-reader rejection. Do not
-discard balances or remove required banking support when binding profiles.
+`build/v3-savings-native-01/results.json` passes 95 native checks, including both
+transaction directions, four milestones across all four residents, reversed
+house arrangement, canonical gifts, complete letters, failed-delivery retries,
+saved receipts, disabled delivery, and guards. Source/frontend/saved-owner host
+tests retain native-I/O doubles for the full UI, Pelly actions, and migration.
 
-All four gift models/behaviours are already complete. The three staged savings
-items reuse their installed banks; the existing mailbox retains its complete
-runtime, scoring, catalogue exclusion, and profile. Artwork installation is not
-reward delivery. Both patchers remain stable V2-14.
+`build/v3-savings-save-native-01/results.json` delivers all four rewards to the
+actual loaded resident's matching house and saves the controlled maximum balance
+and earned bits through both complete native synchronous writers. The 82 writer
+assertions preserve all town, diary, fishing, card, console, and account records.
+`build/v3-savings-reload-native-01/results.json` loads the physical save in a fresh
+emulator process without a checkpoint seed and compares the complete loaded
+state. Ordinary controller-driven Pelly conversations, Save & Quit interaction,
+walked station trips, and original hardware remain unverified. The existing
+travel record already carries the resident account balance and earned flags;
+this feature adds no separate travel format.
+
+Browser/offline configuration uses `feature/savings-account`. It includes all
+four rewards, removes them from the item picker, adds no chosen-item count, and
+requires no item-code option. Thirty connected banking/acquisition/feature host
+tests and nineteen browser-composer unit tests pass. Sanitized player transport
+retains nonzero account rows and receipts for all four identities through home
+return; the six active Pak/transport checks pass, with one unrelated prepared
+integration check skipped. Six actual page downloads match offline at
+`build/v3-savings-interface-04/results.json`, including the savings-only ROM and
+settings round trip. The focused Worker matches at
+`build/v3-savings-browser-03/results.json`. All sixteen files served by the
+existing preview directory match `build/v3-savings-website-03`; the live control,
+item-picker exclusion, chosen-item count, and responsive card widths are checked.
+Public V2 publication remains unchanged.
 
 The current staged acquisition map has 23 entries; use this map rather than
 rescanning unrelated conversion categories:

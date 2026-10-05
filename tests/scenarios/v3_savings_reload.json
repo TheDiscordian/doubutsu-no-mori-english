@@ -1,0 +1,15 @@
+[
+  {"wait":16},
+  {"key":"Return","duration":0.15},
+  {"wait":8},
+  {"repeat":16,"actions":[{"key":"a","duration":0.12},{"wait":3}]},
+  {"wait":14},
+  {"save_state":true},
+  {"pause_game_thread":true},
+  {"command":"QPassSignals:10","expect_result":"OK"},
+  {"test_v3_save_entries_readback":"build/v3-savings-save-native-01/native-entry-export"},
+  {"load_state":true},
+  {"resume":true},
+  {"wait":2},
+  {"read":["8003CE34",4],"expect":"00000000"}
+]

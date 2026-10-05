@@ -163,7 +163,8 @@ def catalogue_record(row):
         **({'password_acquisition':row['password_acquisition']} if row.get('password_acquisition') else {}),
         **({'harvest_acquisition':row['harvest_acquisition']} if row.get('harvest_acquisition') else {}),
         **({'holiday_acquisition':row['holiday_acquisition']} if row.get('holiday_acquisition') else {}),
-        **({'hra_acquisition':row['hra_acquisition']} if row.get('hra_acquisition') else {}))
+        **({'hra_acquisition':row['hra_acquisition']} if row.get('hra_acquisition') else {}),
+        **({'bank_acquisition':row['bank_acquisition']} if row.get('bank_acquisition') else {}))
 
 
 def order_mask(row):
@@ -490,7 +491,7 @@ def build(output, art_path, lock=LOCK):
         **{k:r[k] for k in ('donor_item_id','donor_runtime_index') if k in r},
         donor_list=r['donor_list'],donor_list_sha256=r['donor_list_sha256']) for r in installed
         if not r['reward_route'] and not r.get('password_acquisition') and not r.get('harvest_acquisition')
-        and not r.get('holiday_acquisition') and not r.get('hra_acquisition')]
+        and not r.get('holiday_acquisition') and not r.get('hra_acquisition') and not r.get('bank_acquisition')]
     stock_ids = {r['item_id'] for r in stock_rows}
     goods,table_at,stock_rows = shops.goods(stable,source.rel,source.symbols.encode(),
         [r for r in imports if r['item_id'] in stock_ids],reviewed_rows=stock_rows)
@@ -621,6 +622,8 @@ def build(output, art_path, lock=LOCK):
     admit(report)
     report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
     write_new(output/'animal-forest-v3-asset-loader.z64',result); write_new(output/'asset-loader.ups',patch)
+    from v3_bank_resources import refresh_parent_receipt
+    refresh_parent_receipt(result,report)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())
     pin=dict(directory=str(output.relative_to(ROOT)),runtime_abi=abi,rom_sha256=sha256(result),
         report_sha256=sha256((output/'build.json').read_bytes()))
@@ -735,7 +738,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
                     room_rigs_art=None, room_rigs_code=False, room_goods=None, room_carry=None, scenery_art=None, scenery_gameplay=False,
-                    equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
+                    equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None, bank_mail=False,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,hra_rewards=False,
                     password_runtime=None,password_editor=False,password_nook=None,harvest_connected=None,bank_connected=None,private_save_bank=False,player_travel=False,scene_arena=False,seasonal_stock=False,nook_font_repair=False,room_effects=None,furniture_capacity=False,console_storage=False,
                     console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None,carried_items=None,freshwater_movement=False,normal_acquisition=False):
@@ -770,6 +773,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if bank_connected is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
+    if bank_mail:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
     if private_save_bank:
@@ -847,6 +853,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif nook_font_repair:
         import v3_nook_font as equipment
         equipment_report,owner_changes,report_updates,physical_writes=equipment.repair(
+            base,prior,blob,core,module,output)
+        display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
+    elif bank_mail:
+        import v3_bank_mail as equipment
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
             base,prior,blob,core,module,output)
         display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
     elif normal_acquisition:
@@ -1752,6 +1763,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             additional_resident_bytes=0,additional_scene_bytes=0)
         report['sources'].update(owner['sources'])
         report['native_test']='pending normal acquisition native stock, purchase, and new-town generation checks'
+    if bank_mail:
+        owner=equipment_report['bank']['mail']
+        report['shared_runtime_refresh'].update(adapters=['savings_mail'],
+            additional_resident_bytes=owner['reservation']['bytes'],additional_scene_bytes=0)
+        report['sources'].update(owner['sources'])
+        report['native_test']='pending savings menu, milestone delivery, and physical save/restart verification'
     if freshwater_movement:
         owner=equipment_report['creature_fish']['world']['freshwater']
         report['shared_runtime_refresh'].update(adapters=['freshwater_movement'],
@@ -2003,6 +2020,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if hra_rewards:
         report['sources'].update(report['equipment_resources']['scene_arena']['npc_mail_heap']['sources'])
         hra_reward_runtime.verify_installed_items(result,report)
+    from v3_bank_resources import refresh_parent_receipt
+    refresh_parent_receipt(result,report)
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())
@@ -2099,6 +2118,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install the complete linked Harvest actor, hiding, manager, and dialogue resources')
     parser.add_argument('--bank-connected',type=Path,
         help='With --refresh-runtime, install linked bank/April resources, text, and saved ownership without enabling selection')
+    parser.add_argument('--bank-mail',action='store_true',
+        help='With --refresh-runtime, connect original savings letters, scheduling, and feature activation')
     parser.add_argument('--private-save-bank',action='store_true',
         help='With --refresh-runtime, bind complete save/load workspace independently of the scene heap')
     parser.add_argument('--player-travel',action='store_true',
@@ -2179,6 +2200,7 @@ if __name__=='__main__':
     if args.scene_arena and not args.refresh_runtime:parser.error('--scene-arena requires --refresh-runtime')
     if args.seasonal_stock and not args.refresh_runtime:parser.error('--seasonal-stock requires --refresh-runtime')
     if args.normal_acquisition and not args.refresh_runtime:parser.error('--normal-acquisition requires --refresh-runtime')
+    if args.bank_mail and not args.refresh_runtime:parser.error('--bank-mail requires --refresh-runtime')
     if args.nook_font_repair and not args.refresh_runtime:parser.error('--nook-font-repair requires --refresh-runtime')
     if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
     if args.furniture_capacity and not args.refresh_runtime:parser.error('--furniture-capacity requires --refresh-runtime')
@@ -2205,7 +2227,7 @@ if __name__=='__main__':
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
                             furniture_scoring=args.furniture_scoring,hra_rewards=args.hra_rewards,password_runtime=args.password_runtime,
                             password_editor=args.password_editor,password_nook=args.password_nook,harvest_connected=args.harvest_connected,
-                            bank_connected=args.bank_connected,private_save_bank=args.private_save_bank,player_travel=args.player_travel,scene_arena=args.scene_arena,seasonal_stock=args.seasonal_stock,nook_font_repair=args.nook_font_repair,room_effects=args.room_effects,freshwater_movement=args.freshwater_movement,normal_acquisition=args.normal_acquisition,
+                            bank_connected=args.bank_connected,bank_mail=args.bank_mail,private_save_bank=args.private_save_bank,player_travel=args.player_travel,scene_arena=args.scene_arena,seasonal_stock=args.seasonal_stock,nook_font_repair=args.nook_font_repair,room_effects=args.room_effects,freshwater_movement=args.freshwater_movement,normal_acquisition=args.normal_acquisition,
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,

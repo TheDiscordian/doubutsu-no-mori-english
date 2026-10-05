@@ -493,6 +493,15 @@ def publish_bootstrap(equipment,blob,surface,output):
             expected=reward_end-p['ram']
         if bank:
             from v3_bank_link import RAM as BANK_RAM,END as BANK_END
+            packet_end=BANK_END
+            if bank.get('mail'):
+                from v3_bank_mail import RAM as MAIL_RAM,END as MAIL_END
+                mail=bank['mail']
+                if (not mail['installed'] or MAIL_RAM!=BANK_END or
+                        mail['reservation']!=dict(ram=MAIL_RAM,bytes=MAIL_END-MAIL_RAM) or
+                        not 0<mail['code']['bytes']<=MAIL_END-MAIL_RAM-16):
+                    raise ValueError('Changed complete savings mail startup extension')
+                packet_end=MAIL_END
             from v3_bank_storage import STATE_RAM,STATE_BYTES,SCRATCH_RAM,SCRATCH_PRIOR,SCRATCH_BYTES
             if private:
                 from v3_private_save_bank import RETAINED_STATE_RAM
@@ -503,7 +512,7 @@ def publish_bootstrap(equipment,blob,surface,output):
                     raise ValueError('Changed retained-state relocation in shared save startup')
                 STATE_RAM=RETAINED_STATE_RAM
             if (not rewards or reward_end!=BANK_RAM or not bank['installed'] or bank['packet']!=p or
-                    bank['ram']!=BANK_RAM or bank['end']!=BANK_END or
+                    bank['ram']!=BANK_RAM or bank['end']!=packet_end or
                     bank['packet_offset']!=expected or
                     bank['loaded_packet']['ram']!=BANK_RAM or bank['loaded_packet']['bytes']!=BANK_END-BANK_RAM or
                     bank['save_format']!=21 or bank['wire_version']!=7 or
@@ -514,7 +523,7 @@ def publish_bootstrap(equipment,blob,surface,output):
                     f'-DAF_BANK_STATE_RAM=0x{STATE_RAM:X}u' not in bank['code']['flags'] or
                     bank['code']['symbols'].get('af_v3_card_state')!=rewards['storage']['symbols']['af_v3_card_state']):
                 raise ValueError('Changed complete bank extension of the shared startup packet')
-            expected+=BANK_END-BANK_RAM
+            expected+=packet_end-BANK_RAM
         if (not carried_quest['installed'] or p['ram']!=0x807AC000 or p['bytes']!=expected or
                 p['physical']&15 or p['storage']!='physical-ROM' or
                 not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):

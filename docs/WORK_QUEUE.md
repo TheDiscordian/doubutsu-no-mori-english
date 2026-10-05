@@ -1,15 +1,36 @@
 # Completion queue
 
+## V3 savings account and reward pipeline
+
+The ABI-401 proposal installs the original GameCube account and all four milestone
+rewards through one combined town-feature checkbox outside the item selector.
+Required items add no chosen-item count and do not require Nook's item codes.
+Complete official letters, original initial-mail scheduling, one attempt per
+resident, full-queue retry, exact-success saved receipts, and original disabled-mode
+repayment are connected. Native transactions and delivery pass 95 checks at
+`build/v3-savings-native-01/results.json`. Both complete native save writers and
+a fresh-process reload retain the nonzero balance, earned flags, gifts, and full
+town at `build/v3-savings-save-native-01/results.json` and
+`build/v3-savings-reload-native-01/results.json`.
+The six actual page downloads, combined-feature settings sharing, and correct
+counts pass at `build/v3-savings-interface-04/results.json`; the focused Worker
+matches offline at `build/v3-savings-browser-03/results.json`. The sixteen served
+files match `build/v3-savings-website-03` in the same preview directory. Ordinary
+controller-driven Pelly conversations, a new Save & Quit interaction, walked
+station travel, and original hardware are not established by these checks.
+The public V2 patcher remains unchanged. Lighthouse/Tortimer and island work
+remain outside this task.
+
 ## V3 acquisition and content verification
 
-The category-wide acquisition audit covers all 300 installed catalogue entries
-and all 22 remaining source-worksheet candidates. Original stock lists, reward
+The category-wide acquisition audit covers all 303 installed catalogue entries
+and all 19 remaining source-worksheet candidates. Original stock lists, reward
 categories, creature calendars, and actual installed consumers are checked
 separately from asset preparation or code delivery. The generated evidence is
-`build/v3-normal-acquisition-installed-07/acquisition-audit.json`.
+`build/v3-savings-acquisition-01`.
 
-The current proposal is ABI 399 / save format 21 at
-`build/v3-normal-acquisition-installed-07/build-lock.json`. Normal acquisition
+The current proposal is ABI 401 / save format 21 at
+`build/v3-savings-reward-imports-03/cartridge/build-lock.json`. Normal acquisition
 connects cedar sapling sales at supermarket size and above, original northern
 cedar generation in new towns, orange paper's original A-list stock, and all
 sixteen diary styles in the larger shops. Diaries replace the last existing
@@ -22,10 +43,11 @@ code route alone does not qualify. The local preview uses the same served
 directory, `build/v3-website-golden-copy-01/site`.
 
 The acquisition audit has no uncovered catalogue entry or unresolved normal
-route. The coconut's original island acquisition and mailbox savings reward
-depend on unavailable new systems; retained code acquisition is separate, not
-a personal exception. The 22 unavailable content candidates require island
-facilities, e-Reader support, savings accounts, the Museum, the lighthouse quest,
+route. The coconut's original island acquisition depends on unavailable island
+facilities; retained code acquisition is separate, not a personal exception.
+The four savings rewards have their original installed acquisition route.
+The 19 unavailable content candidates require island
+facilities, e-Reader support, the Museum, the lighthouse quest,
 or custom designs. Do not invent stock or substitute rewards for these items.
 Broad ordinary gameplay and original-hardware acceptance are not established
 by source coverage or controlled native execution.
@@ -36,7 +58,7 @@ is in `build/v3-normal-acquisition-native-08/results.json`,
 `build/v3-normal-acquisition-browser-03/results.json`, and
 `build/v3-normal-acquisition-interface-02/results.json`. Five complete interface
 downloads match offline composition, including the unchanged no-import V2-14
-result. The current export is `build/v3-normal-acquisition-website-02`; all sixteen
+result. The current export is `build/v3-savings-website-03`; all sixteen
 served files are checked against that receipt. ABI 398 and ABI 399 retain save
 format 21 and import identities; equal-profile compatibility is expected in
 both directions without migration, but ordinary cross-build reload is not newly
@@ -67,7 +89,7 @@ The complete GameCube freshwater movement alternative is implemented and
 verified. All six connected swimming, waiting, and escape callbacks and
 initializers are ported together; source comparisons, native execution,
 current composition, and actual browser downloads pass. The running preview
-serves the checked ABI-399 export from its existing directory.
+serves the checked ABI-401 export from its existing directory.
 
 The connected V3 items-and-villagers runtime has a private
 playtest handoff. The current handoff is
@@ -438,8 +460,9 @@ is not automatically V4 work. Items depending on an unavailable acquisition
 feature or building should not be importable until their acquisition works.
 Preparing their converted resources is allowed; inventing substitute ordinary
 stock or unrelated gifts is not. New buildings and entirely new features, such
-as savings accounts, Able Sisters/custom designs, and island facilities, are not
-V3 tasks or prerequisites. Assess mail, holiday, gift, and golden-tool acquisition
+as Able Sisters/custom designs and island facilities, are not V3 tasks or
+prerequisites. The GameCube savings account and its four original rewards are
+explicitly in V3 scope with one combined feature checkbox. Assess mail, holiday, gift, and golden-tool acquisition
 by their actual dependencies rather than excluding entire reward categories.
 Already-built features can stay in V3. Do not remove, disable, or isolate them
 solely to enforce the version boundary; retaining them does not require completing
@@ -730,10 +753,10 @@ The complete menu chain and subsequent ordinary-category retention pass, alongsi
 five browser/offline profiles and both-mode saved-owner checks with native I/O
 doubled. Banking stays disabled by default; the 298 choices and 23 staged gates
 remain unchanged. Native gameplay and physical save/restart remain unverified.
-V4 continuation only: connect the four complete official milestone templates, native player/mail
+V3 continuation: connect the four complete official milestone templates, native player/mail
 creation/submission and ordinary scheduling, retaining success-only acknowledgement,
 retry, null-player/visitor handling, and all donor thresholds. Then bind the
-independent bank mechanic/reward choices and the other complete mail owners in
+combined savings account/reward feature control and the other complete mail owners in
 the same source category. Preserve repayment and every installed model; do not
 rebuild unchanged art or reset an existing harness budget. The
 [category source map and remaining connections](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md#remaining-connected-consumers)

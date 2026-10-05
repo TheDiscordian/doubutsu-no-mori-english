@@ -1758,6 +1758,15 @@ def main():
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record,
                                         remaining=action.get('camper_trade_remaining_only',False)))
+            if action.get('test_v3_savings'):
+                from v3_bank_mail_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Savings checks require an emulator checkpoint')
+                needs_checkpoint_restore=True
+                mode=action['test_v3_savings']
+                if mode not in (True,'deliver-for-save'):
+                    raise ValueError('Unknown savings check mode')
+                results.append(exercise(debug,args.rom,record,deliver_for_save=mode=='deliver-for-save'))
             if action.get('test_v3_normal_acquisition'):
                 from v3_normal_acquisition_smoke import exercise
                 if not (out/'test.bs1').is_file():

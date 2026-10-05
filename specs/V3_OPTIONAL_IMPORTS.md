@@ -21,8 +21,8 @@ than silently falling back to the translation-only cartridge. Browser/offline
 composition, settings sharing, and UI build state must agree on that choice.
 Enabling Nook's item-code option imports no items. Items whose current acquisition
 requires item codes remain individually selectable and automatically enable that
-option. The same rule covers required items supplied by the cedar-tree and
-coconut-palm controls. Effective feature requirements are resolved from enabled
+option. The coconut-palm control also requires item codes; cedar trees use normal
+shop stock and do not require codes. Effective feature requirements are resolved from enabled
 items, not copied into the user's explicit choices or counted as chosen items.
 Removing the last requiring item turns off an automatically enabled option;
 an explicitly enabled option stays on. Settings sharing preserves that distinction.
@@ -41,8 +41,10 @@ importable through browser or offline selections until their acquisition works.
 V3 may prepare their conversion/resources, but should not put them in substitute
 regular stock. Prepared integration and selectable imports are separate states.
 
-Building new systems, including savings accounts, Able Sisters/custom designs,
-the Museum building, and island facilities, is V4 work. Already-built features
+The optional savings account and its original rewards are V3 work, controlled
+by one feature checkbox outside the item selector. Building other new systems,
+including Able Sisters/custom designs, the Museum building, island facilities,
+and Tortimer's lighthouse quest, is V4 work. Already-built features
 can stay in V3; do not remove, disable, or isolate them solely because they are
 V4-type features. This does not require completing unfinished feature ports or
 make unverified acquisition complete. Preserve existing experiments and evaluate reward consumers individually; no V3
@@ -659,14 +661,15 @@ the shared native start-disabled placement rule with source C-stock acquisition
 and catalogue reordering. These category implementations do not establish
 ordinary gameplay or original-hardware acceptance.
 
-### V4: preserved post-office account and source mail experiment
+### V3: optional GameCube savings account and rewards
 
-The new savings-account system is outside V3. Do not continue its account or
-milestone controls to complete the import pipeline. Its dependent items should
-remain unavailable until that acquisition exists. Mail and rewards fitting
-existing systems are evaluated separately and are not automatically V4 work.
-The following describes preserved experimental resources, not authorisation
-to resume the savings-account feature.
+The GameCube savings account and its four original milestone rewards are in V3.
+One separate town-feature checkbox enables banking and automatically includes
+the tissue, piggy bank, mailbox, and post model. These rewards are not independent
+item choices. Complete the existing account frontend, official reward letters,
+native submission, ordinary scheduling, receipt persistence, and browser/offline
+configuration together. Keep original repayment intact when banking is disabled.
+Other mail and rewards fitting existing systems are evaluated separately.
 
 The complete donor banking/Pelly frontend, source April talk controller, and
 format-21 saved-town owner have a bounded combined native link. The separate
@@ -674,10 +677,11 @@ format-21 saved-town owner have a bounded combined native link. The separate
 Actual linked menu/Pelly entries preserve original repayment and use the genuine
 native wallet, pocket, text, and drawing APIs. The complete bank artwork uses
 physical packet pointers without taking the native submenu's segment six.
-Bank configuration has owned initialized storage, but no installed profile
-control. ABI 387 installs this packet with banking disabled by default. Its
-complete 245,824-byte shared startup transfer retains the existing 23-descriptor
-loader, original reservation, guards, and every old physical copy. Repayment/Pelly
+Bank configuration uses an owned aligned mode word controlled by the combined
+savings checkbox. The installed ABI-401 proposal uses save format 21 and includes
+the four original milestones and all twelve official header/body/footer parts.
+The shared startup transfer retains the existing 23-descriptor
+loader, checked reservations, guards, and every old physical copy. Repayment/Pelly
 code and relocation pairs retain native directory order at explicit additive VROM
 identities; both complete allocation readers and the retained menu chain grow
 by their checked 64-byte allowances. The shared next-category reader retains them.
@@ -695,17 +699,20 @@ identity `D012`, independently of the postal draw-type field.
 All 46 public saved-owner entries use the same linked format-21/account owner.
 Fourteen official messages and four choices preserve all existing text and the
 whole current Nook/Harvest/choice-reader receipts. Focused cartridge/resource
-checks and five browser/offline profiles pass; native services remain doubled
-in both-mode saved-owner checks. These results do not prove ordinary gameplay,
-physical save/restart, or hardware behaviour.
+checks and both-mode saved-owner checks pass. Actual native execution verifies
+deposits, withdrawals, all four rewards for all four residents, full-mailbox and
+queue refusals, retries, success-only receipts, and disabled reward delivery.
+Both complete native save writers and a fresh-process cartridge load retain a
+nonzero account, earned flags, attached gifts, and the complete saved town.
+These checks do not claim an ordinary controller-driven Pelly conversation,
+Save & Quit interaction, or original-hardware acceptance.
 
-Genuine successful-mail acknowledgement and scheduling, and independent mechanic/
-reward controls remain unfinished. Assess their existing-system dependencies
-separately from the new V4 savings-account feature. The source milestone does
+Milestone delivery runs immediately before the ordinary initial post-office mail
+delivery, following the original source schedule. The source milestone does
 not become lifetime earnings or random post-office stock. Format-21
 saves migrate older supported records forward with empty accounts; format-20-or-
-earlier readers cannot load format 21, even when banking is disabled. Preserve
-separate builds/saves. See the [current source-mail checkpoint](../docs/checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md).
+earlier readers cannot load format 21. A profile supporting a used account must
+retain savings support. See the [current source-mail checkpoint](../docs/checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md).
 
 ## Browser implementation
 

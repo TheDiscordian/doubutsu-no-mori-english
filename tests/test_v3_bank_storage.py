@@ -5,6 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from unittest.mock import patch
 from tests import test_v3_carried_storage as carried
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -24,10 +25,18 @@ class BankStorageTests(unittest.TestCase):
     def test_checked_memory_and_native_storage_compilation(self):
         import copy
         _,prior=inputs(ROOT/'build/v3-holiday-card-prize-imports-01/password-destinations/build-lock.json')
-        memory=layout(prior)
-        self.assertEqual(memory['scratch']['bytes']-memory['scratch']['retained_bytes'],48)
-        changed=copy.deepcopy(prior);changed['equipment_resources']['diaries']['memory']['scratch']['bytes']+=16
-        with self.assertRaisesRegex(ValueError,'scratch owner'):layout(changed)
+        with self.assertRaisesRegex(ValueError,'overlaps retained resident memory'):
+            layout(prior)
+        # Use the reviewed account location that the current complete native
+        # save owner actually binds, without hiding the old Nook-buffer overlap.
+        _,current=inputs(ROOT/'build/v3-savings-reward-imports-03/cartridge/build-lock.json')
+        address=current['equipment_resources']['bank']['memory']['account']['ram']
+        with patch('v3_bank_storage.STATE_RAM',address):
+            memory=layout(prior)
+            self.assertEqual(memory['account'],current['equipment_resources']['bank']['memory']['account'])
+            self.assertEqual(memory['scratch']['bytes']-memory['scratch']['retained_bytes'],48)
+            changed=copy.deepcopy(prior);changed['equipment_resources']['diaries']['memory']['scratch']['bytes']+=16
+            with self.assertRaisesRegex(ValueError,'scratch owner'):layout(changed)
         # Compile the actual current full storage, retaining every prior flag.
         # The distinct reservation is required, and linking/installation stays
         # pending the real menu/service bindings, not replaced with stubs.

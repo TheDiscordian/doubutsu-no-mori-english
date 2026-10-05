@@ -108,6 +108,13 @@ def audit(image, report, catalog, source):
                 match = [g for g in gifts if g[1] == donor]
                 if len(match) != 1 or match[0][-1] not in (1000000,10000000,100000000,999999999):
                     raise ValueError('Changed original savings-reward dependency')
+                from v3_bank_mail import checked as savings_checked, installed_items as savings_items
+                if savings_checked(source,image,report) and item['item_id'] in savings_items(report):
+                    record(key,'savings-account reward',True,dict(source=proof,
+                        reward_table_sha256=sha256(gift),required_balance=match[0][-1]),
+                        ['saved account balance','initial mail scheduling','selected reward',
+                         'native mailbox/post-office receipt','success-only saved acknowledgement'])
+                    continue
                 rows.append(dict(id=key, name=row['name'], kind=row['kind'], status='V4-dependency',
                     route='savings-account reward', evidence=dict(source=proof,
                         reward_table_sha256=sha256(gift), required_balance=match[0][-1]),

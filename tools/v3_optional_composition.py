@@ -158,8 +158,8 @@ def catalogue(image, report):
         result[row['id']] = {'id':row['id'], 'name':row['name'], 'kind':'furniture',
             'item_id':row['item_id'], 'runtime_index':index, 'dependencies':[],
             'enable_offset':at+4, 'enable_bytes':4, 'enable_ram':row_ram+4}
-        if row.get('harvest_acquisition') or row.get('holiday_acquisition') or row.get('hra_acquisition'):
-            acquisition=row.get('harvest_acquisition') or row.get('holiday_acquisition') or row['hra_acquisition']
+        if row.get('harvest_acquisition') or row.get('holiday_acquisition') or row.get('hra_acquisition') or row.get('bank_acquisition'):
+            acquisition=row.get('harvest_acquisition') or row.get('holiday_acquisition') or row.get('hra_acquisition') or row['bank_acquisition']
             if not acquisition['native_delivery_installed'] or acquisition['destination_item']!=row['item_id']:
                 raise ValueError('Incomplete source furniture acquisition binding')
             result[row['id']]['dependencies']=acquisition['dependencies']
@@ -560,7 +560,8 @@ def compose(image, report, catalog, selection):
     from v3_holiday_selection import groups as event_groups, active as event_active, checksum_fields as event_checksums
     for group in event_groups(image, report):
         if scope == 'v3-pipeline':
-            feature = {'carried-quest':'feature/wisp', 'diary-holidays':'feature/gamecube-events'}.get(group['id'])
+            feature = {'carried-quest':'feature/wisp', 'diary-holidays':'feature/gamecube-events',
+                'savings-account':'feature/savings-account'}.get(group['id'])
             on = feature in selection['requested'] if feature else event_active(group, enabled, values, scope=scope, report=report)
         else:
             on = event_active(group, enabled, values, scope=scope, report=report)

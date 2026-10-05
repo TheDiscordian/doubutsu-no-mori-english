@@ -1392,7 +1392,9 @@ def metadata(source, item, profile, identity):
     holiday=holiday_furniture(source,item,index,lists)
     from v3_hra_rewards import furniture as hra_furniture
     hra_reward=hra_furniture(source,item,index,lists)
-    acquisition=password or harvest or holiday or hra_reward
+    from v3_bank_mail import furniture as bank_furniture
+    bank_reward=bank_furniture(source,item,index,lists)
+    acquisition=password or harvest or holiday or hra_reward or bank_reward
     if not acquisition and (len(lists) != 1 or lists[0][0] not in STOCK | REWARDS):
         raise ReviewRequired('acquisition needs an adapter: ' + ', '.join(r[0] for r in lists))
     group = 255 if acquisition else (STOCK | REWARDS)[lists[0][0]]
@@ -1441,6 +1443,7 @@ def metadata(source, item, profile, identity):
         **({'harvest_acquisition':harvest['harvest_acquisition']} if harvest else {}),
         **({'holiday_acquisition':holiday['holiday_acquisition']} if holiday else {}),
         **({'hra_acquisition':hra_reward['hra_acquisition']} if hra_reward else {}),
+        **({'bank_acquisition':bank_reward['bank_acquisition']} if bank_reward else {}),
         **({k:binding[k] for k in ('room_runtime','room_lifecycle','room_placement') if k in binding} if binding else {}))
 
 

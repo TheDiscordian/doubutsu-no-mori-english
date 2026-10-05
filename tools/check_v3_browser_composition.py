@@ -186,6 +186,29 @@ def check_interface(page, origin, out, expected, catalog, *, scope='development'
         page.locator('#close-items').click()
         build_and_download('equipment-subset')
         page.locator('#clear-all').click()
+    savings=next((row for row in features if row['id']=='feature/savings-account'),None)
+    if savings:
+        page.locator('#enable-savings-account').check()
+        assert not page.locator('#enable-item-codes').is_checked()
+        for key in savings['required_imports']:
+            assert page.locator(f'[data-id="{key}"]').count()==0
+        assert '0 chosen by you' in page.locator('#selection-summary').text_content()
+        with page.expect_download() as event:
+            page.locator('#settings-export').click()
+        shared_path=out/'savings-settings.json';event.value.save_as(shared_path)
+        assert json.loads(shared_path.read_bytes())['requested']==[savings['id']]
+        page.locator('#clear-all').click()
+        page.locator('#settings-import').set_input_files(str(shared_path))
+        page.wait_for_function("() => document.querySelector('#settings-status').textContent.startsWith('Settings imported.')")
+        assert page.locator('#enable-savings-account').is_checked()
+        assert not page.locator('#enable-item-codes').is_checked()
+        selection=build_and_download('savings-account')
+        assert selection['requested']==[savings['id']]
+        assert set(selection['required'])==set(savings['required_imports'])
+        assert selection['enabled_features']==[savings['id']]
+        page.locator('#clear-all').click()
+        assert not page.locator('#enable-savings-account').is_checked()
+        results['combined_savings_checkbox_items_count_and_shared_settings']=True
     for group in import_groups:
         feature=owned.get(group['members'][0])
         if feature:
@@ -384,6 +407,8 @@ def check(export, output, *, interface=False, selected=None, focused_behaviours=
                 (subset_name, ['GAFE01-r0/villager/00EB', extra_item])]
     equipment=[key for key,row in menu.items() if row['kind']=='equipment' and key not in owned]
     if equipment:profiles.append(('equipment-subset',[equipment[1],equipment[-1]]))
+    if 'feature/savings-account' in features:
+        profiles.append(('savings-account',['feature/savings-account']))
     import_groups=plan.get('import_groups',[])
     for group in import_groups:
         first=group['members'][0]

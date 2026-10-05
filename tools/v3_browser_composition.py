@@ -274,7 +274,11 @@ def rules(image, report, *, scope='development'):
                 offered.append(row)
             else:
                 deferred.append({**row, 'selectable':False, 'reason':state['reason']})
-        result.update(scope=scope, options=offered, pending_options=deferred)
+        result.update(scope=scope, options=offered)
+        if deferred:
+            result['pending_options']=deferred
+        else:
+            result.pop('pending_options',None)
         for row in result.get('behaviours', []):
             if row['id'] in UNAVAILABLE_BEHAVIOURS:
                 row['pipeline_unavailable'] = True

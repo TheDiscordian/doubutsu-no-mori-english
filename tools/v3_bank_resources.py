@@ -181,3 +181,15 @@ def menu_allocation(image,report):
             struct.unpack_from('>I',core,patch['address']-CODE_RAM)[0]!=patch['after']+extra-origin):
         raise ValueError('Changed complete bank submenu allocation binding')
     return row
+
+
+def refresh_parent_receipt(image,report):
+    """Retain the bank descriptor's complete parent hash after checked writers."""
+    bank=report.get('equipment_resources',{}).get('bank')
+    if not bank:return
+    parent=by_vrom(image)[MENU_VROM].extract(image)
+    descriptor=bank['resources']['submenu_descriptor']
+    if parent[descriptor['offset']:descriptor['offset']+32].hex()!=descriptor['after']:
+        raise ValueError('Shared catalogue writer changed the bank menu descriptor')
+    descriptor['owner_sha256']=sha256(parent)
+    report['equipment_resources']['diaries']['native_menu_owner_sha256']=sha256(parent)

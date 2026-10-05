@@ -58,7 +58,8 @@ def pipeline_allowed(group, report):
     """Retain complete independent gift/diary and spirit providers."""
     from v3_holiday_acquisition import providers_installed
     from v3_carried_selection import quest_items
-    return ((group['id']=='diary-holidays' and providers_installed(report)) or
+    return ((group['id']=='savings-account' and bool(report.get('equipment_resources',{}).get('bank',{}).get('mail',{}).get('installed'))) or
+            (group['id']=='diary-holidays' and providers_installed(report)) or
             (group['id']=='carried-quest' and bool(quest_items(report))))
 
 
@@ -136,7 +137,8 @@ def update_report(image, blob, report, selection):
     states = {g['id']: active(g, enabled, selection.get('behaviours', {}),
                              scope=selection.get('scope', 'development'),report=report) for g in contract['groups']}
     if selection.get('scope') == 'v3-pipeline':
-        for group, feature in (('carried-quest','feature/wisp'), ('diary-holidays','feature/gamecube-events')):
+        for group, feature in (('carried-quest','feature/wisp'), ('diary-holidays','feature/gamecube-events'),
+                ('savings-account','feature/savings-account')):
             if group in states: states[group] = feature in selection['requested']
     contract['resolved_groups'] = states
     on = states['diary-holidays']

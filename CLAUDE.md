@@ -21,8 +21,13 @@ extending an existing or already-built system. Items depending on those deferred
 importable before they are obtainable. Their conversion/resources can be prepared
 in V3; prepared or installed resources do not make them importable. Do not invent
 substitute regular stock or unrelated gifts for special items.
-Building new systems, including Able Sisters/custom designs, the Museum building,
-island facilities, and savings accounts, is V4 work. Already-built features can
+The optional GameCube savings account and its four original mailed milestone
+rewards are V3 work. One town-feature checkbox controls the account and includes
+all four required reward items; neither accounts nor rewards are separate item
+choices. Finish deposit, withdrawal, official reward letters, normal scheduling,
+successful-delivery receipts, persistence, and browser/offline composition together.
+Building other new systems, including Able Sisters/custom designs, the Museum
+building, island facilities, and Tortimer's lighthouse quest, is V4 work. Already-built features can
 stay in V3; do not remove, disable, or isolate them merely to enforce the version
 boundary. This does not require completing unfinished feature ports or establish
 that their item acquisition works. Preserve existing experimental code/resources;

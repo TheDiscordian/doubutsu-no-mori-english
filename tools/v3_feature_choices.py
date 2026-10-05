@@ -61,6 +61,8 @@ def item_code_patches(image, report):
 
 def options(catalog, report):
     from v3_import_scope import availability
+    bank = report.get('equipment_resources', {}).get('bank', {})
+    savings_keys = {'GAFE01-r0/item/'+row['item'] for row in bank.get('mail', {}).get('source', {}).get('rewards', [])}
     admitted = {key for key, value in availability(catalog, report).items() if value['selectable']}
     groups = report.get('equipment_resources', {}).get('npc_extra', {}).get('events', {}).get('selection', {}).get('groups', [])
     definitions = []
@@ -70,7 +72,7 @@ def options(catalog, report):
         from v3_password_acquisition import installed_items,carried_items
         plants = {'GAFE01-r0/item/2807'}
         if not cedar_stock: plants.add('GAFE01-r0/item/2901')
-        code_items = installed_items(report) | (carried_items(report) & plants)
+        code_items = (installed_items(report) | (carried_items(report) & plants))-savings_keys
         definitions.append(dict(id='feature/item-codes',name='Animal Crossing item codes',
             description='Enter Animal Crossing item codes at Nook’s shop to receive items enabled in your game.',
             required_imports=[],required_by_imports=sorted(code_items & admitted)))
@@ -88,6 +90,11 @@ def options(catalog, report):
     add('golden-tools', 'Golden tools',
         'Add the golden shovel, net, rod, and axe, with their original acquisition routes.',
         ['GAFE01-r0/item/'+item for item in ('2239','223A','223B','223C')])
+    from v3_bank_mail import installed_items as savings_items
+    if savings_items(report):
+        add('savings-account', 'Savings account and rewards',
+            'After paying off your house, deposit and withdraw Bells at the post office. Receive the original savings rewards by mail as your balance grows.',
+            ['GAFE01-r0/item/'+row['item'] for row in bank['mail']['source']['rewards']])
     from v3_furniture_rewards import summer_installed
     if summer_installed(report):
         add('summer-camping', 'Summer camping',
@@ -134,7 +141,8 @@ def runtime_groups(groups, definitions):
     """Replace item-triggered event activation with explicit feature choices."""
     available = {row['id'] for row in definitions}
     for group in groups:
-        feature = {'carried-quest':'feature/wisp', 'diary-holidays':'feature/gamecube-events'}.get(group['id'])
+        feature = {'carried-quest':'feature/wisp', 'diary-holidays':'feature/gamecube-events',
+            'savings-account':'feature/savings-account'}.get(group['id'])
         if feature in available:
             group.update(any_imports=[], any_behaviours=[], any_features=[feature])
     return groups
